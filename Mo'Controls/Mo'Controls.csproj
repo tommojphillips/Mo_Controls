@@ -53,13 +53,13 @@
   <PropertyGroup>
     <PostBuildEvent>if "$(ConfigurationName)" == "Debug" (
 echo Moving files to mods directory.
-copy "$(TargetPath)" "C:\Users\tommo\AppData\LocalLow\Amistech\My Summer Car\Mods" /y
-copy "$(TargetDir)$(TargetName).pdb" "C:\Users\tommo\AppData\LocalLow\Amistech\My Summer Car\Mods" /y
-cd "C:\Users\tommo\AppData\LocalLow\Amistech\My Summer Car\Mods"
+copy "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\Mods" /y
+copy "$(TargetDir)$(TargetName).pdb" "C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\Mods" /y
+cd "C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\Mods"
 echo Calling debug.bat
-call "C:\Users\tommo\AppData\LocalLow\Amistech\My Summer Car\Mods\debug.bat"
+call "C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\Mods\debug.bat"
 ) ELSE (
-copy $(TargetPath) "C:\Users\tommo\AppData\LocalLow\Amistech\My Summer Car\Mods" /y
+copy $(TargetPath) "C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\Mods" /y
 )
 echo Done</PostBuildEvent>
   </PropertyGroup>
