@@ -2,6 +2,9 @@
 
 namespace Mo_Controls.XboxController
 {
+    /// <summary>
+    /// Represents an xbox controller rumble.
+    /// </summary>
     public class XboxRumble
     {
         // Written, 16.07.2018
@@ -37,6 +40,9 @@ namespace Mo_Controls.XboxController
 
         #region Methods
 
+        /// <summary>
+        /// Updates the timer.
+        /// </summary>
         public void update()
         {
             // Written, 16.07.2018

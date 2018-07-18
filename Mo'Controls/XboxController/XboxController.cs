@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using XInputDotNetPure;
 using UnityEngine;
 
@@ -12,7 +13,10 @@ namespace Mo_Controls.XboxController
         // Written, 16.07.2018
 
         #region Properties
-
+        
+        /// <summary>
+        /// Represents whether the controller is connect or not.
+        /// </summary>
         public bool isConnected
         {
             get
@@ -20,14 +24,16 @@ namespace Mo_Controls.XboxController
                 return this.state.IsConnected;
             }
         }
+        /// <summary>
+        /// Represents the index of the controller (1 - 4).
+        /// </summary>
         public int index
         {
             get
             {
-                return this.gamePadIndex;
+                return this.gamePadIndex + 1;
             }
         }
-
         /// <summary>
         /// Represents the previous <see cref="GamePadState"/> of the controller.
         /// </summary>
@@ -210,6 +216,10 @@ namespace Mo_Controls.XboxController
 
         #region Constructors
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="XboxController"/> and sets the index of the controller (1 - 4).
+        /// </summary>
+        /// <param name="index">The controller index to set, 1 - 4.</param>
         public XboxController(int index)
         {
             // Written, 16.07.2018
@@ -249,92 +259,139 @@ namespace Mo_Controls.XboxController
 
         #region Methods
 
+        /// <summary>
+        /// Updates the controllers state as with the input map, and handles current rumbles.
+        /// </summary>
         public void update()
         {
             // Written, 16.07.2018
 
-            this.state = GamePad.GetState(this.playerIndex);
-
-            if (this.state.IsConnected)
+            Thread updateThread = new Thread(delegate ()
             {
-                // Face Buttons
-                this.A.state = this.state.Buttons.A;
-                this.B.state = this.state.Buttons.B;
-                this.X.state = this.state.Buttons.X;
-                this.Y.state = this.state.Buttons.Y;
-                this.Start.state = this.state.Buttons.Start;
-                this.Back.state = this.state.Buttons.Back;
-                // D-Pad
-                this.DPadUp.state = this.state.DPad.Up;
-                this.DPadDown.state = this.state.DPad.Down;
-                this.DPadLeft.state = this.state.DPad.Left;
-                this.DPadRight.state = this.state.DPad.Right;
-                // Other
-                this.LB.state = this.state.Buttons.LeftShoulder;
-                this.RB.state = this.state.Buttons.RightShoulder;
-                this.LS.state = this.state.Buttons.LeftStick;
-                this.RS.state = this.state.Buttons.RightStick;
-                // Triggers
-                this.LT.state = this.state.Triggers.Left;
-                this.RT.state = this.state.Triggers.Right;
+                this.state = GamePad.GetState(this.playerIndex);
 
-                this.updateInputMap();
-                this.handleRumble();
-            }
+                if (this.state.IsConnected)
+                {
+                    // Face Buttons
+                    this.A.state = this.state.Buttons.A;
+                    this.B.state = this.state.Buttons.B;
+                    this.X.state = this.state.Buttons.X;
+                    this.Y.state = this.state.Buttons.Y;
+                    this.Start.state = this.state.Buttons.Start;
+                    this.Back.state = this.state.Buttons.Back;
+                    // D-Pad
+                    this.DPadUp.state = this.state.DPad.Up;
+                    this.DPadDown.state = this.state.DPad.Down;
+                    this.DPadLeft.state = this.state.DPad.Left;
+                    this.DPadRight.state = this.state.DPad.Right;
+                    // Other
+                    this.LB.state = this.state.Buttons.LeftShoulder;
+                    this.RB.state = this.state.Buttons.RightShoulder;
+                    this.LS.state = this.state.Buttons.LeftStick;
+                    this.RS.state = this.state.Buttons.RightStick;
+                    // Triggers
+                    this.LT.state = this.state.Triggers.Left;
+                    this.RT.state = this.state.Triggers.Right;
+
+                    this.updateInputMap();
+                    this.handleRumble();
+                }
+            });
+            updateThread.Start();
         }
+        /// <summary>
+        /// Refreshes the controllers previous state as with the input map.
+        /// </summary>
         public void refresh()
         {
             // Written, 16.07.2018
 
-            this.previousState = this.state;
-
-            if (this.state.IsConnected)
+            Thread refreshThread = new Thread(delegate ()
             {
-                // Face Buttons
-                this.A.previousState = this.previousState.Buttons.A;
-                this.B.previousState = this.previousState.Buttons.B;
-                this.X.previousState = this.previousState.Buttons.X;
-                this.Y.previousState = this.previousState.Buttons.Y;
-                this.Start.previousState = this.previousState.Buttons.Start;
-                this.Back.previousState = this.previousState.Buttons.Back;
-                // D-Pad
-                this.DPadUp.previousState = this.previousState.DPad.Up;
-                this.DPadDown.previousState = this.previousState.DPad.Down;
-                this.DPadLeft.previousState = this.previousState.DPad.Left;
-                this.DPadRight.previousState = this.previousState.DPad.Right;
-                // Other
-                this.LB.previousState = this.previousState.Buttons.LeftShoulder;
-                this.RB.previousState = this.previousState.Buttons.RightShoulder;
-                this.LS.previousState = this.previousState.Buttons.LeftStick;
-                this.RS.previousState = this.previousState.Buttons.RightStick;
-                // Triggers
-                this.LT.previousState = this.previousState.Triggers.Left;
-                this.RT.previousState = this.previousState.Triggers.Right;
+                this.previousState = this.state;
 
-                this.updateInputMap();
-            }
+                if (this.state.IsConnected)
+                {
+                    // Face Buttons
+                    this.A.previousState = this.previousState.Buttons.A;
+                    this.B.previousState = this.previousState.Buttons.B;
+                    this.X.previousState = this.previousState.Buttons.X;
+                    this.Y.previousState = this.previousState.Buttons.Y;
+                    this.Start.previousState = this.previousState.Buttons.Start;
+                    this.Back.previousState = this.previousState.Buttons.Back;
+                    // D-Pad
+                    this.DPadUp.previousState = this.previousState.DPad.Up;
+                    this.DPadDown.previousState = this.previousState.DPad.Down;
+                    this.DPadLeft.previousState = this.previousState.DPad.Left;
+                    this.DPadRight.previousState = this.previousState.DPad.Right;
+                    // Other
+                    this.LB.previousState = this.previousState.Buttons.LeftShoulder;
+                    this.RB.previousState = this.previousState.Buttons.RightShoulder;
+                    this.LS.previousState = this.previousState.Buttons.LeftStick;
+                    this.RS.previousState = this.previousState.Buttons.RightStick;
+                    // Triggers
+                    this.LT.previousState = this.previousState.Triggers.Left;
+                    this.RT.previousState = this.previousState.Triggers.Right;
+
+                    this.updateInputMap();
+                }
+            });
+            refreshThread.Start();
         }
-        public bool getButtonPressed(string xboxButton)
+        /// <summary>
+        /// Returns true if the provided <see cref="XboxButtonEnum"/> has been pressed.
+        /// </summary>
+        /// <param name="xboxButton">The button to check</param>
+        /// <returns></returns>
+        public bool getButtonPressed(XboxButtonEnum xboxButton)
         {
             // Written, 16.07.2018
 
-            if (this.inputMap[xboxButton].state == ButtonState.Pressed)
+            if (this.inputMap[xboxButton.toString()].state == ButtonState.Pressed)
             {
                 return true;
             }
             return false;
         }
-        public bool getButtonDown(string xboxButton)
+        /// <summary>
+        /// Returns true if the provided <see cref="XboxButtonEnum"/> has been pressed and held down.
+        /// </summary>
+        /// <param name="xboxButton">The button to check.</param>
+        public bool getButtonDown(XboxButtonEnum xboxButton)
         {
             // Written, 16.07.2018
 
-            XboxButton button = this.inputMap[xboxButton];
+            XboxButton button = this.inputMap[xboxButton.toString()];
             if (button.previousState == ButtonState.Released && button.state == ButtonState.Pressed)
             {
                 return true;
             }
             return false;
         }
+        /// <summary>
+        /// Gets the left thumb sticks values.
+        /// </summary>
+        public GamePadThumbSticks.StickValue getLeftStick()
+        {
+            // Written, 18.07.2018
+
+            return this.state.ThumbSticks.Left;
+        }
+        /// <summary>
+        /// Gets the right thumb sticks values.
+        /// </summary>
+        public GamePadThumbSticks.StickValue getRightStick()
+        {
+            // Written, 18.07.2018
+
+            return this.state.ThumbSticks.Right;
+        }
+        /// <summary>
+        /// Adds a rumble to the xbox controller.
+        /// </summary>
+        /// <param name="timer">The time in seconds to rumble for.</param>
+        /// <param name="power">The power of the rumble.</param>
+        /// <param name="duration">The duration until the fade-time comes.</param>
         public void addRumble(float timer, Vector2 power, float duration)
         {
             // Written, 16.07.2018
@@ -347,12 +404,19 @@ namespace Mo_Controls.XboxController
             };
             this.addRumble(xboxRumble);
         }
+        /// <summary>
+        /// Adds the provided rumble to the xbox controller.
+        /// </summary>
+        /// <param name="xboxRumble">The rumble to add.</param>
         public void addRumble(XboxRumble xboxRumble)
         {
             // Written, 16.07.2018
 
             this.xboxRumbleEvents.Add(xboxRumble);
         }
+        /// <summary>
+        /// Updates the input map.
+        /// </summary>
         private void updateInputMap()
         {
             // Written, 16.07.2018
@@ -372,6 +436,9 @@ namespace Mo_Controls.XboxController
             inputMap["LB"] = LB;
             inputMap["RB"] = RB;
         }
+        /// <summary>
+        /// Handles all current rumbles.
+        /// </summary>
         private void handleRumble()
         {
             // Written, 16.07.2018

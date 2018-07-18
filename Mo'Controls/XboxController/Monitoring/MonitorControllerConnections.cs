@@ -1,13 +1,20 @@
 ﻿using System.Threading;
+using MSCLoader;
 
 namespace Mo_Controls.XboxController.Monitoring
 {
+    /// <summary>
+    /// Represents monitoring methods for monitoring controller connections.
+    /// </summary>
     public class MonitorControllerConnections
     {
         // Written, 16.07.2018
 
         #region Properties / Fields
-
+        
+        /// <summary>
+        /// Represents whether the current instance is monitoring for controller connections changing.
+        /// </summary>
         public bool Monitor
         {
             get
@@ -19,28 +26,53 @@ namespace Mo_Controls.XboxController.Monitoring
                 if (value)
                 {
                     if (!this.monitoringThread.IsAlive)
+                    {
+                        ModConsole.Print("Started Monitoring for controller connections...");
                         this.monitoringThread.Start();
+                    }
+                }
+                else
+                {
+                    ModConsole.Print("Stopped Monitoring for controller connections...");
                 }
                 this.monitor = value;
             }
         }        
-        public XboxController[] xboxControllers
+        /// <summary>
+        /// Represents a List of xbox controllers to monitor.
+        /// </summary>
+        private XboxController[] xboxControllers
         {
             get;
             set;
         }
-        public ControllerConnection[] controllerConnections
+        /// <summary>
+        /// Represents an array of connections.
+        /// </summary>
+        private ControllerConnection[] controllerConnections
         {
             get;
             set;
         }
+        /// <summary>
+        /// Represents whether the current instance is monitoring.
+        /// </summary>
         private bool monitor;
+        /// <summary>
+        /// Represents the monitoring thread.
+        /// </summary>
         private Thread monitoringThread;
 
         #endregion
 
         #region Constructors
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="MonitorControllerConnections"/>.
+        /// </summary>
+        /// <param name="numOfSupportedControllers">Number of supported controllers.</param>
+        /// <param name="inMonitor">Monitor connection stautus?</param>
+        /// <param name="xboxControllers">An array of xbox controllers.</param>
         public MonitorControllerConnections(int numOfSupportedControllers, bool inMonitor = false, params XboxController[] xboxControllers)
         {
             // Written, 16.07.2018
@@ -64,11 +96,14 @@ namespace Mo_Controls.XboxController.Monitoring
 
         #region Methods
 
+        /// <summary>
+        /// Monitors for changing connections and sends events based on what it finds. 
+        /// </summary>
         private void monitorControllerConnections()
         {
             // Written, 16.07.2018
 
-            while (this.Monitor)
+            while (this.Monitor && !PlayMakerFSM.ApplicationIsQuitting)
             {
                for (int i = 0; i < this.xboxControllers.Length; i++)
                 {

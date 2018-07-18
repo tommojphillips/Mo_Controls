@@ -13,17 +13,6 @@ namespace Mo_Controls
     {
         // Written, 06.07.2018
 
-        private XboxControllerManager xboxControllerManager
-        {
-            get;
-            set;
-        }
-        private _XboxController xboxController
-        {
-            get;
-            set;
-        }
-
         #region Mod Fields
 
         public override string ID => "Mo_Controls";
@@ -36,6 +25,22 @@ namespace Mo_Controls
 
         #region Fields
 
+        /// <summary>
+        /// Represents the xbox controller manager.
+        /// </summary>
+        private XboxControllerManager xboxControllerManager
+        {
+            get;
+            set;
+        }
+        /// <summary>
+        /// Represents an xbox controller.
+        /// </summary>
+        private _XboxController xboxController
+        {
+            get;
+            set;
+        }
         /// <summary>
         /// Represents all functional inputs for the game.
         /// </summary>
@@ -366,24 +371,11 @@ namespace Mo_Controls
             cInput.OnKeyChanged += this.CInput_OnKeyChanged;
 
             this.xboxController = new _XboxController(1);
-            this.xboxControllerManager = new XboxControllerManager(1);//, this.xboxController);
-            this.xboxControllerManager.addController(this.xboxController);
+            this.xboxControllerManager = new XboxControllerManager(1, this.xboxController);
             XboxControllerManager.ControllerConnected += this.XboxControllerManager_ControllerConnected;
             XboxControllerManager.ControllerDisconnected += this.XboxControllerManager_ControllerDisconnected;
-
             ModConsole.Print(String.Format("{0} v{1}: Loaded", this.Name, this.Version));
         }
-
-        private void XboxControllerManager_ControllerDisconnected(object sender, EventArgs e)
-        {
-            ModConsole.Print("Controller Disconnected");
-        }
-
-        private void XboxControllerManager_ControllerConnected(object sender, EventArgs e)
-        {
-            ModConsole.Print("Controller Connected");
-        }
-
         public override void OnGUI()
         {
             // Written, 10.07.2018
@@ -415,13 +407,8 @@ namespace Mo_Controls
             if (this.changeInputResult.reassignKey)
             {
                 this.changeInput();
-            }            
-
-            if (this.xboxController.getButtonDown("A"))
-            {
-                ModConsole.Print("A was pressed!");
-                xboxController.addRumble(5f, new Vector2(1f, 1f), 3f);
             }
+
             this.xboxControllerManager.refresh();
         }
 
@@ -439,6 +426,14 @@ namespace Mo_Controls
             this.loadControlInputsFromCInput();
         }
 
+        private void XboxControllerManager_ControllerDisconnected(object sender, EventArgs e)
+        {
+            ModConsole.Print("Controller Disconnected");
+        }
+        private void XboxControllerManager_ControllerConnected(object sender, EventArgs e)
+        {
+            ModConsole.Print("Controller Connected");
+        }
         #endregion
     }
 }   

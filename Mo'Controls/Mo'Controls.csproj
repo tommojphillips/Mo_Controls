@@ -39,6 +39,9 @@
     <OutputPath>bin\x64\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\mysummercar_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
     <Reference Include="cInput">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\mysummercar_Data\Managed\cInput.dll</HintPath>
     </Reference>
@@ -52,7 +55,7 @@
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\mysummercar_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="XInputDotNetPure">
-      <HintPath>C:\Users\tommo\Desktop\XInputDotNet-master\XInputDotNetPure\obj\x64\Debug\XInputDotNetPure.dll</HintPath>
+      <HintPath>..\Required References\XInputDotNetPure.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -65,6 +68,7 @@
     <Compile Include="XboxController\Monitoring\MonitorControllerConnections.cs" />
     <Compile Include="XboxController\XboxButton.cs" />
     <Compile Include="XboxController\XboxButtonEnum.cs" />
+    <Compile Include="XboxController\XboxButtonEnumExtentions.cs" />
     <Compile Include="XboxController\XboxController.cs" />
     <Compile Include="XboxController\XboxControllerManager.cs" />
     <Compile Include="XboxController\XboxRumble.cs" />
@@ -73,14 +77,14 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if "$(ConfigurationName)" == "Debug" (
-echo Moving files to mods directory.
-copy "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\Mods" /y
-copy "$(TargetDir)$(TargetName).pdb" "C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\Mods" /y
-cd "C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\Mods"
+echo "Moving files to mods directory. (C:\Users\tommo\AppData\LocalLow\Amistech\My Summer Car\Mods)"
+copy "$(TargetPath)" "C:\Users\tommo\AppData\LocalLow\Amistech\My Summer Car\Mods" /y
+copy "$(TargetDir)$(TargetName).pdb" "C:\Users\tommo\AppData\LocalLow\Amistech\My Summer Car\Mods" /y
+cd "C:\Users\tommo\AppData\LocalLow\Amistech\My Summer Car\Mods"
 echo Calling debug.bat
-call "C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\Mods\debug.bat"
+call "C:\Users\tommo\AppData\LocalLow\Amistech\My Summer Car\Mods\debug.bat"
 ) ELSE (
-copy $(TargetPath) "C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\Mods" /y
+copy $(TargetPath) "C:\Users\tommo\AppData\LocalLow\Amistech\My Summer Car\Mods" /y
 )
 echo Done</PostBuildEvent>
   </PropertyGroup>
