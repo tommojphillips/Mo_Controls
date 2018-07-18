@@ -6,6 +6,10 @@
     public enum XboxButtonEnum
     {
         /// <summary>
+        /// Represents null.
+        /// </summary>
+        NULL,
+        /// <summary>
         /// Represents the A button.
         /// </summary>
         A,

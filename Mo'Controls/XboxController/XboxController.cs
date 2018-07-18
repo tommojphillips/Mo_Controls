@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Threading;
+using System.Collections.Generic;
 using XInputDotNetPure;
 using UnityEngine;
 
@@ -369,6 +370,38 @@ namespace Mo_Controls.XboxController
             return false;
         }
         /// <summary>
+        /// If xbox button has been pressed; returns that xbox button, else returns <see cref="XboxButtonEnum.NULL"/>.
+        /// </summary>
+        public XboxButtonEnum getAnyButtonPressed()
+        {
+            // Written, 18.07.2018
+
+            foreach (XboxButtonEnum xButton in Enum.GetValues(typeof(XboxButtonEnum)))
+            {
+                if (this.getButtonPressed(xButton))
+                {
+                    return xButton;
+                }
+            }
+            return XboxButtonEnum.NULL;
+        }
+        /// <summary>
+        /// If xbox button has been pressed down; returns that xbox button, else returns <see cref="XboxButtonEnum.NULL"/>.
+        /// </summary>
+        public XboxButtonEnum getAnyButtonDown()
+        {
+            // Written, 18.07.2018
+
+            foreach (XboxButtonEnum xButton in Enum.GetValues(typeof(XboxButtonEnum)))
+            {
+                if (this.getButtonDown(xButton))
+                {
+                    return xButton;
+                }
+            }
+            return XboxButtonEnum.NULL;
+        }
+        /// <summary>
         /// Gets the left thumb sticks values.
         /// </summary>
         public GamePadThumbSticks.StickValue getLeftStick()
@@ -385,6 +418,46 @@ namespace Mo_Controls.XboxController
             // Written, 18.07.2018
 
             return this.state.ThumbSticks.Right;
+        }
+        /// <summary>
+        /// Gets the left trigger. Ranges from 0.0f (not pressed) to 1.0f (fully pressed).
+        /// </summary>
+        public float getLeftTrigger()
+        {
+            // Written, 18.07.2018
+
+            return state.Triggers.Left;
+        }
+        /// <summary>
+        /// Gets the right trigger. Ranges from 0.0f (not pressed) to 1.0f (fully pressed).
+        /// </summary>
+        public float getRightTrigger()
+        {
+            // Written, 18.07.2018
+
+            return state.Triggers.Right;
+        }
+        /// <summary>
+        /// Returns true if the left trigger was tapped.
+        /// </summary>
+        public bool getLeftTriggerTap()
+        {
+            // Written, 18.07.2018
+
+            if (this.LT.previousState == 0f && this.LT.state >= 0.1f)
+                return true;
+            return false;
+        }
+        /// <summary>
+        /// Returns true of the right trigger was tapped.
+        /// </summary>
+        public bool getRightTriggerTap()
+        {
+            // Written, 18.07.2018
+
+            if (this.RT.previousState == 0f && this.RT.state >= 0.1f)
+                return true;
+            return false;
         }
         /// <summary>
         /// Adds a rumble to the xbox controller.

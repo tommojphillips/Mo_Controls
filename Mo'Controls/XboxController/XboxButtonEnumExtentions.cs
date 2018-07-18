@@ -13,7 +13,7 @@
         {
             // Written, 17.07.2018
 
-            string value;
+            string value = null;
             switch (xboxButtonEnum)
             {
                 case XboxButtonEnum.A:
@@ -58,7 +58,7 @@
                 case XboxButtonEnum.RB:
                     value = "RB";
                     break;
-                default:
+                case XboxButtonEnum.NULL:
                     value = null;
                     break;
             }
