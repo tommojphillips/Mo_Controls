@@ -5,7 +5,7 @@ namespace Mo_Controls.XboxController
     /// <summary>
     /// Represents an xbox controller button.
     /// </summary>
-    public class XboxButton
+    public class XboxButton : XboxControl
     {
         // Written, 16.07.2018
 
@@ -26,6 +26,15 @@ namespace Mo_Controls.XboxController
         {
             get;
             set;
+        }
+
+        #endregion
+
+        #region Constructors
+
+        public XboxButton(string inInputName, string inXboxButtonName, XboxControlTypeEnum inType) : base(inInputName, inXboxButtonName, inType)
+        {
+            // Written, 20.07.2018
         }
 
         #endregion

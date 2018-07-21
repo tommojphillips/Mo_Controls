@@ -51,6 +51,7 @@
     <Reference Include="PlayMaker">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\mysummercar_Data\Managed\PlayMaker.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\mysummercar_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
@@ -69,9 +70,12 @@
     <Compile Include="XboxController\XboxButton.cs" />
     <Compile Include="XboxController\XboxButtonEnum.cs" />
     <Compile Include="XboxController\XboxButtonEnumExtentions.cs" />
+    <Compile Include="XboxController\XboxControl.cs" />
     <Compile Include="XboxController\XboxController.cs" />
     <Compile Include="XboxController\XboxControllerManager.cs" />
+    <Compile Include="XboxController\XboxControlTypeEnum.cs" />
     <Compile Include="XboxController\XboxRumble.cs" />
+    <Compile Include="XboxController\XboxThumbStick.cs" />
     <Compile Include="XboxController\XboxTriggerState.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

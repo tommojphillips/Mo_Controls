@@ -2,8 +2,10 @@
 using System.Linq;
 using MSCLoader;
 using UnityEngine;
+using HutongGames.PlayMaker;
+using XInputDotNetPure;
 using Mo_Controls.XboxController;
-using _XboxController = Mo_Controls.XboxController.XboxController;
+using xController = Mo_Controls.XboxController.XboxController;
 
 namespace Mo_Controls
 {
@@ -19,11 +21,11 @@ namespace Mo_Controls
         public override string Name => "Mo'Controls";
         public override string Author => "tommojphillips";
         public override string Version => "1.0.2";
-        public override bool UseAssetsFolder => false;
+        public override bool UseAssetsFolder => true;
 
         #endregion
 
-        #region Fields
+        #region Fields / Properties
 
         /// <summary>
         /// Represents the xbox controller manager.
@@ -36,7 +38,7 @@ namespace Mo_Controls
         /// <summary>
         /// Represents an xbox controller.
         /// </summary>
-        private _XboxController xboxController
+        private xController xboxController
         {
             get;
             set;
@@ -89,46 +91,6 @@ namespace Mo_Controls
             "Smoking",
         };
         /// <summary>
-        /// Represents all xbox one controller axes.
-        /// </summary>
-        private readonly string[,] xboxControllerAxes = new string[,]
-        {
-            // D-Pad
-            { "D-Pad Left", Keys.XboxDPadLeft },
-            { "D-Pad Right", Keys.XboxDPadRight },
-            { "D-Pad Up", Keys.XboxDPadUp },
-            { "D-Pad Down", Keys.XboxDPadDown },
-            // Left Stick
-            { "Left-Stick Left", Keys.Xbox1LStickLeft },
-            { "Left-Stick Right", Keys.Xbox1LStickRight },
-            { "Left-Stick Up", Keys.Xbox1LStickUp },
-            { "Left-Stick Down", Keys.Xbox1LStickDown },
-            // Right Stick
-            { "Right-Stick Left", Keys.Xbox1RStickLeft},
-            { "Right-Stick Right", Keys.Xbox1RStickRight },
-            { "Right-Stick Up", Keys.Xbox1RStickUp },
-            { "Right-Stick Down", Keys.Xbox1RStickDown },
-            // Triggers
-            { "Trigger Left", Keys.Xbox1TriggerLeft },
-            { "Trigger Right", Keys.Xbox1TriggerRight },
-        };
-        /// <summary>
-        /// Represents all xbox one controller buttons.
-        /// </summary>
-        private readonly string[,] xboxControllerButtons = new string[,]
-        {
-            { "Xbox A", Keys.XboxA },
-            { "Xbox B", Keys.XboxB },
-            { "Xbox X", Keys.XboxX },
-            { "Xbox Y", Keys.XboxY },
-            { "Xbox LB", Keys.Xbox1BumperLeft },
-            { "Xbox RB", Keys.Xbox1BumperRight },
-            { "Xbox Back", Keys.XboxBack },
-            { "Xbox Start", Keys.XboxStart },
-            { "Xbox LS", Keys.XboxLStickButton },
-            { "Xbox RS", Keys.XboxRStickButton },
-        };
-        /// <summary>
         /// Represents currently assigned control inputs for the game.
         /// </summary>
         private string[,] controlInputs;
@@ -145,18 +107,30 @@ namespace Mo_Controls
         /// </summary>
         private Vector2 controlsGuiScrollPosition;
         /// <summary>
+        /// Represents the scroll position of the scroll bar for the virtual xbox axis gui.
+        /// </summary>
+        private Vector2 virtualAxisGuiScrollPosition;
+        /// <summary>
         /// Represents the width for the main gui.
         /// </summary>
-        private readonly float controlsGuiWidth = 600f;
+        private readonly float controlsGuiWidth = 400f;
+        private readonly float controlsMainHeight = 170f;
         /// <summary>
         /// Represents the width for the virtual axes gui.
         /// </summary>
-        private readonly float virtualXboxAxesGuiWidth = 300f;
+        private readonly float virtualXboxAxesGuiWidth = 180f;
+        /// <summary>
+        /// Represents the width for the xbox controller debug gui.
+        /// </summary>
+        private readonly float xboxControllerDebugGuiWidth = 250f;
         /// <summary>
         /// Represents the change input result for the mod.
         /// </summary>
         private ChangeInputResult changeInputResult = new ChangeInputResult();
-
+        /// <summary>
+        /// Represents whether the mod should display debug info or not.
+        /// </summary>
+        private const bool DEBUG = true;
         #endregion
 
         #region Methods
@@ -193,9 +167,9 @@ namespace Mo_Controls
             }
         }
         /// <summary>
-        /// Changes the input for a control defined in <see cref="changeInputResult"/>.
+        /// Monitors for input.
         /// </summary>
-        private void changeInput()
+        private void monitorForInput()
         {
             // Written, 09.07.2018
 
@@ -217,11 +191,115 @@ namespace Mo_Controls
                                 {
                                     this.changeInput(kcode.ToString());
                                 }
+                                else
+                                {
+                                    this.changeInputResult = new ChangeInputResult();
+                                }
                             }
                             return;
                         }
                         else
                             return;
+                    }
+                }
+            }
+            else
+            {
+                // Check xbox controller for input.
+
+                if (this.xboxController.getRightTrigger() > 0.5f)
+                {
+                    this.changeInput(this.xboxController.RT.inputName);
+                }
+                else
+                {
+                    if (this.xboxController.getLeftTrigger() > 0.5f)
+                    {
+                        this.changeInput(this.xboxController.LT.inputName);
+                    }
+                    else
+                    {
+                        if (this.xboxController.DPadUp.state == ButtonState.Pressed)
+                        {
+                            this.changeInput(this.xboxController.DPadUp.inputName);
+                        }
+                        else
+                        {
+                            if (this.xboxController.DPadDown.state == ButtonState.Pressed)
+                            {
+                                this.changeInput(this.xboxController.DPadDown.inputName);
+                            }
+                            else
+                            {
+                                if (this.xboxController.DPadLeft.state == ButtonState.Pressed)
+                                {
+                                    this.changeInput(this.xboxController.DPadLeft.inputName);
+                                }
+                                else
+                                {
+                                    if (this.xboxController.DPadRight.state == ButtonState.Pressed)
+                                    {
+                                        this.changeInput(this.xboxController.DPadRight.inputName);
+                                    }
+                                    else
+                                    {
+                                        if (this.xboxController.getLeftStick().X > 0.0f)
+                                        {
+                                            this.changeInput(this.xboxController.leftThumbstick.right.inputName);
+                                        }
+                                        else
+                                        {
+                                            if (this.xboxController.getLeftStick().X < 0.0f)
+                                            {
+                                                this.changeInput(this.xboxController.leftThumbstick.left.inputName);
+                                            }
+                                            else
+                                            {
+                                                if (this.xboxController.getLeftStick().Y > 0.0f)
+                                                {
+                                                    this.changeInput(this.xboxController.leftThumbstick.up.inputName);
+                                                }
+                                                else
+                                                {
+                                                    if (this.xboxController.getLeftStick().Y < 0.0f)
+                                                    {
+                                                        this.changeInput(this.xboxController.leftThumbstick.down.inputName);
+                                                    }
+                                                    else
+                                                    {
+                                                        if (this.xboxController.getRightStick().X > 0.0f)
+                                                        {
+                                                            this.changeInput(this.xboxController.rightThumbstick.right.inputName);
+                                                        }
+                                                        else
+                                                        {
+                                                            if (this.xboxController.getRightStick().X < 0.0f)
+                                                            {
+                                                                this.changeInput(this.xboxController.rightThumbstick.left.inputName);
+                                                            }
+                                                            else
+                                                            {
+                                                                if (this.xboxController.getRightStick().Y > 0.0f)
+                                                                {
+                                                                    this.changeInput(this.xboxController.rightThumbstick.up.inputName);
+                                                                }
+                                                                else
+                                                                {
+                                                                    if (this.xboxController.getRightStick().Y < 0.0f)
+                                                                    {
+                                                                        this.changeInput(this.xboxController.rightThumbstick.down.inputName);
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -252,17 +330,18 @@ namespace Mo_Controls
         {
             // Written, 10.07.2018
 
-            GUI.color = Color.white;
-            GUILayout.BeginArea(new Rect(20, 20, this.controlsGuiWidth, Screen.height - 40));
-            GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(this.controlsGuiWidth) });
-            this.controlsGuiScrollPosition = GUILayout.BeginScrollView(controlsGuiScrollPosition, false, true, new GUILayoutOption[1] { GUILayout.Width(this.controlsGuiWidth) });
+            GUILayoutOption[] layoutOption = new GUILayoutOption[1] 
+            {
+                GUILayout.Width(this.controlsGuiWidth - 25)
+            };
+            GUILayout.BeginArea(new Rect(20, 20, this.controlsGuiWidth, this.controlsMainHeight));
+            GUILayout.BeginVertical("box");
             GUILayout.Label(String.Format("{0} v{1} by {2}", this.Name, this.Version, this.Author));
-            GUILayout.Label(String.Format("RMB & {0} are forbidden.\r\nESC cancels.\r\nLMB Selects.", this.openControlsGui.Key));
+            GUILayout.Label(String.Format("{0} is a forbidden key (GUI key bind).\r\nESC Sets as None.\r\nLMB Selects.\r\nRMB Cancels.", this.openControlsGui.Key));
             int numJoysticks = Input.GetJoystickNames().Count();
             if (numJoysticks > 0)
             {
-
-                GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(this.controlsGuiWidth - 10) });
+                GUILayout.BeginVertical("box", layoutOption);
                 GUILayout.Label(String.Format("Detected Joysticks: {0}", numJoysticks));
                 foreach (string joystick in Input.GetJoystickNames())
                 {
@@ -270,33 +349,52 @@ namespace Mo_Controls
                 }
                 GUILayout.EndVertical();
             }
+            GUILayout.EndVertical();
+            GUILayout.EndArea();
+            // Game Controls
+            GUILayout.BeginArea(new Rect(20, this.controlsMainHeight + 10, this.controlsGuiWidth, Screen.height - this.controlsMainHeight - 40));
+            GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(this.controlsGuiWidth) });
+            this.controlsGuiScrollPosition = GUILayout.BeginScrollView(this.controlsGuiScrollPosition, false, true, new GUILayoutOption[1] { GUILayout.Width(this.controlsGuiWidth) });
             GUILayout.Label(String.Format("Game Controls ({0})", this.controlInputs.GetLength(0)));
-            for (int input = 0; input < this.controlInputs.GetLength(0); input++)
+            for (int i = 0; i < this.controlInputs.GetLength(0); i++)
             {
-                string controlName = this.controlInputs[input, 0];
-                string primaryInput = this.checkIfInputIsXboxInput(this.controlInputs[input, 1]);
-                string secondaryInput = this.checkIfInputIsXboxInput(this.controlInputs[input, 2]);
+                string controlName = this.controlInputs[i, 0];
+                string primaryInput = this.controlInputs[i, 1];
+                string secondaryInput = this.controlInputs[i, 2];
+                XboxControl xboxControl;
 
-                GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(this.controlsGuiWidth - 10) });
+                GUILayout.BeginVertical("box", layoutOption);
                 GUILayout.Label(String.Format("{0}: {1}", controlName, this.changeInputResult.inputName == controlName ? "Awaiting key input" : ""));
                 GUILayout.Label("Primary input:");
-                if (GUILayout.Button(primaryInput))
+                xboxControl = this.xboxController.getXboxControlByInputName(primaryInput);
+                if (xboxControl != null)
                 {
-                    if (!this.changeInputResult.reassignKey)
+                    if (GUILayout.Button(xboxControl.texture))
                     {
-                        this.changeInputResult.reassignKey = true;
-                        this.changeInputResult.inputName = controlName;
-                        this.changeInputResult.index = 1;
+                        this.changeToPollingState(controlName, 1);
                     }
                 }
-                GUILayout.Label("Secondary input:");
-                if (GUILayout.Button(secondaryInput))
+                else
                 {
-                    if (!this.changeInputResult.reassignKey)
+                    if (GUILayout.Button(primaryInput))
                     {
-                        this.changeInputResult.reassignKey = true;
-                        this.changeInputResult.inputName = controlName;
-                        this.changeInputResult.index = 2;
+                        this.changeToPollingState(controlName, 1);
+                    }                    
+                }
+                GUILayout.Label("Secondary input:");
+                xboxControl = this.xboxController.getXboxControlByInputName(secondaryInput);
+                if (xboxControl != null)
+                {
+                    if (GUILayout.Button(xboxControl.texture))
+                    {
+                        this.changeToPollingState(controlName, 2);
+                    }
+                }
+                else
+                {
+                    if (GUILayout.Button(secondaryInput))
+                    {
+                        this.changeToPollingState(controlName, 2);
                     }
                 }
                 GUILayout.EndVertical();
@@ -315,46 +413,100 @@ namespace Mo_Controls
             GUILayout.BeginArea(new Rect(this.controlsGuiWidth + 40, 20, this.virtualXboxAxesGuiWidth, 600));
             GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(this.virtualXboxAxesGuiWidth) });
             GUILayout.Label("Virtual xbox controller axes");
-            for (int i = 0; i < this.xboxControllerAxes.GetLength(0); i++)
+            this.virtualAxisGuiScrollPosition = GUILayout.BeginScrollView(this.virtualAxisGuiScrollPosition, false, true, new GUILayoutOption[1] { GUILayout.Width(this.virtualXboxAxesGuiWidth) });
+            foreach (XboxControl xboxControl in this.xboxController.getXboxControls())
             {
-                string axisName = this.xboxControllerAxes[i, 0];
-                string axisInput = this.xboxControllerAxes[i, 1];
-                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(this.virtualXboxAxesGuiWidth / 2) });
-                if (GUILayout.Button(axisName, new GUILayoutOption[1] { GUILayout.Width(this.virtualXboxAxesGuiWidth / 2) }))
+                if (xboxControl.controlType == XboxControlTypeEnum.Axis)
                 {
-                    if (this.changeInputResult.reassignKey)
+                    GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(this.virtualXboxAxesGuiWidth - 35) });
+                    if (GUILayout.Button(xboxControl.texture, new GUILayoutOption[1] { GUILayout.Width(this.virtualXboxAxesGuiWidth - 35) }))
                     {
-                        this.changeInput(axisInput);
+                        if (this.changeInputResult.reassignKey)
+                        {
+                            this.changeInput(xboxControl.inputName);
+                        }
                     }
+                    GUILayout.EndVertical();
                 }
+            }
+            GUILayout.EndScrollView();
+            GUILayout.EndVertical();
+            GUILayout.EndArea();
+        }
+        /// <summary>
+        /// Draws the xbox controller debug gui.
+        /// </summary>
+        private void drawXboxControllerDebugGui()
+        {
+            // Written, 19.07.2018
+
+            float left = this.changeInputResult.reassignKey ? (this.controlsGuiWidth + this.virtualXboxAxesGuiWidth + 60) : (this.controlsGuiWidth + 40);
+            GUILayout.BeginArea(new Rect(left, 20, this.xboxControllerDebugGuiWidth, 650));
+            GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(this.xboxControllerDebugGuiWidth) });   
+            GUILayout.Label("Xbox Controller Debug");
+            GUILayout.Space(5f);
+            if (this.xboxController.isConnected)
+            {
+                // Triggers
+                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(this.xboxControllerDebugGuiWidth - 10) });
+                GUILayout.Label("Triggers:");
+                GUILayout.Label(String.Format("Left: {0}\r\nRight: {1}", Math.Round(this.xboxController.getLeftTrigger(), 2), Math.Round(this.xboxController.getRightTrigger(), 2)));
                 GUILayout.EndVertical();
+                // Bumpers
+                GUILayout.Space(5f);
+                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(this.xboxControllerDebugGuiWidth - 10) });
+                GUILayout.Label("Bumpers:");
+                GUILayout.Label(String.Format("Left: {0}\r\nRight: {1}", this.xboxController.LB.state, this.xboxController.RB.state));
+                GUILayout.EndVertical();
+                // Left Thumbsick
+                GUILayout.Space(5f);
+                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(this.xboxControllerDebugGuiWidth - 10) });
+                GUILayout.Label("Left Thumbstick:");
+                GUILayout.Label(String.Format("X: {0}\r\nY: {1}\r\nLS: {2}", Math.Round(this.xboxController.getLeftStick().X, 2), Math.Round(this.xboxController.getLeftStick().Y, 2), this.xboxController.LS.state));
+                GUILayout.EndVertical();
+                // Right Thumbstick
+                GUILayout.Space(5f);
+                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(this.xboxControllerDebugGuiWidth - 10) });
+                GUILayout.Label("Right Thumbstick:");
+                GUILayout.Label(String.Format("X: {0}\r\nY: {1}\r\nRS: {2}", Math.Round(this.xboxController.getRightStick().X, 2), Math.Round(this.xboxController.getRightStick().Y, 2), this.xboxController.RS.state));
+                GUILayout.EndVertical();
+                // Buttons
+                GUILayout.Space(5f);
+                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(this.xboxControllerDebugGuiWidth - 10) });
+                GUILayout.Label("Buttons");
+                GUILayout.Label(String.Format("A: {0}\r\nB: {1}\r\nX: {2}\r\nY: {3}\r\nStart: {4}\r\nBack: {5}",
+                    this.xboxController.A.state, this.xboxController.B.state, this.xboxController.X.state, this.xboxController.Y.state, this.xboxController.Start.state, this.xboxController.Back.state));
+                GUILayout.EndVertical();
+                // D-Pad
+                GUILayout.Space(5f);
+                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(this.xboxControllerDebugGuiWidth - 10) });
+                GUILayout.Label("D-Pad");
+                GUILayout.Label(
+                    String.Format("Up: {0}\r\nDown: {1}\r\nLeft: {2}\r\nRight: {3}", this.xboxController.DPadUp.state, this.xboxController.DPadDown.state, this.xboxController.DPadLeft.state, this.xboxController.DPadRight.state));
+                GUILayout.EndVertical();
+            }
+            else
+            {
+                GUILayout.Label("Xbox Controller not connected/detected.");
             }
             GUILayout.EndVertical();
             GUILayout.EndArea();
         }
         /// <summary>
-        /// Checks if the provided input is an xbox controller input then returns a more user-friendly name for it eg, "Joy1 Axis 1-" would be "Left-Stick Left".
+        /// Changes the <see cref="changeInputResult"/> to it's "polling" state, with the values provided, <paramref name="inControlName"/>, + <paramref name="inIndex"/>. Which inturn lets <see cref="Update"/> branch to <see cref="monitorForInput"/>.
         /// </summary>
-        /// <param name="input">The input to check.</param>
-        private string checkIfInputIsXboxInput(string input)
+        /// <param name="inControlName">The game control to change.</param>
+        /// <param name="inIndex">The index to change, Primary = 1, Secondary = 2.</param>
+        private void changeToPollingState(string inControlName, int inIndex)
         {
-            // Written, 10.07.2018
+            // Written, 20.07.2018
 
-            for (int i = 0; i < this.xboxControllerAxes.GetLength(0); i++)
+            if (!this.changeInputResult.reassignKey)
             {
-                if (xboxControllerAxes[i, 1] == input)
-                {
-                    return xboxControllerAxes[i, 0];
-                }
+                this.changeInputResult.reassignKey = true;
+                this.changeInputResult.inputName = inControlName;
+                this.changeInputResult.index = inIndex;
             }
-            for (int i = 0; i < this.xboxControllerButtons.GetLength(0); i++)
-            {
-                if (xboxControllerButtons[i, 1] == input)
-                {
-                    return xboxControllerButtons[i, 0];
-                }
-            }
-            return input;
         }
 
         #endregion
@@ -369,8 +521,7 @@ namespace Mo_Controls
             this.controlInputs = new string[this.inputNames.Length, 3];
             this.loadControlInputsFromCInput();
             cInput.OnKeyChanged += this.CInput_OnKeyChanged;
-
-            this.xboxController = new _XboxController(1);
+            this.xboxController = new xController(1);
             this.xboxControllerManager = new XboxControllerManager(1, this.xboxController);
             XboxControllerManager.ControllerConnected += this.XboxControllerManager_ControllerConnected;
             XboxControllerManager.ControllerDisconnected += this.XboxControllerManager_ControllerDisconnected;
@@ -382,17 +533,13 @@ namespace Mo_Controls
 
             if (this.controlsGuiOpened)
             {
-                try
-                {                    
-                    this.drawControlsGui();
-                    if (this.changeInputResult.reassignKey)
-                        this.drawVirtualXboxControllerAxesGui();
-                }
-                catch (Exception ex)
-                {
-                    ModConsole.Print(ex);
-                }
+                this.drawControlsGui();
+                if (this.changeInputResult.reassignKey)
+                    this.drawVirtualXboxControllerAxesGui();
+                if (DEBUG)
+                    this.drawXboxControllerDebugGui();
             }
+            
         }
         public override void Update()
         {
@@ -403,10 +550,25 @@ namespace Mo_Controls
             if (this.openControlsGui.IsDown())
             {
                 this.controlsGuiOpened = !this.controlsGuiOpened;
+
+                if (this.controlsGuiOpened)
+                {
+                    FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = true;
+                }
+                else
+                {
+                    FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = false;
+                }
             }
             if (this.changeInputResult.reassignKey)
             {
-                this.changeInput();
+                this.monitorForInput();
+            }
+
+            XboxButtonEnum xboxButtonDown = this.xboxController.getAnyButtonPressed();
+            if (xboxButtonDown != XboxButtonEnum.NULL)
+            {
+                ModConsole.Print(xboxButtonDown.toString());
             }
 
             this.xboxControllerManager.refresh();
@@ -425,11 +587,20 @@ namespace Mo_Controls
 
             this.loadControlInputsFromCInput();
         }
-
+        /// <summary>
+        /// Occurs when a controller is disconnected.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void XboxControllerManager_ControllerDisconnected(object sender, EventArgs e)
         {
             ModConsole.Print("Controller Disconnected");
         }
+        /// <summary>
+        /// Occurs when a controller is connected.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void XboxControllerManager_ControllerConnected(object sender, EventArgs e)
         {
             ModConsole.Print("Controller Connected");

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Collections.Generic;
 using XInputDotNetPure;
 using UnityEngine;
+using MSCLoader;
 
 namespace Mo_Controls.XboxController
 {
@@ -15,6 +16,14 @@ namespace Mo_Controls.XboxController
 
         #region Properties
         
+        /// <summary>
+        /// Represents all the controls of an xbox controller.
+        /// </summary>
+        private XboxControl[] xboxControls
+        {
+            get;
+            set;
+        }
         /// <summary>
         /// Represents whether the controller is connect or not.
         /// </summary>
@@ -83,131 +92,178 @@ namespace Mo_Controls.XboxController
             get;
             set;
         }
-
         /// <summary>
         /// Represents the A button on the xbox controller.
         /// </summary>
         public XboxButton A
         {
-            get;
-            private set;
+            get
+            {
+                return (XboxButton)this.xboxControls[0];
+            }
         }
         /// <summary>
         /// Represents the B button on the xbox controller.
         /// </summary>
         public XboxButton B
         {
-            get;
-            private set;
+            get
+            {
+                return (XboxButton)this.xboxControls[1];
+            }
         }
         /// <summary>
         /// Represents the X button on the xbox controller.
         /// </summary>
         public XboxButton X
         {
-            get;
-            private set;
+            get
+            {
+                return (XboxButton)this.xboxControls[2];
+            }
         }
         /// <summary>
         /// Represents the Y button on the xbox controller.
         /// </summary>
         public XboxButton Y
         {
-            get;
-            private set;
+            get
+            {
+                return (XboxButton)this.xboxControls[3];
+            }
         }
         /// <summary>
         /// Represents the D-Pad Up button on the xbox controller.
         /// </summary>
         public XboxButton DPadUp
         {
-            get;
-            private set;
+            get
+            {
+                return (XboxButton)this.xboxControls[10];
+            }
         }
         /// <summary>
         /// Represents the D-Pad Down button on the xbox controller.
         /// </summary>
         public XboxButton DPadDown
         {
-            get;
-            private set;
+            get
+            {
+                return (XboxButton)this.xboxControls[11];
+            }
         }
         /// <summary>
         /// Represents the D-Pad Left button on the xbox controller.
         /// </summary>
         public XboxButton DPadLeft
         {
-            get;
-            private set;
+            get
+            {
+                return (XboxButton)this.xboxControls[12];
+            }
         }
         /// <summary>
         /// Represents the D-Pad Right button on the xbox controller.
         /// </summary>
         public XboxButton DPadRight
         {
-            get;
-            private set;
+            get
+            {
+                return (XboxButton)this.xboxControls[13];
+            }
         }
         /// <summary>
         /// Represents the Start button on the xbox controller.
         /// </summary>
         public XboxButton Start
         {
-            get;
-            private set;
+            get
+            {
+                return (XboxButton)this.xboxControls[7];
+            }
         }
         /// <summary>
         /// Represents the Back button on the xbox controller.
         /// </summary>
         public XboxButton Back
         {
-            get;
-            private set;
+            get
+            {
+                return (XboxButton)this.xboxControls[6];
+            }
         }
         /// <summary>
         /// Represents the Left-Stick button on the xbox controller.
         /// </summary>
         public XboxButton LS
         {
-            get;
-            private set;
+            get
+            {
+                return (XboxButton)this.xboxControls[8];
+            }
         }
         /// <summary>
         /// Represents the Right-Stick button on the xbox controller.
         /// </summary>
         public XboxButton RS
         {
-            get;
-            private set;
+            get
+            {
+                return (XboxButton)this.xboxControls[9];
+            }
         }
         /// <summary>
         /// Represents the Left-Bumper button on the xbox controller.
         /// </summary>
         public XboxButton LB
         {
-            get;
-            private set;
+            get
+            {
+                return (XboxButton)this.xboxControls[4];
+            }
         }
         /// <summary>
         /// Represents the Right-Bumper button on the xbox controller.
         /// </summary>
         public XboxButton RB
         {
-            get;
-            private set;
+            get
+            {
+                return (XboxButton)this.xboxControls[5];
+            }
         }
         /// <summary>
         /// Represents the Left Trigger on the xbox controller
         /// </summary>
         public XboxTriggerState LT
         {
-            get;
-            private set;
+            get
+            {
+                return (XboxTriggerState)this.xboxControls[14];
+            }
         }
         /// <summary>
         /// Represents the Right Trigger on the xbox controller.
         /// </summary>
         public XboxTriggerState RT
+        {
+            get
+            {
+                return (XboxTriggerState)this.xboxControls[15];
+            }
+        }
+        /// <summary>
+        /// Represents the left thumbstick on the xbox controller.
+        /// </summary>
+        public XboxThumbstick leftThumbstick
+        {
+            get;
+            private set;
+        }
+        /// <summary>
+        /// Represents the right thumbstick on the xbox controller.
+        /// </summary>
+        public XboxThumbstick rightThumbstick
         {
             get;
             private set;
@@ -232,28 +288,56 @@ namespace Mo_Controls.XboxController
 
             #region Initilize Xbox Buttons
 
-            // Face Buttons
-            this.A = new XboxButton();
-            this.B = new XboxButton();
-            this.X = new XboxButton();
-            this.Y = new XboxButton();
-            this.Start = new XboxButton();
-            this.Back = new XboxButton();
-            // D-Pad
-            this.DPadUp = new XboxButton();
-            this.DPadDown = new XboxButton();
-            this.DPadLeft = new XboxButton();
-            this.DPadRight = new XboxButton();
-            // Other
-            this.LB = new XboxButton();
-            this.RB = new XboxButton();
-            this.LS = new XboxButton();
-            this.RS = new XboxButton();
-            // Triggers
-            this.LT = new XboxTriggerState();
-            this.RT = new XboxTriggerState();
+            string buttonPrefix = "JoystickButton";
+            string axisPrefix = String.Format("Joy{0} Axis ", index);
+
+            this.xboxControls = new XboxControl[]
+            { 
+                // Buttons
+                new XboxButton(String.Format("{0}0", buttonPrefix), "A", XboxControlTypeEnum.Button),
+                new XboxButton(String.Format("{0}1", buttonPrefix), "B", XboxControlTypeEnum.Button),
+                new XboxButton(String.Format("{0}2", buttonPrefix), "X", XboxControlTypeEnum.Button),
+                new XboxButton(String.Format("{0}3", buttonPrefix), "Y", XboxControlTypeEnum.Button),
+                new XboxButton(String.Format("{0}4", buttonPrefix), "LB", XboxControlTypeEnum.Button),
+                new XboxButton(String.Format("{0}5", buttonPrefix), "RB", XboxControlTypeEnum.Button),
+                new XboxButton(String.Format("{0}6", buttonPrefix), "Back", XboxControlTypeEnum.Button),
+                new XboxButton(String.Format("{0}7", buttonPrefix), "Start", XboxControlTypeEnum.Button),
+                new XboxButton(String.Format("{0}8", buttonPrefix), "LS", XboxControlTypeEnum.Button),
+                new XboxButton(String.Format("{0}9", buttonPrefix), "RS", XboxControlTypeEnum.Button),
+                // D-Pad
+                new XboxButton(String.Format("{0}7+", axisPrefix), "D-Pad Up", XboxControlTypeEnum.Axis),
+                new XboxButton(String.Format("{0}7-", axisPrefix), "D-Pad Down", XboxControlTypeEnum.Axis),
+                new XboxButton(String.Format("{0}6-", axisPrefix), "D-Pad Left", XboxControlTypeEnum.Axis),
+                new XboxButton(String.Format("{0}6+", axisPrefix), "D-Pad Right", XboxControlTypeEnum.Axis),
+                // Triggers
+                new XboxTriggerState(String.Format("{0}9+", axisPrefix), "LT"),
+                new XboxTriggerState(String.Format("{0}10+", axisPrefix), "RT"),
+                // LS
+                new XboxControl(String.Format("{0}1-", axisPrefix), "LS-Left", XboxControlTypeEnum.Axis),
+                new XboxControl(String.Format("{0}1+", axisPrefix), "LS-Right", XboxControlTypeEnum.Axis),
+                new XboxControl(String.Format("{0}2-", axisPrefix), "LS-Up", XboxControlTypeEnum.Axis),
+                new XboxControl(String.Format("{0}2+", axisPrefix), "LS-Down", XboxControlTypeEnum.Axis),
+                // RS
+                new XboxControl(String.Format("{0}4-", axisPrefix), "RS-Left", XboxControlTypeEnum.Axis),
+                new XboxControl(String.Format("{0}4+", axisPrefix), "RS-Right", XboxControlTypeEnum.Axis),
+                new XboxControl(String.Format("{0}5-", axisPrefix), "RS-Up", XboxControlTypeEnum.Axis),
+                new XboxControl(String.Format("{0}5+", axisPrefix), "RS-Down", XboxControlTypeEnum.Axis)
+            };
+            // Thumbsticks
+            this.leftThumbstick = new XboxThumbstick(
+                this.xboxControls[16],
+                this.xboxControls[17],
+                this.xboxControls[18],
+                this.xboxControls[19]);
+            this.rightThumbstick = new XboxThumbstick(
+                this.xboxControls[20],
+                this.xboxControls[21],
+                this.xboxControls[22],
+                this.xboxControls[23]);
 
             #endregion
+
+            this.loadControllerAssets();
         }
 
         #endregion
@@ -378,9 +462,12 @@ namespace Mo_Controls.XboxController
 
             foreach (XboxButtonEnum xButton in Enum.GetValues(typeof(XboxButtonEnum)))
             {
-                if (this.getButtonPressed(xButton))
+                if (xButton != XboxButtonEnum.NULL)
                 {
-                    return xButton;
+                    if (this.getButtonPressed(xButton))
+                    {
+                        return xButton;
+                    }
                 }
             }
             return XboxButtonEnum.NULL;
@@ -394,9 +481,12 @@ namespace Mo_Controls.XboxController
 
             foreach (XboxButtonEnum xButton in Enum.GetValues(typeof(XboxButtonEnum)))
             {
-                if (this.getButtonDown(xButton))
+                if (xButton != XboxButtonEnum.NULL)
                 {
-                    return xButton;
+                    if (this.getButtonDown(xButton))
+                    {
+                        return xButton;
+                    }
                 }
             }
             return XboxButtonEnum.NULL;
@@ -494,20 +584,20 @@ namespace Mo_Controls.XboxController
         {
             // Written, 16.07.2018
 
-            inputMap["A"] = A;
-            inputMap["B"] = B;
-            inputMap["X"] = X;
-            inputMap["Y"] = Y;
-            inputMap["D-Pad Up"] = DPadUp;
-            inputMap["D-Pad Down"] = DPadDown;
-            inputMap["D-Pad Left"] = DPadLeft;
-            inputMap["D-Pad Right"] = DPadRight;
-            inputMap["Back"] = Back;
-            inputMap["Start"] = Start;
-            inputMap["LS"] = LS;
-            inputMap["RS"] = RS;
-            inputMap["LB"] = LB;
-            inputMap["RB"] = RB;
+            this.inputMap[A.name] = A;
+            this.inputMap[B.name] = B;
+            this.inputMap[X.name] = X;
+            this.inputMap[Y.name] = Y;
+            this.inputMap[DPadUp.name] = DPadUp;
+            this.inputMap[DPadDown.name] = DPadDown;
+            this.inputMap[DPadLeft.name] = DPadLeft;
+            this.inputMap[DPadRight.name] = DPadRight;
+            this.inputMap[Back.name] = Back;
+            this.inputMap[Start.name] = Start;
+            this.inputMap[LS.name] = LS;
+            this.inputMap[RS.name] = RS;
+            this.inputMap[LB.name] = LB;
+            this.inputMap[RB.name] = RB;
         }
         /// <summary>
         /// Handles all current rumbles.
@@ -535,6 +625,87 @@ namespace Mo_Controls.XboxController
                     }
                 }
             }
+        }
+        /// <summary>
+        /// Loads control asset textures.
+        /// </summary>
+        public void loadControllerAssets()
+        {
+            // Written, 20.07.2018
+
+            Mo_Controls moC = new Mo_Controls();
+
+            // Buttons
+            this.A.texture = LoadAssets.LoadTexture(moC, "XboxOne_A.png");
+            this.B.texture = LoadAssets.LoadTexture(moC, "XboxOne_B.png");
+            this.X.texture = LoadAssets.LoadTexture(moC, "XboxOne_X.png");
+            this.Y.texture = LoadAssets.LoadTexture(moC, "XboxOne_Y.png");
+            this.Back.texture = LoadAssets.LoadTexture(moC, "XboxOne_Windows.png");
+            this.Start.texture = LoadAssets.LoadTexture(moC, "XboxOne_Menu.png");
+            this.LB.texture = LoadAssets.LoadTexture(moC, "XboxOne_LB.png");
+            this.RB.texture = LoadAssets.LoadTexture(new Mo_Controls(), "XboxOne_RB.png");
+            // D-Pad
+            this.DPadUp.texture = LoadAssets.LoadTexture(moC, "XboxOne_Dpad_Up.png");
+            this.DPadDown.texture = LoadAssets.LoadTexture(moC, "XboxOne_Dpad_Down.png");
+            this.DPadLeft.texture = LoadAssets.LoadTexture(moC, "XboxOne_Dpad_Left.png");
+            this.DPadRight.texture = LoadAssets.LoadTexture(moC, "XboxOne_Dpad_Right.png");
+            // Thumbsticks
+            this.LS.texture = LoadAssets.LoadTexture(moC, "XboxOne_Left_Stick.png");
+            this.RS.texture = LoadAssets.LoadTexture(moC, "XboxOne_Right_Stick.png");
+            // Triggers
+            this.LT.texture = LoadAssets.LoadTexture(moC, "XboxOne_LT.png");
+            this.RT.texture = LoadAssets.LoadTexture(moC, "XboxOne_RT.png");
+            //  Thumbstick Left
+            this.leftThumbstick.left.texture = LoadAssets.LoadTexture(moC, "XboxOne_Left_Stick_Left.png");
+            this.leftThumbstick.right.texture = LoadAssets.LoadTexture(moC, "XboxOne_Left_Stick_Right.png");
+            this.leftThumbstick.up.texture = LoadAssets.LoadTexture(moC, "XboxOne_Left_Stick_Up.png");
+            this.leftThumbstick.down.texture = LoadAssets.LoadTexture(moC, "XboxOne_Left_Stick_Down.png");
+            // Thumbstick Right
+            this.rightThumbstick.left.texture = LoadAssets.LoadTexture(moC, "XboxOne_Right_Stick_Left.png");
+            this.rightThumbstick.right.texture = LoadAssets.LoadTexture(moC, "XboxOne_Right_Stick_Right.png");
+            this.rightThumbstick.up.texture = LoadAssets.LoadTexture(moC, "XboxOne_Right_Stick_Up.png");
+            this.rightThumbstick.down.texture = LoadAssets.LoadTexture(moC, "XboxOne_Right_Stick_Down.png");
+        }
+        /// <summary>
+        /// Gets an xbox control by input name.
+        /// </summary>
+        public XboxControl getXboxControlByInputName(string inputName)
+        {
+            // Written, 20.07.2018
+            if (inputName != KeyCode.None.ToString()) // no point enumerating..
+            {
+                foreach (XboxControl xboxControl in this.xboxControls)
+                {
+                    if (xboxControl.inputName == inputName)
+                    {
+                        return xboxControl;
+                    }
+                }
+                foreach (XboxControl xboxControl in this.leftThumbstick.controls)
+                {
+                    if (xboxControl.inputName == inputName)
+                    {
+                        return xboxControl;
+                    }
+                }
+                foreach (XboxControl xboxControl in this.rightThumbstick.controls)
+                {
+                    if (xboxControl.inputName == inputName)
+                    {
+                        return xboxControl;
+                    }
+                }
+            }
+            return null;
+        }
+        /// <summary>
+        /// Returns all the xbox controls.
+        /// </summary>
+        public XboxControl[] getXboxControls()
+        {
+            // Written, 22.07.2018
+
+            return this.xboxControls;
         }
 
         #endregion
