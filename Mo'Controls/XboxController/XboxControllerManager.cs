@@ -36,10 +36,10 @@ namespace Mo_Controls.XboxController
         /// <summary>
         /// Represents the controllers.
         /// </summary>
-        private XboxController[] controllers
+        public XboxController[] controllers
         {
             get;
-            set;
+            private set;
         }
         /// <summary>
         /// Represents the monitoring controller connections system.
@@ -55,43 +55,30 @@ namespace Mo_Controls.XboxController
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of <see cref="XboxControllerManager"/> and sets the provided integer to <see cref="numOfControllersSupported"/>.
+        /// Initializes a new instance of <see cref="XboxControllerManager"/> and sets the provided integer to <see cref="numOfControllersSupported"/> and adds a controller to the manager for every <see cref="numOfControllersSupported"/>.
         /// </summary>
         /// <param name="numOfControllersToSupport">The amount of controllers to support.</param>
         public XboxControllerManager(int numOfControllersToSupport)
         {
             // Written, 16.07.2018
 
-            this.preInitialize(numOfControllersToSupport);
-            this.postInitialize();
-        }
-        /// <summary>
-        /// Initializes a new instance of <see cref="XboxControllerManager"/> and sets the provided integer to <see cref="numOfControllersSupported"/> and adds all provided controllers to the manager.
-        /// </summary>
-        /// <param name="numOfControllersToSupport">The amount of controllers to support.</param>
-        /// <param name="controllers">The controllers to add.</param>
-        public XboxControllerManager(int numOfControllersToSupport, params XboxController[] controllers)
-        {
-            // Written, 16.07.2018
-
-            if (controllers.Length <= numOfControllersToSupport)
-            {
-                this.preInitialize(numOfControllersToSupport);
-                foreach (XboxController controller in controllers)
-                {
-                    this.addController(controller);
-                }
-                this.postInitialize();
-            }
+            if (numOfControllersToSupport <= 4 && numOfControllersToSupport > 0)
+                this.numOfControllersSupported = numOfControllersToSupport;
             else
-                throw new Exception("The provided controllers were not in the correct range of first argument, numOfControllersToSupport. Specify between 1-numOfControllersToSupport value.");
+                throw new Exception("Invaild amount of controllers to support. MIN = 1, MAX = 4.");
+            this.controllers = new XboxController[this.numOfControllersSupported];
+            for (int i = 1; i <= numOfControllersToSupport; i++)
+            {
+                this.addController(new XboxController(i));
+            }
+            this.monitorControllerConnections = new MonitorControllerConnections(this.numOfControllersSupported, true, this.controllers);
         }
 
         #endregion
 
         #region Methods
 
-        /// <summary>
+        /*/// <summary>
         /// pre-initializes items that the manager needs to run, also runs checks.
         /// </summary>
         /// <param name="numOfControllersToSupport"></param>
@@ -104,8 +91,8 @@ namespace Mo_Controls.XboxController
             else
                 throw new Exception("Invaild amount of controllers to support. MIN = 1, MAX = 4.");
             this.controllers = new XboxController[this.numOfControllersSupported];
-        }
-        /// <summary>
+        }*/
+        /*/// <summary>
         /// Post-initializes items that are required for the manager to run.
         /// </summary>
         private void postInitialize()
@@ -113,8 +100,8 @@ namespace Mo_Controls.XboxController
             // Written, 16.07.2018
 
             this.monitorControllerConnections = new MonitorControllerConnections(this.numOfControllersSupported, true, this.controllers);
-        }
-        /// <summary>
+        }*/
+         /// <summary>
         /// Adds the specified xbox controller to the manager.
         /// </summary>
         /// <param name="xboxController">The controller to add.</param>

@@ -46,29 +46,23 @@ namespace Mo_Controls
         /// <summary>
         /// Represents all functional inputs for the game.
         /// </summary>
-        private readonly string[] inputNames = new string[]
+        private string[] inputNames = new string[]
         {
+            "Left",
+            "Right",
             "Throttle",
             "Brake",
             "Clutch",
-            "Handbrake",
-            "Left",
-            "Right",
             "ShiftUp",
             "ShiftDown",
-            "reverse",
-            "first",
-            "second",
-            "third",
-            "fourth",
-            "fifth",
-            "sixth",
             "IndicatorLeft",
             "IndicatorRight",
             "Range",
             "HighBeam",
             "Wipers",
             "Boost",
+            "Handbrake",
+            "DrivingMode",
             "PlayerLeft",
             "PlayerRight",
             "PlayerUp",
@@ -87,8 +81,14 @@ namespace Mo_Controls
             "Finger",
             "Urinate",
             "Drunk",
-            "DrivingMode",
             "Smoking",
+            "reverse",
+            "first",
+            "second",
+            "third",
+            "fourth",
+            "fifth",
+            "sixth",
         };
         /// <summary>
         /// Represents currently assigned control inputs for the game.
@@ -114,7 +114,7 @@ namespace Mo_Controls
         /// Represents the width for the main gui.
         /// </summary>
         private readonly float controlsGuiWidth = 400f;
-        private readonly float controlsMainHeight = 170f;
+        private readonly float controlsMainHeight = 180f;
         /// <summary>
         /// Represents the width for the virtual axes gui.
         /// </summary>
@@ -130,7 +130,11 @@ namespace Mo_Controls
         /// <summary>
         /// Represents whether the mod should display debug info or not.
         /// </summary>
-        private const bool DEBUG = true;
+        private Settings showDebugGui = new Settings("showDebug", "Show debug?", true);
+        /// <summary>
+        /// Represent whether the mod should display the virtual gui.
+        /// </summary>
+        private Settings showVirtualGui = new Settings("", "Show xbox controller virtual gui?", true);
         #endregion
 
         #region Methods
@@ -332,29 +336,21 @@ namespace Mo_Controls
 
             GUILayoutOption[] layoutOption = new GUILayoutOption[1] 
             {
-                GUILayout.Width(this.controlsGuiWidth - 25)
+                GUILayout.Width(this.controlsGuiWidth - 31)
             };
+
             GUILayout.BeginArea(new Rect(20, 20, this.controlsGuiWidth, this.controlsMainHeight));
             GUILayout.BeginVertical("box");
             GUILayout.Label(String.Format("{0} v{1} by {2}", this.Name, this.Version, this.Author));
             GUILayout.Label(String.Format("{0} is a forbidden key (GUI key bind).\r\nESC Sets as None.\r\nLMB Selects.\r\nRMB Cancels.", this.openControlsGui.Key));
-            int numJoysticks = Input.GetJoystickNames().Count();
-            if (numJoysticks > 0)
-            {
-                GUILayout.BeginVertical("box", layoutOption);
-                GUILayout.Label(String.Format("Detected Joysticks: {0}", numJoysticks));
-                foreach (string joystick in Input.GetJoystickNames())
-                {
-                    GUILayout.Label(String.Format("{0}", joystick));
-                }
-                GUILayout.EndVertical();
-            }
+            this.showDebugGui.Value = GUILayout.Toggle((bool)this.showDebugGui.Value, "Show Debug");
+            this.showVirtualGui.Value = GUILayout.Toggle((bool)this.showVirtualGui.Value, "Show Virtual Axes GUI");
             GUILayout.EndVertical();
             GUILayout.EndArea();
             // Game Controls
             GUILayout.BeginArea(new Rect(20, this.controlsMainHeight + 10, this.controlsGuiWidth, Screen.height - this.controlsMainHeight - 40));
             GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(this.controlsGuiWidth) });
-            this.controlsGuiScrollPosition = GUILayout.BeginScrollView(this.controlsGuiScrollPosition, false, true, new GUILayoutOption[1] { GUILayout.Width(this.controlsGuiWidth) });
+            this.controlsGuiScrollPosition = GUILayout.BeginScrollView(this.controlsGuiScrollPosition, false, true, new GUILayoutOption[1] { GUILayout.Width(this.controlsGuiWidth - 7) });
             GUILayout.Label(String.Format("Game Controls ({0})", this.controlInputs.GetLength(0)));
             for (int i = 0; i < this.controlInputs.GetLength(0); i++)
             {
@@ -362,7 +358,6 @@ namespace Mo_Controls
                 string primaryInput = this.controlInputs[i, 1];
                 string secondaryInput = this.controlInputs[i, 2];
                 XboxControl xboxControl;
-
                 GUILayout.BeginVertical("box", layoutOption);
                 GUILayout.Label(String.Format("{0}: {1}", controlName, this.changeInputResult.inputName == controlName ? "Awaiting key input" : ""));
                 GUILayout.Label("Primary input:");
@@ -440,13 +435,14 @@ namespace Mo_Controls
         {
             // Written, 19.07.2018
 
-            float left = this.changeInputResult.reassignKey ? (this.controlsGuiWidth + this.virtualXboxAxesGuiWidth + 60) : (this.controlsGuiWidth + 40);
+            float left = this.changeInputResult.reassignKey && (bool)this.showVirtualGui.Value ? (this.controlsGuiWidth + this.virtualXboxAxesGuiWidth + 60) : (this.controlsGuiWidth + 40);
             GUILayout.BeginArea(new Rect(left, 20, this.xboxControllerDebugGuiWidth, 650));
             GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(this.xboxControllerDebugGuiWidth) });   
             GUILayout.Label("Xbox Controller Debug");
             GUILayout.Space(5f);
+            GUILayout.Label("Xbox Controller Status: " + (this.xboxController.isConnected ? "Connected" : "Disconnected"));
             if (this.xboxController.isConnected)
-            {
+            {                
                 // Triggers
                 GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(this.xboxControllerDebugGuiWidth - 10) });
                 GUILayout.Label("Triggers:");
@@ -485,10 +481,6 @@ namespace Mo_Controls
                     String.Format("Up: {0}\r\nDown: {1}\r\nLeft: {2}\r\nRight: {3}", this.xboxController.DPadUp.state, this.xboxController.DPadDown.state, this.xboxController.DPadLeft.state, this.xboxController.DPadRight.state));
                 GUILayout.EndVertical();
             }
-            else
-            {
-                GUILayout.Label("Xbox Controller not connected/detected.");
-            }
             GUILayout.EndVertical();
             GUILayout.EndArea();
         }
@@ -513,6 +505,13 @@ namespace Mo_Controls
 
         #region Override Methods
 
+        public override void ModSettings()
+        {
+            // 23.07.2018
+
+            Settings.AddCheckBox(this, showDebugGui);
+            Settings.AddCheckBox(this, this.showVirtualGui);
+        }
         public override void OnLoad()
         {
             // Written, 06.07.2018    
@@ -521,8 +520,8 @@ namespace Mo_Controls
             this.controlInputs = new string[this.inputNames.Length, 3];
             this.loadControlInputsFromCInput();
             cInput.OnKeyChanged += this.CInput_OnKeyChanged;
-            this.xboxController = new xController(1);
-            this.xboxControllerManager = new XboxControllerManager(1, this.xboxController);
+            this.xboxControllerManager = new XboxControllerManager(1);
+            this.xboxController = this.xboxControllerManager.controllers[0];
             XboxControllerManager.ControllerConnected += this.XboxControllerManager_ControllerConnected;
             XboxControllerManager.ControllerDisconnected += this.XboxControllerManager_ControllerDisconnected;
             ModConsole.Print(String.Format("{0} v{1}: Loaded", this.Name, this.Version));
@@ -535,8 +534,9 @@ namespace Mo_Controls
             {
                 this.drawControlsGui();
                 if (this.changeInputResult.reassignKey)
+                    if ((bool)this.showVirtualGui.Value)
                     this.drawVirtualXboxControllerAxesGui();
-                if (DEBUG)
+                if ((bool)this.showDebugGui.Value)
                     this.drawXboxControllerDebugGui();
             }
             
