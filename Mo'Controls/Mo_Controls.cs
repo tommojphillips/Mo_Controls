@@ -109,6 +109,10 @@ namespace Mo_Controls
             get;
             set;
         }
+        /// <summary>
+        /// Represents the amount of keybinds that have been loaded via the mods.
+        /// </summary>
+        private int modKeybindCount = 0;
 
         #endregion
 
@@ -201,9 +205,17 @@ namespace Mo_Controls
             get;
             private set;
         }
-
+        /// <summary>
+        /// Represents the select keycode.
+        /// </summary>
         private const KeyCode selectKey = KeyCode.Mouse0; // LMB
+        /// <summary>
+        /// Represents the cancel keycode.
+        /// </summary>
         private const KeyCode cancelKey = KeyCode.Mouse1; // RMB
+        /// <summary>
+        /// Represents the none keycode.
+        /// </summary>
         private const KeyCode noneKey = KeyCode.Delete;
 
         #endregion
@@ -387,16 +399,34 @@ namespace Mo_Controls
         {
             // Written, 09.07.2018
 
-            if (this.changeInputResult.index == 1)
+            if (this.changeInputResult.isModKeybind)
             {
-                cInput.ChangeKey(this.changeInputResult.inputName, input, cInput.GetText(this.changeInputResult.inputName, 2));
+                if (this.changeInputResult.index == 1)
+                {
+                    cInput.ChangeKey(this.changeInputResult.inputName, input, cInput.GetText(this.changeInputResult.inputName, 2));
+                }
+                else
+                {
+                    cInput.ChangeKey(this.changeInputResult.inputName, cInput.GetText(this.changeInputResult.inputName, 1), input);
+                }
+                this.loadControlInputsFromCInput();
             }
             else
             {
-                cInput.ChangeKey(this.changeInputResult.inputName, cInput.GetText(this.changeInputResult.inputName, 1), input);
+                // Treat as a mod keybind.
+
+                Keybind modKeybind = Keybind.Get(this.changeInputResult.mod).Where(kb => kb.Name == this.changeInputResult.inputName).First();
+                if (this.changeInputResult.index == 1)
+                {
+                    modKeybind.Key = (KeyCode)Enum.Parse(typeof(KeyCode), input);
+                }
+                else
+                {
+                    modKeybind.Modifier = (KeyCode)Enum.Parse(typeof(KeyCode), input);
+                }
+                ModSettings_menu.SaveModBinds(this.changeInputResult.mod);
             }
             this.changeInputResult = new ChangeInputResult();
-            this.loadControlInputsFromCInput();
         }
         /// <summary>
         /// Draws the main gui.
@@ -455,7 +485,7 @@ namespace Mo_Controls
 
             #region Game Controls
 
-            if (GUILayout.Button(String.Format("{1} Game Controls ({0})", Mo_Controls.instance.controlInputs.GetLength(0), this.showGameControls ? "Close" : "Open")))
+            if (GUILayout.Button(String.Format("{1} Game Controls ({0})", this.controlInputs.GetLength(0), this.showGameControls ? "Close" : "Open")))
             {
                 this.showGameControls = !this.showGameControls;
             }
@@ -466,40 +496,38 @@ namespace Mo_Controls
                     string controlName = this.controlInputs[i, 0];
                     string primaryInput = this.controlInputs[i, 1];
                     string secondaryInput = this.controlInputs[i, 2];
-                    XboxControl xboxControl;
+
                     GUILayout.BeginVertical("box", layoutOption);
                     GUILayout.Label(String.Format("{0}: {1}", controlName, this.changeInputResult.inputName == controlName ? "Awaiting key input" : ""));
-                    GUILayout.Label("Primary input:");
-                    xboxControl = this.xboxController.getXboxControlByInputName(primaryInput);
-                    if (xboxControl != null)
+                    this.drawCommonControl("Primary input", controlName, primaryInput, 1);
+                    this.drawCommonControl("Secondary input", controlName, secondaryInput, 2);
+                    GUILayout.EndVertical();
+                }
+            }
+
+            #endregion
+
+            GUILayout.Space(5f);
+
+            #region Mod Controls / Keybinds
+
+            if (GUILayout.Button(String.Format("{0}, Mod Keybinds ({1})", this.showModControls ? "Close" : "Open", this.modKeybindCount)))
+            {
+                this.showModControls = !this.showModControls;
+            }
+            if (this.showModControls)
+            {
+                foreach (Mod mod in ModLoader.LoadedMods)
+                {
+                    GUILayout.BeginVertical("box", layoutOption);
+                    GUILayout.Label(String.Format("{0} v{1}: {2}", mod.Name, mod.Version, mod.Author));
+                    foreach (Keybind kb in Keybind.Get(mod))
                     {
-                        if (GUILayout.Button(xboxControl.texture))
-                        {
-                            this.changeToPollingState(controlName, 1);
-                        }
-                    }
-                    else
-                    {
-                        if (GUILayout.Button(primaryInput))
-                        {
-                            this.changeToPollingState(controlName, 1);
-                        }
-                    }
-                    GUILayout.Label("Secondary input:");
-                    xboxControl = this.xboxController.getXboxControlByInputName(secondaryInput);
-                    if (xboxControl != null)
-                    {
-                        if (GUILayout.Button(xboxControl.texture))
-                        {
-                            this.changeToPollingState(controlName, 2);
-                        }
-                    }
-                    else
-                    {
-                        if (GUILayout.Button(secondaryInput))
-                        {
-                            this.changeToPollingState(controlName, 2);
-                        }
+                        GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(CONTROLS_GUI_WIDTH - 40) });
+                        GUILayout.Label(String.Format("{0}: {1}", kb.Name, this.changeInputResult.inputName == kb.Name ? "Awaiting key input" : ""));
+                        this.drawCommonControl("Modifier", kb.Name, kb.Modifier.ToString(), 1, mod);
+                        this.drawCommonControl("Input", kb.Name, kb.Key.ToString(), 2, mod);
+                        GUILayout.EndVertical();
                     }
                     GUILayout.EndVertical();
                 }
@@ -598,6 +626,30 @@ namespace Mo_Controls
             GUILayout.EndArea();
         }
         /// <summary>
+        /// 
+        /// </summary>
+        private void drawCommonControl(string title, string controlName, string inputName, int index, Mod mod = null)
+        {
+            // Written, 01.08.2018
+
+            GUILayout.Label(String.Format("{0}: {1}", title, this.changeInputResult.inputName == controlName ? "Awaiting key input" : ""));
+            XboxControl xboxControl = this.xboxController.getXboxControlByInputName(inputName);
+            if (xboxControl != null)
+            {
+                if (GUILayout.Button(xboxControl.texture))
+                {
+                    this.changeToPollingState(controlName, index, mod);
+                }
+            }
+            else
+            {
+                if (GUILayout.Button(inputName))
+                {
+                    this.changeToPollingState(controlName, index, mod);
+                }
+            }
+        }
+        /// <summary>
         /// Evaluates the correct height for the game controls gui.
         /// </summary>
         private float evaluateGameControlsGuiHeight()
@@ -617,7 +669,7 @@ namespace Mo_Controls
         /// </summary>
         /// <param name="inControlName">The game control to change.</param>
         /// <param name="inIndex">The index to change, Primary = 1, Secondary = 2.</param>
-        private void changeToPollingState(string inControlName, int inIndex)
+        private void changeToPollingState(string inControlName, int inIndex, Mod inMod = null)
         {
             // Written, 20.07.2018
 
@@ -626,6 +678,7 @@ namespace Mo_Controls
                 this.changeInputResult.reassignKey = true;
                 this.changeInputResult.inputName = inControlName;
                 this.changeInputResult.index = inIndex;
+                this.changeInputResult.mod = inMod;
             }
         }
 
@@ -643,6 +696,10 @@ namespace Mo_Controls
         public override void OnLoad()
         {
             // Written, 06.07.2018    
+
+            // Getting the amount of keybinds within the current game instance. Doing that here as mods cannot be added while the game is running (currently).
+            foreach (Mod mod in ModLoader.LoadedMods)
+                this.modKeybindCount += Keybind.Get(mod).Count;
 
             instance = this;
             this.changeInputResult = new ChangeInputResult();
@@ -735,6 +792,7 @@ namespace Mo_Controls
         {
             ModConsole.Print("Controller Connected");
         }
+
         #endregion
     }
 }   
