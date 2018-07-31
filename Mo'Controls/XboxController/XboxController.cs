@@ -633,7 +633,7 @@ namespace Mo_Controls.XboxController
         {
             // Written, 20.07.2018
 
-            Mo_Controls moC = new Mo_Controls();
+            Mo_Controls moC = Mo_Controls.instance;
 
             // Buttons
             this.A.texture = LoadAssets.LoadTexture(moC, "XboxOne_A.png");
@@ -643,7 +643,7 @@ namespace Mo_Controls.XboxController
             this.Back.texture = LoadAssets.LoadTexture(moC, "XboxOne_Windows.png");
             this.Start.texture = LoadAssets.LoadTexture(moC, "XboxOne_Menu.png");
             this.LB.texture = LoadAssets.LoadTexture(moC, "XboxOne_LB.png");
-            this.RB.texture = LoadAssets.LoadTexture(new Mo_Controls(), "XboxOne_RB.png");
+            this.RB.texture = LoadAssets.LoadTexture(moC, "XboxOne_RB.png");
             // D-Pad
             this.DPadUp.texture = LoadAssets.LoadTexture(moC, "XboxOne_Dpad_Up.png");
             this.DPadDown.texture = LoadAssets.LoadTexture(moC, "XboxOne_Dpad_Down.png");
