@@ -39,6 +39,9 @@
     <OutputPath>bin\x64\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\mysummercar_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
     <Reference Include="cInput">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\mysummercar_Data\Managed\cInput.dll</HintPath>
     </Reference>
@@ -48,27 +51,36 @@
     <Reference Include="PlayMaker">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\mysummercar_Data\Managed\PlayMaker.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\mysummercar_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="XInputDotNetPure">
+      <HintPath>..\Required References\XInputDotNetPure.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChangeInputResult.cs" />
     <Compile Include="Mo_Controls.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="XboxController\ControllerConnectedEventArgs.cs" />
+    <Compile Include="XboxController\ControllerDisconnectedEventArgs.cs" />
+    <Compile Include="XboxController\Monitoring\ControllerConnection.cs" />
+    <Compile Include="XboxController\Monitoring\MonitorControllerConnections.cs" />
+    <Compile Include="XboxController\XboxButton.cs" />
+    <Compile Include="XboxController\XboxButtonEnum.cs" />
+    <Compile Include="XboxController\XboxButtonEnumExtentions.cs" />
+    <Compile Include="XboxController\XboxControl.cs" />
+    <Compile Include="XboxController\XboxController.cs" />
+    <Compile Include="XboxController\XboxControllerManager.cs" />
+    <Compile Include="XboxController\XboxControlTypeEnum.cs" />
+    <Compile Include="XboxController\XboxRumble.cs" />
+    <Compile Include="XboxController\XboxThumbStick.cs" />
+    <Compile Include="XboxController\XboxTriggerState.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if "$(ConfigurationName)" == "Debug" (
-echo Moving files to mods directory.
-copy "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\Mods" /y
-copy "$(TargetDir)$(TargetName).pdb" "C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\Mods" /y
-cd "C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\Mods"
-echo Calling debug.bat
-call "C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\Mods\debug.bat"
-) ELSE (
-copy $(TargetPath) "C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\Mods" /y
-)
-echo Done</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
