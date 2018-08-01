@@ -32,10 +32,10 @@ namespace Mo_Controls
         /// <summary>
         /// Represents the name of the input to change; if <see cref="reassignKey"/> is false, this is equal to null. 
         /// The input name should equal the one from <see cref="cInput"/>.
-        /// If ressign key is a mod keybind, (<see cref="mod"/> != <see langword="null"/>) then this, <see cref="inputName"/> should equal 
-        /// <see cref="Keybind.Name"/> property.
+        /// If ressign key is a mod keybind, (<see cref="mod"/> != <see langword="null"/>) then this, <see cref="controlName"/> should equal 
+        /// <see cref="Keybind.ID"/> property.
         /// </summary>
-        public string inputName
+        public string controlName
         {
             get;
             set;
@@ -72,7 +72,7 @@ namespace Mo_Controls
             // Written, 16.07.2018
 
             this.reassignKey = false;
-            this.inputName = null;
+            this.controlName = null;
             this.index = 0;
             this.mod = null;
         }
@@ -88,9 +88,32 @@ namespace Mo_Controls
             // Written, 11.07.2018
 
             this.reassignKey = reassignKey;
-            this.inputName = inputName;
+            this.controlName = inputName;
             this.index = index;
             this.mod = mod;
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Changes the <see cref="changeInputResult"/> to it's "polling" state, with the values provided, <paramref name="inControlName"/>, + <paramref name="inIndex"/>. Which inturn lets <see cref="Update"/> branch to <see cref="monitorForInput"/>.
+        /// </summary>
+        /// <param name="inControlName">The game control to change.</param>
+        /// <param name="inIndex">The index to change, Primary = 1, Secondary = 2.</param>
+        /// <param name="inMod">The mod to change its keybind.</param>
+        public void changeToPollingState(string inControlName, int inIndex, Mod inMod = null)
+        {
+            // Written, 20.07.2018
+
+            if (!this.reassignKey)
+            {
+                this.reassignKey = true;
+                this.controlName = inControlName;
+                this.index = inIndex;
+                this.mod = inMod;
+            }
         }
 
         #endregion

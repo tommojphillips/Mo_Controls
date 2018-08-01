@@ -129,7 +129,7 @@ namespace Mo_Controls
         /// <summary>
         /// Represent whether the mod should display the virtual gui.
         /// </summary>
-        private Settings showVirtualGui = new Settings("", "Show xbox controller virtual gui?", true);
+        private Settings showVirtualGui = new Settings("", "Show xbox controller virtual gui?", false);
 
         #endregion
 
@@ -399,15 +399,17 @@ namespace Mo_Controls
         {
             // Written, 09.07.2018
 
-            if (this.changeInputResult.isModKeybind)
+            if (!this.changeInputResult.isModKeybind)
             {
+                // Treat as a game control.
+
                 if (this.changeInputResult.index == 1)
                 {
-                    cInput.ChangeKey(this.changeInputResult.inputName, input, cInput.GetText(this.changeInputResult.inputName, 2));
+                    cInput.ChangeKey(this.changeInputResult.controlName, input, cInput.GetText(this.changeInputResult.controlName, 2));
                 }
                 else
                 {
-                    cInput.ChangeKey(this.changeInputResult.inputName, cInput.GetText(this.changeInputResult.inputName, 1), input);
+                    cInput.ChangeKey(this.changeInputResult.controlName, cInput.GetText(this.changeInputResult.controlName, 1), input);
                 }
                 this.loadControlInputsFromCInput();
             }
@@ -415,14 +417,14 @@ namespace Mo_Controls
             {
                 // Treat as a mod keybind.
 
-                Keybind modKeybind = Keybind.Get(this.changeInputResult.mod).Where(kb => kb.Name == this.changeInputResult.inputName).First();
+                Keybind modKeybind = Keybind.Get(this.changeInputResult.mod).Where(kb => kb.ID == this.changeInputResult.controlName).First();
                 if (this.changeInputResult.index == 1)
                 {
-                    modKeybind.Key = (KeyCode)Enum.Parse(typeof(KeyCode), input);
+                    modKeybind.Modifier = (KeyCode)Enum.Parse(typeof(KeyCode), input);
                 }
                 else
                 {
-                    modKeybind.Modifier = (KeyCode)Enum.Parse(typeof(KeyCode), input);
+                    modKeybind.Key = (KeyCode)Enum.Parse(typeof(KeyCode), input);
                 }
                 ModSettings_menu.SaveModBinds(this.changeInputResult.mod);
             }
@@ -485,7 +487,7 @@ namespace Mo_Controls
 
             #region Game Controls
 
-            if (GUILayout.Button(String.Format("{1} Game Controls ({0})", this.controlInputs.GetLength(0), this.showGameControls ? "Close" : "Open")))
+            if (GUILayout.Button(String.Format("{1}, Game Controls ({0})", this.controlInputs.GetLength(0), this.showGameControls ? "Close" : "Open")))
             {
                 this.showGameControls = !this.showGameControls;
             }
@@ -498,7 +500,7 @@ namespace Mo_Controls
                     string secondaryInput = this.controlInputs[i, 2];
 
                     GUILayout.BeginVertical("box", layoutOption);
-                    GUILayout.Label(String.Format("{0}: {1}", controlName, this.changeInputResult.inputName == controlName ? "Awaiting key input" : ""));
+                    GUILayout.Label(String.Format("{0}:", controlName));
                     this.drawCommonControl("Primary input", controlName, primaryInput, 1);
                     this.drawCommonControl("Secondary input", controlName, secondaryInput, 2);
                     GUILayout.EndVertical();
@@ -507,7 +509,7 @@ namespace Mo_Controls
 
             #endregion
 
-            GUILayout.Space(5f);
+            GUILayout.Space(3f);
 
             #region Mod Controls / Keybinds
 
@@ -524,9 +526,9 @@ namespace Mo_Controls
                     foreach (Keybind kb in Keybind.Get(mod))
                     {
                         GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(CONTROLS_GUI_WIDTH - 40) });
-                        GUILayout.Label(String.Format("{0}: {1}", kb.Name, this.changeInputResult.inputName == kb.Name ? "Awaiting key input" : ""));
-                        this.drawCommonControl("Modifier", kb.Name, kb.Modifier.ToString(), 1, mod);
-                        this.drawCommonControl("Input", kb.Name, kb.Key.ToString(), 2, mod);
+                        GUILayout.Label(String.Format("{0}:", kb.Name));
+                        this.drawCommonControl("Modifier", kb.ID, kb.Modifier.ToString(), 1, mod);
+                        this.drawCommonControl("Input", kb.ID, kb.Key.ToString(), 2, mod);
                         GUILayout.EndVertical();
                     }
                     GUILayout.EndVertical();
@@ -626,26 +628,30 @@ namespace Mo_Controls
             GUILayout.EndArea();
         }
         /// <summary>
-        /// 
+        /// Draws a common control for the gui.
         /// </summary>
         private void drawCommonControl(string title, string controlName, string inputName, int index, Mod mod = null)
         {
             // Written, 01.08.2018
 
-            GUILayout.Label(String.Format("{0}: {1}", title, this.changeInputResult.inputName == controlName ? "Awaiting key input" : ""));
+            string reassignMessage = 
+                this.changeInputResult.controlName == controlName 
+                && this.changeInputResult.index == index 
+                && this.changeInputResult.mod == mod ? "Awaiting key input" : "";
+            GUILayout.Label(String.Format("{0}: {1}", title, reassignMessage));
             XboxControl xboxControl = this.xboxController.getXboxControlByInputName(inputName);
             if (xboxControl != null)
             {
                 if (GUILayout.Button(xboxControl.texture))
                 {
-                    this.changeToPollingState(controlName, index, mod);
+                    this.changeInputResult.changeToPollingState(controlName, index, mod);
                 }
             }
             else
             {
                 if (GUILayout.Button(inputName))
                 {
-                    this.changeToPollingState(controlName, index, mod);
+                    this.changeInputResult.changeToPollingState(controlName, index, mod);
                 }
             }
         }
@@ -663,23 +669,6 @@ namespace Mo_Controls
             else
                 height = ((Screen.height - INFO_GUI_HEIGHT) + (this.showSettings ? 0 : SETTINGS_HEIGHT)) - GUI_SPACE * 2;
             return height;
-        }
-        /// <summary>
-        /// Changes the <see cref="changeInputResult"/> to it's "polling" state, with the values provided, <paramref name="inControlName"/>, + <paramref name="inIndex"/>. Which inturn lets <see cref="Update"/> branch to <see cref="monitorForInput"/>.
-        /// </summary>
-        /// <param name="inControlName">The game control to change.</param>
-        /// <param name="inIndex">The index to change, Primary = 1, Secondary = 2.</param>
-        private void changeToPollingState(string inControlName, int inIndex, Mod inMod = null)
-        {
-            // Written, 20.07.2018
-
-            if (!this.changeInputResult.reassignKey)
-            {
-                this.changeInputResult.reassignKey = true;
-                this.changeInputResult.inputName = inControlName;
-                this.changeInputResult.index = inIndex;
-                this.changeInputResult.mod = inMod;
-            }
         }
 
         #endregion
@@ -766,12 +755,13 @@ namespace Mo_Controls
         #region Events
 
         /// <summary>
-        /// Is called when cinput keys are changed externally, (the game gui controls).
+        /// Occurs when cinput keys are changed externally, (the game gui controls).
         /// </summary>
         private void CInput_OnKeyChanged()
         {
             // Written, 09.07.2018
 
+            ModConsole.Print("[CInput.dll] - 'OnKeyChanged' occured.");
             this.loadControlInputsFromCInput();
         }
         /// <summary>
