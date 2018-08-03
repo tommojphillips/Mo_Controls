@@ -218,6 +218,8 @@ namespace Mo_Controls
         /// </summary>
         private const KeyCode noneKey = KeyCode.Delete;
 
+        private const string SUPPORTED_MODLOADER_VERSION = "0.4.4";
+
         #endregion
 
         #region Methods
@@ -670,6 +672,19 @@ namespace Mo_Controls
                 height = ((Screen.height - INFO_GUI_HEIGHT) + (this.showSettings ? 0 : SETTINGS_HEIGHT)) - GUI_SPACE * 2;
             return height;
         }
+        private void performModLoaderVersionCheck()
+        {
+            // Written, 08.03.2018
+
+            // Modloader supported version check.
+            if (SUPPORTED_MODLOADER_VERSION != ModLoader.Version)
+            {
+                ModUI.ShowMessage(
+                    String.Format("<b>[{0} <color=orange>v{1}]</color></b> - NOTE: modloader v{2} is <color=orange>not</color> currently <color=orange>supported</color> and/or may not be <color=orange>compatible</color>.\r\nSupported " +
+                    "modloader version is <color=orange>v{2}</color>\r\nFeel free to use the mod but keep in mind that it might not work as expected.",
+                    this.Name, this.Version, ModLoader.Version), "ModLoader Version not supported.");
+            }
+        }
 
         #endregion
 
@@ -700,6 +715,7 @@ namespace Mo_Controls
             this.xboxController = this.xboxControllerManager.controllers[0];
             XboxControllerManager.ControllerConnected += this.XboxControllerManager_ControllerConnected;
             XboxControllerManager.ControllerDisconnected += this.XboxControllerManager_ControllerDisconnected;
+            this.performModLoaderVersionCheck();
             ModConsole.Print(String.Format("{0} v{1}: Loaded", this.Name, this.Version));
         }
         public override void OnGUI()
