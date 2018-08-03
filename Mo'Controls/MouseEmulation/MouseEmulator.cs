@@ -1,0 +1,364 @@
+﻿using System;
+using System.Drawing;
+using System.Threading;
+using System.Runtime.InteropServices;
+using UnityEngine;
+using xController = Mo_Controls.XboxController.XboxController;
+using XInputDotNetPure;
+using MSCLoader;
+
+namespace Mo_Controls.MouseEmulation
+{
+    public class MouseEmulator
+    {
+        // Written, 01.08.2018
+
+        #region Properties / Fields
+
+        #region MSCLoader Settings
+
+        /// <summary>
+        /// Represents whether the mod should emulate the mouse.
+        /// </summary>
+        public static Settings emulateMouse = new Settings("emulateMouse", "Emulate mouse for controller", false);
+        /// <summary>
+        /// Represents whether the mod should use the left thumbstick for mouse emulation.
+        /// </summary>
+        public static Settings emulateMouse_useLeftThumbstick = new Settings("emulateMouse_useLeftThumbstick", "Use left thumbstick for mouse emulation", false);
+        /// <summary>
+        /// Represents whether the mod should use the right thumbstick for mouse emulation.
+        /// </summary>
+        public static Settings emulateMouse_useRightThumbstick = new Settings("emulateMouse_useRightThumbstick", "Use right thumbstick for mouse emulation", true);
+        /// <summary>
+        /// Represents the current sensitivity for the mouse.
+        /// </summary>
+        public static Settings mouseSensitivity = new Settings("MouseSensitivity", "Mouse Sensitivity", DEFAULT_SENSITIVITY);
+        /// <summary>
+        /// Represents the current deadzone for the mouse.
+        /// </summary>
+        public static Settings mouseDeadzone = new Settings("MouseDeadzone", "Mouse Deadzone", DEFAULT_DEADZONE);
+
+        #endregion
+
+        /// <summary>
+        /// Returns the value of the setting, <see cref="emulateMouse_useLeftThumbstick"/>. if set to <see langword="true"/>; Changes, <see cref="inputType"/> to <see cref="InputTypeEnum.LeftThumbstick"/>,
+        /// else sets to <see cref="InputTypeEnum.RightThumbstick"/>.
+        /// </summary>
+        public bool useLeftThumbstick
+        {
+            get
+            {
+                return (bool)emulateMouse_useLeftThumbstick.Value;
+            }
+            set
+            {
+                emulateMouse_useLeftThumbstick.Value = value;
+                if (value)
+                    this.inputType = InputTypeEnum.LeftThumbstick;
+                else
+                    this.inputType = InputTypeEnum.RightThumbstick;
+            }
+        }
+        /// <summary>
+        /// Returns the value of the setting, <see cref="emulateMouse_useRightThumbstick"/>. if set to <see langword="true"/>; Changes, <see cref="inputType"/> to <see cref="InputTypeEnum.RightThumbstick"/>,
+        /// else sets to <see cref="InputTypeEnum.LeftThumbstick"/>.
+        /// </summary>
+        public bool useRightThumbstick
+        {
+            get
+            {
+                return (bool)emulateMouse_useRightThumbstick.Value;
+            }
+            set
+            {
+                emulateMouse_useRightThumbstick.Value = value;
+                if (value)
+                    this.inputType = InputTypeEnum.RightThumbstick;
+                else
+                    this.inputType = InputTypeEnum.LeftThumbstick;
+            }
+        }
+        /// <summary>
+        /// Returns the <see cref="Settings.Name"/> property of the setting, <see cref="emulateMouse_useLeftThumbstick"/>.
+        /// </summary>
+        public string getUseLeftThumbstickSettingName
+        {
+            get
+            {
+                return emulateMouse_useLeftThumbstick.Name;
+            }
+        }
+        /// <summary>
+        /// Returns the <see cref="Settings.Name"/> property of the setting, <see cref="emulateMouse_useRightThumbstick"/>.
+        /// </summary>
+        public string getUseRightThumbstickSettingName
+        {
+            get
+            {
+                return emulateMouse_useRightThumbstick.Name;
+            }
+        }
+        /// <summary>
+        /// Returns the <see cref="Settings.Name"/> property of the setting, <see cref="emulateMouse"/> which is private.
+        /// </summary>
+        public string getEmulateMouseSettingName
+        {
+            get
+            {
+                return emulateMouse.Name;
+            }
+        }
+        /// <summary>
+        /// Represents whether the current instance is emulating mouse movement.
+        /// </summary>
+        public bool Emulating
+        {
+            get
+            {
+                return (bool)emulateMouse.Value;
+            }
+            set
+            {
+                if (value)
+                {
+                    ModConsole.Print(String.Format("Started Emulating mouse as {0}.",
+                        this.inputType == InputTypeEnum.LeftThumbstick ? "Left Thumbstick" : "Right Thumbstick"));
+                }
+                else
+                {
+                    ModConsole.Print("Stopped Emulating mouse..");
+                }
+                emulateMouse.Value = value;
+            }
+        }
+        /// <summary>
+        /// Returns the current position of the cursor.
+        /// </summary>
+        public Point getCursorPosition
+        {
+            get
+            {
+                Point point = new Point();
+                GetCursorPos(out point);
+                return point;
+            }
+        }
+        /// <summary>
+        /// Represents the input that will control the mouse.
+        /// </summary>
+        public InputTypeEnum inputType
+        {
+            get;
+            set;
+        }        
+        /// <summary>
+        /// Represents the deadzone for the mouse.
+        /// </summary>
+        public float deadzone
+        {
+            get
+            {
+                return float.Parse(mouseDeadzone.Value.ToString());
+            }
+            set
+            {
+                mouseDeadzone.Value = value;
+            }
+        }
+        /// <summary>
+        /// Represents the type of deadzone algorithm to use.
+        /// </summary>
+        public DeadzoneTypeEnum deadzoneType
+        {
+            get;
+            set;
+        }
+        /// <summary>
+        /// Represents the sensitivity fpr the mouse.
+        /// </summary>
+        public float sensitivity
+        {
+            get
+            {
+                return float.Parse(mouseSensitivity.Value.ToString());
+            }
+            set
+            {
+                mouseSensitivity.Value = value;
+            }
+        }  
+        
+        // Mouse Constants
+        /// <summary>
+        /// Represents the default deadzone for the emulated mouse.
+        /// </summary>
+        public const float DEFAULT_DEADZONE = 0.1f;
+        /// <summary>
+        /// Represents the default sensitivity for the emulated mouse.
+        /// </summary>
+        public const float DEFAULT_SENSITIVITY = 30.0f;
+        /// <summary>
+        /// Represents the min deadzone.
+        /// </summary>
+        public const float MIN_DEADZONE = 0.1f;
+        /// <summary>
+        /// Represents the max deadzone.
+        /// </summary>
+        public const float MAX_DEADZONE = 0.99f;
+        /// <summary>
+        /// Represents the min sensitivity.
+        /// </summary>
+        public const float MIN_SENSITIVITY = 1f;
+        /// <summary>
+        /// Represents the max sensitivity.
+        /// </summary>
+        public const float MAX_SENSITIVITY = 100f;        
+
+        private const uint MOUSEEVENTF_ABSOLUTE = 0x8000;
+        private const uint MOUSEEVENTF_MOVE = 0x0001;
+
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="MouseEmulator"/>.
+        /// </summary>
+        /// <param name="inputType">The input type to control the mouse.</param>
+        public MouseEmulator(DeadzoneTypeEnum deadzoneType)
+        {
+            // Written, 01.08.2018
+
+            this.Emulating = this.Emulating;
+            this.useLeftThumbstick = this.useLeftThumbstick;
+            this.useRightThumbstick = this.useRightThumbstick;
+            this.deadzoneType = deadzoneType;
+        }
+
+        #endregion
+
+        #region Methods
+
+        [DllImport("user32.dll")]
+        private static extern bool GetCursorPos(out Point pos);
+        [DllImport("user32.dll")]
+        private static extern void mouse_event(uint dwFlags, int dx, int dy, uint dwData, int dwExtraInfo);
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern uint SendInput(uint nInputs, Input[] pInputs, int cbSize);
+
+        /// <summary>
+        /// Creates required stuff to simulate mouse movement.
+        /// </summary>
+        /// <param name="x">The x.</param>
+        /// <param name="y">The y.</param>
+        /// <param name="data">Data to pass.</param>
+        /// <param name="time">The time of event.</param>
+        /// <param name="flag">flags to pass.</param>
+        private static MouseInput createMouseInput(int x, int y, uint data, uint time, uint flag)
+        {
+            // create from the given data an object of the type MouseInput, which then can be send
+            MouseInput Result = new MouseInput();
+            Result.X = x;
+            Result.Y = y;
+            Result.mouseData = data;
+            Result.time = time;
+            Result.dwFlags = flag;
+            return Result;
+        }
+        /// <summary>
+        /// Simulates mouse movement.
+        /// </summary>
+        /// <param name="x">The X.</param>
+        /// <param name="y">The Y.</param>
+        private static void simulateMouseMove(int x, int y)
+        {
+            Input[] MouseEvent = new Input[1];
+            MouseEvent[0].type = 0;
+            // move mouse: Flags ABSOLUTE (whole screen) and MOVE (move)
+            MouseEvent[0].data = createMouseInput(x, y, 0, 0, MOUSEEVENTF_MOVE);//MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE);
+            SendInput((uint)MouseEvent.Length, MouseEvent, Marshal.SizeOf(MouseEvent[0].GetType()));
+        }
+        /// <summary>
+        /// Should be called every frame; on <see cref="Mod.Update()"/>.
+        /// </summary>
+        public void onUpdate()
+        {
+            // Written, 01.08.2018
+
+            Thread thread = new Thread(delegate ()
+            {
+                if (this.Emulating)
+                {
+                    GamePadThumbSticks.StickValue stickValue_temp = default(GamePadThumbSticks.StickValue);
+                    Vector2 stickValue;
+                    int moveX;
+                    int moveY;
+                    
+                    switch (this.inputType)
+                    {
+                        case InputTypeEnum.LeftThumbstick:
+                            stickValue_temp = Mo_Controls.instance.xboxController.getLeftStick();
+                            break;
+                        case InputTypeEnum.RightThumbstick:
+                            stickValue_temp = Mo_Controls.instance.xboxController.getRightStick();
+                            break;
+                    }
+
+                    stickValue.x = stickValue_temp.X;
+                    stickValue.y = stickValue_temp.Y;
+
+                    // Deadzone
+                    stickValue = this.doDeadzoneCheck(stickValue);
+
+                    // Sensitivity
+                    moveX = (int)(stickValue.x * this.sensitivity);
+                    moveY = (int)(stickValue.y * this.sensitivity) * -1; // '* -1' y axis is naturally inverted. so changing the that..
+
+                    simulateMouseMove(moveX, moveY);
+                }
+            });
+            thread.Start();
+        }
+        /// <summary>
+        /// Should be called on <see cref="Mod.ModSettings"/>.
+        /// </summary>
+        public static void onModSettings()
+        {
+            // Written, 03.08.2018
+
+            Mo_Controls moC = Mo_Controls.instance;
+
+            Settings.AddCheckBox(moC, emulateMouse);
+            Settings.AddCheckBox(moC, emulateMouse_useLeftThumbstick, "Emulate Mouse Settings");
+            Settings.AddCheckBox(moC, emulateMouse_useRightThumbstick, "Emulate Mouse Settings");
+            Settings.AddSlider(moC, mouseDeadzone, MIN_DEADZONE, MAX_DEADZONE);
+            Settings.AddSlider(moC, mouseSensitivity, MIN_SENSITIVITY, MAX_SENSITIVITY);
+        }
+        /// <summary>
+        /// Performs a deadzone check.
+        /// </summary>
+        /// <param name="stickValue">The values to perform the check on.</param>
+        private Vector2 doDeadzoneCheck(Vector2 stickValue)
+        {
+            // Written, 02.08.2018
+
+            Vector2 deadzonedStickValue = stickValue;
+
+            switch (this.deadzoneType)
+            {
+                case DeadzoneTypeEnum.Radial:
+                    if (deadzonedStickValue.magnitude < this.deadzone)
+                        deadzonedStickValue = Vector2.zero;
+                    break;
+                case DeadzoneTypeEnum.ScaledRadial:
+                    if (deadzonedStickValue.magnitude < this.deadzone)
+                        deadzonedStickValue = Vector2.zero;
+                    deadzonedStickValue = deadzonedStickValue.normalized * ((deadzonedStickValue.magnitude - this.deadzone) / (1 - this.deadzone));
+                    break;
+            }
+            return deadzonedStickValue;
+        }
+
+        #endregion
+    }
+}

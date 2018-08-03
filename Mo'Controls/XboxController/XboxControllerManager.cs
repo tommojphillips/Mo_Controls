@@ -78,29 +78,6 @@ namespace Mo_Controls.XboxController
 
         #region Methods
 
-        /*/// <summary>
-        /// pre-initializes items that the manager needs to run, also runs checks.
-        /// </summary>
-        /// <param name="numOfControllersToSupport"></param>
-        private void preInitialize(int numOfControllersToSupport)
-        {
-            // Written, 16.07.2018
-
-            if (numOfControllersToSupport <= 4 && numOfControllersToSupport > 0)
-                this.numOfControllersSupported = numOfControllersToSupport;
-            else
-                throw new Exception("Invaild amount of controllers to support. MIN = 1, MAX = 4.");
-            this.controllers = new XboxController[this.numOfControllersSupported];
-        }*/
-        /*/// <summary>
-        /// Post-initializes items that are required for the manager to run.
-        /// </summary>
-        private void postInitialize()
-        {
-            // Written, 16.07.2018
-
-            this.monitorControllerConnections = new MonitorControllerConnections(this.numOfControllersSupported, true, this.controllers);
-        }*/
          /// <summary>
         /// Adds the specified xbox controller to the manager.
         /// </summary>
@@ -134,9 +111,9 @@ namespace Mo_Controls.XboxController
             }
         }
         /// <summary>
-        /// Performs updates for every controller within the manager.
+        /// Performs updates for every controller within the manager. Updates <see cref="monitorControllerConnections"/>.
         /// </summary>
-        public void update()
+        public void onUpdate()
         {
             // Written, 16.07.2018
 
@@ -144,11 +121,12 @@ namespace Mo_Controls.XboxController
             {
                 controller.update();
             }
+            this.monitorControllerConnections.onUpdate();
         }
         /// <summary>
         /// Performs refreshes for every controller within the manager.
         /// </summary>
-        public void refresh()
+        public void onRefresh()
         {
             // Written, 16.07.2018
 
