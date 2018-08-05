@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a super structure for input data of the C++ function SendInput
     /// </summary>
-    internal struct Input
+    internal struct InputData
     {
         // Written, 01.08.2018
 

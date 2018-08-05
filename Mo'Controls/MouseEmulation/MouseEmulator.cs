@@ -40,6 +40,12 @@ namespace Mo_Controls.MouseEmulation
 
         #endregion
 
+        public const string LMB_INPUT_NAME = "EmLMB";
+        public const string RMB_INPUT_NAME = "RmLMB";
+        public Keybind lmbPrimaryInput = new Keybind(LMB_INPUT_NAME + "1", "LMB Primary Input", KeyCode.None);
+        public Keybind lmbSecondaryInput = new Keybind(LMB_INPUT_NAME + "2", "LMB Secondary", KeyCode.None);
+        public Keybind rmbPrimaryInput = new Keybind(RMB_INPUT_NAME + "1", "RMB Primary Input", KeyCode.None);
+        public Keybind rmbSecondaryInput = new Keybind(RMB_INPUT_NAME + "2", "RMB Secondary", KeyCode.None);
         /// <summary>
         /// Returns the value of the setting, <see cref="emulateMouse_useLeftThumbstick"/>. if set to <see langword="true"/>; Changes, <see cref="inputType"/> to <see cref="InputTypeEnum.LeftThumbstick"/>,
         /// else sets to <see cref="InputTypeEnum.RightThumbstick"/>.
@@ -192,7 +198,7 @@ namespace Mo_Controls.MouseEmulation
         /// <summary>
         /// Represents the default deadzone for the emulated mouse.
         /// </summary>
-        public const float DEFAULT_DEADZONE = 0.1f;
+        public const float DEFAULT_DEADZONE = 0;
         /// <summary>
         /// Represents the default sensitivity for the emulated mouse.
         /// </summary>
@@ -200,7 +206,7 @@ namespace Mo_Controls.MouseEmulation
         /// <summary>
         /// Represents the min deadzone.
         /// </summary>
-        public const float MIN_DEADZONE = 0.1f;
+        public const float MIN_DEADZONE = 0;
         /// <summary>
         /// Represents the max deadzone.
         /// </summary>
@@ -214,8 +220,11 @@ namespace Mo_Controls.MouseEmulation
         /// </summary>
         public const float MAX_SENSITIVITY = 100f;        
 
-        private const uint MOUSEEVENTF_ABSOLUTE = 0x8000;
         private const uint MOUSEEVENTF_MOVE = 0x0001;
+        private const int MOUSEEVENTF_LEFTDOWN = 0x02;
+        private const int MOUSEEVENTF_LEFTUP = 0x04;
+        private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
+        private const int MOUSEEVENTF_RIGHTUP = 0x10;
 
         #endregion
 
@@ -233,6 +242,10 @@ namespace Mo_Controls.MouseEmulation
             this.useLeftThumbstick = this.useLeftThumbstick;
             this.useRightThumbstick = this.useRightThumbstick;
             this.deadzoneType = deadzoneType;
+            Keybind.Add(Mo_Controls.instance, this.lmbPrimaryInput);
+            Keybind.Add(Mo_Controls.instance, this.lmbSecondaryInput);
+            Keybind.Add(Mo_Controls.instance, this.rmbPrimaryInput);
+            Keybind.Add(Mo_Controls.instance, this.rmbSecondaryInput);
         }
 
         #endregion
@@ -244,7 +257,7 @@ namespace Mo_Controls.MouseEmulation
         [DllImport("user32.dll")]
         private static extern void mouse_event(uint dwFlags, int dx, int dy, uint dwData, int dwExtraInfo);
         [DllImport("user32.dll", SetLastError = true)]
-        private static extern uint SendInput(uint nInputs, Input[] pInputs, int cbSize);
+        private static extern uint SendInput(uint nInputs, InputData[] pInputs, int cbSize);
 
         /// <summary>
         /// Creates required stuff to simulate mouse movement.
@@ -272,7 +285,7 @@ namespace Mo_Controls.MouseEmulation
         /// <param name="y">The Y.</param>
         private static void simulateMouseMove(int x, int y)
         {
-            Input[] MouseEvent = new Input[1];
+            InputData[] MouseEvent = new InputData[1];
             MouseEvent[0].type = 0;
             // move mouse: Flags ABSOLUTE (whole screen) and MOVE (move)
             MouseEvent[0].data = createMouseInput(x, y, 0, 0, MOUSEEVENTF_MOVE);//MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE);
@@ -293,7 +306,7 @@ namespace Mo_Controls.MouseEmulation
                     Vector2 stickValue;
                     int moveX;
                     int moveY;
-                    
+
                     switch (this.inputType)
                     {
                         case InputTypeEnum.LeftThumbstick:
@@ -312,9 +325,18 @@ namespace Mo_Controls.MouseEmulation
 
                     // Sensitivity
                     moveX = (int)(stickValue.x * this.sensitivity);
-                    moveY = (int)(stickValue.y * this.sensitivity) * -1; // '* -1' y axis is naturally inverted. so changing the that..
+                    moveY = (int)(stickValue.y * this.sensitivity) * -1; // '* -1' xbox controller y axis is naturally inverted. so changing the that..
 
                     simulateMouseMove(moveX, moveY);
+
+                    if (this.lmbPrimaryInput.IsDown() || this.lmbSecondaryInput.IsDown())
+                    {
+                        this.simulateLeftClick();
+                    }
+                    if (this.rmbPrimaryInput.IsDown() || this.rmbSecondaryInput.IsDown())
+                    {
+                        this.simulateRightClick();
+                    }
                 }
             });
             thread.Start();
@@ -322,11 +344,11 @@ namespace Mo_Controls.MouseEmulation
         /// <summary>
         /// Should be called on <see cref="Mod.ModSettings"/>.
         /// </summary>
-        public static void onModSettings()
+        public static void onModSettings(Mo_Controls mo_Controls)
         {
             // Written, 03.08.2018
 
-            Mo_Controls moC = Mo_Controls.instance;
+            Mo_Controls moC = mo_Controls;
 
             Settings.AddCheckBox(moC, emulateMouse);
             Settings.AddCheckBox(moC, emulateMouse_useLeftThumbstick, "Emulate Mouse Settings");
@@ -357,6 +379,30 @@ namespace Mo_Controls.MouseEmulation
                     break;
             }
             return deadzonedStickValue;
+        }
+        /// <summary>
+        /// Simulates a left mouse button click.
+        /// </summary>
+        public void simulateLeftClick()
+        {
+            // Written, 04.08.2018
+
+            Point tempCursPos = this.getCursorPosition;
+            int X = tempCursPos.X;
+            int Y = tempCursPos.Y;
+            mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
+        }
+        /// <summary>
+        /// Simulates a right mouse button click
+        /// </summary>
+        public void simulateRightClick()
+        {
+            // Written, 04.08.2018
+
+            Point tempCursPos = this.getCursorPosition;
+            int X = tempCursPos.X;
+            int Y = tempCursPos.Y;
+            mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, X, Y, 0, 0);
         }
 
         #endregion

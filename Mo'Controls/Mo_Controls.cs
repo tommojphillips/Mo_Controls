@@ -114,7 +114,7 @@ namespace Mo_Controls
         /// <summary>
         /// Represents the change input result for the mod.
         /// </summary>
-        private ChangeInputResult changeInputResult
+        private ChangeInput changeInputResult
         {
             get;
             set;
@@ -131,7 +131,7 @@ namespace Mo_Controls
         /// <summary>
         /// Represents a keybind to open/close the gui for the mod.
         /// </summary>
-        private readonly Keybind openControlsGui = new Keybind("OpenControls", "Open Controls GUI", KeyCode.F12);
+        public readonly Keybind openControlsGui = new Keybind("OpenControls", "Open Controls GUI", KeyCode.F12);
         /// <summary>
         /// Represents whether the mod should display debug info or not.
         /// </summary>
@@ -214,7 +214,7 @@ namespace Mo_Controls
         private const float EMULATION_SETTINGS_HEIGHT = 70f;
 
         private const float MOUSE_EMULATION_GUI_WIDHT = 400f;
-        private const float MOUSE_EMULATION_GUI_HEIGHT = 400f;
+        private const float MOUSE_EMULATION_GUI_HEIGHT = 725f;
 
         #endregion
 
@@ -280,144 +280,6 @@ namespace Mo_Controls
             }
         }
         /// <summary>
-        /// Monitors for input.
-        /// </summary>
-        private void monitorForInput()
-        {
-            // Written, 09.07.2018
-
-            if (uInput.anyKeyDown)
-            {
-                foreach (KeyCode kcode in Enum.GetValues(typeof(KeyCode)))
-                {
-                    if (uInput.GetKeyDown(kcode))
-                    {
-                        if (kcode != selectKey) //Select key
-                        {
-                            if (kcode == noneKey) // Set as none key
-                            {
-                                this.changeInput(KeyCode.None.ToString());
-                            }
-                            else
-                            {
-                                if (kcode != this.openControlsGui.Key && kcode != cancelKey) // not allowed
-                                {
-                                    this.changeInput(kcode.ToString());
-                                }
-                                else
-                                {
-                                    this.changeInputResult = new ChangeInputResult();
-                                }
-                            }
-                            return;
-                        }
-                        else
-                            return;
-                    }
-                }
-            }
-            else
-            {
-                // Check xbox controller for input.
-
-                if (this.xboxController.getRightTrigger() > 0.5f)
-                {
-                    this.changeInput(this.xboxController.RT.inputName);
-                }
-                else
-                {
-                    if (this.xboxController.getLeftTrigger() > 0.5f)
-                    {
-                        this.changeInput(this.xboxController.LT.inputName);
-                    }
-                    else
-                    {
-                        if (this.xboxController.DPadUp.state == ButtonState.Pressed)
-                        {
-                            this.changeInput(this.xboxController.DPadUp.inputName);
-                        }
-                        else
-                        {
-                            if (this.xboxController.DPadDown.state == ButtonState.Pressed)
-                            {
-                                this.changeInput(this.xboxController.DPadDown.inputName);
-                            }
-                            else
-                            {
-                                if (this.xboxController.DPadLeft.state == ButtonState.Pressed)
-                                {
-                                    this.changeInput(this.xboxController.DPadLeft.inputName);
-                                }
-                                else
-                                {
-                                    if (this.xboxController.DPadRight.state == ButtonState.Pressed)
-                                    {
-                                        this.changeInput(this.xboxController.DPadRight.inputName);
-                                    }
-                                    else
-                                    {
-                                        if (this.xboxController.getLeftStick().X > 0.0f)
-                                        {
-                                            this.changeInput(this.xboxController.leftThumbstick.right.inputName);
-                                        }
-                                        else
-                                        {
-                                            if (this.xboxController.getLeftStick().X < 0.0f)
-                                            {
-                                                this.changeInput(this.xboxController.leftThumbstick.left.inputName);
-                                            }
-                                            else
-                                            {
-                                                if (this.xboxController.getLeftStick().Y > 0.0f)
-                                                {
-                                                    this.changeInput(this.xboxController.leftThumbstick.up.inputName);
-                                                }
-                                                else
-                                                {
-                                                    if (this.xboxController.getLeftStick().Y < 0.0f)
-                                                    {
-                                                        this.changeInput(this.xboxController.leftThumbstick.down.inputName);
-                                                    }
-                                                    else
-                                                    {
-                                                        if (this.xboxController.getRightStick().X > 0.0f)
-                                                        {
-                                                            this.changeInput(this.xboxController.rightThumbstick.right.inputName);
-                                                        }
-                                                        else
-                                                        {
-                                                            if (this.xboxController.getRightStick().X < 0.0f)
-                                                            {
-                                                                this.changeInput(this.xboxController.rightThumbstick.left.inputName);
-                                                            }
-                                                            else
-                                                            {
-                                                                if (this.xboxController.getRightStick().Y > 0.0f)
-                                                                {
-                                                                    this.changeInput(this.xboxController.rightThumbstick.up.inputName);
-                                                                }
-                                                                else
-                                                                {
-                                                                    if (this.xboxController.getRightStick().Y < 0.0f)
-                                                                    {
-                                                                        this.changeInput(this.xboxController.rightThumbstick.down.inputName);
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        /// <summary>
         /// Changes the input for a control defined in <see cref="changeInputResult"/> to the provided input string, <paramref name="input"/>.
         /// </summary>
         /// <param name="input"></param>
@@ -453,8 +315,9 @@ namespace Mo_Controls
                     modKeybind.Key = (KeyCode)Enum.Parse(typeof(KeyCode), input);
                 }
                 ModSettings_menu.SaveModBinds(this.changeInputResult.mod);
+
             }
-            this.changeInputResult = new ChangeInputResult();
+            this.changeInputResult = new ChangeInput();
         }
         /// <summary>
         /// Draws the main gui.
@@ -688,33 +551,57 @@ namespace Mo_Controls
         {
             // Written 03.08.2018
 
-            float tempValue;
-            bool saveSettings = false;
-            GUILayout.BeginArea(new Rect((Screen.width - MOUSE_EMULATION_GUI_HEIGHT - GUI_SPACE), GUI_SPACE, MOUSE_EMULATION_GUI_WIDHT, MOUSE_EMULATION_GUI_HEIGHT));
-            GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDHT) });
-            GUILayout.Label("Mouse Emulation");
-            GUILayout.Space(5f);
-            GUILayout.Label(String.Format("Mouse Deadzone: {0}", this.mouseEmulator.deadzone));
-            tempValue = GUILayout.HorizontalSlider(this.mouseEmulator.deadzone, MouseEmulator.MIN_DEADZONE, MouseEmulator.MAX_DEADZONE);
-            if (tempValue != this.mouseEmulator.deadzone) // Value Changed.
+            if (this.mouseEmulator.Emulating)
             {
-                this.mouseEmulator.deadzone = tempValue;
-                saveSettings = true;
-            }
-            GUILayout.Space(5f);
-            GUILayout.Label(String.Format("Mouse Sensitivity: {0}", this.mouseEmulator.sensitivity));
-            tempValue = GUILayout.HorizontalSlider(this.mouseEmulator.sensitivity, MouseEmulator.MIN_SENSITIVITY, MouseEmulator.MAX_SENSITIVITY);
-            if (tempValue != this.mouseEmulator.sensitivity) // Value Changed.
-            {
-                this.mouseEmulator.sensitivity = tempValue;
-                saveSettings = true;
-            }
-            GUILayout.EndVertical();
-            GUILayout.EndArea();
+                float tempValue;
+                bool saveSettings = false;
+                GUILayout.BeginArea(new Rect((Screen.width - MOUSE_EMULATION_GUI_WIDHT - GUI_SPACE), GUI_SPACE, MOUSE_EMULATION_GUI_WIDHT, MOUSE_EMULATION_GUI_HEIGHT));
+                GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDHT) });
+                GUILayout.Label("Mouse Emulation");
+                GUILayout.Space(5f);
+                GUILayout.Label(String.Format("Mouse Deadzone: {0}", this.mouseEmulator.deadzone));
+                tempValue = GUILayout.HorizontalSlider(this.mouseEmulator.deadzone, MouseEmulator.MIN_DEADZONE, MouseEmulator.MAX_DEADZONE);
+                if (tempValue != this.mouseEmulator.deadzone) // Value Changed.
+                {
+                    this.mouseEmulator.deadzone = tempValue;
+                    saveSettings = true;
+                }
+                GUILayout.Space(5f);
+                GUILayout.Label(String.Format("Mouse Sensitivity: {0}", this.mouseEmulator.sensitivity));
+                tempValue = GUILayout.HorizontalSlider(this.mouseEmulator.sensitivity, MouseEmulator.MIN_SENSITIVITY, MouseEmulator.MAX_SENSITIVITY);
+                if (tempValue != this.mouseEmulator.sensitivity) // Value Changed.
+                {
+                    this.mouseEmulator.sensitivity = tempValue;
+                    saveSettings = true;
+                }
+                GUILayout.Space(5f);
+                GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDHT - 10) });
+                GUILayout.Label(String.Format("{0}:", this.mouseEmulator.lmbPrimaryInput.Name));
+                this.drawCommonControl("Modifier", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Modifier.ToString(), 1, this);
+                this.drawCommonControl("Input", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Key.ToString(), 2, this);
+                GUILayout.EndVertical();
+                GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDHT - 10) });
+                GUILayout.Label(String.Format("{0}:", this.mouseEmulator.lmbSecondaryInput.Name));
+                this.drawCommonControl("Modifier", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Modifier.ToString(), 1, this);
+                this.drawCommonControl("Input", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Key.ToString(), 2, this);
+                GUILayout.EndVertical();
+                GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDHT - 10) });
+                GUILayout.Label(String.Format("{0}:", this.mouseEmulator.rmbPrimaryInput.Name));
+                this.drawCommonControl("Modifier", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Modifier.ToString(), 1, this);
+                this.drawCommonControl("Input", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Key.ToString(), 2, this);
+                GUILayout.EndVertical();
+                GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDHT - 10) });
+                GUILayout.Label(String.Format("{0}:", this.mouseEmulator.rmbSecondaryInput.Name));
+                this.drawCommonControl("Modifier", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Modifier.ToString(), 1, this);
+                this.drawCommonControl("Input", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Key.ToString(), 2, this);
+                GUILayout.EndVertical();
+                GUILayout.EndVertical();
+                GUILayout.EndArea();
 
-            if (saveSettings)
-            {
-                ModSettings_menu.SaveSettings(this);
+                if (saveSettings)
+                {
+                    ModSettings_menu.SaveSettings(this);
+                }
             }
         }
         /// <summary>
@@ -772,11 +659,7 @@ namespace Mo_Controls
             Settings.AddCheckBox(this, showDebugGui);
             Settings.AddCheckBox(this, this.showVirtualGui);
             Settings.AddCheckBox(this, this.monitiorXboxControllerConnectionStatus);
-            Settings.AddCheckBox(this, MouseEmulator.emulateMouse);
-            Settings.AddCheckBox(this, MouseEmulator.emulateMouse_useLeftThumbstick, "Emulate Mouse Settings");
-            Settings.AddCheckBox(this, MouseEmulator.emulateMouse_useRightThumbstick, "Emulate Mouse Settings");
-            Settings.AddSlider(this, MouseEmulator.mouseDeadzone, MouseEmulator.MIN_DEADZONE, MouseEmulator.MAX_DEADZONE);
-            Settings.AddSlider(this, MouseEmulator.mouseSensitivity, MouseEmulator.MIN_SENSITIVITY, MouseEmulator.MAX_SENSITIVITY);
+            MouseEmulator.onModSettings(this);
 
         }
         public override void OnLoad()
@@ -788,7 +671,7 @@ namespace Mo_Controls
                 this.modKeybindCount += Keybind.Get(mod).Count;
 
             instance = this;
-            this.changeInputResult = new ChangeInputResult();
+            this.changeInputResult = new ChangeInput();
             Keybind.Add(this, this.openControlsGui);
             this.controlInputs = new string[this.inputNames.Length, 3];
             this.loadControlInputsFromCInput();
@@ -798,7 +681,6 @@ namespace Mo_Controls
             XboxControllerManager.ControllerConnected += this.XboxControllerManager_ControllerConnected;
             XboxControllerManager.ControllerDisconnected += this.XboxControllerManager_ControllerDisconnected;
             this.mouseEmulator = new MouseEmulator(DeadzoneTypeEnum.ScaledRadial);
-
             ModConsole.Print(String.Format("{0} v{1}: Loaded", this.Name, this.Version));
         }
         public override void OnGUI()
@@ -838,7 +720,9 @@ namespace Mo_Controls
             }
             if (this.changeInputResult.reassignKey)
             {
-                this.monitorForInput();
+                MonitorInputData mid = Input.monitorForInput();
+                if (mid.foundInput)
+                    this.changeInput(mid.input);
             }
             this.xboxControllerManager.onRefresh();
         }
