@@ -3,7 +3,6 @@ using System.Drawing;
 using System.Threading;
 using System.Runtime.InteropServices;
 using UnityEngine;
-using xController = Mo_Controls.XboxController.XboxController;
 using XInputDotNetPure;
 using MSCLoader;
 
@@ -30,6 +29,10 @@ namespace Mo_Controls.MouseEmulation
         /// </summary>
         public static Settings emulateMouse_useRightThumbstick = new Settings("emulateMouse_useRightThumbstick", "Use right thumbstick for mouse emulation", true);
         /// <summary>
+        /// Represents whether the mod should use the d-pad for mouse emulation.
+        /// </summary>
+        public static Settings emulateMouse_useDPad = new Settings("emulateMouse_useDPad", "Use D-Pad for mouse emulation", false);
+        /// <summary>
         /// Represents the current sensitivity for the mouse.
         /// </summary>
         public static Settings mouseSensitivity = new Settings("MouseSensitivity", "Mouse Sensitivity", DEFAULT_SENSITIVITY);
@@ -40,15 +43,32 @@ namespace Mo_Controls.MouseEmulation
 
         #endregion
 
+        /// <summary>
+        /// Represents LMB input name.
+        /// </summary>
         public const string LMB_INPUT_NAME = "EmLMB";
+        /// <summary>
+        /// Represents RMB input name.
+        /// </summary>
         public const string RMB_INPUT_NAME = "RmLMB";
+        /// <summary>
+        /// Represents the primary input for LMB
+        /// </summary>
         public Keybind lmbPrimaryInput = new Keybind(LMB_INPUT_NAME + "1", "LMB Primary Input", KeyCode.None);
+        /// <summary>
+        /// Represents the secondary input for LMB
+        /// </summary>
         public Keybind lmbSecondaryInput = new Keybind(LMB_INPUT_NAME + "2", "LMB Secondary", KeyCode.None);
+        /// <summary>
+        /// Represents the primary input for RMB
+        /// </summary>
         public Keybind rmbPrimaryInput = new Keybind(RMB_INPUT_NAME + "1", "RMB Primary Input", KeyCode.None);
+        /// <summary>
+        /// Represents the secondary input for RMB
+        /// </summary>
         public Keybind rmbSecondaryInput = new Keybind(RMB_INPUT_NAME + "2", "RMB Secondary", KeyCode.None);
         /// <summary>
-        /// Returns the value of the setting, <see cref="emulateMouse_useLeftThumbstick"/>. if set to <see langword="true"/>; Changes, <see cref="inputType"/> to <see cref="InputTypeEnum.LeftThumbstick"/>,
-        /// else sets to <see cref="InputTypeEnum.RightThumbstick"/>.
+        /// Returns the value of the setting, <see cref="emulateMouse_useLeftThumbstick"/>. if set to <see langword="true"/>; Changes, <see cref="inputType"/> to <see cref="InputTypeEnum.LS"/>.
         /// </summary>
         public bool useLeftThumbstick
         {
@@ -60,14 +80,11 @@ namespace Mo_Controls.MouseEmulation
             {
                 emulateMouse_useLeftThumbstick.Value = value;
                 if (value)
-                    this.inputType = InputTypeEnum.LeftThumbstick;
-                else
-                    this.inputType = InputTypeEnum.RightThumbstick;
+                    this.inputType = InputTypeEnum.LS;
             }
         }
         /// <summary>
-        /// Returns the value of the setting, <see cref="emulateMouse_useRightThumbstick"/>. if set to <see langword="true"/>; Changes, <see cref="inputType"/> to <see cref="InputTypeEnum.RightThumbstick"/>,
-        /// else sets to <see cref="InputTypeEnum.LeftThumbstick"/>.
+        /// Returns the value of the setting, <see cref="emulateMouse_useRightThumbstick"/>. if set to <see langword="true"/>; Changes, <see cref="inputType"/> to <see cref="InputTypeEnum.RS"/>.
         /// </summary>
         public bool useRightThumbstick
         {
@@ -79,9 +96,33 @@ namespace Mo_Controls.MouseEmulation
             {
                 emulateMouse_useRightThumbstick.Value = value;
                 if (value)
-                    this.inputType = InputTypeEnum.RightThumbstick;
-                else
-                    this.inputType = InputTypeEnum.LeftThumbstick;
+                    this.inputType = InputTypeEnum.RS;
+            }
+        }
+        /// <summary>
+        /// Returns the value of the setting, <see cref="emulateMouse_useDPad"/>. if set to <see langword="true"/>; Changes, <see cref="inputType"/> to <see cref="InputTypeEnum.DPad"/>.
+        /// </summary>
+        public bool useDPad
+        {
+            get
+            {
+                return (bool)emulateMouse_useDPad.Value;
+            }
+            set
+            {
+                emulateMouse_useDPad.Value = value;
+                if (value)
+                    this.inputType = InputTypeEnum.DPad;
+            }
+        }
+        /// <summary>
+        /// Returns the <see cref="Settings.Name"/> property of the setting, <see cref="emulateMouse_useDPad"/>.
+        /// </summary>
+        public string getUseDPadSettingName
+        {
+            get
+            {
+                return emulateMouse_useDPad.Name;
             }
         }
         /// <summary>
@@ -128,7 +169,7 @@ namespace Mo_Controls.MouseEmulation
                 if (value)
                 {
                     ModConsole.Print(String.Format("Started Emulating mouse as {0}.",
-                        this.inputType == InputTypeEnum.LeftThumbstick ? "Left Thumbstick" : "Right Thumbstick"));
+                        this.inputType == InputTypeEnum.LS ? "Left Thumbstick" : "Right Thumbstick"));
                 }
                 else
                 {
@@ -140,7 +181,7 @@ namespace Mo_Controls.MouseEmulation
         /// <summary>
         /// Returns the current position of the cursor.
         /// </summary>
-        public Point getCursorPosition
+        public static Point getCursorPosition
         {
             get
             {
@@ -241,6 +282,7 @@ namespace Mo_Controls.MouseEmulation
             this.Emulating = this.Emulating;
             this.useLeftThumbstick = this.useLeftThumbstick;
             this.useRightThumbstick = this.useRightThumbstick;
+            this.useDPad = this.useDPad;
             this.deadzoneType = deadzoneType;
             Keybind.Add(Mo_Controls.instance, this.lmbPrimaryInput);
             Keybind.Add(Mo_Controls.instance, this.lmbSecondaryInput);
@@ -292,33 +334,81 @@ namespace Mo_Controls.MouseEmulation
             SendInput((uint)MouseEvent.Length, MouseEvent, Marshal.SizeOf(MouseEvent[0].GetType()));
         }
         /// <summary>
+        /// Simulates a left mouse button click.
+        /// </summary>
+        private static void simulateLeftClick()
+        {
+            // Written, 04.08.2018
+
+            Point tempCursPos = getCursorPosition;
+            int X = tempCursPos.X;
+            int Y = tempCursPos.Y;
+            mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
+        }
+        /// <summary>
+        /// Simulates a right mouse button click
+        /// </summary>
+        private static void simulateRightClick()
+        {
+            // Written, 04.08.2018
+
+            Point tempCursPos = getCursorPosition;
+            int X = tempCursPos.X;
+            int Y = tempCursPos.Y;
+            mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, X, Y, 0, 0);
+        }
+        /// <summary>
         /// Should be called every frame; on <see cref="Mod.Update()"/>.
         /// </summary>
         public void onUpdate()
         {
             // Written, 01.08.2018
 
-            Thread thread = new Thread(delegate ()
+            if (this.Emulating)
             {
-                if (this.Emulating)
+                Thread thread = new Thread(delegate ()
                 {
+
                     GamePadThumbSticks.StickValue stickValue_temp = default(GamePadThumbSticks.StickValue);
-                    Vector2 stickValue;
+                    Vector2 stickValue = Vector2.zero;
                     int moveX;
                     int moveY;
 
                     switch (this.inputType)
                     {
-                        case InputTypeEnum.LeftThumbstick:
+                        case InputTypeEnum.LS:
                             stickValue_temp = Mo_Controls.instance.xboxController.getLeftStick();
                             break;
-                        case InputTypeEnum.RightThumbstick:
+                        case InputTypeEnum.RS:
                             stickValue_temp = Mo_Controls.instance.xboxController.getRightStick();
                             break;
                     }
 
-                    stickValue.x = stickValue_temp.X;
-                    stickValue.y = stickValue_temp.Y;
+                    if (this.inputType != InputTypeEnum.DPad)
+                    {
+                        stickValue.x = stickValue_temp.X;
+                        stickValue.y = stickValue_temp.Y;
+                    }
+                    else
+                    {
+                        XboxController.XboxController xboxController = Mo_Controls.instance.xboxController;
+                        if (xboxController.DPadLeft.state == ButtonState.Pressed)
+                        {
+                            stickValue.x = -1;
+                        }
+                        if (xboxController.DPadRight.state == ButtonState.Pressed)
+                        {
+                            stickValue.x = 1;
+                        }
+                        if (xboxController.DPadUp.state == ButtonState.Pressed)
+                        {
+                            stickValue.y = 1;
+                        }
+                        if (xboxController.DPadDown.state == ButtonState.Pressed)
+                        {
+                            stickValue.y = -1;
+                        }
+                    }
 
                     // Deadzone
                     stickValue = this.doDeadzoneCheck(stickValue);
@@ -331,15 +421,16 @@ namespace Mo_Controls.MouseEmulation
 
                     if (this.lmbPrimaryInput.IsDown() || this.lmbSecondaryInput.IsDown())
                     {
-                        this.simulateLeftClick();
+                        simulateLeftClick();
                     }
                     if (this.rmbPrimaryInput.IsDown() || this.rmbSecondaryInput.IsDown())
                     {
-                        this.simulateRightClick();
+                        simulateRightClick();
                     }
-                }
-            });
-            thread.Start();
+
+                });
+                thread.Start();
+            }
         }
         /// <summary>
         /// Should be called on <see cref="Mod.ModSettings"/>.
@@ -353,6 +444,7 @@ namespace Mo_Controls.MouseEmulation
             Settings.AddCheckBox(moC, emulateMouse);
             Settings.AddCheckBox(moC, emulateMouse_useLeftThumbstick, "Emulate Mouse Settings");
             Settings.AddCheckBox(moC, emulateMouse_useRightThumbstick, "Emulate Mouse Settings");
+            Settings.AddCheckBox(moC, emulateMouse_useDPad, "Emulate Mouse Settings");
             Settings.AddSlider(moC, mouseDeadzone, MIN_DEADZONE, MAX_DEADZONE);
             Settings.AddSlider(moC, mouseSensitivity, MIN_SENSITIVITY, MAX_SENSITIVITY);
         }
@@ -379,30 +471,6 @@ namespace Mo_Controls.MouseEmulation
                     break;
             }
             return deadzonedStickValue;
-        }
-        /// <summary>
-        /// Simulates a left mouse button click.
-        /// </summary>
-        public void simulateLeftClick()
-        {
-            // Written, 04.08.2018
-
-            Point tempCursPos = this.getCursorPosition;
-            int X = tempCursPos.X;
-            int Y = tempCursPos.Y;
-            mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
-        }
-        /// <summary>
-        /// Simulates a right mouse button click
-        /// </summary>
-        public void simulateRightClick()
-        {
-            // Written, 04.08.2018
-
-            Point tempCursPos = this.getCursorPosition;
-            int X = tempCursPos.X;
-            int Y = tempCursPos.Y;
-            mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, X, Y, 0, 0);
         }
 
         #endregion

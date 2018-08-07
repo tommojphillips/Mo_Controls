@@ -1,0 +1,55 @@
+Mo'Controls, assign your driving controls to both, the keyboard and an Xbox controller at the same time! Control/Move the players camera/head around with the Xbox Controllers' Thumb Stick!
+Note, i have only tested the Xbox one controller,
+# Bluetooth does not work! you must plug your controller in via, a cord!
+
+Default key to get up GUI is F12, you can change this, via the mod loader settings (Ctrl+M => Mo'Controls Settings => Keybindings)
+----------------------------------------------------------
+[ATTACH=full]263475[/ATTACH] [ATTACH=full]263476[/ATTACH] [ATTACH=full]263484[/ATTACH]
+-------------------------------------------------------------
+CHANGE LOG:
+
+# v1.0.1
+
+    # Fixed bug with D-Pad not working as expected!
+
+#v1.0.2
+
+    # Reworked GUI.
+    # Added Mouse Emulation; You can now use your Xbox Controllers' Thumb Sticks to move the players camera/head.
+    # Added functionality to detect Xbox controller axes input; You can now assign e.g. D-pad-Down to Player-Left simply by pressing it.
+    # Added Xbox controller support via, Xinput.
+    # Added Xbox controller icons to display game control Xbox input.
+
+----------------------------------------------------------
+HOW TO INSTALL:
+
+1.) Extract "Mo'Controls vx.x.x Installation Package.rar" (where "x.x.x" is the version) to a folder.
+2.) Copy "Required References\XInputDotNePure.dll" into "My Summer Car\mysummercar_Data\Managed\".
+3.) Copy "Requried References\XInputInterface.dll" into "My
+Summer Car\" (Next to mysummercar.exe).
+4.) Copy "Mo'Controls.dll" into your mods folders .
+5.) Copy the folder, "Assets" into your mods folder.
+
+[MEDIA=youtube]itJsZ08PURk[/MEDIA]
+
+If you have successfully installed the mod, in the mod console in-game it should display the message, "Mo'Controls Vx.x.x: Loaded"
+----------------------------------------------------------
+KNOWN BUGS/ISSUES:
+
+# Minor conflict with "GrabAnything" mod has been discovered, Mo'Controls GUI background color is black.
+# If you change controls within the game settings, it will reset all you secondary control inputs!
+----------------------------------------------------------
+UP COMING IMPLEMENTATIONS:
+
+# Be able to control the mouse with the an Xbox controller. Done - v1.0.2
+# Be able to change the dead zone for Xbox controller axes.
+# Rumble features.
+# Xbox Controller support. Done  - v1.0.2
+---------------------------------------------------------
+# Please let me know if you are having issues or you have found a potential bug! Thanks.
+# If you like my mod, please review it!
+# if you have an issue with the mod please, use the support & feedback thread.
+# If you have any suggestions for this mod, or have a mod request please comment/message me!
+
+Designed for Mod-loader v0.4.4
+----------------------------------------------------------

@@ -82,7 +82,7 @@
     <Compile Include="XboxController\XboxControllerManager.cs" />
     <Compile Include="XboxController\XboxControlTypeEnum.cs" />
     <Compile Include="XboxController\XboxRumble.cs" />
-    <Compile Include="XboxController\XboxThumbStick.cs" />
+    <Compile Include="XboxController\XboxJoyStick.cs" />
     <Compile Include="XboxController\XboxTriggerState.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,6 +1,6 @@
 ﻿namespace Mo_Controls.XboxController
 {
-    public class XboxThumbstick
+    public class XboxJoystick
     {
         // Written, 21.07.2018
 
@@ -60,13 +60,13 @@
         #region Constuctors
 
         /// <summary>
-        /// Initializes a new instance of <see cref="XboxThumbstick"/>.
+        /// Initializes a new instance of <see cref="XboxJoystick"/>.
         /// </summary>
         /// <param name="inLeft">The left input.</param>
         /// <param name="inRight">The right input.</param>
         /// <param name="inUp">The up input.</param>
         /// <param name="inDown">The down input.</param>
-        public XboxThumbstick(XboxControl inLeft, XboxControl inRight, XboxControl inUp, XboxControl inDown)
+        public XboxJoystick(XboxControl inLeft, XboxControl inRight, XboxControl inUp, XboxControl inDown)
         {
             // Written, 21.07.2018
 
