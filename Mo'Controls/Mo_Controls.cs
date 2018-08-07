@@ -14,7 +14,7 @@ namespace Mo_Controls
     public class Mo_Controls : Mod
     {
         // Written, 06.07.2018        
-        
+
         #region Mod Fields
 
         public override string ID => "Mo_Controls";
@@ -171,9 +171,17 @@ namespace Mo_Controls
         /// Represents the scroll position of the scroll bar for the virtual xbox axis gui.
         /// </summary>
         private Vector2 virtualAxisGuiScrollPosition;
+        /// <summary>
+        /// Represents the scroll position of the scroll bar for the xbox controller debug gui.
+        /// </summary>
+        private Vector2 xboxControllerDebugGuiScrollPosition;
+        /// <summary>
+        /// Represents the scroll position of the scroll bar for the mouse emulator gui.
+        /// </summary>
+        private Vector2 mouseEmulatorGuiScrollPosition;
 
         // Constants
-        
+
         /// <summary>
         /// Represents the width for the main (game/mod controls/keybinds) gui.
         /// </summary>
@@ -187,10 +195,9 @@ namespace Mo_Controls
         /// </summary>
         private const float VIRTUAL_XBOX_AXES_GUI_WIDTH = 180f;
         /// <summary>
-        /// Represents the height for the virtual axes gui.
+        /// /// Represents the height for the virtual axes gui.
         /// </summary>
         private const float VIRTUAL_XBOX_AXES_GUI_HEIGHT = 600f;
-        /// <summary>
         /// Represents the width for the xbox controller debug gui.
         /// </summary>
         private const float XBOX_CONTROLLER_DEBUG_GUI_WIDTH = 250f;
@@ -213,7 +220,11 @@ namespace Mo_Controls
         /// <summary>
         /// Represents the height of the emulation settings gui.
         /// </summary>
-        private const float MOUSE_EMULATION_GUI_HEIGHT = 850f;//725f;
+        private const float MOUSE_EMULATION_GUI_HEIGHT = 845f;
+        /// <summary>
+        /// Represents the off set of the scroll bar.
+        /// </summary>
+        private const float SCROLLBAR_OFFSET = 7f;
 
         #endregion
 
@@ -381,7 +392,7 @@ namespace Mo_Controls
             float top = INFO_GUI_HEIGHT + GUI_SPACE - (this.showSettings ? 0 : SETTINGS_HEIGHT);
             GUILayout.BeginArea(new Rect(GUI_SPACE, top, CONTROLS_GUI_WIDTH, this.evaluateGameControlsGuiHeight()));
             GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(CONTROLS_GUI_WIDTH) });
-            this.controlsGuiScrollPosition = GUILayout.BeginScrollView(this.controlsGuiScrollPosition, false, true, new GUILayoutOption[1] { GUILayout.Width(CONTROLS_GUI_WIDTH - 7) });
+            this.controlsGuiScrollPosition = GUILayout.BeginScrollView(this.controlsGuiScrollPosition, false, false, new GUILayoutOption[1] { GUILayout.Width(CONTROLS_GUI_WIDTH - SCROLLBAR_OFFSET) });
 
             #region Game Controls
 
@@ -446,16 +457,18 @@ namespace Mo_Controls
         {
             // Written, 10.07.2018
 
-            GUILayout.BeginArea(new Rect(CONTROLS_GUI_WIDTH + (GUI_SPACE * 2), GUI_SPACE, VIRTUAL_XBOX_AXES_GUI_WIDTH, VIRTUAL_XBOX_AXES_GUI_HEIGHT));
+            bool isGreaterThanScreen = VIRTUAL_XBOX_AXES_GUI_HEIGHT >= Screen.height;
+            float offset = isGreaterThanScreen ? 35 : GUI_SPACE;
+            GUILayout.BeginArea(new Rect(CONTROLS_GUI_WIDTH + (GUI_SPACE * 2), GUI_SPACE, VIRTUAL_XBOX_AXES_GUI_WIDTH, (isGreaterThanScreen ? (Screen.height - (GUI_SPACE * 2)) : (VIRTUAL_XBOX_AXES_GUI_HEIGHT))));
             GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(VIRTUAL_XBOX_AXES_GUI_WIDTH) });
             GUILayout.Label("Virtual xbox controller axes");
-            this.virtualAxisGuiScrollPosition = GUILayout.BeginScrollView(this.virtualAxisGuiScrollPosition, false, true, new GUILayoutOption[1] { GUILayout.Width(VIRTUAL_XBOX_AXES_GUI_WIDTH) });
+            this.virtualAxisGuiScrollPosition = GUILayout.BeginScrollView(this.virtualAxisGuiScrollPosition, false, false, new GUILayoutOption[1] { GUILayout.Width(VIRTUAL_XBOX_AXES_GUI_WIDTH - SCROLLBAR_OFFSET) });
             foreach (XboxControl xboxControl in this.xboxController.getXboxControls())
             {
                 if (xboxControl.controlType == XboxControlTypeEnum.Axis)
                 {
-                    GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(VIRTUAL_XBOX_AXES_GUI_WIDTH - 35) });
-                    if (GUILayout.Button(xboxControl.texture, new GUILayoutOption[1] { GUILayout.Width(VIRTUAL_XBOX_AXES_GUI_WIDTH - 35) }))
+                    GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(VIRTUAL_XBOX_AXES_GUI_WIDTH - offset) });
+                    if (GUILayout.Button(xboxControl.texture, new GUILayoutOption[1] { GUILayout.Width(VIRTUAL_XBOX_AXES_GUI_WIDTH - offset) }))
                     {
                         if (this.changeInputResult.reassignKey)
                         {
@@ -477,51 +490,55 @@ namespace Mo_Controls
             // Written, 19.07.2018
 
             float left = this.changeInputResult.reassignKey && (bool)this.showVirtualGui.Value ? (CONTROLS_GUI_WIDTH + VIRTUAL_XBOX_AXES_GUI_WIDTH + (GUI_SPACE * 3)) : (CONTROLS_GUI_WIDTH + (GUI_SPACE * 2));
-            GUILayout.BeginArea(new Rect(left, GUI_SPACE, XBOX_CONTROLLER_DEBUG_GUI_WIDTH, XBOX_CONTROLLER_DEBUG_GUI_HEIGHT));
-            GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(XBOX_CONTROLLER_DEBUG_GUI_WIDTH) });   
+            bool isGreaterThanScreen = XBOX_CONTROLLER_DEBUG_GUI_HEIGHT >= Screen.height;
+            float offset = isGreaterThanScreen ? 31 : GUI_SPACE;
+            GUILayout.BeginArea(new Rect(left, GUI_SPACE, XBOX_CONTROLLER_DEBUG_GUI_WIDTH, (isGreaterThanScreen ? (Screen.height - (GUI_SPACE * 2)) : (XBOX_CONTROLLER_DEBUG_GUI_HEIGHT))));
+            GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(XBOX_CONTROLLER_DEBUG_GUI_WIDTH - offset - SCROLLBAR_OFFSET) });
+            this.xboxControllerDebugGuiScrollPosition = GUILayout.BeginScrollView(this.xboxControllerDebugGuiScrollPosition, false, false, new GUILayoutOption[1] { GUILayout.Width(XBOX_CONTROLLER_DEBUG_GUI_WIDTH - SCROLLBAR_OFFSET) });
             GUILayout.Label("Xbox Controller Debug");
             GUILayout.Space(5f);
             GUILayout.Label("Xbox Controller Status: " + (this.xboxController.isConnected ? "Connected" : "Disconnected"));
             if (this.xboxController.isConnected)
             {                
                 // Triggers
-                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(XBOX_CONTROLLER_DEBUG_GUI_WIDTH - GUI_SPACE) });
+                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(XBOX_CONTROLLER_DEBUG_GUI_WIDTH - offset - SCROLLBAR_OFFSET) });
                 GUILayout.Label("Triggers:");
                 GUILayout.Label(String.Format("Left: {0}\r\nRight: {1}", Math.Round(this.xboxController.getLeftTrigger(), 2), Math.Round(this.xboxController.getRightTrigger(), 2)));
                 GUILayout.EndVertical();
                 // Bumpers
                 GUILayout.Space(5f);
-                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(XBOX_CONTROLLER_DEBUG_GUI_WIDTH - GUI_SPACE) });
+                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(XBOX_CONTROLLER_DEBUG_GUI_WIDTH - offset - SCROLLBAR_OFFSET) });
                 GUILayout.Label("Bumpers:");
                 GUILayout.Label(String.Format("Left: {0}\r\nRight: {1}", this.xboxController.LB.state, this.xboxController.RB.state));
                 GUILayout.EndVertical();
                 // Left Thumbsick
                 GUILayout.Space(5f);
-                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(XBOX_CONTROLLER_DEBUG_GUI_WIDTH - GUI_SPACE) });
+                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(XBOX_CONTROLLER_DEBUG_GUI_WIDTH - offset - SCROLLBAR_OFFSET) });
                 GUILayout.Label("Left Thumbstick:");
                 GUILayout.Label(String.Format("X: {0}\r\nY: {1}\r\nLS: {2}", Math.Round(this.xboxController.getLeftStick().X, 2), Math.Round(this.xboxController.getLeftStick().Y, 2), this.xboxController.LS.state));
                 GUILayout.EndVertical();
                 // Right Thumbstick
                 GUILayout.Space(5f);
-                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(XBOX_CONTROLLER_DEBUG_GUI_WIDTH - GUI_SPACE) });
+                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(XBOX_CONTROLLER_DEBUG_GUI_WIDTH - offset - SCROLLBAR_OFFSET) });
                 GUILayout.Label("Right Thumbstick:");
                 GUILayout.Label(String.Format("X: {0}\r\nY: {1}\r\nRS: {2}", Math.Round(this.xboxController.getRightStick().X, 2), Math.Round(this.xboxController.getRightStick().Y, 2), this.xboxController.RS.state));
                 GUILayout.EndVertical();
                 // Buttons
                 GUILayout.Space(5f);
-                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(XBOX_CONTROLLER_DEBUG_GUI_WIDTH - GUI_SPACE) });
+                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(XBOX_CONTROLLER_DEBUG_GUI_WIDTH - offset - SCROLLBAR_OFFSET) });
                 GUILayout.Label("Buttons");
                 GUILayout.Label(String.Format("A: {0}\r\nB: {1}\r\nX: {2}\r\nY: {3}\r\nStart: {4}\r\nBack: {5}",
                     this.xboxController.A.state, this.xboxController.B.state, this.xboxController.X.state, this.xboxController.Y.state, this.xboxController.Start.state, this.xboxController.Back.state));
                 GUILayout.EndVertical();
                 // D-Pad
                 GUILayout.Space(5f);
-                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(XBOX_CONTROLLER_DEBUG_GUI_WIDTH - GUI_SPACE) });
+                GUILayout.BeginVertical("Box", new GUILayoutOption[1] { GUILayout.Width(XBOX_CONTROLLER_DEBUG_GUI_WIDTH - offset - SCROLLBAR_OFFSET) });
                 GUILayout.Label("D-Pad");
                 GUILayout.Label(
                     String.Format("Up: {0}\r\nDown: {1}\r\nLeft: {2}\r\nRight: {3}", this.xboxController.DPadUp.state, this.xboxController.DPadDown.state, this.xboxController.DPadLeft.state, this.xboxController.DPadRight.state));
                 GUILayout.EndVertical();
             }
+            GUILayout.EndScrollView();
             GUILayout.EndVertical();
             GUILayout.EndArea();
         }
@@ -534,8 +551,12 @@ namespace Mo_Controls
 
             float tempValue;
             bool saveSettings = false;
-            GUILayout.BeginArea(new Rect((Screen.width - MOUSE_EMULATION_GUI_WIDTH - GUI_SPACE), GUI_SPACE, MOUSE_EMULATION_GUI_WIDTH, MOUSE_EMULATION_GUI_HEIGHT));
-            GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDTH) });
+            bool isGreaterThanScreen = MOUSE_EMULATION_GUI_HEIGHT >= Screen.height;
+            float offset = isGreaterThanScreen ? 31 : GUI_SPACE;
+            GUILayout.BeginArea(new Rect((Screen.width - MOUSE_EMULATION_GUI_WIDTH - GUI_SPACE), GUI_SPACE, MOUSE_EMULATION_GUI_WIDTH, (isGreaterThanScreen ? (Screen.height - (GUI_SPACE * 2)) : (MOUSE_EMULATION_GUI_HEIGHT))));
+            GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDTH - offset - SCROLLBAR_OFFSET) });
+            this.mouseEmulatorGuiScrollPosition = 
+                GUILayout.BeginScrollView(this.mouseEmulatorGuiScrollPosition, false, false, new GUILayoutOption[1] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDTH - SCROLLBAR_OFFSET) });
             GUILayout.Label("Mouse Emulation");
             GUILayout.Space(5f);
             GUILayout.Label(String.Format("Mouse Deadzone: {0}", this.mouseEmulator.deadzone));
@@ -594,26 +615,27 @@ namespace Mo_Controls
                 }
             }
             GUILayout.Space(5f);
-            GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDTH - 10) });
+            GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDTH - offset - SCROLLBAR_OFFSET) });
             GUILayout.Label(String.Format("{0}:", this.mouseEmulator.lmbPrimaryInput.Name));
             this.drawCommonControl("Modifier", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Modifier.ToString(), 1, this);
             this.drawCommonControl("Input", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Key.ToString(), 2, this);
             GUILayout.EndVertical();
-            GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDTH - 10) });
+            GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDTH - offset - SCROLLBAR_OFFSET) });
             GUILayout.Label(String.Format("{0}:", this.mouseEmulator.lmbSecondaryInput.Name));
             this.drawCommonControl("Modifier", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Modifier.ToString(), 1, this);
             this.drawCommonControl("Input", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Key.ToString(), 2, this);
             GUILayout.EndVertical();
-            GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDTH - 10) });
+            GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDTH - offset - SCROLLBAR_OFFSET) });
             GUILayout.Label(String.Format("{0}:", this.mouseEmulator.rmbPrimaryInput.Name));
             this.drawCommonControl("Modifier", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Modifier.ToString(), 1, this);
             this.drawCommonControl("Input", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Key.ToString(), 2, this);
             GUILayout.EndVertical();
-            GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDTH - 10) });
+            GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDTH - offset - SCROLLBAR_OFFSET) });
             GUILayout.Label(String.Format("{0}:", this.mouseEmulator.rmbSecondaryInput.Name));
             this.drawCommonControl("Modifier", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Modifier.ToString(), 1, this);
             this.drawCommonControl("Input", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Key.ToString(), 2, this);
             GUILayout.EndVertical();
+            GUILayout.EndScrollView();
             GUILayout.EndVertical();
             GUILayout.EndArea();
 
@@ -662,7 +684,7 @@ namespace Mo_Controls
             if (!this.showGameControls && !this.showModControls)
                 height = 65f;
             else
-                height = (Screen.height - INFO_GUI_HEIGHT) - GUI_SPACE * 2;
+                height = ((Screen.height - INFO_GUI_HEIGHT) + (this.showSettings ? 0 : SETTINGS_HEIGHT)) - (GUI_SPACE * 2);
             return height;
         }
         private void performModLoaderVersionCheck()
