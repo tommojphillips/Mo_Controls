@@ -255,7 +255,7 @@ namespace Mo_Controls.XboxController
         /// <summary>
         /// Represents the left thumbstick on the xbox controller.
         /// </summary>
-        public XboxThumbstick leftThumbstick
+        public XboxJoystick leftThumbstick
         {
             get;
             private set;
@@ -263,7 +263,15 @@ namespace Mo_Controls.XboxController
         /// <summary>
         /// Represents the right thumbstick on the xbox controller.
         /// </summary>
-        public XboxThumbstick rightThumbstick
+        public XboxJoystick rightThumbstick
+        {
+            get;
+            private set;
+        }
+        /// <summary>
+        /// Represents the d-pad on the xbox controller.
+        /// </summary>
+        public XboxJoystick DPad
         {
             get;
             private set;
@@ -324,16 +332,21 @@ namespace Mo_Controls.XboxController
                 new XboxControl(String.Format("{0}5+", axisPrefix), "RS-Down", XboxControlTypeEnum.Axis)
             };
             // Thumbsticks
-            this.leftThumbstick = new XboxThumbstick(
+            this.leftThumbstick = new XboxJoystick(
                 this.xboxControls[16],
                 this.xboxControls[17],
                 this.xboxControls[18],
                 this.xboxControls[19]);
-            this.rightThumbstick = new XboxThumbstick(
+            this.rightThumbstick = new XboxJoystick(
                 this.xboxControls[20],
                 this.xboxControls[21],
                 this.xboxControls[22],
                 this.xboxControls[23]);
+            this.DPad = new XboxJoystick(
+                this.DPadLeft,
+                this.DPadRight,
+                this.DPadUp,
+                this.DPadDown);
 
             #endregion
 

@@ -20,7 +20,7 @@ namespace Mo_Controls
         public override string ID => "Mo_Controls";
         public override string Name => "Mo'Controls";
         public override string Author => "tommojphillips";
-        public override string Version => "1.0.2";
+        public override string Version => "1.0.3";
         public override bool UseAssetsFolder => true;
 
         #endregion
@@ -181,7 +181,7 @@ namespace Mo_Controls
         /// <summary>
         /// Represents the height of the info gui.
         /// </summary>
-        private const float INFO_GUI_HEIGHT = 340f;
+        private const float INFO_GUI_HEIGHT = 235f;//340f;
         /// <summary>
         /// Represents the width for the virtual axes gui.
         /// </summary>
@@ -205,14 +205,15 @@ namespace Mo_Controls
         /// <summary>
         /// Represents the height of the settings in the info gui.
         /// </summary>
-        private const float SETTINGS_HEIGHT = 210f;
+        private const float SETTINGS_HEIGHT = 100f;
         /// <summary>
-        /// Represents the height of the emulation settings gui (within INFO GUI) segement.
+        /// Represents the width of the emulation settings gui.
         /// </summary>
-        private const float EMULATION_SETTINGS_HEIGHT = 70f;
-
-        private const float MOUSE_EMULATION_GUI_WIDHT = 400f;
-        private const float MOUSE_EMULATION_GUI_HEIGHT = 725f;
+        private const float MOUSE_EMULATION_GUI_WIDTH = 400f;
+        /// <summary>
+        /// Represents the height of the emulation settings gui.
+        /// </summary>
+        private const float MOUSE_EMULATION_GUI_HEIGHT = 850f;//725f;
 
         #endregion
 
@@ -363,32 +364,10 @@ namespace Mo_Controls
                 {
                     this.monitiorXboxControllerConnectionStatus.Value = !(bool)this.monitiorXboxControllerConnectionStatus.Value;
                     saveSettings = true;
-                }
-                if (GUILayout.Toggle(this.mouseEmulator.Emulating, String.Format("{0}: {1}", this.mouseEmulator.getEmulateMouseSettingName, this.mouseEmulator.inputType == InputTypeEnum.LeftThumbstick ? "Using LS" : "Using RS")) != this.mouseEmulator.Emulating)
-                {
-                    this.mouseEmulator.Emulating = !this.mouseEmulator.Emulating;
-                    saveSettings = true;
-                }
-                if (this.mouseEmulator.Emulating)
-                {
-                    // As left + right thumb stick settings are grouped; need to manually change other value..
-                    if (GUILayout.Toggle(this.mouseEmulator.useLeftThumbstick, String.Format("{0}: {1}", this.mouseEmulator.getUseLeftThumbstickSettingName, this.mouseEmulator.useLeftThumbstick ? "ON" : "")) != this.mouseEmulator.useLeftThumbstick)
-                    {
-                        this.mouseEmulator.useLeftThumbstick = !this.mouseEmulator.useLeftThumbstick;
-                        this.mouseEmulator.useRightThumbstick = !this.mouseEmulator.useLeftThumbstick;
-                        saveSettings = true;
-                    }
-                    if (GUILayout.Toggle(this.mouseEmulator.useRightThumbstick, String.Format("{0}: {1}", this.mouseEmulator.getUseRightThumbstickSettingName, this.mouseEmulator.useRightThumbstick ? "ON" : "")) != this.mouseEmulator.useRightThumbstick)
-                    {
-                        this.mouseEmulator.useRightThumbstick = !this.mouseEmulator.useRightThumbstick;
-                        this.mouseEmulator.useLeftThumbstick = !this.mouseEmulator.useRightThumbstick;
-                        saveSettings = true;
-                    }
-                }
+                }                
                 if (saveSettings)
                 {
                     ModSettings_menu.SaveSettings(this);
-                    //ModSettings_menu.LoadSettings();
                 }
             }
 
@@ -399,7 +378,7 @@ namespace Mo_Controls
 
             #endregion
 
-            float top = INFO_GUI_HEIGHT + GUI_SPACE - (this.showSettings ? (this.mouseEmulator.Emulating ? 0 : EMULATION_SETTINGS_HEIGHT) : SETTINGS_HEIGHT);
+            float top = INFO_GUI_HEIGHT + GUI_SPACE - (this.showSettings ? 0 : SETTINGS_HEIGHT);
             GUILayout.BeginArea(new Rect(GUI_SPACE, top, CONTROLS_GUI_WIDTH, this.evaluateGameControlsGuiHeight()));
             GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(CONTROLS_GUI_WIDTH) });
             this.controlsGuiScrollPosition = GUILayout.BeginScrollView(this.controlsGuiScrollPosition, false, true, new GUILayoutOption[1] { GUILayout.Width(CONTROLS_GUI_WIDTH - 7) });
@@ -553,57 +532,94 @@ namespace Mo_Controls
         {
             // Written 03.08.2018
 
+            float tempValue;
+            bool saveSettings = false;
+            GUILayout.BeginArea(new Rect((Screen.width - MOUSE_EMULATION_GUI_WIDTH - GUI_SPACE), GUI_SPACE, MOUSE_EMULATION_GUI_WIDTH, MOUSE_EMULATION_GUI_HEIGHT));
+            GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDTH) });
+            GUILayout.Label("Mouse Emulation");
+            GUILayout.Space(5f);
+            GUILayout.Label(String.Format("Mouse Deadzone: {0}", this.mouseEmulator.deadzone));
+            tempValue = GUILayout.HorizontalSlider(this.mouseEmulator.deadzone, MouseEmulator.MIN_DEADZONE, MouseEmulator.MAX_DEADZONE);
+            if (tempValue != this.mouseEmulator.deadzone) // Value Changed.
+            {
+                this.mouseEmulator.deadzone = tempValue;
+                saveSettings = true;
+            }
+            GUILayout.Space(5f);
+            GUILayout.Label(String.Format("Mouse Sensitivity: {0}", this.mouseEmulator.sensitivity));
+            tempValue = GUILayout.HorizontalSlider(this.mouseEmulator.sensitivity, MouseEmulator.MIN_SENSITIVITY, MouseEmulator.MAX_SENSITIVITY);
+            if (tempValue != this.mouseEmulator.sensitivity) // Value Changed.
+            {
+                this.mouseEmulator.sensitivity = tempValue;
+                saveSettings = true;
+            }
+            GUILayout.Space(5f);
+            if (GUILayout.Toggle(this.mouseEmulator.Emulating, String.Format("{0}: Using {1}", this.mouseEmulator.getEmulateMouseSettingName, this.mouseEmulator.inputType)) != this.mouseEmulator.Emulating)
+            {
+                this.mouseEmulator.Emulating = !this.mouseEmulator.Emulating;
+                saveSettings = true;
+            }
             if (this.mouseEmulator.Emulating)
             {
-                float tempValue;
-                bool saveSettings = false;
-                GUILayout.BeginArea(new Rect((Screen.width - MOUSE_EMULATION_GUI_WIDHT - GUI_SPACE), GUI_SPACE, MOUSE_EMULATION_GUI_WIDHT, MOUSE_EMULATION_GUI_HEIGHT));
-                GUILayout.BeginVertical("box", new GUILayoutOption[1] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDHT) });
-                GUILayout.Label("Mouse Emulation");
-                GUILayout.Space(5f);
-                GUILayout.Label(String.Format("Mouse Deadzone: {0}", this.mouseEmulator.deadzone));
-                tempValue = GUILayout.HorizontalSlider(this.mouseEmulator.deadzone, MouseEmulator.MIN_DEADZONE, MouseEmulator.MAX_DEADZONE);
-                if (tempValue != this.mouseEmulator.deadzone) // Value Changed.
+                // As left + right thumb stick settings are grouped; need to manually change other value..
+                if (GUILayout.Toggle(this.mouseEmulator.useLeftThumbstick, String.Format("{0}: {1}", this.mouseEmulator.getUseLeftThumbstickSettingName, this.mouseEmulator.useLeftThumbstick ? "ON" : "")) != this.mouseEmulator.useLeftThumbstick)
                 {
-                    this.mouseEmulator.deadzone = tempValue;
-                    saveSettings = true;
+                    if (this.mouseEmulator.inputType != InputTypeEnum.LS)
+                    {
+                        this.mouseEmulator.useLeftThumbstick = !this.mouseEmulator.useLeftThumbstick;
+                        this.mouseEmulator.useRightThumbstick = !this.mouseEmulator.useLeftThumbstick;
+                        this.mouseEmulator.useDPad = !this.mouseEmulator.useLeftThumbstick;
+                        saveSettings = true;
+                    }
                 }
-                GUILayout.Space(5f);
-                GUILayout.Label(String.Format("Mouse Sensitivity: {0}", this.mouseEmulator.sensitivity));
-                tempValue = GUILayout.HorizontalSlider(this.mouseEmulator.sensitivity, MouseEmulator.MIN_SENSITIVITY, MouseEmulator.MAX_SENSITIVITY);
-                if (tempValue != this.mouseEmulator.sensitivity) // Value Changed.
+                if (GUILayout.Toggle(this.mouseEmulator.useRightThumbstick, String.Format("{0}: {1}", this.mouseEmulator.getUseRightThumbstickSettingName, this.mouseEmulator.useRightThumbstick ? "ON" : "")) != this.mouseEmulator.useRightThumbstick)
                 {
-                    this.mouseEmulator.sensitivity = tempValue;
-                    saveSettings = true;
+                    if (this.mouseEmulator.inputType != InputTypeEnum.RS)
+                    {
+                        this.mouseEmulator.useRightThumbstick = !this.mouseEmulator.useRightThumbstick;
+                        this.mouseEmulator.useLeftThumbstick = !this.mouseEmulator.useRightThumbstick;
+                        this.mouseEmulator.useDPad = !this.mouseEmulator.useRightThumbstick;
+                        saveSettings = true;
+                    }
                 }
-                GUILayout.Space(5f);
-                GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDHT - 10) });
-                GUILayout.Label(String.Format("{0}:", this.mouseEmulator.lmbPrimaryInput.Name));
-                this.drawCommonControl("Modifier", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Modifier.ToString(), 1, this);
-                this.drawCommonControl("Input", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Key.ToString(), 2, this);
-                GUILayout.EndVertical();
-                GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDHT - 10) });
-                GUILayout.Label(String.Format("{0}:", this.mouseEmulator.lmbSecondaryInput.Name));
-                this.drawCommonControl("Modifier", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Modifier.ToString(), 1, this);
-                this.drawCommonControl("Input", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Key.ToString(), 2, this);
-                GUILayout.EndVertical();
-                GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDHT - 10) });
-                GUILayout.Label(String.Format("{0}:", this.mouseEmulator.rmbPrimaryInput.Name));
-                this.drawCommonControl("Modifier", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Modifier.ToString(), 1, this);
-                this.drawCommonControl("Input", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Key.ToString(), 2, this);
-                GUILayout.EndVertical();
-                GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDHT - 10) });
-                GUILayout.Label(String.Format("{0}:", this.mouseEmulator.rmbSecondaryInput.Name));
-                this.drawCommonControl("Modifier", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Modifier.ToString(), 1, this);
-                this.drawCommonControl("Input", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Key.ToString(), 2, this);
-                GUILayout.EndVertical();
-                GUILayout.EndVertical();
-                GUILayout.EndArea();
+                if (GUILayout.Toggle(this.mouseEmulator.useDPad, String.Format("{0}: {1}", this.mouseEmulator.getUseDPadSettingName, this.mouseEmulator.useDPad ? "ON" : "")) != this.mouseEmulator.useDPad)
+                {
+                    if (this.mouseEmulator.inputType != InputTypeEnum.DPad)
+                    {
+                        this.mouseEmulator.useDPad = !this.mouseEmulator.useDPad;
+                        this.mouseEmulator.useLeftThumbstick = !this.mouseEmulator.useDPad;
+                        this.mouseEmulator.useRightThumbstick = !this.mouseEmulator.useDPad;
+                        saveSettings = true;
+                    }
+                }
+            }
+            GUILayout.Space(5f);
+            GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDTH - 10) });
+            GUILayout.Label(String.Format("{0}:", this.mouseEmulator.lmbPrimaryInput.Name));
+            this.drawCommonControl("Modifier", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Modifier.ToString(), 1, this);
+            this.drawCommonControl("Input", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Key.ToString(), 2, this);
+            GUILayout.EndVertical();
+            GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDTH - 10) });
+            GUILayout.Label(String.Format("{0}:", this.mouseEmulator.lmbSecondaryInput.Name));
+            this.drawCommonControl("Modifier", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Modifier.ToString(), 1, this);
+            this.drawCommonControl("Input", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Key.ToString(), 2, this);
+            GUILayout.EndVertical();
+            GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDTH - 10) });
+            GUILayout.Label(String.Format("{0}:", this.mouseEmulator.rmbPrimaryInput.Name));
+            this.drawCommonControl("Modifier", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Modifier.ToString(), 1, this);
+            this.drawCommonControl("Input", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Key.ToString(), 2, this);
+            GUILayout.EndVertical();
+            GUILayout.BeginVertical("box", new GUILayoutOption[] { GUILayout.Width(MOUSE_EMULATION_GUI_WIDTH - 10) });
+            GUILayout.Label(String.Format("{0}:", this.mouseEmulator.rmbSecondaryInput.Name));
+            this.drawCommonControl("Modifier", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Modifier.ToString(), 1, this);
+            this.drawCommonControl("Input", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Key.ToString(), 2, this);
+            GUILayout.EndVertical();
+            GUILayout.EndVertical();
+            GUILayout.EndArea();
 
-                if (saveSettings)
-                {
-                    ModSettings_menu.SaveSettings(this);
-                }
+            if (saveSettings)
+            {
+                ModSettings_menu.SaveSettings(this);
             }
         }
         /// <summary>
@@ -646,7 +662,7 @@ namespace Mo_Controls
             if (!this.showGameControls && !this.showModControls)
                 height = 65f;
             else
-                height = ((Screen.height - INFO_GUI_HEIGHT) + (this.showSettings ? (this.mouseEmulator.Emulating ? 0 : EMULATION_SETTINGS_HEIGHT) : SETTINGS_HEIGHT)) - GUI_SPACE * 2;
+                height = (Screen.height - INFO_GUI_HEIGHT) - GUI_SPACE * 2;
             return height;
         }
         private void performModLoaderVersionCheck()
