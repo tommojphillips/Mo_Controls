@@ -1,9 +1,12 @@
-﻿namespace Mo_Controls.XboxController
+﻿using UnityEngine;
+using XInputDotNetPure;
+
+namespace Mo_Controls.XboxController
 {
     /// <summary>
     /// Represents extention methods for <see cref="XboxButtonEnum"/>.
     /// </summary>
-    public static class XboxButtonEnumExtentions
+    public static class XboxExtentions
     {
         /// <summary>
         /// Returns the string representation of the provided <see cref="XboxButtonEnum"/>.
@@ -63,6 +66,39 @@
                     break;
             }
             return value;
+        }
+        /// <summary>
+        /// Performs a deadzone check.
+        /// </summary>
+        /// <param name="stickValue">The values to perform the check on.</param>
+        public static Vector2 doDeadzoneCheck(this Vector2 stickValue, float deadzoneThreshhold, DeadzoneTypeEnum deadzoneType)
+        {
+            // Written, 02.08.2018
+
+            switch (deadzoneType)
+            {
+                case DeadzoneTypeEnum.Radial:
+                    if (stickValue.magnitude < deadzoneThreshhold)
+                        stickValue = Vector2.zero;
+                    break;
+                case DeadzoneTypeEnum.ScaledRadial:
+                    if (stickValue.magnitude < deadzoneThreshhold)
+                        stickValue = Vector2.zero;
+                    stickValue = stickValue.normalized * ((stickValue.magnitude - deadzoneThreshhold) / (1 - deadzoneThreshhold));
+                    break;
+            }
+            return stickValue;
+        }
+        /// <summary>
+        /// Performs sensitivity operation.
+        /// </summary>
+        /// <param name="stickValue">inValue.</param>
+        public static Vector2 doSensitivityOperation(this Vector2 stickValue, float sensitivityThreshhold)
+        {
+            // Written, 07.08.2018
+
+            stickValue.Set(stickValue.x *= sensitivityThreshhold, stickValue.y *= sensitivityThreshhold);
+            return stickValue;
         }
     }
 }

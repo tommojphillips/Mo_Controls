@@ -1,4 +1,4 @@
-﻿namespace Mo_Controls.MouseEmulation
+﻿namespace Mo_Controls.XboxController
 {
     public enum DeadzoneTypeEnum
     {

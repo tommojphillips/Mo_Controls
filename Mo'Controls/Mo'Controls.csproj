@@ -60,7 +60,7 @@
     <Compile Include="ChangeInput.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="MonitorInputData.cs" />
-    <Compile Include="MouseEmulation\DeadzoneTypeEnum.cs" />
+    <Compile Include="XboxController\DeadzoneTypeEnum.cs" />
     <Compile Include="MouseEmulation\InputData.cs" />
     <Compile Include="MouseEmulation\InputTypeEnum.cs" />
     <Compile Include="MouseEmulation\MouseEmulator.cs" />
@@ -73,7 +73,7 @@
     <Compile Include="XboxController\Monitoring\MonitorControllerConnections.cs" />
     <Compile Include="XboxController\XboxButton.cs" />
     <Compile Include="XboxController\XboxButtonEnum.cs" />
-    <Compile Include="XboxController\XboxButtonEnumExtentions.cs" />
+    <Compile Include="XboxController\XboxExtentions.cs" />
     <Compile Include="XboxController\XboxControl.cs" />
     <Compile Include="XboxController\XboxController.cs" />
     <Compile Include="XboxController\XboxControllerManager.cs" />

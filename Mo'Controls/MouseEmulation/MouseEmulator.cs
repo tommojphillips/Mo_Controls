@@ -5,6 +5,8 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using XInputDotNetPure;
 using MSCLoader;
+using Mo_Controls.XboxController;
+using xController = Mo_Controls.XboxController.XboxController;
 
 namespace Mo_Controls.MouseEmulation
 {
@@ -374,60 +376,59 @@ namespace Mo_Controls.MouseEmulation
                     int moveX;
                     int moveY;
 
+                    xController xboxController = Mo_Controls.instance.xboxController;
                     switch (this.inputType)
-                    {
+                    {                           
                         case InputTypeEnum.LS:
-                            stickValue_temp = Mo_Controls.instance.xboxController.getLeftStick();
+                            stickValue_temp = xboxController.getLeftStick();
                             break;
                         case InputTypeEnum.RS:
-                            stickValue_temp = Mo_Controls.instance.xboxController.getRightStick();
+                            stickValue_temp = xboxController.getRightStick();
+                            break;
+                        case InputTypeEnum.DPad:
+                            if (xboxController.DPadLeft.state == ButtonState.Pressed)
+                            {
+                                stickValue.x = -1;
+                            }
+                            if (xboxController.DPadRight.state == ButtonState.Pressed)
+                            {
+                                stickValue.x = 1;
+                            }
+                            if (xboxController.DPadUp.state == ButtonState.Pressed)
+                            {
+                                stickValue.y = 1;
+                            }
+                            if (xboxController.DPadDown.state == ButtonState.Pressed)
+                            {
+                                stickValue.y = -1;
+                            }
                             break;
                     }
-
                     if (this.inputType != InputTypeEnum.DPad)
                     {
                         stickValue.x = stickValue_temp.X;
                         stickValue.y = stickValue_temp.Y;
                     }
-                    else
+                    if (stickValue != Vector2.zero)
                     {
-                        XboxController.XboxController xboxController = Mo_Controls.instance.xboxController;
-                        if (xboxController.DPadLeft.state == ButtonState.Pressed)
+                        // Deadzone
+                        stickValue = stickValue.doDeadzoneCheck(this.deadzone, this.deadzoneType);
+                        // Sensitivity
+                        stickValue = stickValue.doSensitivityOperation(this.sensitivity);
+
+                        moveX = (int)stickValue.x;
+                        moveY = (int)stickValue.y * -1; // '* -1' xbox controller y axis is naturally inverted. so changing the that..;
+                        simulateMouseMove(moveX, moveY);
+
+                        if (this.lmbPrimaryInput.IsDown() || this.lmbSecondaryInput.IsDown())
                         {
-                            stickValue.x = -1;
+                            simulateLeftClick();
                         }
-                        if (xboxController.DPadRight.state == ButtonState.Pressed)
+                        if (this.rmbPrimaryInput.IsDown() || this.rmbSecondaryInput.IsDown())
                         {
-                            stickValue.x = 1;
-                        }
-                        if (xboxController.DPadUp.state == ButtonState.Pressed)
-                        {
-                            stickValue.y = 1;
-                        }
-                        if (xboxController.DPadDown.state == ButtonState.Pressed)
-                        {
-                            stickValue.y = -1;
+                            simulateRightClick();
                         }
                     }
-
-                    // Deadzone
-                    stickValue = this.doDeadzoneCheck(stickValue);
-
-                    // Sensitivity
-                    moveX = (int)(stickValue.x * this.sensitivity);
-                    moveY = (int)(stickValue.y * this.sensitivity) * -1; // '* -1' xbox controller y axis is naturally inverted. so changing the that..
-
-                    simulateMouseMove(moveX, moveY);
-
-                    if (this.lmbPrimaryInput.IsDown() || this.lmbSecondaryInput.IsDown())
-                    {
-                        simulateLeftClick();
-                    }
-                    if (this.rmbPrimaryInput.IsDown() || this.rmbSecondaryInput.IsDown())
-                    {
-                        simulateRightClick();
-                    }
-
                 });
                 thread.Start();
             }
@@ -447,30 +448,6 @@ namespace Mo_Controls.MouseEmulation
             Settings.AddCheckBox(moC, emulateMouse_useDPad, "Emulate Mouse Settings");
             Settings.AddSlider(moC, mouseDeadzone, MIN_DEADZONE, MAX_DEADZONE);
             Settings.AddSlider(moC, mouseSensitivity, MIN_SENSITIVITY, MAX_SENSITIVITY);
-        }
-        /// <summary>
-        /// Performs a deadzone check.
-        /// </summary>
-        /// <param name="stickValue">The values to perform the check on.</param>
-        private Vector2 doDeadzoneCheck(Vector2 stickValue)
-        {
-            // Written, 02.08.2018
-
-            Vector2 deadzonedStickValue = stickValue;
-
-            switch (this.deadzoneType)
-            {
-                case DeadzoneTypeEnum.Radial:
-                    if (deadzonedStickValue.magnitude < this.deadzone)
-                        deadzonedStickValue = Vector2.zero;
-                    break;
-                case DeadzoneTypeEnum.ScaledRadial:
-                    if (deadzonedStickValue.magnitude < this.deadzone)
-                        deadzonedStickValue = Vector2.zero;
-                    deadzonedStickValue = deadzonedStickValue.normalized * ((deadzonedStickValue.magnitude - this.deadzone) / (1 - this.deadzone));
-                    break;
-            }
-            return deadzonedStickValue;
         }
 
         #endregion
