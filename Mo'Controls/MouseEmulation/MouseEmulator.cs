@@ -366,72 +366,74 @@ namespace Mo_Controls.MouseEmulation
         {
             // Written, 01.08.2018
 
-            if (this.Emulating)
-            {
-                Thread thread = new Thread(delegate ()
+            Thread thread = new Thread(delegate ()
+            {                
+                if (this.Emulating)
                 {
-
-                    GamePadThumbSticks.StickValue stickValue_temp = default(GamePadThumbSticks.StickValue);
-                    Vector2 stickValue = Vector2.zero;
-                    int moveX;
-                    int moveY;
-
                     xController xboxController = Mo_Controls.instance.xboxController;
-                    switch (this.inputType)
-                    {                           
-                        case InputTypeEnum.LS:
-                            stickValue_temp = xboxController.getLeftStick();
-                            break;
-                        case InputTypeEnum.RS:
-                            stickValue_temp = xboxController.getRightStick();
-                            break;
-                        case InputTypeEnum.DPad:
-                            if (xboxController.DPadLeft.state == ButtonState.Pressed)
-                            {
-                                stickValue.x = -1;
-                            }
-                            if (xboxController.DPadRight.state == ButtonState.Pressed)
-                            {
-                                stickValue.x = 1;
-                            }
-                            if (xboxController.DPadUp.state == ButtonState.Pressed)
-                            {
-                                stickValue.y = 1;
-                            }
-                            if (xboxController.DPadDown.state == ButtonState.Pressed)
-                            {
-                                stickValue.y = -1;
-                            }
-                            break;
-                    }
-                    if (this.inputType != InputTypeEnum.DPad)
-                    {
-                        stickValue.x = stickValue_temp.X;
-                        stickValue.y = stickValue_temp.Y;
-                    }
-                    if (stickValue != Vector2.zero)
-                    {
-                        // Deadzone
-                        stickValue = stickValue.doDeadzoneCheck(this.deadzone, this.deadzoneType);
-                        // Sensitivity
-                        stickValue = stickValue.doSensitivityOperation(this.sensitivity);
 
-                        moveX = (int)stickValue.x;
-                        moveY = (int)stickValue.y * -1; // '* -1' xbox controller y axis is naturally inverted. so changing the that..;
-                        simulateMouseMove(moveX, moveY);
-
-                        if (this.lmbPrimaryInput.IsDown() || this.lmbSecondaryInput.IsDown())
-                        {
-                            simulateLeftClick();
-                        }
-                        if (this.rmbPrimaryInput.IsDown() || this.rmbSecondaryInput.IsDown())
-                        {
-                            simulateRightClick();
-                        }
+                    if (this.lmbPrimaryInput.IsDown() || this.lmbSecondaryInput.IsDown())
+                    {
+                        simulateLeftClick();
                     }
-                });
-                thread.Start();
-            }
+                    if (this.rmbPrimaryInput.IsDown() || this.rmbSecondaryInput.IsDown())
+                    {
+                        simulateRightClick();
+                    }
+                    if (xboxController.isConnected)
+                    {
+                        GamePadThumbSticks.StickValue stickValue_temp = default(GamePadThumbSticks.StickValue);
+                        Vector2 stickValue = Vector2.zero;
+                        int moveX;
+                        int moveY;
+
+                        switch (this.inputType)
+                        {
+                            case InputTypeEnum.LS:
+                                stickValue_temp = xboxController.getLeftStick();
+                                break;
+                            case InputTypeEnum.RS:
+                                stickValue_temp = xboxController.getRightStick();
+                                break;
+                            case InputTypeEnum.DPad:
+                                if (xboxController.DPadLeft.state == ButtonState.Pressed)
+                                {
+                                    stickValue.x = -1;
+                                }
+                                if (xboxController.DPadRight.state == ButtonState.Pressed)
+                                {
+                                    stickValue.x = 1;
+                                }
+                                if (xboxController.DPadUp.state == ButtonState.Pressed)
+                                {
+                                    stickValue.y = 1;
+                                }
+                                if (xboxController.DPadDown.state == ButtonState.Pressed)
+                                {
+                                    stickValue.y = -1;
+                                }
+                                break;
+                        }
+                        if (this.inputType != InputTypeEnum.DPad)
+                        {
+                            stickValue.x = stickValue_temp.X;
+                            stickValue.y = stickValue_temp.Y;
+                        }
+                        if (stickValue != Vector2.zero)
+                        {
+                            // Deadzone
+                            stickValue = stickValue.doDeadzoneCheck(this.deadzone, this.deadzoneType);
+                            // Sensitivity
+                            stickValue = stickValue.doSensitivityOperation(this.sensitivity);
+
+                            moveX = (int)stickValue.x;
+                            moveY = (int)stickValue.y * -1; // '* -1' xbox controller y axis is naturally inverted. so changing the that..;
+                            simulateMouseMove(moveX, moveY);
+                        }
+                    }                
+                }
+            });
+            thread.Start();
         }
         /// <summary>
         /// Should be called on <see cref="Mod.ModSettings"/>.
