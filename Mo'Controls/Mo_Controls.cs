@@ -687,6 +687,9 @@ namespace Mo_Controls
                 height = ((Screen.height - INFO_GUI_HEIGHT) + (this.showSettings ? 0 : SETTINGS_HEIGHT)) - (GUI_SPACE * 2);
             return height;
         }
+        /// <summary>
+        /// Performs a check to see if the mod loader version is the same as the currently supported version.
+        /// </summary>
         private void performModLoaderVersionCheck()
         {
             // Written, 03.08.2018

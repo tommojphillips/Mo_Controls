@@ -39,49 +39,13 @@ namespace Mo_Controls
                 input = null,
             };
             XboxController.XboxController xboxController = Mo_Controls.instance.xboxController;
-
-            if (uInput.anyKeyDown)
+            // Check xbox controller for input.
+            if (xboxController.isConnected)
             {
-                foreach (KeyCode kcode in Enum.GetValues(typeof(KeyCode)))
-                {
-                    if (uInput.GetKeyDown(kcode))
-                    {
-                        if (kcode != selectKey) //Select key
-                        {
-                            if (kcode == noneKey) // Set as none key
-                            {
-                                monitorInputData = new MonitorInputData()
-                                {
-                                    foundInput = true,
-                                    input = KeyCode.None.ToString(),
-                                };
-                            }
-                            else
-                            {
-                                if (kcode != Mo_Controls.instance.openControlsGui.Key && kcode != cancelKey) // not allowed
-                                {
-                                    monitorInputData = new MonitorInputData()
-                                    {
-                                        foundInput = true,
-                                        input = kcode.ToString(),
-                                    };
-                                }
-                            }
-                            break;
-                        }
-                        else
-                            break;
-                    }
-                }
-            }
-            else
-            {
-                // Check xbox controller for input.
-
                 if (xboxController.getRightTrigger() > 0.5f)
                 {
                     monitorInputData.foundInput = true;
-                        monitorInputData.input = xboxController.RT.inputName;
+                    monitorInputData.input = xboxController.RT.inputName;
                 }
                 else
                 {
@@ -188,7 +152,43 @@ namespace Mo_Controls
                     }
                 }
             }
-
+            if (!monitorInputData.foundInput)
+            {
+                if (uInput.anyKeyDown)
+                {
+                    foreach (KeyCode kcode in Enum.GetValues(typeof(KeyCode)))
+                    {
+                        if (uInput.GetKeyDown(kcode))
+                        {
+                            if (kcode != selectKey) //Select key
+                            {
+                                if (kcode == noneKey) // Set as none key
+                                {
+                                    monitorInputData = new MonitorInputData()
+                                    {
+                                        foundInput = true,
+                                        input = KeyCode.None.ToString(),
+                                    };
+                                }
+                                else
+                                {
+                                    if (kcode != Mo_Controls.instance.openControlsGui.Key && kcode != cancelKey) // not allowed
+                                    {
+                                        monitorInputData = new MonitorInputData()
+                                        {
+                                            foundInput = true,
+                                            input = kcode.ToString(),
+                                        };
+                                    }
+                                }
+                                break;
+                            }
+                            else
+                                break;
+                        }
+                    }
+                }
+            }
             return monitorInputData;
         }
 
