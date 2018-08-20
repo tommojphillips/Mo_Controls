@@ -124,7 +124,7 @@ namespace Mo_Controls
 
         #endregion
 
-        #region Mod Loader Settings
+        #region Settings
 
         /// <summary>
         /// Represents a keybind to open/close the gui for the mod.
@@ -133,15 +133,15 @@ namespace Mo_Controls
         /// <summary>
         /// Represents whether the mod should display debug info or not.
         /// </summary>
-        private Settings showDebugGui = new Settings("showDebugGui", "Show Debug GUI", true);
+        private bool showDebugGui;
         /// <summary>
         /// Represent whether the mod should display the virtual gui.
         /// </summary>
-        private Settings showVirtualGui = new Settings("showVirtualGui", "Show Virtual Axes GUI", false);
+        private bool showVirtualGui;
         /// <summary>
         /// Represents whether the mod should monitor for xbox controller connections?
         /// </summary>
-        private Settings monitiorXboxControllerConnectionStatus = new Settings("monitorConnectionStatus", "Monitor Controller status", true);
+        private bool monitiorXboxControllerConnectionStatus;
 
         #endregion
 
@@ -189,7 +189,7 @@ namespace Mo_Controls
         /// <summary>
         /// Represents the height of the info gui.
         /// </summary>
-        private const float INFO_GUI_HEIGHT = 235f;//340f;
+        private const float INFO_GUI_HEIGHT = 235f;
         /// <summary>
         /// Represents the width for the virtual axes gui.
         /// </summary>
@@ -380,24 +380,24 @@ namespace Mo_Controls
             if (this.showSettings)
             {
                 bool saveSettings = false;
-                if (GUILayout.Toggle((bool)this.showDebugGui.Value, this.showDebugGui.Name) != (bool)this.showDebugGui.Value)
+                if (GUILayout.Toggle(this.showDebugGui, "Show Debug GUI") != this.showDebugGui)
                 {
-                    this.showDebugGui.Value = !(bool)this.showDebugGui.Value;
+                    this.showDebugGui = !this.showDebugGui;
                     saveSettings = true;
                 }
-                if (GUILayout.Toggle((bool)this.showVirtualGui.Value, this.showVirtualGui.Name) != (bool)this.showVirtualGui.Value)
+                if (GUILayout.Toggle(this.showVirtualGui, "Show Virtual Axes GUI") != this.showVirtualGui)
                 {
-                    this.showVirtualGui.Value = !(bool)this.showVirtualGui.Value;
+                    this.showVirtualGui = !this.showVirtualGui;
                     saveSettings = true;
                 }
-                if (GUILayout.Toggle((bool)this.monitiorXboxControllerConnectionStatus.Value, this.monitiorXboxControllerConnectionStatus.Name) != (bool)this.monitiorXboxControllerConnectionStatus.Value)
+                if (GUILayout.Toggle(this.monitiorXboxControllerConnectionStatus, "Monitor Controller status") != this.monitiorXboxControllerConnectionStatus)
                 {
-                    this.monitiorXboxControllerConnectionStatus.Value = !(bool)this.monitiorXboxControllerConnectionStatus.Value;
+                    this.monitiorXboxControllerConnectionStatus = !this.monitiorXboxControllerConnectionStatus;
                     saveSettings = true;
                 }                
                 if (saveSettings)
                 {
-                    ModSettings_menu.SaveSettings(this);
+                    this.saveSettings();
                 }
             }
 
@@ -508,7 +508,7 @@ namespace Mo_Controls
         {
             // Written, 19.07.2018
 
-            float left = this.changeInputResult.reassignKey && (bool)this.showVirtualGui.Value ? (CONTROLS_GUI_WIDTH + VIRTUAL_XBOX_AXES_GUI_WIDTH + (GUI_SPACE * 3)) : (CONTROLS_GUI_WIDTH + (GUI_SPACE * 2));
+            float left = this.changeInputResult.reassignKey && this.showVirtualGui ? (CONTROLS_GUI_WIDTH + VIRTUAL_XBOX_AXES_GUI_WIDTH + (GUI_SPACE * 3)) : (CONTROLS_GUI_WIDTH + (GUI_SPACE * 2));
             bool isGreaterThanScreen = XBOX_CONTROLLER_DEBUG_GUI_HEIGHT >= Screen.height;
             float offset = isGreaterThanScreen ? 31 : GUI_SPACE;
             GUILayout.BeginArea(new Rect(left, GUI_SPACE, XBOX_CONTROLLER_DEBUG_GUI_WIDTH, (isGreaterThanScreen ? (Screen.height - (GUI_SPACE * 2)) : (XBOX_CONTROLLER_DEBUG_GUI_HEIGHT))));
@@ -594,7 +594,7 @@ namespace Mo_Controls
                 saveSettings = true;
             }
             GUILayout.Space(5f);
-            if (GUILayout.Toggle(this.mouseEmulator.Emulating, String.Format("{0}: Using {1}", this.mouseEmulator.getEmulateMouseSettingName, this.mouseEmulator.inputType)) != this.mouseEmulator.Emulating)
+            if (GUILayout.Toggle(this.mouseEmulator.Emulating, String.Format("{0}: Using {1}", "Emulate mouse for controller", this.mouseEmulator.inputType)) != this.mouseEmulator.Emulating)
             {
                 this.mouseEmulator.Emulating = !this.mouseEmulator.Emulating;
                 saveSettings = true;
@@ -602,33 +602,30 @@ namespace Mo_Controls
             if (this.mouseEmulator.Emulating)
             {
                 // As left + right thumb stick settings are grouped; need to manually change other value..
-                if (GUILayout.Toggle(this.mouseEmulator.useLeftThumbstick, String.Format("{0}: {1}", this.mouseEmulator.getUseLeftThumbstickSettingName, this.mouseEmulator.useLeftThumbstick ? "ON" : "")) != this.mouseEmulator.useLeftThumbstick)
+                bool _asInput = (this.mouseEmulator.inputType == InputTypeEnum.LS);
+                if (GUILayout.Toggle(_asInput, String.Format("Use LS: {0}", _asInput ? "ON" : "")) != _asInput)
                 {
                     if (this.mouseEmulator.inputType != InputTypeEnum.LS)
                     {
-                        this.mouseEmulator.useLeftThumbstick = !this.mouseEmulator.useLeftThumbstick;
-                        this.mouseEmulator.useRightThumbstick = !this.mouseEmulator.useLeftThumbstick;
-                        this.mouseEmulator.useDPad = !this.mouseEmulator.useLeftThumbstick;
+                        this.mouseEmulator.inputType = InputTypeEnum.LS;
                         saveSettings = true;
                     }
                 }
-                if (GUILayout.Toggle(this.mouseEmulator.useRightThumbstick, String.Format("{0}: {1}", this.mouseEmulator.getUseRightThumbstickSettingName, this.mouseEmulator.useRightThumbstick ? "ON" : "")) != this.mouseEmulator.useRightThumbstick)
+                _asInput = (this.mouseEmulator.inputType == InputTypeEnum.RS);
+                if (GUILayout.Toggle(_asInput, String.Format("Use RS: {0}", _asInput ? "ON" : "")) != _asInput)
                 {
                     if (this.mouseEmulator.inputType != InputTypeEnum.RS)
                     {
-                        this.mouseEmulator.useRightThumbstick = !this.mouseEmulator.useRightThumbstick;
-                        this.mouseEmulator.useLeftThumbstick = !this.mouseEmulator.useRightThumbstick;
-                        this.mouseEmulator.useDPad = !this.mouseEmulator.useRightThumbstick;
+                        this.mouseEmulator.inputType = InputTypeEnum.RS;
                         saveSettings = true;
                     }
                 }
-                if (GUILayout.Toggle(this.mouseEmulator.useDPad, String.Format("{0}: {1}", this.mouseEmulator.getUseDPadSettingName, this.mouseEmulator.useDPad ? "ON" : "")) != this.mouseEmulator.useDPad)
+                _asInput = (this.mouseEmulator.inputType == InputTypeEnum.DPad);
+                if (GUILayout.Toggle(_asInput, String.Format("Use D-Pad: {0}", _asInput ? "ON" : "")) != _asInput)
                 {
                     if (this.mouseEmulator.inputType != InputTypeEnum.DPad)
                     {
-                        this.mouseEmulator.useDPad = !this.mouseEmulator.useDPad;
-                        this.mouseEmulator.useLeftThumbstick = !this.mouseEmulator.useDPad;
-                        this.mouseEmulator.useRightThumbstick = !this.mouseEmulator.useDPad;
+                        this.mouseEmulator.inputType = InputTypeEnum.DPad;
                         saveSettings = true;
                     }
                 }
@@ -660,7 +657,7 @@ namespace Mo_Controls
 
             if (saveSettings)
             {
-                ModSettings_menu.SaveSettings(this);
+                this.saveSettings();
             }
         }
         /// <summary>
@@ -722,21 +719,56 @@ namespace Mo_Controls
                     this.Name, this.Version, ModLoader.Version), "ModLoader Version not supported.");
             }
         }
+        /// <summary>
+        /// Saves the settings.
+        /// </summary>
+        private void saveSettings()
+        {
+            // Written, 20.08.2018
+
+            MoControlsSaveData mcsd = new MoControlsSaveData()
+            {
+                showXboxDebugGui = this.showDebugGui,
+                showXboxVirtualAxesGui = this.showVirtualGui,
+                monitiorXboxControllerConnectionStatus = this.monitiorXboxControllerConnectionStatus,
+                emulateMouse = mouseEmulator.Emulating,
+                mouseDeadzone = mouseEmulator.deadzone,
+                mouseSensitivity = mouseEmulator.sensitivity,
+                mouseInputType = mouseEmulator.inputType,
+            };
+            SaveLoad.SerializeSaveFile(this, mcsd, MoControlsSaveData.fileName + MoControlsSaveData.fileExtention);
+        }
+        /// <summary>
+        /// Loads the settings.
+        /// </summary>
+        private void loadSettings()
+        {
+            // Written, 20.08.2018
+
+            MoControlsSaveData mcsd;
+            try
+            {
+                mcsd = SaveLoad.DeserializeSaveFile<MoControlsSaveData>(this, MoControlsSaveData.fileName + MoControlsSaveData.fileExtention);
+                if (mcsd == null)
+                    throw new NullReferenceException();
+            }
+            catch (NullReferenceException)
+            {
+                mcsd = MoControlsSaveData.defaultSave;
+            }
+            this.showDebugGui = mcsd.showXboxDebugGui;
+            this.showVirtualGui = mcsd.showXboxVirtualAxesGui;
+            this.monitiorXboxControllerConnectionStatus = mcsd.monitiorXboxControllerConnectionStatus;            
+            this.mouseEmulator.deadzone = mcsd.mouseDeadzone;
+            this.mouseEmulator.sensitivity = mcsd.mouseSensitivity;
+            this.mouseEmulator.inputType = mcsd.mouseInputType;
+            this.mouseEmulator.Emulating = mcsd.emulateMouse;
+        }
 
         #endregion
 
         #region Override Methods
 
-        public override void ModSettings()
-        {
-            // 23.07.2018
-
-            Settings.AddCheckBox(this, showDebugGui);
-            Settings.AddCheckBox(this, this.showVirtualGui);
-            Settings.AddCheckBox(this, this.monitiorXboxControllerConnectionStatus);
-            MouseEmulator.onModSettings(this);
-
-        }
         public override void OnLoad()
         {
             // Written, 06.07.2018    
@@ -758,6 +790,8 @@ namespace Mo_Controls
             if (!this.xboxControllerManager.controllerDisconnectedEvent)
                 XboxControllerManager.ControllerDisconnected += this.XboxControllerManager_ControllerDisconnected;
             this.mouseEmulator = new MouseEmulator(DeadzoneTypeEnum.ScaledRadial);
+            this.loadSettings();
+            ModConsole.Print("<color=green>>></color> Settings Loaded");
             this.performModLoaderVersionCheck();
             ModConsole.Print(String.Format("<color=green>{0} <b>v{1}</b> Loaded</color>", this.Name, this.Version));
         }
@@ -769,9 +803,9 @@ namespace Mo_Controls
             {
                 this.drawControlsGui();
                 if (this.changeInputResult.reassignKey)
-                    if ((bool)this.showVirtualGui.Value)
+                    if (this.showVirtualGui)
                     this.drawVirtualXboxControllerAxesGui();
-                if ((bool)this.showDebugGui.Value)
+                if (this.showDebugGui)
                     this.drawXboxControllerDebugGui();
                 this.drawMouseEmulationGui();
             }

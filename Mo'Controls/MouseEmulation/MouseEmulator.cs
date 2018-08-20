@@ -21,27 +21,27 @@ namespace Mo_Controls.MouseEmulation
         /// <summary>
         /// Represents whether the mod should emulate the mouse.
         /// </summary>
-        public static Settings emulateMouse = new Settings("emulateMouse", "Emulate mouse for controller", false);
+        public static bool emulateMouse;
         /// <summary>
         /// Represents whether the mod should use the left thumbstick for mouse emulation.
         /// </summary>
-        public static Settings emulateMouse_useLeftThumbstick = new Settings("emulateMouse_useLeftThumbstick", "Use left thumbstick for mouse emulation", false);
+        public static bool emulateMouse_useLeftThumbstick;
         /// <summary>
         /// Represents whether the mod should use the right thumbstick for mouse emulation.
         /// </summary>
-        public static Settings emulateMouse_useRightThumbstick = new Settings("emulateMouse_useRightThumbstick", "Use right thumbstick for mouse emulation", true);
+        public static bool emulateMouse_useRightThumbstick;
         /// <summary>
         /// Represents whether the mod should use the d-pad for mouse emulation.
         /// </summary>
-        public static Settings emulateMouse_useDPad = new Settings("emulateMouse_useDPad", "Use D-Pad for mouse emulation", false);
+        public static bool emulateMouse_useDPad;
         /// <summary>
         /// Represents the current sensitivity for the mouse.
         /// </summary>
-        public static Settings mouseSensitivity = new Settings("MouseSensitivity", "Mouse Sensitivity", DEFAULT_SENSITIVITY);
+        public static float mouseSensitivity;
         /// <summary>
         /// Represents the current deadzone for the mouse.
         /// </summary>
-        public static Settings mouseDeadzone = new Settings("MouseDeadzone", "Mouse Deadzone", DEFAULT_DEADZONE);
+        public static float mouseDeadzone;
 
         #endregion
 
@@ -70,114 +70,25 @@ namespace Mo_Controls.MouseEmulation
         /// </summary>
         public Keybind rmbSecondaryInput = new Keybind(RMB_INPUT_NAME + "2", "RMB Secondary", KeyCode.None);
         /// <summary>
-        /// Returns the value of the setting, <see cref="emulateMouse_useLeftThumbstick"/>. if set to <see langword="true"/>; Changes, <see cref="inputType"/> to <see cref="InputTypeEnum.LS"/>.
-        /// </summary>
-        public bool useLeftThumbstick
-        {
-            get
-            {
-                return (bool)emulateMouse_useLeftThumbstick.Value;
-            }
-            set
-            {
-                emulateMouse_useLeftThumbstick.Value = value;
-                if (value)
-                    this.inputType = InputTypeEnum.LS;
-            }
-        }
-        /// <summary>
-        /// Returns the value of the setting, <see cref="emulateMouse_useRightThumbstick"/>. if set to <see langword="true"/>; Changes, <see cref="inputType"/> to <see cref="InputTypeEnum.RS"/>.
-        /// </summary>
-        public bool useRightThumbstick
-        {
-            get
-            {
-                return (bool)emulateMouse_useRightThumbstick.Value;
-            }
-            set
-            {
-                emulateMouse_useRightThumbstick.Value = value;
-                if (value)
-                    this.inputType = InputTypeEnum.RS;
-            }
-        }
-        /// <summary>
-        /// Returns the value of the setting, <see cref="emulateMouse_useDPad"/>. if set to <see langword="true"/>; Changes, <see cref="inputType"/> to <see cref="InputTypeEnum.DPad"/>.
-        /// </summary>
-        public bool useDPad
-        {
-            get
-            {
-                return (bool)emulateMouse_useDPad.Value;
-            }
-            set
-            {
-                emulateMouse_useDPad.Value = value;
-                if (value)
-                    this.inputType = InputTypeEnum.DPad;
-            }
-        }
-        /// <summary>
-        /// Returns the <see cref="Settings.Name"/> property of the setting, <see cref="emulateMouse_useDPad"/>.
-        /// </summary>
-        public string getUseDPadSettingName
-        {
-            get
-            {
-                return emulateMouse_useDPad.Name;
-            }
-        }
-        /// <summary>
-        /// Returns the <see cref="Settings.Name"/> property of the setting, <see cref="emulateMouse_useLeftThumbstick"/>.
-        /// </summary>
-        public string getUseLeftThumbstickSettingName
-        {
-            get
-            {
-                return emulateMouse_useLeftThumbstick.Name;
-            }
-        }
-        /// <summary>
-        /// Returns the <see cref="Settings.Name"/> property of the setting, <see cref="emulateMouse_useRightThumbstick"/>.
-        /// </summary>
-        public string getUseRightThumbstickSettingName
-        {
-            get
-            {
-                return emulateMouse_useRightThumbstick.Name;
-            }
-        }
-        /// <summary>
-        /// Returns the <see cref="Settings.Name"/> property of the setting, <see cref="emulateMouse"/> which is private.
-        /// </summary>
-        public string getEmulateMouseSettingName
-        {
-            get
-            {
-                return emulateMouse.Name;
-            }
-        }
-        /// <summary>
         /// Represents whether the current instance is emulating mouse movement.
         /// </summary>
         public bool Emulating
         {
             get
             {
-                return (bool)emulateMouse.Value;
+                return emulateMouse;
             }
             set
             {
                 if (value)
                 {
-                    ModConsole.Print(String.Format("<color=green>>></color> Started Emulating mouse as {0}.",
-                        (this.inputType == InputTypeEnum.DPad ? "D-Pad" : (this.inputType == InputTypeEnum.LS ? "Left Thumbstick" : "Right Thumbstick"))));
+                    ModConsole.Print(String.Format("<color=green>>></color> Started Emulating mouse as {0}.", this.inputType));
                 }
                 else
                 {
                     ModConsole.Print("<color=green>>></color> Stopped Emulating mouse..");
                 }
-                emulateMouse.Value = value;
+                emulateMouse = value;
             }
         }
         /// <summary>
@@ -207,11 +118,11 @@ namespace Mo_Controls.MouseEmulation
         {
             get
             {
-                return float.Parse(mouseDeadzone.Value.ToString());
+                return mouseDeadzone;
             }
             set
             {
-                mouseDeadzone.Value = value;
+                mouseDeadzone = value;
             }
         }
         /// <summary>
@@ -229,11 +140,11 @@ namespace Mo_Controls.MouseEmulation
         {
             get
             {
-                return float.Parse(mouseSensitivity.Value.ToString());
+                return mouseSensitivity;
             }
             set
             {
-                mouseSensitivity.Value = value;
+                mouseSensitivity = value;
             }
         }  
         
@@ -281,11 +192,8 @@ namespace Mo_Controls.MouseEmulation
         {
             // Written, 01.08.2018
 
-            this.Emulating = this.Emulating;
-            this.useLeftThumbstick = this.useLeftThumbstick;
-            this.useRightThumbstick = this.useRightThumbstick;
-            this.useDPad = this.useDPad;
-            this.deadzoneType = deadzoneType;
+            this.deadzoneType = DeadzoneTypeEnum.ScaledRadial;
+
             Keybind.Add(Mo_Controls.instance, this.lmbPrimaryInput);
             Keybind.Add(Mo_Controls.instance, this.lmbSecondaryInput);
             Keybind.Add(Mo_Controls.instance, this.rmbPrimaryInput);
@@ -434,22 +342,6 @@ namespace Mo_Controls.MouseEmulation
                 }
             });
             thread.Start();
-        }
-        /// <summary>
-        /// Should be called on <see cref="Mod.ModSettings"/>.
-        /// </summary>
-        public static void onModSettings(Mo_Controls mo_Controls)
-        {
-            // Written, 03.08.2018
-
-            Mo_Controls moC = mo_Controls;
-
-            Settings.AddCheckBox(moC, emulateMouse);
-            Settings.AddCheckBox(moC, emulateMouse_useLeftThumbstick, "Emulate Mouse Settings");
-            Settings.AddCheckBox(moC, emulateMouse_useRightThumbstick, "Emulate Mouse Settings");
-            Settings.AddCheckBox(moC, emulateMouse_useDPad, "Emulate Mouse Settings");
-            Settings.AddSlider(moC, mouseDeadzone, MIN_DEADZONE, MAX_DEADZONE);
-            Settings.AddSlider(moC, mouseSensitivity, MIN_SENSITIVITY, MAX_SENSITIVITY);
         }
 
         #endregion
