@@ -26,6 +26,30 @@ namespace Mo_Controls.XboxController
         #region Properties
 
         /// <summary>
+        /// Returns a bool depending if the event, <see cref="ControllerConnected"/> to equal to null.
+        /// </summary>
+        public bool controllerConnectedEvent
+        {
+            get
+            {
+                if (ControllerConnected == null)
+                    return false;
+                return true;
+            }
+        }
+        /// <summary>
+        /// Returns a bool depending if the event, <see cref="ControllerDisconnected"/> to equal to null.
+        /// </summary>
+        public bool controllerDisconnectedEvent
+        {
+            get
+            {
+                if (ControllerDisconnected == null)
+                    return false;
+                return true;
+            }
+        }
+        /// <summary>
         /// Represents the amount of supported controllers for the application.
         /// </summary>
         public int numOfControllersSupported
@@ -62,6 +86,8 @@ namespace Mo_Controls.XboxController
         {
             // Written, 16.07.2018
 
+            ControllerConnected = null;
+            ControllerDisconnected = null;
             if (numOfControllersToSupport <= 4 && numOfControllersToSupport > 0)
                 this.numOfControllersSupported = numOfControllersToSupport;
             else
@@ -78,7 +104,7 @@ namespace Mo_Controls.XboxController
 
         #region Methods
 
-         /// <summary>
+        /// <summary>
         /// Adds the specified xbox controller to the manager.
         /// </summary>
         /// <param name="xboxController">The controller to add.</param>

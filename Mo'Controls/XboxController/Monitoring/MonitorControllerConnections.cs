@@ -25,11 +25,11 @@ namespace Mo_Controls.XboxController.Monitoring
             {
                 if (value)
                 {
-                    ModConsole.Print("Started Monitoring for controller connections...");
+                    ModConsole.Print("<color=green>>></color> Started Monitoring for controller connections...");
                 }
                 else
                 {
-                    ModConsole.Print("Stopped Monitoring for controller connections...");
+                    ModConsole.Print("<color=green>>></color> Stopped Monitoring for controller connections...");
                 }
                 this.monitor = value;
             }

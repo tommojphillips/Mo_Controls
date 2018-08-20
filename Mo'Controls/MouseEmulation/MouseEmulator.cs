@@ -170,12 +170,12 @@ namespace Mo_Controls.MouseEmulation
             {
                 if (value)
                 {
-                    ModConsole.Print(String.Format("Started Emulating mouse as {0}.",
-                        this.inputType == InputTypeEnum.LS ? "Left Thumbstick" : "Right Thumbstick"));
+                    ModConsole.Print(String.Format("<color=green>>></color> Started Emulating mouse as {0}.",
+                        (this.inputType == InputTypeEnum.DPad ? "D-Pad" : (this.inputType == InputTypeEnum.LS ? "Left Thumbstick" : "Right Thumbstick"))));
                 }
                 else
                 {
-                    ModConsole.Print("Stopped Emulating mouse..");
+                    ModConsole.Print("<color=green>>></color> Stopped Emulating mouse..");
                 }
                 emulateMouse.Value = value;
             }

@@ -241,10 +241,14 @@ namespace Mo_Controls
         /// <summary>
         /// Represents the none keycode.
         /// </summary>
-        private const KeyCode noneKey = KeyCode.Delete;        
+        private const KeyCode noneKey = KeyCode.Delete;
 
         #endregion
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private static bool onKeyChangedEventSet = false;
         /// <summary>
         /// Represents the current instance of <see cref="Mo_Controls"/>.
         /// </summary>
@@ -257,6 +261,21 @@ namespace Mo_Controls
         /// Represents the supported/compatible version of mod loader.
         /// </summary>
         public const string SUPPORTED_MODLOADER_VERSION = "0.4.4";
+
+        #endregion
+
+        #region Constructors
+
+        public Mo_Controls()
+        {
+            // Written, 20.08.2018
+
+            // Getting the amount of keybinds within the current game instance. Doing that here as mods cannot be added while the game is running (currently).
+            foreach (Mod mod in ModLoader.LoadedMods)
+                this.modKeybindCount += Keybind.Get(mod).Count;
+            instance = this;
+            ModConsole.Print(String.Format("<color=green>{0} <b>v{1}</b> Initialized</color>", this.Name, this.Version));
+        }
 
         #endregion
 
@@ -722,23 +741,25 @@ namespace Mo_Controls
         {
             // Written, 06.07.2018    
 
-            // Getting the amount of keybinds within the current game instance. Doing that here as mods cannot be added while the game is running (currently).
-            foreach (Mod mod in ModLoader.LoadedMods)
-                this.modKeybindCount += Keybind.Get(mod).Count;
-
-            instance = this;
+            ModConsole.Print(String.Format("\r\n<color=green>{0} <b>v{1}</b> Loading</color>", this.Name, this.Version));
             this.changeInputResult = new ChangeInput();
             Keybind.Add(this, this.openControlsGui);
             this.controlInputs = new string[this.inputNames.Length, 3];
             this.loadControlInputsFromCInput();
-            cInput.OnKeyChanged += this.CInput_OnKeyChanged;
+            if (!onKeyChangedEventSet)
+            {
+                cInput.OnKeyChanged += this.CInput_OnKeyChanged;
+                onKeyChangedEventSet = true;
+            }
             this.xboxControllerManager = new XboxControllerManager(1);
             this.xboxController = this.xboxControllerManager.controllers[0];
-            XboxControllerManager.ControllerConnected += this.XboxControllerManager_ControllerConnected;
-            XboxControllerManager.ControllerDisconnected += this.XboxControllerManager_ControllerDisconnected;
+            if (!this.xboxControllerManager.controllerConnectedEvent)
+                XboxControllerManager.ControllerConnected += this.XboxControllerManager_ControllerConnected;
+            if (!this.xboxControllerManager.controllerDisconnectedEvent)
+                XboxControllerManager.ControllerDisconnected += this.XboxControllerManager_ControllerDisconnected;
             this.mouseEmulator = new MouseEmulator(DeadzoneTypeEnum.ScaledRadial);
             this.performModLoaderVersionCheck();
-            ModConsole.Print(String.Format("{0} v{1}: Loaded", this.Name, this.Version));
+            ModConsole.Print(String.Format("<color=green>{0} <b>v{1}</b> Loaded</color>", this.Name, this.Version));
         }
         public override void OnGUI()
         {
