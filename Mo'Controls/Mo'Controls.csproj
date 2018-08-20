@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="ChangeInput.cs" />
     <Compile Include="Input.cs" />
+    <Compile Include="MoControlsSaveData.cs" />
     <Compile Include="MonitorInputData.cs" />
     <Compile Include="XboxController\DeadzoneTypeEnum.cs" />
     <Compile Include="MouseEmulation\InputData.cs" />
