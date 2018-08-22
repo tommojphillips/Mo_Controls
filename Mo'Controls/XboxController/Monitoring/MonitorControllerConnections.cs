@@ -65,7 +65,7 @@ namespace Mo_Controls.XboxController.Monitoring
         /// <param name="numOfSupportedControllers">Number of supported controllers.</param>
         /// <param name="inMonitor">Monitor connection stautus?</param>
         /// <param name="xboxControllers">An array of xbox controllers.</param>
-        public MonitorControllerConnections(int numOfSupportedControllers, bool inMonitor = false, params XboxController[] xboxControllers)
+        public MonitorControllerConnections(int numOfSupportedControllers, params XboxController[] xboxControllers)
         {
             // Written, 16.07.2018
             
@@ -80,7 +80,6 @@ namespace Mo_Controls.XboxController.Monitoring
                     this.controllerConnections[i] = new ControllerConnection() { currentConnectionStatus = xboxController.isConnected, previousConnectionStatus = null };
                 }
             }
-            this.Monitor = inMonitor;
         }
 
         #endregion

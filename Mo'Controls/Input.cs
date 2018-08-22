@@ -12,15 +12,15 @@ namespace Mo_Controls
         /// <summary>
         /// Represents the select keycode.
         /// </summary>
-        private const KeyCode selectKey = KeyCode.Mouse0; // LMB
+        public const KeyCode selectKey = KeyCode.Mouse0; // LMB
         /// <summary>
         /// Represents the cancel keycode.
         /// </summary>
-        private const KeyCode cancelKey = KeyCode.Mouse1; // RMB
+        public const KeyCode cancelKey = KeyCode.Mouse1; // RMB
         /// <summary>
         /// Represents the none keycode.
         /// </summary>
-        private const KeyCode noneKey = KeyCode.Delete;
+        public const KeyCode noneKey = KeyCode.Delete;
 
         #endregion
 
@@ -172,13 +172,17 @@ namespace Mo_Controls
                                 }
                                 else
                                 {
-                                    if (kcode != Mo_Controls.instance.openControlsGui.Key && kcode != cancelKey) // not allowed
+                                    if (kcode != Mo_Controls.instance.moControlsGui.openControlsGui.Key && kcode != cancelKey) // not allowed
                                     {
                                         monitorInputData = new MonitorInputData()
                                         {
                                             foundInput = true,
                                             input = kcode.ToString(),
                                         };
+                                    }
+                                    else
+                                    {
+                                        Mo_Controls.instance.controlManager.changeInputResult = new ChangeInput();
                                     }
                                 }
                                 break;

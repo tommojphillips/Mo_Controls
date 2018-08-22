@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Mo_Controls.MouseEmulation;
+using MSCLoader;
 
 namespace Mo_Controls
 {
@@ -15,7 +13,7 @@ namespace Mo_Controls
         /// <summary>
         /// Represents the file extention for the save data file.
         /// </summary>
-        public const string fileExtention = ".MCSaveData";
+        public const string fileExtention = ".txt";
         /// <summary>
         /// Represents the file name for the save data file.
         /// </summary>
@@ -36,6 +34,7 @@ namespace Mo_Controls
                     mouseDeadzone = MouseEmulator.DEFAULT_DEADZONE,
                     mouseSensitivity = MouseEmulator.DEFAULT_SENSITIVITY,
                     mouseInputType = InputTypeEnum.RS,
+                    displayCurrentPlayerModeOverlay = true,
                 };
             }
         }
@@ -79,25 +78,63 @@ namespace Mo_Controls
             get;
             set;
         }
-        public string lmbPrimaryInput
+        public bool displayCurrentPlayerModeOverlay
         {
             get;
             set;
         }
-        public string lmbSecondaryInput
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Saves the settings.
+        /// </summary>
+        public static void saveSettings(Mo_Controls mo_Controls)
         {
-            get;
-            set;
+            // Written, 20.08.2018
+
+            MoControlsSaveData mcsd = new MoControlsSaveData()
+            {
+                showXboxVirtualAxesGui = mo_Controls.moControlsGui.showVirtualGui,
+                monitiorXboxControllerConnectionStatus = mo_Controls.xboxControllerManager.monitorControllerConnections.Monitor,
+                emulateMouse = mo_Controls.mouseEmulator.Emulating,
+                mouseDeadzone = mo_Controls.mouseEmulator.deadzone,
+                mouseSensitivity = mo_Controls.mouseEmulator.sensitivity,
+                mouseInputType = mo_Controls.mouseEmulator.inputType,
+                displayCurrentPlayerModeOverlay = mo_Controls.controlManager.displayCurrentPlayerModeOverlay,
+            };
+            SaveLoad.SerializeSaveFile(mo_Controls, mcsd, fileName + fileExtention);
         }
-        public string rmbPrimaryInput
+        /// <summary>
+        /// Saves the settings.
+        /// </summary>
+        public static void saveSettings(Mo_Controls mo_Controls, MoControlsSaveData mcsd)
         {
-            get;
-            set;
+            // Written, 22.08.2018
+
+            SaveLoad.SerializeSaveFile(mo_Controls, mcsd, fileName + fileExtention);
         }
-        public string rmbSecondaryInput
+        /// <summary>
+        /// Loads the settings.
+        /// </summary>
+        public static MoControlsSaveData loadSettings(Mo_Controls mo_Controls)
         {
-            get;
-            set;
+            // Written, 20.08.2018
+
+            MoControlsSaveData mcsd;
+            try
+            {
+                mcsd = SaveLoad.DeserializeSaveFile<MoControlsSaveData>(mo_Controls, fileName + fileExtention);
+                if (mcsd == null)
+                    throw new NullReferenceException();
+            }
+            catch (NullReferenceException)
+            {
+                mcsd = defaultSave;
+            }
+            return mcsd;            
         }
 
         #endregion
