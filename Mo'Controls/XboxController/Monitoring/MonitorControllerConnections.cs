@@ -125,13 +125,6 @@ namespace Mo_Controls.XboxController.Monitoring
             thread.Start();
         }
 
-        public void setControllers(XboxController[] inXboxControllers)
-        {
-            // Written, 30.08.2018
-
-            this.xboxControllers = inXboxControllers;
-        }
-
         #endregion
     }
 }
