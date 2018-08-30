@@ -6,6 +6,7 @@ using UnityEngine;
 using XInputDotNetPure;
 using MSCLoader;
 using Mo_Controls.XboxController;
+using NM = Mo_Controls.MouseEmulation.NativeMethods;
 using xController = Mo_Controls.XboxController.XboxController;
 
 namespace Mo_Controls.MouseEmulation
@@ -99,7 +100,7 @@ namespace Mo_Controls.MouseEmulation
             get
             {
                 Point point = new Point();
-                GetCursorPos(out point);
+                NativeMethods.GetCursorPos(out point);
                 return point;
             }
         }
@@ -204,12 +205,7 @@ namespace Mo_Controls.MouseEmulation
 
         #region Methods
 
-        [DllImport("user32.dll")]
-        private static extern bool GetCursorPos(out Point pos);
-        [DllImport("user32.dll")]
-        private static extern void mouse_event(uint dwFlags, int dx, int dy, uint dwData, int dwExtraInfo);
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern uint SendInput(uint nInputs, InputData[] pInputs, int cbSize);
+
 
         /// <summary>
         /// Creates required stuff to simulate mouse movement.
@@ -241,7 +237,7 @@ namespace Mo_Controls.MouseEmulation
             MouseEvent[0].type = 0;
             // move mouse: Flags ABSOLUTE (whole screen) and MOVE (move)
             MouseEvent[0].data = createMouseInput(x, y, 0, 0, MOUSEEVENTF_MOVE);//MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE);
-            SendInput((uint)MouseEvent.Length, MouseEvent, Marshal.SizeOf(MouseEvent[0].GetType()));
+            NM.SendInput((uint)MouseEvent.Length, MouseEvent, Marshal.SizeOf(MouseEvent[0].GetType()));
         }
         /// <summary>
         /// Simulates a left mouse button click.
@@ -253,7 +249,7 @@ namespace Mo_Controls.MouseEmulation
             Point tempCursPos = getCursorPosition;
             int X = tempCursPos.X;
             int Y = tempCursPos.Y;
-            mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
+            NM.mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
         }
         /// <summary>
         /// Simulates a right mouse button click
@@ -265,7 +261,7 @@ namespace Mo_Controls.MouseEmulation
             Point tempCursPos = getCursorPosition;
             int X = tempCursPos.X;
             int Y = tempCursPos.Y;
-            mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, X, Y, 0, 0);
+            NM.mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, X, Y, 0, 0);
         }
         /// <summary>
         /// Should be called every frame; on <see cref="Mod.Update()"/>.
