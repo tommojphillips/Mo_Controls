@@ -59,6 +59,14 @@ namespace Mo_Controls
             get;
             set;
         }
+        /// <summary>
+        /// Reprents the mode to modify.
+        /// </summary>
+        public PlayerModeEnum? mode
+        {
+            get;
+            set;
+        }
 
         #endregion
 
@@ -75,22 +83,24 @@ namespace Mo_Controls
             this.controlName = null;
             this.index = 0;
             this.mod = null;
+            this.mode = null;
         }
         /// <summary>
         /// Initializes a new instance of <see cref="ChangeInput"/> and assigns the classes properties to the parameters.
         /// </summary>
-        /// <param name="reassignKey">Indicates if the program should begin ressign key function.</param>
-        /// <param name="inputName">The name of the input to change. If <paramref name="reassignKey"/> is equal to false, this should be null.</param>
-        /// <param name="index">The input to change, either 1 or 2; 1 for primary input, 2 for secondary input. if <paramref name="reassignKey"/> is equal to <see langword="false"/>, this should be equal to 0</param>
+        /// <param name="inReassignKey">Indicates if the program should begin ressign key function.</param>
+        /// <param name="inInputName">The name of the input to change. If <paramref name="inReassignKey"/> is equal to false, this should be null.</param>
+        /// <param name="inIndex">The input to change, either 1 or 2; 1 for primary input, 2 for secondary input. if <paramref name="inReassignKey"/> is equal to <see langword="false"/>, this should be equal to 0</param>
         /// <param name="mod">The mod to change keybind.</param>
-        public ChangeInput(bool reassignKey, string inputName, int index, Mod mod = null)
+        public ChangeInput(bool inReassignKey, string inInputName, int inIndex, PlayerModeEnum? inMode = null, Mod inMod = null)
         {
             // Written, 11.07.2018
 
-            this.reassignKey = reassignKey;
-            this.controlName = inputName;
-            this.index = index;
-            this.mod = mod;
+            this.reassignKey = inReassignKey;
+            this.controlName = inInputName;
+            this.index = inIndex;
+            this.mod = inMod;
+            this.mode = inMode;
         }
 
         #endregion
@@ -103,7 +113,7 @@ namespace Mo_Controls
         /// <param name="inControlName">The game control to change.</param>
         /// <param name="inIndex">The index to change, Primary = 1, Secondary = 2.</param>
         /// <param name="inMod">The mod to change its keybind.</param>
-        public void changeToPollingState(string inControlName, int inIndex, Mod inMod = null)
+        public void changeToPollingState(string inControlName, int inIndex, PlayerModeEnum? inMode = null, Mod inMod = null)
         {
             // Written, 20.07.2018
 
@@ -113,6 +123,7 @@ namespace Mo_Controls
                 this.controlName = inControlName;
                 this.index = inIndex;
                 this.mod = inMod;
+                this.mode = inMode;
             }
         }
 

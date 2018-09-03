@@ -31,11 +31,25 @@ namespace Mo_Controls
         /// Represents the supported/compatible version of mod loader.
         /// </summary>
         public const string SUPPORTED_MODLOADER_VERSION = "0.4.4";
+        /// <summary>
+        /// Represents whether the settings have been loaded.
+        /// </summary>
+        private static bool _settingsLoaded = false;
 
         #endregion
 
         #region Properties
 
+        /// <summary>
+        /// Represents whether the settings have been loaded.
+        /// </summary>
+        public static bool settingsLoaded
+        {
+            get
+            {
+                return _settingsLoaded;
+            }
+        }
         /// <summary>
         /// Represents the GUI for the mod.
         /// </summary>
@@ -102,38 +116,6 @@ namespace Mo_Controls
         #region Methods
 
         /// <summary>
-        /// Gets infomation about a cInput input based on the input namem, <paramref name="inputName"/>. Returns an array with 3 items within it. In this order:
-        /// 1. The name of the control, 2. The Primary input for the control, 3. The Secondary input for the control.
-        /// </summary>
-        /// <param name="inputName">The name of the input.</param>
-        private string[] getInputNameControl(string inputName)
-        {
-            // Written, 06.07.2018
-
-            string[] returnValues = new string[3];
-            for (int i = 0; i < 3; i++)
-                returnValues[i] = cInput.GetText(inputName, i);
-            return returnValues;
-        }
-        /// <summary>
-        /// Loads control inputs (defined in <see cref="inputNames"/>) from the class, <see cref="cInput"/> and adds each one to <see cref="controlInputs"/> with it's primary
-        /// and secondary input.
-        /// </summary>
-        public void loadControlInputsFromCInput()
-        {
-            // Written, 06.07.2018
-
-            for (int i = 0; i < ControlManager.inputNames.Length; i++)
-            {
-                string[] inputName = this.getInputNameControl(ControlManager.inputNames[i]);
-                for (int j = 0; j < inputName.Length; j++)
-                {
-                    //ModConsole.Print("[loadControlInputsFromCInput] - Not Working, please fix me.");
-                }
-            }
-            ModConsole.Print("[loadControlInputsFromCInput] - Not Working, please fix me.");
-        }
-        /// <summary>
         /// Performs a check to see if the mod loader version is the same as the currently supported version.
         /// </summary>
         private void performModLoaderVersionCheck()
@@ -165,8 +147,12 @@ namespace Mo_Controls
             this.mouseEmulator.inputType = inSaveData.mouseInputType;
             this.mouseEmulator.Emulating = inSaveData.emulateMouse;
             this.controlManager.displayCurrentPlayerModeOverlay = inSaveData.displayCurrentPlayerModeOverlay;
+            this.controlManager.setControls(inSaveData.footControls, inSaveData.drivingControls);
             if (startUp)
+            {
+                _settingsLoaded = true;
                 ModConsole.Print("<color=green>>></color> Settings Loaded");
+            }
         }
 
         #endregion
@@ -177,12 +163,9 @@ namespace Mo_Controls
         {
             // Written, 06.07.2018    
 
+            ModConsole.Print(String.Format("\r\n<color=green>{0} <b>v{1}</b> Loading</color>", this.Name, this.Version));
             this.controlManager = new ControlManager();
             this.moControlsGui = new MoControlsGUI(this);
-            ModConsole.Print(String.Format("\r\n<color=green>{0} <b>v{1}</b> Loading</color>", this.Name, this.Version));
-            this.loadControlInputsFromCInput();
-            cInput.OnKeyChanged += null;
-            cInput.OnKeyChanged += this.CInput_OnKeyChanged;
             this.xboxControllerManager = new XboxControllerManager(1);
             this.xboxController = this.xboxControllerManager.controllers[0];
             if (!this.xboxControllerManager.controllerConnectedEvent)
@@ -205,26 +188,17 @@ namespace Mo_Controls
             // Written, 22.08.2018
             // Update is called once per frame
 
+            this.controlManager.onUpdate();
             this.moControlsGui.onUpdate();
             this.xboxControllerManager.onUpdate();
-            this.mouseEmulator.onUpdate();       
+            this.mouseEmulator.onUpdate();            
             this.xboxControllerManager.onRefresh();
         }
 
         #endregion
         
         #region Events
-
-        /// <summary>
-        /// Occurs when cinput keys are changed externally, (the game gui controls).
-        /// </summary>
-        private void CInput_OnKeyChanged()
-        {
-            // Written, 09.07.2018
-
-            ModConsole.Print("[CInput.dll] - 'OnKeyChanged' occured.");
-            this.loadControlInputsFromCInput();
-        }
+        
         /// <summary>
         /// Occurs when a controller is disconnected.
         /// </summary>

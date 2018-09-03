@@ -287,16 +287,18 @@ namespace Mo_Controls.McGUI
         /// </summary>
         private void drawFootControlsContent()
         {
-            // Written, 20.08.2018
+            // Written, 02.09.2018
 
+            this.drawControlModeContent("Foot Controls", this.mod.controlManager.footControls);
         }
         /// <summary>
         /// Draws driving controls content to the main gui.
         /// </summary>
         private void drawDrivingControlsContent()
         {
-            // Written, 20.08.2018
+            // Written, 02.09.2018
 
+            this.drawControlModeContent("Driving Controls", this.mod.controlManager.drivingControls);
         }
         /// <summary>
         /// Draws settings content to the main gui.
@@ -508,29 +510,29 @@ namespace Mo_Controls.McGUI
             gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.lmbPrimaryInput.Name));
             using (new gui.HorizontalScope("box"))
             {
-                this.drawCommonControl("Modifier", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Modifier.ToString(), 1, this.mod);
-                this.drawCommonControl("Input", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Key.ToString(), 2, this.mod);
+                this.drawCommonControl("Modifier", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Modifier.ToString(), 1, inMod: this.mod);
+                this.drawCommonControl("Input", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Key.ToString(), 2, inMod: this.mod);
             }
             gui.Space(3f);
             gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.lmbSecondaryInput.Name));
             using (new gui.HorizontalScope("box"))
             {
-                this.drawCommonControl("Modifier", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Modifier.ToString(), 1, this.mod);
-                this.drawCommonControl("Input", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Key.ToString(), 2, this.mod);
+                this.drawCommonControl("Modifier", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Modifier.ToString(), 1, inMod: this.mod);
+                this.drawCommonControl("Input", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Key.ToString(), 2, inMod: this.mod);
             }
             gui.Space(3f);
             gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.rmbPrimaryInput.Name));
             using (new gui.HorizontalScope("box"))
             {
-                this.drawCommonControl("Modifier", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Modifier.ToString(), 1, this.mod);
-                this.drawCommonControl("Input", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Key.ToString(), 2, this.mod);
+                this.drawCommonControl("Modifier", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Modifier.ToString(), 1, inMod: this.mod);
+                this.drawCommonControl("Input", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Key.ToString(), 2, inMod: this.mod);
             }
             gui.Space(3f);
             gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.rmbSecondaryInput.Name));
             using (new gui.HorizontalScope("box"))
             {
-                this.drawCommonControl("Modifier", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Modifier.ToString(), 1, this.mod);
-                this.drawCommonControl("Input", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Key.ToString(), 2, this.mod);
+                this.drawCommonControl("Modifier", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Modifier.ToString(), 1, inMod: this.mod);
+                this.drawCommonControl("Input", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Key.ToString(), 2, inMod: this.mod);
             }
             gui.Space(5f);
             if (saveSettings)
@@ -598,27 +600,27 @@ namespace Mo_Controls.McGUI
         /// <summary>
         /// Draws a common control for the gui.
         /// </summary>
-        private void drawCommonControl(string title, string controlName, string inputName, int index, Mod mod = null)
+        private void drawCommonControl(string inTitle, string inControlName, string inInputName, int inIndex, PlayerModeEnum? inMode = null, Mod inMod = null)
         {
             // Written, 01.08.2018
 
             string reassignMessage =
-                this.changeInputResult.controlName == controlName
-                && this.changeInputResult.index == index
+                this.changeInputResult.controlName == inControlName
+                && this.changeInputResult.index == inIndex
                 && this.changeInputResult.mod == mod ? "<b>Awaiting key input</b>" : null;            
-            XboxControl xboxControl = this.xboxController.getXboxControlByInputName(inputName);
+            XboxControl xboxControl = this.xboxController.getXboxControlByInputName(inInputName);
             if (xboxControl != null && reassignMessage == null)
             {
                 if (gui.Button(xboxControl.texture))
                 {
-                    this.changeInputResult.changeToPollingState(controlName, index, mod);
+                    this.changeInputResult.changeToPollingState(inControlName, inIndex, inMode, mod);
                 }
             }
             else
             {
-                if (gui.Button(reassignMessage ?? inputName))
+                if (gui.Button(reassignMessage ?? inInputName))
                 {
-                    this.changeInputResult.changeToPollingState(controlName, index, mod);
+                    this.changeInputResult.changeToPollingState(inControlName, inIndex, inMode, mod);
                 }
             }
         }
@@ -634,15 +636,33 @@ namespace Mo_Controls.McGUI
             {
                 // Treat as a game control.
 
-                if (this.changeInputResult.index == 1)
+                PlayerModeEnum? playerMode = this.changeInputResult.mode;
+
+                if (playerMode == null)
                 {
-                    cInput.ChangeKey(this.changeInputResult.controlName, input, cInput.GetText(this.changeInputResult.controlName, 2));
+                    bool mistake = true;
+                    ModUI.ShowYesNoMessage("Player Mode was null, is that right?", "Mistake?", delegate ()
+                    {
+                        mistake = false;
+                    });
+                    if (!mistake)
+                    {
+
+                        if (this.changeInputResult.index == 1)
+                        {
+                            cInput.ChangeKey(this.changeInputResult.controlName, input, cInput.GetText(this.changeInputResult.controlName, 2));
+                        }
+                        else
+                        {
+                            cInput.ChangeKey(this.changeInputResult.controlName, cInput.GetText(this.changeInputResult.controlName, 1), input);
+                        }
+                        this.mod.controlManager.currentControls = ControlManager.loadControlInputsFromCInput();
+                    }
                 }
                 else
                 {
-                    cInput.ChangeKey(this.changeInputResult.controlName, cInput.GetText(this.changeInputResult.controlName, 1), input);
+                    this.mod.controlManager.setGameControl((PlayerModeEnum)playerMode, this.changeInputResult.controlName, this.changeInputResult.index, input);
                 }
-                this.mod.loadControlInputsFromCInput();
             }
             else
             {
@@ -661,6 +681,32 @@ namespace Mo_Controls.McGUI
 
             }
             this.changeInputResult = new ChangeInput();
+        }
+        /// <summary>
+        /// draws the control input list.
+        /// </summary>
+        /// <param name="inControlInputs">The list to draw.</param>
+        private void drawControlModeContent(string inTitle, string[,] inControlInputs)
+        {
+            // Written, 02.09.2018
+
+            gui.Space(3f);
+            gui.Label(String.Format("<b>{0}</b>", inTitle));
+            gui.Space(5f);
+            for (int i = 0; i < inControlInputs.GetLength(0); i++)
+            {
+                string controlName = inControlInputs[i, 0];
+                gui.Space(3f);
+                gui.Label(String.Format("<b>{0}:</b>", controlName));
+                using (new gui.HorizontalScope("box"))
+                {
+                    bool isFootControls = (this.mainGUIMenu == MainGUIMenuEnum.FootControls);
+                    PlayerModeEnum playerMode = isFootControls ? PlayerModeEnum.OnFoot : PlayerModeEnum.OnFoot;
+                    this.drawCommonControl("Primary Input", controlName, inControlInputs[i, 1], 1, playerMode);
+                    this.drawCommonControl("Secondary Input", controlName, inControlInputs[i, 2], 2, playerMode);
+                }                
+            }
+            gui.Space(3f);
         }
 
         #endregion

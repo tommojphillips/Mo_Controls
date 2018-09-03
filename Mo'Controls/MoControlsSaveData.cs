@@ -17,7 +17,7 @@ namespace Mo_Controls
         /// <summary>
         /// Represents the file name for the save data file.
         /// </summary>
-        public const string fileName = "MoControlsSaveData";
+        public const string fileName = "Mo_ControlsSaveData";
         /// <summary>
         /// Represents the default save for the save file.
         /// </summary>
@@ -25,6 +25,7 @@ namespace Mo_Controls
         {
             get
             {
+                string[,] currentControlInputs = ControlManager.loadControlInputsFromCInput();
                 return new MoControlsSaveData()
                 {
                     showXboxDebugGui = false,
@@ -35,6 +36,8 @@ namespace Mo_Controls
                     mouseSensitivity = MouseEmulator.DEFAULT_SENSITIVITY,
                     mouseInputType = InputTypeEnum.RS,
                     displayCurrentPlayerModeOverlay = true,
+                    footControls = currentControlInputs,
+                    drivingControls = currentControlInputs,
                 };
             }
         }
@@ -83,6 +86,16 @@ namespace Mo_Controls
             get;
             set;
         }
+        public string[,] footControls
+        {
+            get;
+            set;
+        }
+        public string[,] drivingControls
+        {
+            get;
+            set;
+        }
 
         #endregion
 
@@ -104,6 +117,8 @@ namespace Mo_Controls
                 mouseSensitivity = mo_Controls.mouseEmulator.sensitivity,
                 mouseInputType = mo_Controls.mouseEmulator.inputType,
                 displayCurrentPlayerModeOverlay = mo_Controls.controlManager.displayCurrentPlayerModeOverlay,
+                footControls = mo_Controls.controlManager.footControls,
+                drivingControls = mo_Controls.controlManager.drivingControls,
             };
             SaveLoad.SerializeSaveFile(mo_Controls, mcsd, fileName + fileExtention);
         }
