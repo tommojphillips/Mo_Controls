@@ -123,7 +123,7 @@ namespace Mo_Controls.XboxController.Monitoring
                 }
             });
             thread.Start();
-        }        
+        }
 
         #endregion
     }

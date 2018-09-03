@@ -715,8 +715,8 @@ namespace Mo_Controls
             {
                 ModUI.ShowMessage(
                     String.Format("<b>[{0} <color=orange>v{1}]</color></b> - NOTE: modloader v{2} is <color=orange>not</color> currently <color=orange>supported</color> and/or may not be <color=orange>compatible</color>.\r\nSupported " +
-                    "modloader version is <color=orange>v{2}</color>\r\nFeel free to use the mod but keep in mind that it might not work as expected.",
-                    this.Name, this.Version, ModLoader.Version), "ModLoader Version not supported.");
+                    "modloader version is <color=orange>v{3}</color>\r\nFeel free to use the mod but keep in mind that it might not work as expected.",
+                    this.Name, this.Version, ModLoader.Version, SUPPORTED_MODLOADER_VERSION), "ModLoader Version not supported.");
             }
         }
         /// <summary>
