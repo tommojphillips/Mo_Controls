@@ -30,26 +30,12 @@ namespace Mo_Controls
         /// <summary>
         /// Represents the supported/compatible version of mod loader.
         /// </summary>
-        public const string SUPPORTED_MODLOADER_VERSION = "0.4.4";
-        /// <summary>
-        /// Represents whether the settings have been loaded.
-        /// </summary>
-        private static bool _settingsLoaded = false;
+        public const string SUPPORTED_MODLOADER_VERSION = "0.4.5";
 
         #endregion
 
         #region Properties
 
-        /// <summary>
-        /// Represents whether the settings have been loaded.
-        /// </summary>
-        public static bool settingsLoaded
-        {
-            get
-            {
-                return _settingsLoaded;
-            }
-        }
         /// <summary>
         /// Represents the GUI for the mod.
         /// </summary>
@@ -106,7 +92,7 @@ namespace Mo_Controls
         public Mo_Controls()
         {
             // Written, 20.08.2018
-            
+
             instance = this;
             ModConsole.Print(String.Format("<color=green>{0} <b>v{1}</b> Initialized</color>", this.Name, this.Version));
         }
@@ -150,7 +136,6 @@ namespace Mo_Controls
             this.controlManager.setControls(inSaveData.footControls, inSaveData.drivingControls);
             if (startUp)
             {
-                _settingsLoaded = true;
                 ModConsole.Print("<color=green>>></color> Settings Loaded");
             }
         }

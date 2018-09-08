@@ -62,7 +62,7 @@ namespace Mo_Controls
             "fifth",
             "sixth",
         };
-
+        
         #endregion
 
         #region Properties
@@ -71,14 +71,15 @@ namespace Mo_Controls
         {
             get
             {
-                return currentPlayerMode == PlayerModeEnum.Driving ? this.drivingControls : this.footControls;
+                return currentPlayerMode == PlayerModeEnum.Driving ? this.drivingControls : currentPlayerMode == PlayerModeEnum.OnFoot ? this.footControls : null;
             }
             set
             {
                 if (this.currentPlayerMode == PlayerModeEnum.Driving)
                     this.drivingControls = value;
                 else
-                    this.footControls = value;
+                    //if (currentPlayerMode == PlayerModeEnum.OnDriving)
+                        this.footControls = value;
             }
         }
         /// <summary>
@@ -280,8 +281,13 @@ namespace Mo_Controls
         {
             // Written, 02.09.2018
 
-            /*if (inIndex != 1 || inIndex != 2)
-                throw new IndexOutOfRangeException();*/
+            //string[,] prevControls;
+
+            if (inIndex != 1 && inIndex != 2)
+            {
+                ModConsole.Error("<b>C285 PControlManager</b>\r\nIndex out of range for game control editing...");
+                throw new IndexOutOfRangeException();
+            }
             if (inMode == PlayerModeEnum.Driving)
             {
                 for (int i = 0; i < this.drivingControls.GetLength(0); i++)
@@ -289,11 +295,14 @@ namespace Mo_Controls
                     string _controlName = this.drivingControls[i, 0];
                     if (inControlName == _controlName)
                     {
+                        //prevControls = this.footControls;
                         this.drivingControls[i, inIndex] = inInput;
+                        //this.footControls = prevControls;
                         break;
                     }
                 }
-                this.loadControlModeToCInput(inMode, this.drivingControls);
+                if (this.currentPlayerMode == inMode)
+                    this.loadControlModeToCInput(inMode, this.drivingControls);
             }
             else
             {
@@ -302,11 +311,14 @@ namespace Mo_Controls
                     string _controlName = this.footControls[i, 0];
                     if (inControlName == _controlName)
                     {
+                        //prevControls = this.drivingControls;
                         this.footControls[i, inIndex] = inInput;
+                        //this.drivingControls = prevControls;
                         break;
                     }
                 }
-                this.loadControlModeToCInput(inMode, this.footControls);
+                if (this.currentPlayerMode == inMode)
+                    this.loadControlModeToCInput(inMode, this.footControls);
             }
         }
 

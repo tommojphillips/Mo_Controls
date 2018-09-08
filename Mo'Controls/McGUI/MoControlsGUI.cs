@@ -603,25 +603,31 @@ namespace Mo_Controls.McGUI
         private void drawCommonControl(string inTitle, string inControlName, string inInputName, int inIndex, PlayerModeEnum? inMode = null, Mod inMod = null)
         {
             // Written, 01.08.2018
-
+            
             string reassignMessage =
                 this.changeInputResult.controlName == inControlName
                 && this.changeInputResult.index == inIndex
-                && this.changeInputResult.mod == mod ? "<b>Awaiting key input</b>" : null;            
+                && this.changeInputResult.mod == inMod 
+                && this.changeInputResult.mode == inMode ? "<b>Awaiting key input</b>" : null;            
             XboxControl xboxControl = this.xboxController.getXboxControlByInputName(inInputName);
+            bool buttonClicked = false;
             if (xboxControl != null && reassignMessage == null)
             {
                 if (gui.Button(xboxControl.texture))
                 {
-                    this.changeInputResult.changeToPollingState(inControlName, inIndex, inMode, mod);
+                    buttonClicked = true;
                 }
             }
             else
             {
                 if (gui.Button(reassignMessage ?? inInputName))
                 {
-                    this.changeInputResult.changeToPollingState(inControlName, inIndex, inMode, mod);
+                    buttonClicked = true;
                 }
+            }
+            if (buttonClicked)
+            {
+                this.changeInputResult.changeToPollingState(inControlName, inIndex, inMode, inMod);
             }
         }
         /// <summary>
@@ -700,8 +706,19 @@ namespace Mo_Controls.McGUI
                 gui.Label(String.Format("<b>{0}:</b>", controlName));
                 using (new gui.HorizontalScope("box"))
                 {
-                    bool isFootControls = (this.mainGUIMenu == MainGUIMenuEnum.FootControls);
-                    PlayerModeEnum playerMode = isFootControls ? PlayerModeEnum.OnFoot : PlayerModeEnum.OnFoot;
+                      bool isControls = (this.mainGUIMenu == MainGUIMenuEnum.FootControls);
+                    PlayerModeEnum? playerMode;
+                    if (isControls)
+                        playerMode = PlayerModeEnum.OnFoot;
+                    else
+                    {
+                        isControls = (this.mainGUIMenu == MainGUIMenuEnum.DrivingControls);
+                        if (isControls)
+                            playerMode = PlayerModeEnum.Driving;
+                        else
+                            playerMode = null;
+                    }
+                    
                     this.drawCommonControl("Primary Input", controlName, inControlInputs[i, 1], 1, playerMode);
                     this.drawCommonControl("Secondary Input", controlName, inControlInputs[i, 2], 2, playerMode);
                 }                
