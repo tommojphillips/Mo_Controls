@@ -66,6 +66,7 @@
     <Compile Include="McGUI\SettingsMenuEnum.cs" />
     <Compile Include="MoControlsSaveData.cs" />
     <Compile Include="MonitorInputData.cs" />
+    <Compile Include="MouseEmulation\NativeMethods.cs" />
     <Compile Include="PlayerModeEnum.cs" />
     <Compile Include="XboxController\DeadzoneTypeEnum.cs" />
     <Compile Include="MouseEmulation\InputData.cs" />
