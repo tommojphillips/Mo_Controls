@@ -57,6 +57,10 @@ namespace Mo_Controls.McGUI
 
         #endregion
 
+        private Color buttonTextSelectedColor = Color.gray;
+        private Color buttonTextNotSelectedColor = Color.white;
+        private Color buttonSelectedColor = Color.white;
+        private Color buttonNotSelectedColor = Color.gray;
         /// <summary>
         /// Represents the default color.
         /// </summary>
@@ -64,7 +68,7 @@ namespace Mo_Controls.McGUI
         /// <summary>
         /// Represents the background color.
         /// </summary>
-        private Color backGroundColor = new Color(0, 0, 0, 0.6f);
+        private Color backgroundColor = new Color(0, 0, 0, 0.6f);
         /// <summary>
         /// Represents the amount of keybinds that have been loaded via the mods.
         /// </summary>
@@ -214,6 +218,8 @@ namespace Mo_Controls.McGUI
         {
             // Written, 22.08.2018
 
+
+
             using (new gui.AreaScope(new Rect(MAIN_GUI_LEFT + 5f, MENU_GUI_TOP, this.mainGuiWidth - SCROLL_BAR_OFFSET, MENU_GUI_HEIGHT)))
             using (new gui.HorizontalScope())
             {
@@ -221,13 +227,25 @@ namespace Mo_Controls.McGUI
                 {
                     bool isSelected = (this.mainGUIMenu == mainMenuItem);
                     if (isSelected)
-                        GUI.contentColor = Color.green;
+                    {
+                        GUI.contentColor = this.buttonTextSelectedColor;
+                        GUI.backgroundColor = this.buttonSelectedColor;
+                        GUI.color = this.buttonSelectedColor;
+                    }
+                    else
+                    {
+                        GUI.contentColor = this.buttonTextNotSelectedColor;
+                        GUI.backgroundColor = this.buttonNotSelectedColor;
+                        GUI.color = this.buttonTextSelectedColor;
+                    }
+
                     if (gui.Button(mainMenuItem.toString()) && !isSelected)
                     {
                         this.mainGUIMenu = mainMenuItem;
                     }
-                    if (isSelected)
-                        GUI.contentColor = Color.white;
+                    GUI.contentColor = this.defaultColor;
+                    GUI.backgroundColor = this.defaultColor;
+                    GUI.color = this.defaultColor;
                 }
             }
         }
@@ -339,20 +357,31 @@ namespace Mo_Controls.McGUI
         private void drawSettingsMenu()
         {
             // Written, 20.08.2018
-
+            
             using (new gui.HorizontalScope("box"))
             {
                 foreach (SettingsMenuEnum settingsMenuItem in Enum.GetValues(typeof(SettingsMenuEnum)))
                 {
                     bool isSelected = (this.settingsMenu == settingsMenuItem);
                     if (isSelected)
-                        GUI.contentColor = Color.green;
+                    {
+                        GUI.contentColor = this.buttonTextSelectedColor;
+                        GUI.backgroundColor = this.buttonSelectedColor;
+                        GUI.color = this.buttonSelectedColor;
+                    }
+                    else
+                    {
+                        GUI.contentColor = this.buttonTextNotSelectedColor;
+                        GUI.backgroundColor = this.buttonNotSelectedColor;
+                        GUI.color = this.buttonTextSelectedColor;
+                    }
                     if (gui.Button(settingsMenuItem.toString()) && !isSelected)
                     {
                         this.settingsMenu = settingsMenuItem;
                     }
-                    if (isSelected)
-                        GUI.contentColor = Color.white;
+                    GUI.contentColor = this.defaultColor;
+                    GUI.backgroundColor = this.defaultColor;
+                    GUI.color = this.defaultColor;
                 }
             }
         }
@@ -622,6 +651,8 @@ namespace Mo_Controls.McGUI
                 && this.changeInputResult.mode == inMode ? "<b>Awaiting key input</b>" : null;            
             XboxControl xboxControl = this.xboxController.getXboxControlByInputName(inInputName);
             bool buttonClicked = false;
+            Color prevColor = GUI.backgroundColor;
+            GUI.backgroundColor = this.defaultColor;
             if (xboxControl != null && reassignMessage == null)
             {
                 if (gui.Button(xboxControl.texture))
@@ -636,6 +667,7 @@ namespace Mo_Controls.McGUI
                     buttonClicked = true;
                 }
             }
+            GUI.backgroundColor = prevColor;
             if (buttonClicked)
             {
                 this.changeInputResult.changeToPollingState(inControlName, inIndex, inMode, inMod);
@@ -710,15 +742,23 @@ namespace Mo_Controls.McGUI
             gui.Space(3f);
             gui.Label(String.Format("<b>{0}</b>", inTitle));
             gui.Space(5f);
+            int j = 0;
             for (int i = 0; i < inControlInputs.GetLength(0); i++)
             {
+                j++;
+
+                if (j == 2)
+                {
+                    j = 0;
+                    GUI.backgroundColor = this.backgroundColor;
+                }
+                else
+                    GUI.backgroundColor = this.defaultColor;
                 string controlName = inControlInputs[i, 0];
                 gui.Space(3f);
-                GUI.backgroundColor = this.backGroundColor;
                 using (new gui.VerticalScope("box"))
                 {
                     gui.Label(String.Format("<b>{0}:</b>", controlName.gameControlToString(true)));
-                    GUI.backgroundColor = this.defaultColor;
                     using (new gui.HorizontalScope())
                     {
                         bool isControls = (this.mainGUIMenu == MainGUIMenuEnum.FootControls);
@@ -757,11 +797,11 @@ namespace Mo_Controls.McGUI
                 if (modKeybinds.Count() > 0)
                 {
                     gui.Space(3f);
-                    GUI.backgroundColor = this.backGroundColor;
+                    //GUI.backgroundColor = this.backgroundColor;
                     using (new gui.HorizontalScope("box"))
                     {
                         gui.Label(String.Format("<b>{0}</b>, by <b>{1}</b>:", _mod.Name, _mod.Author));
-                        GUI.backgroundColor = this.defaultColor;
+                        //GUI.backgroundColor = this.defaultColor;
                         using (new gui.VerticalScope("box"))
                         {                            
                             for (int i = 0; i < modKeybinds.Length; i++)
