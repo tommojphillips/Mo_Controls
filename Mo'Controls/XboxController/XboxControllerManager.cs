@@ -97,7 +97,7 @@ namespace Mo_Controls.XboxController
             {
                 this.addController(new XboxController(i));
             }
-            this.monitorControllerConnections = new MonitorControllerConnections(this.numOfControllersSupported, true, this.controllers);
+            this.monitorControllerConnections = new MonitorControllerConnections(this.numOfControllersSupported, this.controllers);
         }
 
         #endregion
@@ -129,11 +129,7 @@ namespace Mo_Controls.XboxController
             }
             else
             {
-                if (this.monitorControllerConnections != null)
-                {
-                    bool isMonitoring = this.monitorControllerConnections.Monitor;
-                    this.monitorControllerConnections = new MonitorControllerConnections(this.numOfControllersSupported, isMonitoring, this.controllers);
-                }
+                this.monitorControllerConnections = new MonitorControllerConnections(this.numOfControllersSupported, this.controllers);
             }
         }
         /// <summary>

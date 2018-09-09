@@ -58,10 +58,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChangeInput.cs" />
+    <Compile Include="ControlManager.cs" />
     <Compile Include="Input.cs" />
+    <Compile Include="McGUI\MainGUIMenuEnum.cs" />
+    <Compile Include="McGUI\GUIMenuEnumExtentions.cs" />
+    <Compile Include="McGUI\MoControlsGUI.cs" />
+    <Compile Include="McGUI\SettingsMenuEnum.cs" />
     <Compile Include="MoControlsSaveData.cs" />
     <Compile Include="MonitorInputData.cs" />
-    <Compile Include="MouseEmulation\NativeMethods.cs" />
+    <Compile Include="PlayerModeEnum.cs" />
     <Compile Include="XboxController\DeadzoneTypeEnum.cs" />
     <Compile Include="MouseEmulation\InputData.cs" />
     <Compile Include="MouseEmulation\InputTypeEnum.cs" />
