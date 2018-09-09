@@ -58,6 +58,14 @@ namespace Mo_Controls.McGUI
         #endregion
 
         /// <summary>
+        /// Represents the default color.
+        /// </summary>
+        private Color defaultColor = new Color(1, 1, 1);
+        /// <summary>
+        /// Represents the background color.
+        /// </summary>
+        private Color backGroundColor = new Color(0, 0, 0, 0.6f);
+        /// <summary>
         /// Represents the amount of keybinds that have been loaded via the mods.
         /// </summary>
         private int modKeybindCount = 0;
@@ -136,8 +144,8 @@ namespace Mo_Controls.McGUI
             this.mod = inMod;
             Keybind.Add(this.mod, this.openControlsGui);
             // Getting the amount of keybinds within the current game instance. Doing that here as mods cannot be added while the game is running (currently).
-            foreach (Mod mod in ModLoader.LoadedMods)
-                this.modKeybindCount += Keybind.Get(mod).Count;
+            foreach (Mod mod in ModLoader.LoadedMods.Where(lm => Keybind.Get(mod).Count() > 0))
+                this.modKeybindCount += Keybind.Get(mod).Count();
         }
 
         #endregion
@@ -252,6 +260,9 @@ namespace Mo_Controls.McGUI
                         break;
                     case MainGUIMenuEnum.Settings:
                         this.drawSettingsContent();
+                        break;
+                    case MainGUIMenuEnum.ModControls:
+                        this.drawModContent();
                         break;
                 }
             }
@@ -703,27 +714,69 @@ namespace Mo_Controls.McGUI
             {
                 string controlName = inControlInputs[i, 0];
                 gui.Space(3f);
-                gui.Label(String.Format("<b>{0}:</b>", controlName));
-                using (new gui.HorizontalScope("box"))
+                GUI.backgroundColor = this.backGroundColor;
+                using (new gui.VerticalScope("box"))
                 {
-                      bool isControls = (this.mainGUIMenu == MainGUIMenuEnum.FootControls);
-                    PlayerModeEnum? playerMode;
-                    if (isControls)
-                        playerMode = PlayerModeEnum.OnFoot;
-                    else
+                    gui.Label(String.Format("<b>{0}:</b>", controlName.gameControlToString(true)));
+                    GUI.backgroundColor = this.defaultColor;
+                    using (new gui.HorizontalScope())
                     {
-                        isControls = (this.mainGUIMenu == MainGUIMenuEnum.DrivingControls);
+                        bool isControls = (this.mainGUIMenu == MainGUIMenuEnum.FootControls);
+                        PlayerModeEnum? playerMode;
                         if (isControls)
-                            playerMode = PlayerModeEnum.Driving;
+                            playerMode = PlayerModeEnum.OnFoot;
                         else
-                            playerMode = null;
+                        {
+                            isControls = (this.mainGUIMenu == MainGUIMenuEnum.DrivingControls);
+                            if (isControls)
+                                playerMode = PlayerModeEnum.Driving;
+                            else
+                                playerMode = null;
+                        }
+
+                        this.drawCommonControl("Primary Input", controlName, inControlInputs[i, 1], 1, playerMode);
+                        this.drawCommonControl("Secondary Input", controlName, inControlInputs[i, 2], 2, playerMode);
                     }
-                    
-                    this.drawCommonControl("Primary Input", controlName, inControlInputs[i, 1], 1, playerMode);
-                    this.drawCommonControl("Secondary Input", controlName, inControlInputs[i, 2], 2, playerMode);
                 }                
             }
             gui.Space(3f);
+        }
+        /// <summary>
+        /// Draws all mod keybinds.
+        /// </summary>
+        private void drawModContent()
+        {
+            // Written, 09.09.2018
+
+            gui.Space(3f);
+            gui.Label(String.Format("<b>Total Mod Keybinds: {0}</b>", modKeybindCount));
+            foreach (Mod _mod in ModLoader.LoadedMods)
+            {
+                Keybind[] modKeybinds = Keybind.Get(_mod).ToArray();
+
+                if (modKeybinds.Count() > 0)
+                {
+                    gui.Space(3f);
+                    GUI.backgroundColor = this.backGroundColor;
+                    using (new gui.HorizontalScope("box"))
+                    {
+                        gui.Label(String.Format("<b>{0}</b>, by <b>{1}</b>:", _mod.Name, _mod.Author));
+                        GUI.backgroundColor = this.defaultColor;
+                        using (new gui.VerticalScope("box"))
+                        {                            
+                            for (int i = 0; i < modKeybinds.Length; i++)
+                            {
+                                gui.Label(String.Format("<b>{0}:</b>", modKeybinds[i].Name));
+                                using (new gui.HorizontalScope())
+                                {
+                                    this.drawCommonControl("Modifier", modKeybinds[i].ID, modKeybinds[i].Modifier.ToString(), 1, inMod: _mod);
+                                    this.drawCommonControl("Input", modKeybinds[i].ID, modKeybinds[i].Key.ToString(), 2, inMod: _mod);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         #endregion
