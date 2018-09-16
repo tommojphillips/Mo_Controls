@@ -254,6 +254,7 @@ namespace Mo_Controls.McGUI
 
                     if (gui.Button(mainMenuItem.toString()) && !isSelected)
                     {
+                        this.mainGUIScrollPosition = Vector2.zero;
                         this.mainGUIMenu = mainMenuItem;
                     }
                     GUI.contentColor = this.defaultColor;
