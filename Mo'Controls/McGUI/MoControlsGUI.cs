@@ -802,6 +802,7 @@ namespace Mo_Controls.McGUI
         {
             // Written, 09.09.2018
 
+            int j = 0;
             if (!this.hasCountedModKeybinds)
             {
                 this.hasCountedModKeybinds = true;
@@ -821,17 +822,28 @@ namespace Mo_Controls.McGUI
                     using (new gui.HorizontalScope("box"))
                     {
                         gui.Label(String.Format("<b>{0}</b>, by <b>{1}</b>:", _mod.Name, _mod.Author));
-                        GUI.backgroundColor = this.defaultColor;
-                        using (new gui.VerticalScope("box"))
-                        {                            
+                        using (new gui.VerticalScope())
+                        {
                             for (int i = 0; i < modKeybinds.Length; i++)
-                            {                                
-                                gui.Label(String.Format("<b>{0}:</b>", modKeybinds[i].Name));
-                                using (new gui.HorizontalScope())
+                            {
+                                j++;
+                                if (j == 2)
                                 {
-                                    this.drawCommonControl("Modifier", modKeybinds[i].ID, modKeybinds[i].Modifier.ToString(), 1, inMod: _mod);
-                                    this.drawCommonControl("Input", modKeybinds[i].ID, modKeybinds[i].Key.ToString(), 2, inMod: _mod);
+                                    j = 0;
+                                    GUI.backgroundColor = this.backgroundColor;
                                 }
+                                else
+                                    GUI.backgroundColor = this.defaultColor;
+                                using (new gui.VerticalScope("box"))
+                                {
+                                    gui.Label(String.Format("<b>{0}:</b>", modKeybinds[i].Name));
+                                    using (new gui.HorizontalScope())
+                                    {
+                                        this.drawCommonControl("Modifier", modKeybinds[i].ID, modKeybinds[i].Modifier.ToString(), 1, inMod: _mod);
+                                        this.drawCommonControl("Input", modKeybinds[i].ID, modKeybinds[i].Key.ToString(), 2, inMod: _mod);
+                                    }
+                                }
+                                gui.Space(3f);
                             }
                         }
                     }
