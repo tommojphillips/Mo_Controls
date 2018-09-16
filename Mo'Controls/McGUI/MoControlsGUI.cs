@@ -57,9 +57,21 @@ namespace Mo_Controls.McGUI
 
         #endregion
 
+        /// <summary>
+        /// Represents the color of the button's text when selected (menu item).
+        /// </summary>
         private Color buttonTextSelectedColor = Color.gray;
+        /// <summary>
+        /// Represents the color of the button's text when not selected (menu item).
+        /// </summary>
         private Color buttonTextNotSelectedColor = Color.white;
+        /// <summary>
+        /// Represents the color of the button's background when selected (menu item).
+        /// </summary>
         private Color buttonSelectedColor = Color.white;
+        /// <summary>
+        /// Represents the color of the button's background when not selected (menu item).
+        /// </summary>
         private Color buttonNotSelectedColor = Color.gray;
         /// <summary>
         /// Represents the default color.
@@ -69,6 +81,10 @@ namespace Mo_Controls.McGUI
         /// Represents the background color.
         /// </summary>
         private Color backgroundColor = new Color(0, 0, 0, 0.6f);
+        /// <summary>
+        /// Represents whether the instance has calculated the amount of keybinds yet.
+        /// </summary>
+        private bool hasCountedModKeybinds = false;
         /// <summary>
         /// Represents the amount of keybinds that have been loaded via the mods.
         /// </summary>
@@ -147,9 +163,6 @@ namespace Mo_Controls.McGUI
 
             this.mod = inMod;
             Keybind.Add(this.mod, this.openControlsGui);
-            // Getting the amount of keybinds within the current game instance. Doing that here as mods cannot be added while the game is running (currently).
-            foreach (Mod mod in ModLoader.LoadedMods.Where(lm => Keybind.Get(mod).Count() > 0))
-                this.modKeybindCount += Keybind.Get(mod).Count();
         }
 
         #endregion
@@ -788,6 +801,12 @@ namespace Mo_Controls.McGUI
         {
             // Written, 09.09.2018
 
+            if (!this.hasCountedModKeybinds)
+            {
+                this.hasCountedModKeybinds = true;
+                foreach (Mod _mod in ModLoader.LoadedMods)
+                    this.modKeybindCount += Keybind.Get(_mod).Count;
+            }
             gui.Space(3f);
             gui.Label(String.Format("<b>Total Mod Keybinds: {0}</b>", modKeybindCount));
             foreach (Mod _mod in ModLoader.LoadedMods)
@@ -797,15 +816,15 @@ namespace Mo_Controls.McGUI
                 if (modKeybinds.Count() > 0)
                 {
                     gui.Space(3f);
-                    //GUI.backgroundColor = this.backgroundColor;
+                    GUI.backgroundColor = this.backgroundColor;
                     using (new gui.HorizontalScope("box"))
                     {
                         gui.Label(String.Format("<b>{0}</b>, by <b>{1}</b>:", _mod.Name, _mod.Author));
-                        //GUI.backgroundColor = this.defaultColor;
+                        GUI.backgroundColor = this.defaultColor;
                         using (new gui.VerticalScope("box"))
                         {                            
                             for (int i = 0; i < modKeybinds.Length; i++)
-                            {
+                            {                                
                                 gui.Label(String.Format("<b>{0}:</b>", modKeybinds[i].Name));
                                 using (new gui.HorizontalScope())
                                 {
@@ -817,6 +836,7 @@ namespace Mo_Controls.McGUI
                     }
                 }
             }
+            GUI.backgroundColor = this.defaultColor;
         }
 
         #endregion
