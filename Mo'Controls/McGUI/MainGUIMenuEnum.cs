@@ -3,8 +3,9 @@
     public enum MainGUIMenuEnum
     {
         About = 0,
-        Settings = 3,
         FootControls = 1,
         DrivingControls = 2,
+        ModControls = 3,
+        Settings = 4,
     }
 }
