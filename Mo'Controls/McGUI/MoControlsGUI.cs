@@ -772,7 +772,7 @@ namespace Mo_Controls.McGUI
                 gui.Space(3f);
                 using (new gui.VerticalScope("box"))
                 {
-                    gui.Label(String.Format("<b>{0}:</b>", controlName.gameControlToString(true)));
+                    gui.Label(String.Format("<b>{0}:</b>", controlName.getGameControlAlias(true)));
                     using (new gui.HorizontalScope())
                     {
                         bool isControls = (this.mainGUIMenu == MainGUIMenuEnum.FootControls);

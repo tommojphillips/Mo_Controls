@@ -33,24 +33,50 @@ namespace Mo_Controls.McGUI
                     return settingsGUIMenu.ToString();
             }
         }
-        public static string gameControlToString(this string gameControlName, bool preserveAcronyms)
+        public static string getGameControlAlias(this string gameControlName, bool preserveAcronyms)
         {
-            // Written, 09.09.2018
+            // Written, 16.09.2018
 
-            if (String.IsNullOrEmpty(gameControlName))
-                return string.Empty;
-            StringBuilder newText = new StringBuilder(gameControlName.Length * 2);
-            newText.Append(gameControlName[0]);
-            for (int i = 1; i < gameControlName.Length; i++)
+            string alias = "";
+
+            switch (gameControlName)
             {
-                if (char.IsUpper(gameControlName[i]))
-                    if ((gameControlName[i - 1] != ' ' && !char.IsUpper(gameControlName[i - 1])) ||
-                        (preserveAcronyms && char.IsUpper(gameControlName[i - 1]) &&
-                         i < gameControlName.Length - 1 && !char.IsUpper(gameControlName[i + 1])))
-                        newText.Append(' ');
-                newText.Append(gameControlName[i]);
+                case "Left":
+                    alias = "Turn Left";
+                    break;
+                case "Right":
+                    alias = "Turn Right";
+                    break;                
+                case "Boost":
+                    alias = "N2O";
+                    break;
+                case "Swear":
+                    alias = "Curse";
+                    break;
+                case "Drunk":
+                    alias = "Talk";
+                    break;
+                case "Smoking":
+                    alias = "Smoke";
+                    break;
+                default:
+                    if (String.IsNullOrEmpty(gameControlName))
+                        return string.Empty;
+                    StringBuilder newText = new StringBuilder(gameControlName.Length * 2);
+                    newText.Append(gameControlName[0]);
+                    for (int i = 1; i < gameControlName.Length; i++)
+                    {
+                        if (char.IsUpper(gameControlName[i]))
+                            if ((gameControlName[i - 1] != ' ' && !char.IsUpper(gameControlName[i - 1])) ||
+                                (preserveAcronyms && char.IsUpper(gameControlName[i - 1]) &&
+                                 i < gameControlName.Length - 1 && !char.IsUpper(gameControlName[i + 1])))
+                                newText.Append(' ');
+                        newText.Append(gameControlName[i]);
+                    }
+                    alias = newText.ToString();
+                    break;
             }
-            return newText.ToString();
+            return alias;           
         }
     }
 }
