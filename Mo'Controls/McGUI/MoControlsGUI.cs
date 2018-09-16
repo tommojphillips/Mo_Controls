@@ -699,7 +699,7 @@ namespace Mo_Controls.McGUI
             {
                 // Treat as a game control.
 
-                PlayerModeEnum? playerMode = this.changeInputResult.mode;
+                PlayerModeEnum? playerMode = this.changeInputResult?.mode;
 
                 if (playerMode == null)
                 {
@@ -725,6 +725,7 @@ namespace Mo_Controls.McGUI
                 else
                 {
                     this.mod.controlManager.setGameControl((PlayerModeEnum)playerMode, this.changeInputResult.controlName, this.changeInputResult.index, input);
+                    MoControlsSaveData.saveSettings(this.mod);
                 }
             }
             else

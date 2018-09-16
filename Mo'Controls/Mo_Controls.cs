@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
 using MSCLoader;
-using UnityEngine;
 using Mo_Controls.McGUI;
 using Mo_Controls.MouseEmulation;
 using Mo_Controls.XboxController;
@@ -30,7 +28,7 @@ namespace Mo_Controls
         /// <summary>
         /// Represents the supported/compatible version of mod loader.
         /// </summary>
-        public const string SUPPORTED_MODLOADER_VERSION = "0.4.5";
+        public const string SUPPORTED_MODLOADER_VERSION = "0.4.6";
 
         #endregion
 

@@ -49,27 +49,27 @@ namespace Mo_Controls.MouseEmulation
         /// <summary>
         /// Represents LMB input name.
         /// </summary>
-        public const string LMB_INPUT_NAME = "EmLMB";
+        public const string LMB_INPUT_NAME = "LMB";
         /// <summary>
         /// Represents RMB input name.
         /// </summary>
-        public const string RMB_INPUT_NAME = "RmLMB";
+        public const string RMB_INPUT_NAME = "RMB";
         /// <summary>
         /// Represents the primary input for LMB
         /// </summary>
-        public Keybind lmbPrimaryInput = new Keybind(LMB_INPUT_NAME + "1", "LMB Primary Input", KeyCode.None);
+        public Keybind lmbPrimaryInput = new Keybind(LMB_INPUT_NAME + "1", "LMB Primary Input", KeyCode.Joystick1Button0);
         /// <summary>
         /// Represents the secondary input for LMB
         /// </summary>
-        public Keybind lmbSecondaryInput = new Keybind(LMB_INPUT_NAME + "2", "LMB Secondary", KeyCode.None);
+        public Keybind lmbSecondaryInput = new Keybind(LMB_INPUT_NAME + "2", "LMB Secondary", KeyCode.Keypad1);
         /// <summary>
         /// Represents the primary input for RMB
         /// </summary>
-        public Keybind rmbPrimaryInput = new Keybind(RMB_INPUT_NAME + "1", "RMB Primary Input", KeyCode.None);
+        public Keybind rmbPrimaryInput = new Keybind(RMB_INPUT_NAME + "1", "RMB Primary Input", KeyCode.Joystick1Button2);
         /// <summary>
         /// Represents the secondary input for RMB
         /// </summary>
-        public Keybind rmbSecondaryInput = new Keybind(RMB_INPUT_NAME + "2", "RMB Secondary", KeyCode.None);
+        public Keybind rmbSecondaryInput = new Keybind(RMB_INPUT_NAME + "2", "RMB Secondary", KeyCode.Keypad2);
         /// <summary>
         /// Represents whether the current instance is emulating mouse movement.
         /// </summary>
@@ -204,9 +204,7 @@ namespace Mo_Controls.MouseEmulation
         #endregion
 
         #region Methods
-
-
-
+        
         /// <summary>
         /// Creates required stuff to simulate mouse movement.
         /// </summary>
@@ -235,8 +233,7 @@ namespace Mo_Controls.MouseEmulation
         {
             InputData[] MouseEvent = new InputData[1];
             MouseEvent[0].type = 0;
-            // move mouse: Flags ABSOLUTE (whole screen) and MOVE (move)
-            MouseEvent[0].data = createMouseInput(x, y, 0, 0, MOUSEEVENTF_MOVE);//MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE);
+            MouseEvent[0].data = createMouseInput(x, y, 0, 0, MOUSEEVENTF_MOVE);
             NM.SendInput((uint)MouseEvent.Length, MouseEvent, Marshal.SizeOf(MouseEvent[0].GetType()));
         }
         /// <summary>
