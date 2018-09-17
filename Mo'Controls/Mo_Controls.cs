@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using MSCLoader;
 using Mo_Controls.McGUI;
 using Mo_Controls.MouseEmulation;
@@ -29,7 +30,10 @@ namespace Mo_Controls
         /// Represents the supported/compatible version of mod loader.
         /// </summary>
         public const string SUPPORTED_MODLOADER_VERSION = "0.4.6";
-
+        /// <summary>
+        /// Represents the update thread.
+        /// </summary>
+        private Thread updateThread;
         #endregion
 
         #region Properties
@@ -171,11 +175,15 @@ namespace Mo_Controls
             // Written, 22.08.2018
             // Update is called once per frame
 
-            this.controlManager.onUpdate();
-            this.moControlsGui.onUpdate();
-            this.xboxControllerManager.onUpdate();
-            this.mouseEmulator.onUpdate();            
-            this.xboxControllerManager.onRefresh();
+            this.updateThread = new Thread(delegate ()
+            {
+                this.controlManager.onUpdate();
+                this.moControlsGui.onUpdate();
+                this.xboxControllerManager.onUpdate();
+                this.mouseEmulator.onUpdate();
+                this.xboxControllerManager.onRefresh();
+            });
+            this.updateThread.Start();
         }
 
         #endregion

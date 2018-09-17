@@ -90,38 +90,34 @@ namespace Mo_Controls.XboxController.Monitoring
         {
             // Written, 16.07.2018
 
-            Thread thread = new Thread(delegate ()
+            if (this.Monitor)
             {
-                if (this.Monitor)
+                for (int i = 0; i < this.xboxControllers.Length; i++)
                 {
-                    for (int i = 0; i < this.xboxControllers.Length; i++)
+                    ControllerConnection controllerConnection = this.controllerConnections[i];
+                    XboxController xboxController = xboxControllers[i];
+                    if (xboxController != null)
                     {
-                        ControllerConnection controllerConnection = this.controllerConnections[i];
-                        XboxController xboxController = xboxControllers[i];
-                        if (xboxController != null)
+                        if (xboxController.isConnected != controllerConnection.currentConnectionStatus)
                         {
-                            if (xboxController.isConnected != controllerConnection.currentConnectionStatus)
-                            {
-                                controllerConnection.previousConnectionStatus = controllerConnection.currentConnectionStatus;
-                                controllerConnection.currentConnectionStatus = xboxController.isConnected;
+                            controllerConnection.previousConnectionStatus = controllerConnection.currentConnectionStatus;
+                            controllerConnection.currentConnectionStatus = xboxController.isConnected;
 
-                                if (controllerConnection.currentConnectionStatus == true)
+                            if (controllerConnection.currentConnectionStatus == true)
+                            {
+                                XboxControllerManager.onControllerConnected(new ControllerConnectedEventArgs(xboxController));
+                            }
+                            else
+                            {
+                                if (controllerConnection.currentConnectionStatus == false)
                                 {
-                                    XboxControllerManager.onControllerConnected(new ControllerConnectedEventArgs(xboxController));
-                                }
-                                else
-                                {
-                                    if (controllerConnection.currentConnectionStatus == false)
-                                    {
-                                        XboxControllerManager.onControllerDisconnected(new ControllerDisconnectedEventArgs(xboxController));
-                                    }
+                                    XboxControllerManager.onControllerDisconnected(new ControllerDisconnectedEventArgs(xboxController));
                                 }
                             }
                         }
                     }
                 }
-            });
-            thread.Start();
+            }
         }
 
         #endregion

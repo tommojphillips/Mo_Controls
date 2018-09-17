@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
-using System.Text;
 using HutongGames.PlayMaker;
-using UnityEngine;
 using MSCLoader;
 
 namespace Mo_Controls
@@ -62,7 +57,7 @@ namespace Mo_Controls
             "fifth",
             "sixth",
         };
-        
+
         #endregion
 
         #region Properties
@@ -253,7 +248,7 @@ namespace Mo_Controls
         public void onUpdate()
         {
             // Written, 31.08.2018
-            
+
             if (this.currentPlayerMode != playerMode)
             {
                 this.currentPlayerMode = playerMode;
@@ -281,8 +276,6 @@ namespace Mo_Controls
         {
             // Written, 02.09.2018
 
-            //string[,] prevControls;
-
             if (inIndex != 1 && inIndex != 2)
             {
                 ModConsole.Error("<b>C285 PControlManager</b>\r\nIndex out of range for game control editing...");
@@ -295,9 +288,7 @@ namespace Mo_Controls
                     string _controlName = this.drivingControls[i, 0];
                     if (inControlName == _controlName)
                     {
-                        //prevControls = this.footControls;
                         this.drivingControls[i, inIndex] = inInput;
-                        //this.footControls = prevControls;
                         break;
                     }
                 }
@@ -311,9 +302,7 @@ namespace Mo_Controls
                     string _controlName = this.footControls[i, 0];
                     if (inControlName == _controlName)
                     {
-                        //prevControls = this.drivingControls;
                         this.footControls[i, inIndex] = inInput;
-                        //this.drivingControls = prevControls;
                         break;
                     }
                 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Collections.Generic;
 using XInputDotNetPure;
 using UnityEngine;
@@ -364,38 +363,34 @@ namespace Mo_Controls.XboxController
         {
             // Written, 16.07.2018
 
-            Thread updateThread = new Thread(delegate ()
+            this.state = GamePad.GetState(this.playerIndex);
+
+            if (this.state.IsConnected)
             {
-                this.state = GamePad.GetState(this.playerIndex);
+                // Face Buttons
+                this.A.state = this.state.Buttons.A;
+                this.B.state = this.state.Buttons.B;
+                this.X.state = this.state.Buttons.X;
+                this.Y.state = this.state.Buttons.Y;
+                this.Start.state = this.state.Buttons.Start;
+                this.Back.state = this.state.Buttons.Back;
+                // D-Pad
+                this.DPadUp.state = this.state.DPad.Up;
+                this.DPadDown.state = this.state.DPad.Down;
+                this.DPadLeft.state = this.state.DPad.Left;
+                this.DPadRight.state = this.state.DPad.Right;
+                // Other
+                this.LB.state = this.state.Buttons.LeftShoulder;
+                this.RB.state = this.state.Buttons.RightShoulder;
+                this.LS.state = this.state.Buttons.LeftStick;
+                this.RS.state = this.state.Buttons.RightStick;
+                // Triggers
+                this.LT.state = this.state.Triggers.Left;
+                this.RT.state = this.state.Triggers.Right;
 
-                if (this.state.IsConnected)
-                {
-                    // Face Buttons
-                    this.A.state = this.state.Buttons.A;
-                    this.B.state = this.state.Buttons.B;
-                    this.X.state = this.state.Buttons.X;
-                    this.Y.state = this.state.Buttons.Y;
-                    this.Start.state = this.state.Buttons.Start;
-                    this.Back.state = this.state.Buttons.Back;
-                    // D-Pad
-                    this.DPadUp.state = this.state.DPad.Up;
-                    this.DPadDown.state = this.state.DPad.Down;
-                    this.DPadLeft.state = this.state.DPad.Left;
-                    this.DPadRight.state = this.state.DPad.Right;
-                    // Other
-                    this.LB.state = this.state.Buttons.LeftShoulder;
-                    this.RB.state = this.state.Buttons.RightShoulder;
-                    this.LS.state = this.state.Buttons.LeftStick;
-                    this.RS.state = this.state.Buttons.RightStick;
-                    // Triggers
-                    this.LT.state = this.state.Triggers.Left;
-                    this.RT.state = this.state.Triggers.Right;
-
-                    this.updateInputMap();
-                    this.handleRumble();
-                }
-            });
-            updateThread.Start();
+                this.updateInputMap();
+                this.handleRumble();
+            }
         }
         /// <summary>
         /// Refreshes the controllers previous state as with the input map.
@@ -404,37 +399,33 @@ namespace Mo_Controls.XboxController
         {
             // Written, 16.07.2018
 
-            Thread refreshThread = new Thread(delegate ()
+            this.previousState = this.state;
+
+            if (this.state.IsConnected)
             {
-                this.previousState = this.state;
+                // Face Buttons
+                this.A.previousState = this.previousState.Buttons.A;
+                this.B.previousState = this.previousState.Buttons.B;
+                this.X.previousState = this.previousState.Buttons.X;
+                this.Y.previousState = this.previousState.Buttons.Y;
+                this.Start.previousState = this.previousState.Buttons.Start;
+                this.Back.previousState = this.previousState.Buttons.Back;
+                // D-Pad
+                this.DPadUp.previousState = this.previousState.DPad.Up;
+                this.DPadDown.previousState = this.previousState.DPad.Down;
+                this.DPadLeft.previousState = this.previousState.DPad.Left;
+                this.DPadRight.previousState = this.previousState.DPad.Right;
+                // Other
+                this.LB.previousState = this.previousState.Buttons.LeftShoulder;
+                this.RB.previousState = this.previousState.Buttons.RightShoulder;
+                this.LS.previousState = this.previousState.Buttons.LeftStick;
+                this.RS.previousState = this.previousState.Buttons.RightStick;
+                // Triggers
+                this.LT.previousState = this.previousState.Triggers.Left;
+                this.RT.previousState = this.previousState.Triggers.Right;
 
-                if (this.state.IsConnected)
-                {
-                    // Face Buttons
-                    this.A.previousState = this.previousState.Buttons.A;
-                    this.B.previousState = this.previousState.Buttons.B;
-                    this.X.previousState = this.previousState.Buttons.X;
-                    this.Y.previousState = this.previousState.Buttons.Y;
-                    this.Start.previousState = this.previousState.Buttons.Start;
-                    this.Back.previousState = this.previousState.Buttons.Back;
-                    // D-Pad
-                    this.DPadUp.previousState = this.previousState.DPad.Up;
-                    this.DPadDown.previousState = this.previousState.DPad.Down;
-                    this.DPadLeft.previousState = this.previousState.DPad.Left;
-                    this.DPadRight.previousState = this.previousState.DPad.Right;
-                    // Other
-                    this.LB.previousState = this.previousState.Buttons.LeftShoulder;
-                    this.RB.previousState = this.previousState.Buttons.RightShoulder;
-                    this.LS.previousState = this.previousState.Buttons.LeftStick;
-                    this.RS.previousState = this.previousState.Buttons.RightStick;
-                    // Triggers
-                    this.LT.previousState = this.previousState.Triggers.Left;
-                    this.RT.previousState = this.previousState.Triggers.Right;
-
-                    this.updateInputMap();
-                }
-            });
-            refreshThread.Start();
+                this.updateInputMap();
+            }
         }
         /// <summary>
         /// Returns true if the provided <see cref="XboxButtonEnum"/> has been pressed.

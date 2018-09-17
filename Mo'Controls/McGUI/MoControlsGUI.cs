@@ -189,11 +189,14 @@ namespace Mo_Controls.McGUI
                     FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = false;
                 }
             }
-            if (this.changeInputResult.reassignKey)
+            if (this.controlsGuiOpened)
             {
-                MonitorInputData mid = Input.monitorForInput();
-                if (mid.foundInput)
-                    this.changeInput(mid.input);
+                if (this.changeInputResult.reassignKey)
+                {
+                    MonitorInputData mid = Input.monitorForInput();
+                    if (mid.foundInput)
+                        this.changeInput(mid.input);
+                }
             }
         }
         /// <summary>

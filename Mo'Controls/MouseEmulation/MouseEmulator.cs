@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.Threading;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using XInputDotNetPure;
@@ -147,8 +146,8 @@ namespace Mo_Controls.MouseEmulation
             {
                 mouseSensitivity = value;
             }
-        }  
-        
+        }
+
         // Mouse Constants
         /// <summary>
         /// Represents the default deadzone for the emulated mouse.
@@ -267,74 +266,70 @@ namespace Mo_Controls.MouseEmulation
         {
             // Written, 01.08.2018
 
-            Thread thread = new Thread(delegate ()
-            {                
-                if (this.Emulating)
+            if (this.Emulating)
+            {
+                xController xboxController = Mo_Controls.instance.xboxController;
+
+                if (this.lmbPrimaryInput.IsDown() || this.lmbSecondaryInput.IsDown())
                 {
-                    xController xboxController = Mo_Controls.instance.xboxController;
-
-                    if (this.lmbPrimaryInput.IsDown() || this.lmbSecondaryInput.IsDown())
-                    {
-                        simulateLeftClick();
-                    }
-                    if (this.rmbPrimaryInput.IsDown() || this.rmbSecondaryInput.IsDown())
-                    {
-                        simulateRightClick();
-                    }
-                    if (xboxController.isConnected)
-                    {
-                        GamePadThumbSticks.StickValue stickValue_temp = default(GamePadThumbSticks.StickValue);
-                        Vector2 stickValue = Vector2.zero;
-                        int moveX;
-                        int moveY;
-
-                        switch (this.inputType)
-                        {
-                            case InputTypeEnum.LS:
-                                stickValue_temp = xboxController.getLeftStick();
-                                break;
-                            case InputTypeEnum.RS:
-                                stickValue_temp = xboxController.getRightStick();
-                                break;
-                            case InputTypeEnum.DPad:
-                                if (xboxController.DPadLeft.state == ButtonState.Pressed)
-                                {
-                                    stickValue.x = -1;
-                                }
-                                if (xboxController.DPadRight.state == ButtonState.Pressed)
-                                {
-                                    stickValue.x = 1;
-                                }
-                                if (xboxController.DPadUp.state == ButtonState.Pressed)
-                                {
-                                    stickValue.y = 1;
-                                }
-                                if (xboxController.DPadDown.state == ButtonState.Pressed)
-                                {
-                                    stickValue.y = -1;
-                                }
-                                break;
-                        }
-                        if (this.inputType != InputTypeEnum.DPad)
-                        {
-                            stickValue.x = stickValue_temp.X;
-                            stickValue.y = stickValue_temp.Y;
-                        }
-                        if (stickValue != Vector2.zero)
-                        {
-                            // Deadzone
-                            stickValue = stickValue.doDeadzoneCheck(this.deadzone, this.deadzoneType);
-                            // Sensitivity
-                            stickValue = stickValue.doSensitivityOperation(this.sensitivity);
-
-                            moveX = (int)stickValue.x;
-                            moveY = (int)stickValue.y * -1; // '* -1' xbox controller y axis is naturally inverted. so changing the that..;
-                            simulateMouseMove(moveX, moveY);
-                        }
-                    }                
+                    simulateLeftClick();
                 }
-            });
-            thread.Start();
+                if (this.rmbPrimaryInput.IsDown() || this.rmbSecondaryInput.IsDown())
+                {
+                    simulateRightClick();
+                }
+                if (xboxController.isConnected)
+                {
+                    GamePadThumbSticks.StickValue stickValue_temp = default(GamePadThumbSticks.StickValue);
+                    Vector2 stickValue = Vector2.zero;
+                    int moveX;
+                    int moveY;
+
+                    switch (this.inputType)
+                    {
+                        case InputTypeEnum.LS:
+                            stickValue_temp = xboxController.getLeftStick();
+                            break;
+                        case InputTypeEnum.RS:
+                            stickValue_temp = xboxController.getRightStick();
+                            break;
+                        case InputTypeEnum.DPad:
+                            if (xboxController.DPadLeft.state == ButtonState.Pressed)
+                            {
+                                stickValue.x = -1;
+                            }
+                            if (xboxController.DPadRight.state == ButtonState.Pressed)
+                            {
+                                stickValue.x = 1;
+                            }
+                            if (xboxController.DPadUp.state == ButtonState.Pressed)
+                            {
+                                stickValue.y = 1;
+                            }
+                            if (xboxController.DPadDown.state == ButtonState.Pressed)
+                            {
+                                stickValue.y = -1;
+                            }
+                            break;
+                    }
+                    if (this.inputType != InputTypeEnum.DPad)
+                    {
+                        stickValue.x = stickValue_temp.X;
+                        stickValue.y = stickValue_temp.Y;
+                    }
+                    if (stickValue != Vector2.zero)
+                    {
+                        // Deadzone
+                        stickValue = stickValue.doDeadzoneCheck(this.deadzone, this.deadzoneType);
+                        // Sensitivity
+                        stickValue = stickValue.doSensitivityOperation(this.sensitivity);
+
+                        moveX = (int)stickValue.x;
+                        moveY = (int)stickValue.y * -1; // '* -1' xbox controller y axis is naturally inverted. so changing the that..;
+                        simulateMouseMove(moveX, moveY);
+                    }
+                }
+            }
         }
 
         #endregion
