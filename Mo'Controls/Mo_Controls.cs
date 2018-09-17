@@ -19,7 +19,7 @@ namespace Mo_Controls
         public override string ID => "Mo_Controls";
         public override string Name => "Mo'Controls";
         public override string Author => "tommojphillips";
-        public override string Version => "1.0.5";
+        public override string Version => "1.0.6";
         public override bool UseAssetsFolder => true;
 
         #endregion
