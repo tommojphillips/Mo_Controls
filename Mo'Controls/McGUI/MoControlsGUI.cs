@@ -14,7 +14,7 @@ namespace Mo_Controls.McGUI
     /// <summary>
     /// Represents the GUI for the mod, <see cref="Mo_Controls"/>.
     /// </summary>
-    public class MoControlsGUI
+    public class MoControlsGUI : MonoBehaviour
     {
         // Written, 22.08.2018
 
@@ -60,27 +60,27 @@ namespace Mo_Controls.McGUI
         /// <summary>
         /// Represents the color of the button's text when selected (menu item).
         /// </summary>
-        private Color buttonTextSelectedColor = Color.gray;
+        private Color buttonTextSelectedColor = new Color32(135, 135, 135, byte.MaxValue); // Light Gray
         /// <summary>
         /// Represents the color of the button's text when not selected (menu item).
         /// </summary>
-        private Color buttonTextNotSelectedColor = Color.white;
+        private Color buttonTextNotSelectedColor = new Color32(118, 159, 222, byte.MaxValue); // Light Blue
         /// <summary>
         /// Represents the color of the button's background when selected (menu item).
         /// </summary>
-        private Color buttonSelectedColor = Color.white;
+        private Color buttonSelectedColor = new Color32(118, 159, 222, byte.MaxValue); // Light Blue
         /// <summary>
         /// Represents the color of the button's background when not selected (menu item).
         /// </summary>
-        private Color buttonNotSelectedColor = Color.gray;
+        private Color buttonNotSelectedColor = new Color32(135, 135, 135, byte.MaxValue); // Light Gray
         /// <summary>
         /// Represents the default color.
         /// </summary>
-        private Color defaultColor = new Color(1, 1, 1);
+        private Color defaultColor = new Color(1, 1, 1, 1); // Some sort of dark-gray : black ratio
         /// <summary>
         /// Represents the background color.
         /// </summary>
-        private Color backgroundColor = new Color(0, 0, 0, 0.6f);
+        private Color backgroundColor = new Color32(118, 159, 222, byte.MaxValue); // Light Blue
         /// <summary>
         /// Represents whether the instance has calculated the amount of keybinds yet.
         /// </summary>
@@ -98,10 +98,6 @@ namespace Mo_Controls.McGUI
         /// </summary>
         private MainGUIMenuEnum mainGUIMenu;
         /// <summary>
-        /// Represents the mod.
-        /// </summary>
-        private Mo_Controls mod;
-        /// <summary>
         /// Represent whether the mod should display the virtual gui.
         /// </summary>
         public bool showVirtualGui;
@@ -114,6 +110,7 @@ namespace Mo_Controls.McGUI
 
         #region Properties
 
+        private Mo_Controls mod => Mo_Controls.instance;
         /// <summary>
         /// Represents the mouse emulator. references <see cref="Mo_Controls.mouseEmulator"/>.
         /// </summary>
@@ -121,7 +118,17 @@ namespace Mo_Controls.McGUI
         {
             get
             {
-                return this.mod.mouseEmulator;
+                return this.mod.mouseEmulator;      
+            }
+        }
+        /// <summary>
+        /// Represents the control manager.
+        /// </summary>
+        private ControlManager controlManager
+        {
+            get
+            {
+                return this.mod.controlManager;
             }
         }
         /// <summary>
@@ -131,11 +138,11 @@ namespace Mo_Controls.McGUI
         {
             get
             {
-                return this.mod.controlManager.changeInputResult;
+                return this.controlManager.changeInputResult;
             }
             set
             {
-                this.mod.controlManager.changeInputResult = value;
+                this.controlManager.changeInputResult = value;
             }
         }
         /// <summary>
@@ -157,11 +164,10 @@ namespace Mo_Controls.McGUI
         /// Initliazes a new instance of <see cref="MoControlsGUI"/>.
         /// </summary>
         /// <param name="inMod">The mod.</param>
-        public MoControlsGUI(Mo_Controls inMod)
+        public MoControlsGUI()
         {
             // Written, 22.08.2018
 
-            this.mod = inMod;
             Keybind.Add(this.mod, this.openControlsGui);
         }
 
@@ -208,6 +214,7 @@ namespace Mo_Controls.McGUI
 
             try
             {
+                GUI.skin = ModLoader.guiskin;
                 if (this.controlsGuiOpened)
                 {
                     this.drawMainMenuGUI();
@@ -215,7 +222,7 @@ namespace Mo_Controls.McGUI
                 }
                 else
                 {
-                    if (this.mod.controlManager.displayCurrentPlayerModeOverlay)
+                    if (this.controlManager.displayCurrentPlayerModeOverlay)
                     {
                         this.drawPlayerModeOverlayGUI();
                     }
@@ -223,7 +230,7 @@ namespace Mo_Controls.McGUI
             }
             catch (Exception ex)
             {
-                ModConsole.Error(ex.StackTrace);
+                ModConsole.Error(ex.ToString());
                 this.controlsGuiOpened = false;
             }
         }
@@ -233,8 +240,6 @@ namespace Mo_Controls.McGUI
         private void drawMainMenuGUI()
         {
             // Written, 22.08.2018
-
-
 
             using (new gui.AreaScope(new Rect(MAIN_GUI_LEFT + 5f, MENU_GUI_TOP, this.mainGuiWidth - SCROLL_BAR_OFFSET, MENU_GUI_HEIGHT)))
             using (new gui.HorizontalScope())
@@ -246,13 +251,11 @@ namespace Mo_Controls.McGUI
                     {
                         GUI.contentColor = this.buttonTextSelectedColor;
                         GUI.backgroundColor = this.buttonSelectedColor;
-                        GUI.color = this.buttonSelectedColor;
                     }
                     else
                     {
                         GUI.contentColor = this.buttonTextNotSelectedColor;
-                        GUI.backgroundColor = this.buttonNotSelectedColor;
-                        GUI.color = this.buttonTextSelectedColor;
+                        GUI.backgroundColor = this.buttonTextSelectedColor;
                     }
 
                     if (gui.Button(mainMenuItem.toString()) && !isSelected)
@@ -262,7 +265,6 @@ namespace Mo_Controls.McGUI
                     }
                     GUI.contentColor = this.defaultColor;
                     GUI.backgroundColor = this.defaultColor;
-                    GUI.color = this.defaultColor;
                 }
             }
         }
@@ -335,7 +337,7 @@ namespace Mo_Controls.McGUI
         {
             // Written, 02.09.2018
 
-            this.drawControlModeContent("Foot Controls", this.mod.controlManager.footControls);
+            this.drawControlModeContent("Foot Controls", this.controlManager.footControls);
         }
         /// <summary>
         /// Draws driving controls content to the main gui.
@@ -344,7 +346,7 @@ namespace Mo_Controls.McGUI
         {
             // Written, 02.09.2018
 
-            this.drawControlModeContent("Driving Controls", this.mod.controlManager.drivingControls);
+            this.drawControlModeContent("Driving Controls", this.controlManager.drivingControls);
         }
         /// <summary>
         /// Draws settings content to the main gui.
@@ -361,7 +363,7 @@ namespace Mo_Controls.McGUI
                     this.drawMouseEmulationContent();
                     break;
                 case SettingsMenuEnum.Debug:
-                    this.drawDebugContent();
+                    this.drawXboxControllerDebugContent();
                     break;
                 case SettingsMenuEnum.Display:
                     this.drawDisplayContent();
@@ -384,13 +386,11 @@ namespace Mo_Controls.McGUI
                     {
                         GUI.contentColor = this.buttonTextSelectedColor;
                         GUI.backgroundColor = this.buttonSelectedColor;
-                        GUI.color = this.buttonSelectedColor;
                     }
                     else
                     {
                         GUI.contentColor = this.buttonTextNotSelectedColor;
                         GUI.backgroundColor = this.buttonNotSelectedColor;
-                        GUI.color = this.buttonTextSelectedColor;
                     }
                     if (gui.Button(settingsMenuItem.toString()) && !isSelected)
                     {
@@ -398,14 +398,13 @@ namespace Mo_Controls.McGUI
                     }
                     GUI.contentColor = this.defaultColor;
                     GUI.backgroundColor = this.defaultColor;
-                    GUI.color = this.defaultColor;
                 }
             }
         }
         /// <summary>
         /// Draws debug content to the main gui.
         /// </summary>
-        private void drawDebugContent()
+        private void drawXboxControllerDebugContent()
         {
             // Written, 20.08.2018
 
@@ -424,7 +423,7 @@ namespace Mo_Controls.McGUI
                         gui.Label("Triggers:");
                         gui.Label(String.Format("Left: {0}\r\nRight: {1}", 
                             leftRounded > 0.0f || leftRounded < 0.0f ? String.Format("<color=yellow>{0}</color>", leftRounded) : leftRounded.ToString(),
-                            rightRounded > 0.0f || rightRounded < 0.0f ? String.Format("<color=yellow>{0}</color>", rightRounded) : rightRounded.ToString()));
+                            rightRounded > 0.0f || rightRounded < 0.0f ? String.Format("<color=yellow>{0}</color>", rightRounded) : rightRounded.ToString()));                        
                     }
                     // Bumpers
                     gui.Space(5f);
@@ -631,9 +630,9 @@ namespace Mo_Controls.McGUI
 
             bool _saveSettings = false;
 
-            if (gui.Toggle(this.mod.controlManager.displayCurrentPlayerModeOverlay, "Display current player mode overlay") != this.mod.controlManager.displayCurrentPlayerModeOverlay)
+            if (gui.Toggle(this.controlManager.displayCurrentPlayerModeOverlay, "Display current player mode overlay") != this.controlManager.displayCurrentPlayerModeOverlay)
             {
-                this.mod.controlManager.displayCurrentPlayerModeOverlay = !this.mod.controlManager.displayCurrentPlayerModeOverlay;
+                this.controlManager.displayCurrentPlayerModeOverlay = !this.controlManager.displayCurrentPlayerModeOverlay;
                 _saveSettings = true;
             }
 
@@ -670,7 +669,7 @@ namespace Mo_Controls.McGUI
             bool buttonClicked = false;
             Color prevColor = GUI.backgroundColor;
             GUI.backgroundColor = this.defaultColor;
-            if (xboxControl != null && reassignMessage == null)
+            if (xboxControl != null && reassignMessage == null && this.xboxController.assetsLoaded)
             {
                 if (gui.Button(xboxControl.texture))
                 {
@@ -679,7 +678,7 @@ namespace Mo_Controls.McGUI
             }
             else
             {
-                if (gui.Button(reassignMessage ?? inInputName))
+                if (gui.Button(reassignMessage ?? (!this.xboxController.assetsLoaded ? "Asset not loaded" : "") + inInputName))
                 {
                     buttonClicked = true;
                 }
@@ -722,12 +721,12 @@ namespace Mo_Controls.McGUI
                         {
                             cInput.ChangeKey(this.changeInputResult.controlName, cInput.GetText(this.changeInputResult.controlName, 1), input);
                         }
-                        this.mod.controlManager.currentControls = ControlManager.loadControlInputsFromCInput();
+                        this.controlManager.currentControls = ControlManager.loadControlInputsFromCInput();
                     }
                 }
                 else
                 {
-                    this.mod.controlManager.setGameControl((PlayerModeEnum)playerMode, this.changeInputResult.controlName, this.changeInputResult.index, input);
+                    this.controlManager.setGameControl((PlayerModeEnum)playerMode, this.changeInputResult.controlName, this.changeInputResult.index, input);
                     MoControlsSaveData.saveSettings(this.mod);
                 }
             }
@@ -795,7 +794,7 @@ namespace Mo_Controls.McGUI
                         this.drawCommonControl("Primary Input", controlName, inControlInputs[i, 1], 1, playerMode);
                         this.drawCommonControl("Secondary Input", controlName, inControlInputs[i, 2], 2, playerMode);
                     }
-                }                
+                }
             }
             gui.Space(3f);
         }
