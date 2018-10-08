@@ -19,7 +19,7 @@ namespace Mo_Controls
         public override string ID => "Mo_Controls";
         public override string Name => "Mo'Controls";
         public override string Author => "tommojphillips";
-        public override string Version => "1.0.6";
+        public override string Version => "1.0.7";
         public override bool UseAssetsFolder => true;
 
         #endregion
@@ -152,7 +152,7 @@ namespace Mo_Controls
 
             ModConsole.Print(String.Format("\r\n<color=green>{0} <b>v{1}</b> Loading</color>", this.Name, this.Version));
             this.controlManager = new ControlManager();
-            this.moControlsGui = new MoControlsGUI(this);
+            this.moControlsGui = new MoControlsGUI();
             this.xboxControllerManager = new XboxControllerManager(1);
             this.xboxController = this.xboxControllerManager.controllers[0];
             if (!this.xboxControllerManager.controllerConnectedEvent)

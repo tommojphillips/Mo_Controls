@@ -15,6 +15,11 @@ namespace Mo_Controls.XboxController
 
         #region Properties
         
+        public bool assetsLoaded
+        {
+            get;
+            private set;
+        }
         /// <summary>
         /// Represents all the controls of an xbox controller.
         /// </summary>
@@ -329,6 +334,38 @@ namespace Mo_Controls.XboxController
                 new XboxControl(String.Format("{0}4+", axisPrefix), "RS-Right", XboxControlTypeEnum.Axis),
                 new XboxControl(String.Format("{0}5-", axisPrefix), "RS-Up", XboxControlTypeEnum.Axis),
                 new XboxControl(String.Format("{0}5+", axisPrefix), "RS-Down", XboxControlTypeEnum.Axis)
+
+                /*
+                // Buttons
+                new XboxButton(Keys.XboxA, "A", XboxControlTypeEnum.Button),
+                new XboxButton(Keys.XboxB, "B", XboxControlTypeEnum.Button),
+                new XboxButton(Keys.XboxX, "X", XboxControlTypeEnum.Button),
+                new XboxButton(Keys.XboxY, "Y", XboxControlTypeEnum.Button),
+                new XboxButton(Keys.XboxBumperLeft, "LB", XboxControlTypeEnum.Button),
+                new XboxButton(Keys.XboxBumperRight, "RB", XboxControlTypeEnum.Button),
+                new XboxButton(Keys.XboxBack, "Back", XboxControlTypeEnum.Button),
+                new XboxButton(Keys.XboxStart, "Start", XboxControlTypeEnum.Button),
+                new XboxButton(Keys.XboxLStickButton, "LS", XboxControlTypeEnum.Button),
+                new XboxButton(Keys.XboxRStickButton, "RS", XboxControlTypeEnum.Button),
+                // D-Pad
+                new XboxButton(Keys.XboxDPadUp, "D-Pad Up", XboxControlTypeEnum.Axis),
+                new XboxButton(Keys.XboxDPadDown, "D-Pad Down", XboxControlTypeEnum.Axis),
+                new XboxButton(Keys.XboxDPadLeft, "D-Pad Left", XboxControlTypeEnum.Axis),
+                new XboxButton(Keys.XboxDPadRight, "D-Pad Right", XboxControlTypeEnum.Axis),
+                // Triggers
+                new XboxTriggerState(Keys.XboxTriggerLeft, "LT"),
+                new XboxTriggerState(Keys.XboxTriggerRight, "RT"),
+                // LS
+                new XboxControl(Keys.XboxLStickLeft, "LS-Left", XboxControlTypeEnum.Axis),
+                new XboxControl(Keys.XboxLStickRight, "LS-Right", XboxControlTypeEnum.Axis),
+                new XboxControl(Keys.XboxLStickUp, "LS-Up", XboxControlTypeEnum.Axis),
+                new XboxControl(Keys.XboxLStickDown, "LS-Down", XboxControlTypeEnum.Axis),
+                // RS
+                new XboxControl(Keys.XboxRStickLeft, "RS-Left", XboxControlTypeEnum.Axis),
+                new XboxControl(Keys.XboxRStickRight, "RS-Right", XboxControlTypeEnum.Axis),
+                new XboxControl(Keys.XboxRStickUp, "RS-Up", XboxControlTypeEnum.Axis),
+                new XboxControl(Keys.XboxRStickDown, "RS-Down", XboxControlTypeEnum.Axis)
+                */
             };
             // Thumbsticks
             this.leftThumbstick = new XboxJoystick(
@@ -349,7 +386,11 @@ namespace Mo_Controls.XboxController
 
             #endregion
 
-            this.loadControllerAssets();
+            try
+            {
+                this.loadControllerAssets();
+            }
+            catch (NullReferenceException) { }
         }
 
         #endregion
@@ -637,38 +678,48 @@ namespace Mo_Controls.XboxController
         {
             // Written, 20.07.2018
 
-            Mo_Controls moC = Mo_Controls.instance;
+            try
+            {
+                AssetBundle ab = LoadAssets.LoadBundle(Mo_Controls.instance, "mo_controls.unity3d");
+                // Buttons
+                this.A.texture = ab.LoadAsset<Texture2D>("XboxOne_A.png");
+                this.B.texture = ab.LoadAsset<Texture2D>("XboxOne_B.png");
+                this.X.texture = ab.LoadAsset<Texture2D>("XboxOne_X.png");
+                this.Y.texture = ab.LoadAsset<Texture2D>("XboxOne_Y.png");
+                this.Back.texture = ab.LoadAsset<Texture2D>("XboxOne_Windows.png");
+                this.Start.texture = ab.LoadAsset<Texture2D>("XboxOne_Menu.png");
+                this.LB.texture = ab.LoadAsset<Texture2D>("XboxOne_LB.png");
+                this.RB.texture = ab.LoadAsset<Texture2D>("XboxOne_RB.png");
+                // D-Pad
+                this.DPadUp.texture = ab.LoadAsset<Texture2D>("XboxOne_Dpad_Up.png");
+                this.DPadDown.texture = ab.LoadAsset<Texture2D>("XboxOne_Dpad_Down.png");
+                this.DPadLeft.texture = ab.LoadAsset<Texture2D>("XboxOne_Dpad_Left.png");
+                this.DPadRight.texture = ab.LoadAsset<Texture2D>("XboxOne_Dpad_Right.png");
+                // Thumbsticks
+                this.LS.texture = ab.LoadAsset<Texture2D>("XboxOne_Left_Stick.png");
+                this.RS.texture = ab.LoadAsset<Texture2D>("XboxOne_Right_Stick.png");
+                // Triggers
+                this.LT.texture = ab.LoadAsset<Texture2D>("XboxOne_LT.png");
+                this.RT.texture = ab.LoadAsset<Texture2D>("XboxOne_RT.png");
+                //  Thumbstick Left
+                this.leftThumbstick.left.texture = ab.LoadAsset<Texture2D>("XboxOne_Left_Stick_Left.png");
+                this.leftThumbstick.right.texture = ab.LoadAsset<Texture2D>("XboxOne_Left_Stick_Right.png");
+                this.leftThumbstick.up.texture = ab.LoadAsset<Texture2D>("XboxOne_Left_Stick_Up.png");
+                this.leftThumbstick.down.texture = ab.LoadAsset<Texture2D>("XboxOne_Left_Stick_Down.png");
+                // Thumbstick Right
+                this.rightThumbstick.left.texture = ab.LoadAsset<Texture2D>("XboxOne_Right_Stick_Left.png");
+                this.rightThumbstick.right.texture = ab.LoadAsset<Texture2D>("XboxOne_Right_Stick_Right.png");
+                this.rightThumbstick.up.texture = ab.LoadAsset<Texture2D>("XboxOne_Right_Stick_Up.png");
+                this.rightThumbstick.down.texture = ab.LoadAsset<Texture2D>("XboxOne_Right_Stick_Down.png");
+                ab.Unload(false);
 
-            // Buttons
-            this.A.texture = LoadAssets.LoadTexture(moC, "XboxOne_A.png");
-            this.B.texture = LoadAssets.LoadTexture(moC, "XboxOne_B.png");
-            this.X.texture = LoadAssets.LoadTexture(moC, "XboxOne_X.png");
-            this.Y.texture = LoadAssets.LoadTexture(moC, "XboxOne_Y.png");
-            this.Back.texture = LoadAssets.LoadTexture(moC, "XboxOne_Windows.png");
-            this.Start.texture = LoadAssets.LoadTexture(moC, "XboxOne_Menu.png");
-            this.LB.texture = LoadAssets.LoadTexture(moC, "XboxOne_LB.png");
-            this.RB.texture = LoadAssets.LoadTexture(moC, "XboxOne_RB.png");
-            // D-Pad
-            this.DPadUp.texture = LoadAssets.LoadTexture(moC, "XboxOne_Dpad_Up.png");
-            this.DPadDown.texture = LoadAssets.LoadTexture(moC, "XboxOne_Dpad_Down.png");
-            this.DPadLeft.texture = LoadAssets.LoadTexture(moC, "XboxOne_Dpad_Left.png");
-            this.DPadRight.texture = LoadAssets.LoadTexture(moC, "XboxOne_Dpad_Right.png");
-            // Thumbsticks
-            this.LS.texture = LoadAssets.LoadTexture(moC, "XboxOne_Left_Stick.png");
-            this.RS.texture = LoadAssets.LoadTexture(moC, "XboxOne_Right_Stick.png");
-            // Triggers
-            this.LT.texture = LoadAssets.LoadTexture(moC, "XboxOne_LT.png");
-            this.RT.texture = LoadAssets.LoadTexture(moC, "XboxOne_RT.png");
-            //  Thumbstick Left
-            this.leftThumbstick.left.texture = LoadAssets.LoadTexture(moC, "XboxOne_Left_Stick_Left.png");
-            this.leftThumbstick.right.texture = LoadAssets.LoadTexture(moC, "XboxOne_Left_Stick_Right.png");
-            this.leftThumbstick.up.texture = LoadAssets.LoadTexture(moC, "XboxOne_Left_Stick_Up.png");
-            this.leftThumbstick.down.texture = LoadAssets.LoadTexture(moC, "XboxOne_Left_Stick_Down.png");
-            // Thumbstick Right
-            this.rightThumbstick.left.texture = LoadAssets.LoadTexture(moC, "XboxOne_Right_Stick_Left.png");
-            this.rightThumbstick.right.texture = LoadAssets.LoadTexture(moC, "XboxOne_Right_Stick_Right.png");
-            this.rightThumbstick.up.texture = LoadAssets.LoadTexture(moC, "XboxOne_Right_Stick_Up.png");
-            this.rightThumbstick.down.texture = LoadAssets.LoadTexture(moC, "XboxOne_Right_Stick_Down.png");
+                this.assetsLoaded = true;
+            }
+            catch (NullReferenceException)
+            {
+                this.assetsLoaded = false;
+                throw;
+            }
         }
         /// <summary>
         /// Gets an xbox control by input name.

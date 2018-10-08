@@ -1,7 +1,7 @@
-23.07.2018
+05.10.2018
 
 Mod: Mo'Controls
-Version: 1.0.6
+Version: 1.0.7
 Arthor: tommojphillips
 
 Installation: 
