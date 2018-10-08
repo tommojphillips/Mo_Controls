@@ -4,15 +4,14 @@ using UnityEngine;
 using gui = UnityEngine.GUILayout;
 using MSCLoader;
 using HutongGames.PlayMaker;
-using Mo_Controls.MouseEmulation;
-using Mo_Controls.XboxController;
-using xController = Mo_Controls.XboxController.XboxController;
+using TommoJProdutions.MoControls.MouseEmulation;
+using TommoJProdutions.MoControls.XInputInterpreter;
 using XInputDotNetPure;
 
-namespace Mo_Controls.McGUI
+namespace TommoJProdutions.MoControls.GUI
 {
     /// <summary>
-    /// Represents the GUI for the mod, <see cref="Mo_Controls"/>.
+    /// Represents the GUI for the mod, <see cref="MoControlsMod"/>.
     /// </summary>
     public class MoControlsGUI : MonoBehaviour
     {
@@ -110,15 +109,18 @@ namespace Mo_Controls.McGUI
 
         #region Properties
 
-        private Mo_Controls mod => Mo_Controls.instance;
         /// <summary>
-        /// Represents the mouse emulator. references <see cref="Mo_Controls.mouseEmulator"/>.
+        /// Represents the instance of the mod.
+        /// </summary>
+        private MoControlsMod mod => MoControlsMod.instance;
+        /// <summary>
+        /// Represents the mouse emulator. references <see cref="MoControlsMod.mouseEmulator"/>.
         /// </summary>
         private MouseEmulator mouseEmulator
         {
             get
             {
-                return this.mod.mouseEmulator;      
+                return MoControlsGO.mouseEmulator;      
             }
         }
         /// <summary>
@@ -128,11 +130,11 @@ namespace Mo_Controls.McGUI
         {
             get
             {
-                return this.mod.controlManager;
+                return MoControlsGO.controlManager;
             }
         }
         /// <summary>
-        /// Represents the change input result. references <see cref="Mo_Controls.changeInputResult"/>.
+        /// Represents the change input result. references <see cref="MoControlsMod.changeInputResult"/>.
         /// </summary>
         private ChangeInput changeInputResult
         {
@@ -146,13 +148,13 @@ namespace Mo_Controls.McGUI
             }
         }
         /// <summary>
-        /// Represents the xbox controller. references <see cref="Mo_Controls.xboxController"/>.
+        /// Represents the xbox controller. references <see cref="MoControlsMod.xboxController"/>.
         /// </summary>
-        private xController xboxController
+        private XboxController xboxController
         {
             get
             {
-                return this.mod.xboxController;
+                return MoControlsGO.xboxController;
             }
         }
 
@@ -178,7 +180,7 @@ namespace Mo_Controls.McGUI
         /// <summary>
         /// on Update.
         /// </summary>
-        public void onUpdate()
+        private void Update()
         {
             // Written, 22.08.2018
 
@@ -208,13 +210,13 @@ namespace Mo_Controls.McGUI
         /// <summary>
         /// on GUI.
         /// </summary>
-        public void onGUI()
+        private void OnGUI()
         {
             // Written, 22.08.2018
 
             try
             {
-                GUI.skin = ModLoader.guiskin;
+                UnityEngine.GUI.skin = ModLoader.guiskin;
                 if (this.controlsGuiOpened)
                 {
                     this.drawMainMenuGUI();
@@ -249,13 +251,13 @@ namespace Mo_Controls.McGUI
                     bool isSelected = (this.mainGUIMenu == mainMenuItem);
                     if (isSelected)
                     {
-                        GUI.contentColor = this.buttonTextSelectedColor;
-                        GUI.backgroundColor = this.buttonSelectedColor;
+                        UnityEngine.GUI.contentColor = this.buttonTextSelectedColor;
+                        UnityEngine.GUI.backgroundColor = this.buttonSelectedColor;
                     }
                     else
                     {
-                        GUI.contentColor = this.buttonTextNotSelectedColor;
-                        GUI.backgroundColor = this.buttonTextSelectedColor;
+                        UnityEngine.GUI.contentColor = this.buttonTextNotSelectedColor;
+                        UnityEngine.GUI.backgroundColor = this.buttonTextSelectedColor;
                     }
 
                     if (gui.Button(mainMenuItem.toString()) && !isSelected)
@@ -263,8 +265,8 @@ namespace Mo_Controls.McGUI
                         this.mainGUIScrollPosition = Vector2.zero;
                         this.mainGUIMenu = mainMenuItem;
                     }
-                    GUI.contentColor = this.defaultColor;
-                    GUI.backgroundColor = this.defaultColor;
+                    UnityEngine.GUI.contentColor = this.defaultColor;
+                    UnityEngine.GUI.backgroundColor = this.defaultColor;
                 }
             }
         }
@@ -384,20 +386,20 @@ namespace Mo_Controls.McGUI
                     bool isSelected = (this.settingsMenu == settingsMenuItem);
                     if (isSelected)
                     {
-                        GUI.contentColor = this.buttonTextSelectedColor;
-                        GUI.backgroundColor = this.buttonSelectedColor;
+                        UnityEngine.GUI.contentColor = this.buttonTextSelectedColor;
+                        UnityEngine.GUI.backgroundColor = this.buttonSelectedColor;
                     }
                     else
                     {
-                        GUI.contentColor = this.buttonTextNotSelectedColor;
-                        GUI.backgroundColor = this.buttonNotSelectedColor;
+                        UnityEngine.GUI.contentColor = this.buttonTextNotSelectedColor;
+                        UnityEngine.GUI.backgroundColor = this.buttonNotSelectedColor;
                     }
                     if (gui.Button(settingsMenuItem.toString()) && !isSelected)
                     {
                         this.settingsMenu = settingsMenuItem;
                     }
-                    GUI.contentColor = this.defaultColor;
-                    GUI.backgroundColor = this.defaultColor;
+                    UnityEngine.GUI.contentColor = this.defaultColor;
+                    UnityEngine.GUI.backgroundColor = this.defaultColor;
                 }
             }
         }
@@ -593,7 +595,7 @@ namespace Mo_Controls.McGUI
             gui.Space(5f);
             if (saveSettings)
             {
-                MoControlsSaveData.saveSettings(this.mod);
+                MoControlsSaveData.saveSettings(MoControlsMod.moControlsGO);
             }
         }
         /// <summary>
@@ -638,7 +640,7 @@ namespace Mo_Controls.McGUI
 
             if (_saveSettings)
             {
-                MoControlsSaveData.saveSettings(this.mod);
+                MoControlsSaveData.saveSettings(MoControlsMod.moControlsGO);
             }
         }
         /// <summary>
@@ -665,10 +667,10 @@ namespace Mo_Controls.McGUI
                 && this.changeInputResult.index == inIndex
                 && this.changeInputResult.mod == inMod 
                 && this.changeInputResult.mode == inMode ? "<b>Awaiting key input</b>" : null;            
-            XboxControl xboxControl = this.xboxController.getXboxControlByInputName(inInputName);
+            XboxControl xboxControl = this.xboxController?.getXboxControlByInputName(inInputName);
             bool buttonClicked = false;
-            Color prevColor = GUI.backgroundColor;
-            GUI.backgroundColor = this.defaultColor;
+            Color prevColor = UnityEngine.GUI.backgroundColor;
+            UnityEngine.GUI.backgroundColor = this.defaultColor;
             if (xboxControl != null && reassignMessage == null && this.xboxController.assetsLoaded)
             {
                 if (gui.Button(xboxControl.texture))
@@ -683,7 +685,7 @@ namespace Mo_Controls.McGUI
                     buttonClicked = true;
                 }
             }
-            GUI.backgroundColor = prevColor;
+            UnityEngine.GUI.backgroundColor = prevColor;
             if (buttonClicked)
             {
                 this.changeInputResult.changeToPollingState(inControlName, inIndex, inMode, inMod);
@@ -727,7 +729,7 @@ namespace Mo_Controls.McGUI
                 else
                 {
                     this.controlManager.setGameControl((PlayerModeEnum)playerMode, this.changeInputResult.controlName, this.changeInputResult.index, input);
-                    MoControlsSaveData.saveSettings(this.mod);
+                    MoControlsSaveData.saveSettings(MoControlsMod.moControlsGO);
                 }
             }
             else
@@ -767,10 +769,10 @@ namespace Mo_Controls.McGUI
                 if (j == 2)
                 {
                     j = 0;
-                    GUI.backgroundColor = this.backgroundColor;
+                    UnityEngine.GUI.backgroundColor = this.backgroundColor;
                 }
                 else
-                    GUI.backgroundColor = this.defaultColor;
+                    UnityEngine.GUI.backgroundColor = this.defaultColor;
                 string controlName = inControlInputs[i, 0];
                 gui.Space(3f);
                 using (new gui.VerticalScope("box"))
@@ -821,7 +823,7 @@ namespace Mo_Controls.McGUI
                 if (modKeybinds.Count() > 0)
                 {
                     gui.Space(3f);
-                    GUI.backgroundColor = this.backgroundColor;
+                    UnityEngine.GUI.backgroundColor = this.backgroundColor;
                     using (new gui.HorizontalScope("box"))
                     {
                         gui.Label(String.Format("<b>{0}</b>, by <b>{1}</b>:", _mod.Name, _mod.Author));
@@ -833,10 +835,10 @@ namespace Mo_Controls.McGUI
                                 if (j == 2)
                                 {
                                     j = 0;
-                                    GUI.backgroundColor = this.backgroundColor;
+                                    UnityEngine.GUI.backgroundColor = this.backgroundColor;
                                 }
                                 else
-                                    GUI.backgroundColor = this.defaultColor;
+                                    UnityEngine.GUI.backgroundColor = this.defaultColor;
                                 using (new gui.VerticalScope("box"))
                                 {
                                     gui.Label(String.Format("<b>{0}:</b>", modKeybinds[i].Name));
@@ -852,7 +854,7 @@ namespace Mo_Controls.McGUI
                     }
                 }
             }
-            GUI.backgroundColor = this.defaultColor;
+            UnityEngine.GUI.backgroundColor = this.defaultColor;
         }
 
         #endregion

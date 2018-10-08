@@ -1,4 +1,4 @@
-﻿namespace Mo_Controls.XboxController
+﻿namespace TommoJProdutions.MoControls.XInputInterpreter
 {
     /// <summary>
     /// Represents current and previous trigger states.

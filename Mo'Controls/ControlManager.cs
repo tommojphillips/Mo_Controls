@@ -1,10 +1,11 @@
 ﻿using System;
 using HutongGames.PlayMaker;
 using MSCLoader;
+using UnityEngine;
 
-namespace Mo_Controls
+namespace TommoJProdutions.MoControls
 {
-    public class ControlManager
+    public class ControlManager : MonoBehaviour
     {
         // Written, 22.08.2018
 
@@ -148,7 +149,7 @@ namespace Mo_Controls
             
             this.currentPlayerMode = null;
             this.changeInputResult = new ChangeInput();
-            cInput.OnKeyChanged += null;
+            cInput.OnKeyChanged -= this.CInput_OnKeyChanged;
             cInput.OnKeyChanged += this.CInput_OnKeyChanged;
         }
 
@@ -156,6 +157,20 @@ namespace Mo_Controls
 
         #region Methods
 
+        /// <summary>
+        /// Occurs on update.
+        /// </summary>
+        private void Update()
+        {
+            // Written, 31.08.2018
+
+            if (this.currentPlayerMode != playerMode)
+            {
+                this.currentPlayerMode = playerMode;
+                this.changeControlMode((PlayerModeEnum)currentPlayerMode);
+                ModConsole.Print("Control Mode changed: " + currentPlayerMode);
+            }
+        }
         /// <summary>
         /// Loads provided control list to cInput.
         /// </summary>
@@ -240,20 +255,6 @@ namespace Mo_Controls
                 ModConsole.Print("<b>[loadControlInputsFromCInput]</b> - <b><color=red>Unsuccessfully</color></b> loaded game control inputs from cInput.");
                 ModConsole.Error(ex.ToString());
                 throw;
-            }
-        }
-        /// <summary>
-        /// Occurs on update.
-        /// </summary>
-        public void onUpdate()
-        {
-            // Written, 31.08.2018
-
-            if (this.currentPlayerMode != playerMode)
-            {
-                this.currentPlayerMode = playerMode;
-                this.changeControlMode((PlayerModeEnum)currentPlayerMode);
-                ModConsole.Print("Control Mode changed: " + currentPlayerMode);
             }
         }
         /// <summary>

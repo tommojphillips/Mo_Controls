@@ -1,4 +1,4 @@
-﻿namespace Mo_Controls.XboxController.Monitoring
+﻿namespace TommoJProdutions.MoControls.XInputInterpreter.Monitoring
 {
     /// <summary>
     /// Represents current and previous connection statuses.

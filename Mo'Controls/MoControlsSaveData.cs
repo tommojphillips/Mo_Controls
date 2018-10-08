@@ -1,8 +1,8 @@
 ﻿using System;
-using Mo_Controls.MouseEmulation;
+using TommoJProdutions.MoControls.MouseEmulation;
 using MSCLoader;
 
-namespace Mo_Controls
+namespace TommoJProdutions.MoControls
 {
     public class MoControlsSaveData
     {
@@ -191,28 +191,28 @@ namespace Mo_Controls
         /// <summary>
         /// Saves the settings.
         /// </summary>
-        public static void saveSettings(Mo_Controls mo_Controls)
+        public static void saveSettings(MoControlsGO mo_Controls)
         {
             // Written, 20.08.2018
 
             MoControlsSaveData mcsd = new MoControlsSaveData()
             {
-                showXboxVirtualAxesGui = mo_Controls.moControlsGui.showVirtualGui,
-                monitiorXboxControllerConnectionStatus = mo_Controls.xboxControllerManager.monitorControllerConnections.Monitor,
-                emulateMouse = mo_Controls.mouseEmulator.Emulating,
-                mouseDeadzone = mo_Controls.mouseEmulator.deadzone,
-                mouseSensitivity = mo_Controls.mouseEmulator.sensitivity,
-                mouseInputType = mo_Controls.mouseEmulator.inputType,
-                displayCurrentPlayerModeOverlay = mo_Controls.controlManager.displayCurrentPlayerModeOverlay,
-                footControls = mo_Controls.controlManager.footControls,
-                drivingControls = mo_Controls.controlManager.drivingControls,
+                showXboxVirtualAxesGui = MoControlsGO.moControlsGui.showVirtualGui,
+                monitiorXboxControllerConnectionStatus = MoControlsGO.xboxControllerManager.monitorControllerConnections.Monitor,
+                emulateMouse = MoControlsGO.mouseEmulator.Emulating,
+                mouseDeadzone = MoControlsGO.mouseEmulator.deadzone,
+                mouseSensitivity = MoControlsGO.mouseEmulator.sensitivity,
+                mouseInputType = MoControlsGO.mouseEmulator.inputType,
+                displayCurrentPlayerModeOverlay = MoControlsGO.controlManager.displayCurrentPlayerModeOverlay,
+                footControls = MoControlsGO.controlManager.footControls,
+                drivingControls = MoControlsGO.controlManager.drivingControls,
             };
-            SaveLoad.SerializeSaveFile(mo_Controls, mcsd, fileName + fileExtention);
+            SaveLoad.SerializeSaveFile(MoControlsMod.instance, mcsd, fileName + fileExtention);
         }
         /// <summary>
         /// Saves the settings.
         /// </summary>
-        public static void saveSettings(Mo_Controls mo_Controls, MoControlsSaveData mcsd)
+        public static void saveSettings(MoControlsMod mo_Controls, MoControlsSaveData mcsd)
         {
             // Written, 22.08.2018
 
@@ -221,14 +221,14 @@ namespace Mo_Controls
         /// <summary>
         /// Loads the settings.
         /// </summary>
-        public static MoControlsSaveData loadSettings(Mo_Controls mo_Controls)
+        public static MoControlsSaveData loadSettings()
         {
             // Written, 20.08.2018
 
             MoControlsSaveData mcsd;
             try
             {
-                mcsd = SaveLoad.DeserializeSaveFile<MoControlsSaveData>(mo_Controls, fileName + fileExtention);
+                mcsd = SaveLoad.DeserializeSaveFile<MoControlsSaveData>(MoControlsMod.instance, fileName + fileExtention);
                 if (mcsd == null)
                     throw new NullReferenceException();
             }
@@ -236,7 +236,7 @@ namespace Mo_Controls
             {
                 mcsd = defaultSave;
                 ModConsole.Print("<color=green>>></color> Save file does not exist, creating save file.");
-                saveSettings(mo_Controls, mcsd);
+                saveSettings(MoControlsMod.instance, mcsd);
             }
             return mcsd;            
         }

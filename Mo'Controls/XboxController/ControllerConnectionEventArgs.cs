@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace Mo_Controls.XboxController
+namespace TommoJProdutions.MoControls.XInputInterpreter
 {
     /// <summary>
-    /// Represents event data for the <see cref="XboxControllerManager.ControllerConnected"/> event.
+    /// Represents event data for the when the controllers connection changes.
     /// </summary>
-    public class ControllerConnectedEventArgs : EventArgs
+    public class ControllerConnectionEventArgs : EventArgs
     {
         // Written, 16.07.2018
 
@@ -19,10 +19,10 @@ namespace Mo_Controls.XboxController
         }
 
         /// <summary>
-        /// Initalizes a new instance of, <see cref="ControllerConnectedEventArgs"/> and assigns <see cref="xboxController"/> to the parameter, <paramref name="inXboxController"/>.
+        /// Initalizes a new instance of, <see cref="ControllerConnectionEventArgs"/> and assigns <see cref="xboxController"/> to the parameter, <paramref name="inXboxController"/>.
         /// </summary>
         /// <param name="inXboxController">The xbox controller that was connected.</param>
-        public ControllerConnectedEventArgs(XboxController inXboxController)
+        public ControllerConnectionEventArgs(XboxController inXboxController)
         {
             // Written, 16.07.2018
 

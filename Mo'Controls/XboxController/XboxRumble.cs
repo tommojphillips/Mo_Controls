@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Mo_Controls.XboxController
+namespace TommoJProdutions.MoControls.XInputInterpreter
 {
     /// <summary>
     /// Represents an xbox controller rumble.

@@ -1,25 +1,30 @@
 ﻿using System;
-using Mo_Controls.XboxController.Monitoring;
+using TommoJProdutions.MoControls.XInputInterpreter.Monitoring;
+using UnityEngine;
 
-namespace Mo_Controls.XboxController
+namespace TommoJProdutions.MoControls.XInputInterpreter
 {
     /// <summary>
     /// Represents an xbox controller manager, that manages xbox controllers that are added to it.
     /// </summary>
-    public class XboxControllerManager
+    public class XboxControllerManager : MonoBehaviour
     {
         // Written, 16.07.2018
 
         #region Fields
-        
+
+        /// <summary>
+        /// Represents the amount of supported controllers for the application.
+        /// </summary>
+        public const int numOfControllersSupported = 1;
         /// <summary>
         /// Represents an event that occurs when an xbox controller is connected.
         /// </summary>
-        public static event EventHandler ControllerConnected;
+        public static event EventHandler<ControllerConnectionEventArgs> ControllerConnected;
         /// <summary>
         /// Represents an event that occurs when an xbox controller is disconnected.
         /// </summary>
-        public static event EventHandler ControllerDisconnected;
+        public static event EventHandler<ControllerConnectionEventArgs> ControllerDisconnected;
 
         #endregion
 
@@ -50,14 +55,6 @@ namespace Mo_Controls.XboxController
             }
         }
         /// <summary>
-        /// Represents the amount of supported controllers for the application.
-        /// </summary>
-        public int numOfControllersSupported
-        {
-            get;
-            private set;
-        }
-        /// <summary>
         /// Represents the controllers.
         /// </summary>
         public XboxController[] controllers
@@ -82,28 +79,59 @@ namespace Mo_Controls.XboxController
         /// Initializes a new instance of <see cref="XboxControllerManager"/> and sets the provided integer to <see cref="numOfControllersSupported"/> and adds a controller to the manager for every <see cref="numOfControllersSupported"/>.
         /// </summary>
         /// <param name="numOfControllersToSupport">The amount of controllers to support.</param>
-        public XboxControllerManager(int numOfControllersToSupport)
+        public XboxControllerManager()
         {
             // Written, 16.07.2018
 
             ControllerConnected = null;
             ControllerDisconnected = null;
-            if (numOfControllersToSupport <= 4 && numOfControllersToSupport > 0)
-                this.numOfControllersSupported = numOfControllersToSupport;
-            else
-                throw new Exception("Invaild amount of controllers to support. MIN = 1, MAX = 4.");
-            this.controllers = new XboxController[this.numOfControllersSupported];
-            for (int i = 1; i <= numOfControllersToSupport; i++)
-            {
-                this.addController(new XboxController(i));
-            }
-            this.monitorControllerConnections = new MonitorControllerConnections(this.numOfControllersSupported, this.controllers);
         }
 
         #endregion
 
         #region Methods
 
+        private void Start()
+        {
+            try
+            {                
+                this.controllers = new XboxController[numOfControllersSupported];
+                for (int i = 1; i <= numOfControllersSupported; i++)
+                {
+                    this.addController(new XboxController(i));
+                }
+                this.monitorControllerConnections = this.gameObject.AddComponent<MonitorControllerConnections>();
+                MSCLoader.ModConsole.Print(nameof(XboxControllerManager) + ": Loaded");
+            }
+            catch (Exception ex)
+            {
+                MSCLoader.ModConsole.Error(ex.StackTrace);
+            }
+        }
+        /// <summary>
+        /// Performs updates for every controller within the manager. Updates <see cref="monitorControllerConnections"/>.
+        /// </summary>
+        private void Update()
+        {
+            // Written, 16.07.2018
+
+            foreach (XboxController controller in this.controllers)
+            {
+                controller.update();
+            }
+        }
+        /// <summary>
+        /// Performs refreshes for every controller within the manager.
+        /// </summary>
+        private void LateUpdate()
+        {
+            // Written, 16.07.2018
+
+            foreach (XboxController controller in this.controllers)
+            {
+                controller.refresh();
+            }
+        }
         /// <summary>
         /// Adds the specified xbox controller to the manager.
         /// </summary>
@@ -113,7 +141,7 @@ namespace Mo_Controls.XboxController
             // Written, 16.07.2018
 
             bool isControllerAssigned = false;
-            for (int i = 0; i < this.numOfControllersSupported; i++)
+            for (int i = 0; i < numOfControllersSupported; i++)
             {
                 if (this.controllers[i] == null)
                 {
@@ -124,37 +152,9 @@ namespace Mo_Controls.XboxController
             }
             if (!isControllerAssigned)
             {
-                throw new Exception(String.Format("This instance of {2} only supports {0} controller{1}. You have attempted to add another controller which cannot be executed.",
-                    this.numOfControllersSupported, (this.numOfControllersSupported > 1 ? "s" : ""), nameof(XboxControllerManager)));
-            }
-            else
-            {
-                this.monitorControllerConnections = new MonitorControllerConnections(this.numOfControllersSupported, this.controllers);
-            }
-        }
-        /// <summary>
-        /// Performs updates for every controller within the manager. Updates <see cref="monitorControllerConnections"/>.
-        /// </summary>
-        public void onUpdate()
-        {
-            // Written, 16.07.2018
-
-            foreach (XboxController controller in this.controllers)
-            {
-                controller.update();
-            }
-            this.monitorControllerConnections.onUpdate();
-        }
-        /// <summary>
-        /// Performs refreshes for every controller within the manager.
-        /// </summary>
-        public void onRefresh()
-        {
-            // Written, 16.07.2018
-
-            foreach (XboxController controller in this.controllers)
-            {
-                controller.refresh();
+                string errorMessage = String.Format("This instance of {2} only supports {0} controller{1}. You have attempted to add another controller which cannot be executed.", numOfControllersSupported, (numOfControllersSupported > 1 ? "s" : ""), nameof(XboxControllerManager));
+                MSCLoader.ModConsole.Error(errorMessage);
+                throw new Exception(errorMessage);
             }
         }
 
@@ -166,7 +166,7 @@ namespace Mo_Controls.XboxController
         /// Raises the <see cref="ControllerConnected"/> event.
         /// </summary>
         /// <param name="eventArgs">The event data.</param>
-        internal static void onControllerConnected(ControllerConnectedEventArgs eventArgs)
+        internal static void onControllerConnected(ControllerConnectionEventArgs eventArgs)
         {
             // Written, 16.07.2018
 
@@ -177,7 +177,7 @@ namespace Mo_Controls.XboxController
         /// Raises the <see cref="ControllerDisconnected"/> event.
         /// </summary>
         /// <param name="eventArgs">The event data.</param>
-        internal static void onControllerDisconnected(ControllerDisconnectedEventArgs eventArgs)
+        internal static void onControllerDisconnected(ControllerConnectionEventArgs eventArgs)
         {
             // Written, 16.07.2018
 

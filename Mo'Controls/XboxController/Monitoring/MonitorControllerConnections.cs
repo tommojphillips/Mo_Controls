@@ -1,12 +1,13 @@
 ﻿using System.Threading;
 using MSCLoader;
+using UnityEngine;
 
-namespace Mo_Controls.XboxController.Monitoring
+namespace TommoJProdutions.MoControls.XInputInterpreter.Monitoring
 {
     /// <summary>
     /// Represents monitoring methods for monitoring controller connections.
     /// </summary>
-    public class MonitorControllerConnections
+    public class MonitorControllerConnections : MonoBehaviour
     {
         // Written, 16.07.2018
 
@@ -39,8 +40,10 @@ namespace Mo_Controls.XboxController.Monitoring
         /// </summary>
         private XboxController[] xboxControllers
         {
-            get;
-            set;
+            get
+            {
+                return this.gameObject.GetComponent<XboxControllerManager>().controllers;
+            }
         }
         /// <summary>
         /// Represents an array of connections.
@@ -65,13 +68,12 @@ namespace Mo_Controls.XboxController.Monitoring
         /// <param name="numOfSupportedControllers">Number of supported controllers.</param>
         /// <param name="inMonitor">Monitor connection stautus?</param>
         /// <param name="xboxControllers">An array of xbox controllers.</param>
-        public MonitorControllerConnections(int numOfSupportedControllers, params XboxController[] xboxControllers)
+        public MonitorControllerConnections()
         {
             // Written, 16.07.2018
             
-            this.controllerConnections = new ControllerConnection[numOfSupportedControllers];
-            this.xboxControllers = new XboxController[numOfSupportedControllers];
-            for (int i = 0; i < numOfSupportedControllers; i++)
+            this.controllerConnections = new ControllerConnection[XboxControllerManager.numOfControllersSupported];
+            for (int i = 0; i < XboxControllerManager.numOfControllersSupported; i++)
             {
                 XboxController xboxController = xboxControllers[i];
                 if (xboxController != null)
@@ -86,7 +88,7 @@ namespace Mo_Controls.XboxController.Monitoring
 
         #region Methods
 
-        public void onUpdate()
+        private void Update()
         {
             // Written, 16.07.2018
 
@@ -105,13 +107,13 @@ namespace Mo_Controls.XboxController.Monitoring
 
                             if (controllerConnection.currentConnectionStatus == true)
                             {
-                                XboxControllerManager.onControllerConnected(new ControllerConnectedEventArgs(xboxController));
+                                XboxControllerManager.onControllerConnected(new ControllerConnectionEventArgs(xboxController));
                             }
                             else
                             {
                                 if (controllerConnection.currentConnectionStatus == false)
                                 {
-                                    XboxControllerManager.onControllerDisconnected(new ControllerDisconnectedEventArgs(xboxController));
+                                    XboxControllerManager.onControllerDisconnected(new ControllerConnectionEventArgs(xboxController));
                                 }
                             }
                         }

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using XInputDotNetPure;
 
-namespace Mo_Controls.XboxController
+namespace TommoJProdutions.MoControls.XInputInterpreter
 {
     /// <summary>
     /// Represents extention methods for <see cref="XboxButtonEnum"/>.

@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace Mo_Controls.MouseEmulation
+namespace TommoJProdutions.MoControls.MouseEmulation
 {
     internal class NativeMethods
     {

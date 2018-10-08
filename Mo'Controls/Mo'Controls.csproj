@@ -64,6 +64,7 @@
     <Compile Include="McGUI\GUIMenuEnumExtentions.cs" />
     <Compile Include="McGUI\MoControlsGUI.cs" />
     <Compile Include="McGUI\SettingsMenuEnum.cs" />
+    <Compile Include="MoControlsGO.cs" />
     <Compile Include="MoControlsSaveData.cs" />
     <Compile Include="MonitorInputData.cs" />
     <Compile Include="MouseEmulation\NativeMethods.cs" />
@@ -73,10 +74,9 @@
     <Compile Include="MouseEmulation\InputTypeEnum.cs" />
     <Compile Include="MouseEmulation\MouseEmulator.cs" />
     <Compile Include="MouseEmulation\MouseInput.cs" />
-    <Compile Include="Mo_Controls.cs" />
+    <Compile Include="MoControlsMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="XboxController\ControllerConnectedEventArgs.cs" />
-    <Compile Include="XboxController\ControllerDisconnectedEventArgs.cs" />
+    <Compile Include="XboxController\ControllerConnectionEventArgs.cs" />
     <Compile Include="XboxController\Monitoring\ControllerConnection.cs" />
     <Compile Include="XboxController\Monitoring\MonitorControllerConnections.cs" />
     <Compile Include="XboxController\XboxButton.cs" />

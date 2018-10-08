@@ -1,4 +1,4 @@
-﻿namespace Mo_Controls.MouseEmulation
+﻿namespace TommoJProdutions.MoControls.MouseEmulation
 {
     public enum InputTypeEnum
     {

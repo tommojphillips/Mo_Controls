@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Mo_Controls.McGUI
+namespace TommoJProdutions.MoControls.GUI
 {
     public static class GUIMenuEnumExtentions
     {

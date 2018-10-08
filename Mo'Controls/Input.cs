@@ -2,8 +2,9 @@
 using UnityEngine;
 using uInput = UnityEngine.Input;
 using XInputDotNetPure;
+using TommoJProdutions.MoControls.XInputInterpreter;
 
-namespace Mo_Controls
+namespace TommoJProdutions.MoControls
 {
     public class Input
     {
@@ -38,7 +39,7 @@ namespace Mo_Controls
                 foundInput = false,
                 input = null,
             };
-            XboxController.XboxController xboxController = Mo_Controls.instance.xboxController;
+            XboxController xboxController = MoControlsGO.xboxController;
             // Check xbox controller for input.
             if (xboxController.isConnected)
             {
@@ -172,7 +173,7 @@ namespace Mo_Controls
                                 }
                                 else
                                 {
-                                    if (kcode != Mo_Controls.instance.moControlsGui.openControlsGui.Key && kcode != cancelKey) // not allowed
+                                    if (kcode != MoControlsGO.moControlsGui.openControlsGui.Key && kcode != cancelKey) // not allowed
                                     {
                                         monitorInputData = new MonitorInputData()
                                         {
@@ -182,7 +183,7 @@ namespace Mo_Controls
                                     }
                                     else
                                     {
-                                        Mo_Controls.instance.controlManager.changeInputResult = new ChangeInput();
+                                        MoControlsGO.controlManager.changeInputResult = new ChangeInput();
                                     }
                                 }
                                 break;

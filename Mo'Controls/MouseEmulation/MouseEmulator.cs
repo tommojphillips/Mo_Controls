@@ -4,13 +4,12 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using XInputDotNetPure;
 using MSCLoader;
-using Mo_Controls.XboxController;
-using NM = Mo_Controls.MouseEmulation.NativeMethods;
-using xController = Mo_Controls.XboxController.XboxController;
+using TommoJProdutions.MoControls.XInputInterpreter;
+using NM = TommoJProdutions.MoControls.MouseEmulation.NativeMethods;
 
-namespace Mo_Controls.MouseEmulation
+namespace TommoJProdutions.MoControls.MouseEmulation
 {
-    public class MouseEmulator
+    public class MouseEmulator : MonoBehaviour
     {
         // Written, 01.08.2018
 
@@ -188,87 +187,32 @@ namespace Mo_Controls.MouseEmulation
         /// Initializes a new instance of <see cref="MouseEmulator"/>.
         /// </summary>
         /// <param name="inputType">The input type to control the mouse.</param>
-        public MouseEmulator(DeadzoneTypeEnum deadzoneType)
+        public MouseEmulator()
         {
             // Written, 01.08.2018
 
             this.deadzoneType = DeadzoneTypeEnum.ScaledRadial;
 
-            Keybind.Add(Mo_Controls.instance, this.lmbPrimaryInput);
-            Keybind.Add(Mo_Controls.instance, this.lmbSecondaryInput);
-            Keybind.Add(Mo_Controls.instance, this.rmbPrimaryInput);
-            Keybind.Add(Mo_Controls.instance, this.rmbSecondaryInput);
+            Keybind.Add(MoControlsMod.instance, this.lmbPrimaryInput);
+            Keybind.Add(MoControlsMod.instance, this.lmbSecondaryInput);
+            Keybind.Add(MoControlsMod.instance, this.rmbPrimaryInput);
+            Keybind.Add(MoControlsMod.instance, this.rmbSecondaryInput);
         }
 
         #endregion
 
         #region Methods
-        
-        /// <summary>
-        /// Creates required stuff to simulate mouse movement.
-        /// </summary>
-        /// <param name="x">The x.</param>
-        /// <param name="y">The y.</param>
-        /// <param name="data">Data to pass.</param>
-        /// <param name="time">The time of event.</param>
-        /// <param name="flag">flags to pass.</param>
-        private static MouseInput createMouseInput(int x, int y, uint data, uint time, uint flag)
-        {
-            // create from the given data an object of the type MouseInput, which then can be send
-            MouseInput Result = new MouseInput();
-            Result.X = x;
-            Result.Y = y;
-            Result.mouseData = data;
-            Result.time = time;
-            Result.dwFlags = flag;
-            return Result;
-        }
-        /// <summary>
-        /// Simulates mouse movement.
-        /// </summary>
-        /// <param name="x">The X.</param>
-        /// <param name="y">The Y.</param>
-        private static void simulateMouseMove(int x, int y)
-        {
-            InputData[] MouseEvent = new InputData[1];
-            MouseEvent[0].type = 0;
-            MouseEvent[0].data = createMouseInput(x, y, 0, 0, MOUSEEVENTF_MOVE);
-            NM.SendInput((uint)MouseEvent.Length, MouseEvent, Marshal.SizeOf(MouseEvent[0].GetType()));
-        }
-        /// <summary>
-        /// Simulates a left mouse button click.
-        /// </summary>
-        private static void simulateLeftClick()
-        {
-            // Written, 04.08.2018
 
-            Point tempCursPos = getCursorPosition;
-            int X = tempCursPos.X;
-            int Y = tempCursPos.Y;
-            NM.mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
-        }
-        /// <summary>
-        /// Simulates a right mouse button click
-        /// </summary>
-        private static void simulateRightClick()
-        {
-            // Written, 04.08.2018
-
-            Point tempCursPos = getCursorPosition;
-            int X = tempCursPos.X;
-            int Y = tempCursPos.Y;
-            NM.mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, X, Y, 0, 0);
-        }
         /// <summary>
         /// Should be called every frame; on <see cref="Mod.Update()"/>.
         /// </summary>
-        public void onUpdate()
+        private void Update()
         {
             // Written, 01.08.2018
 
             if (this.Emulating)
             {
-                xController xboxController = Mo_Controls.instance.xboxController;
+                XboxController xboxController = MoControlsGO.xboxController;
 
                 if (this.lmbPrimaryInput.IsDown() || this.lmbSecondaryInput.IsDown())
                 {
@@ -330,6 +274,61 @@ namespace Mo_Controls.MouseEmulation
                     }
                 }
             }
+        }
+        /// <summary>
+        /// Creates required stuff to simulate mouse movement.
+        /// </summary>
+        /// <param name="x">The x.</param>
+        /// <param name="y">The y.</param>
+        /// <param name="data">Data to pass.</param>
+        /// <param name="time">The time of event.</param>
+        /// <param name="flag">flags to pass.</param>
+        private static MouseInput createMouseInput(int x, int y, uint data, uint time, uint flag)
+        {
+            // create from the given data an object of the type MouseInput, which then can be send
+            MouseInput Result = new MouseInput();
+            Result.X = x;
+            Result.Y = y;
+            Result.mouseData = data;
+            Result.time = time;
+            Result.dwFlags = flag;
+            return Result;
+        }
+        /// <summary>
+        /// Simulates mouse movement.
+        /// </summary>
+        /// <param name="x">The X.</param>
+        /// <param name="y">The Y.</param>
+        private static void simulateMouseMove(int x, int y)
+        {
+            InputData[] MouseEvent = new InputData[1];
+            MouseEvent[0].type = 0;
+            MouseEvent[0].data = createMouseInput(x, y, 0, 0, MOUSEEVENTF_MOVE);
+            NM.SendInput((uint)MouseEvent.Length, MouseEvent, Marshal.SizeOf(MouseEvent[0].GetType()));
+        }
+        /// <summary>
+        /// Simulates a left mouse button click.
+        /// </summary>
+        private static void simulateLeftClick()
+        {
+            // Written, 04.08.2018
+
+            Point tempCursPos = getCursorPosition;
+            int X = tempCursPos.X;
+            int Y = tempCursPos.Y;
+            NM.mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
+        }
+        /// <summary>
+        /// Simulates a right mouse button click
+        /// </summary>
+        private static void simulateRightClick()
+        {
+            // Written, 04.08.2018
+
+            Point tempCursPos = getCursorPosition;
+            int X = tempCursPos.X;
+            int Y = tempCursPos.Y;
+            NM.mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, X, Y, 0, 0);
         }
 
         #endregion

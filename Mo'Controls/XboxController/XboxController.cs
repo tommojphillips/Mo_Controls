@@ -4,7 +4,7 @@ using XInputDotNetPure;
 using UnityEngine;
 using MSCLoader;
 
-namespace Mo_Controls.XboxController
+namespace TommoJProdutions.MoControls.XInputInterpreter
 {
     /// <summary>
     /// Represents an xbox controller.
@@ -680,7 +680,7 @@ namespace Mo_Controls.XboxController
 
             try
             {
-                AssetBundle ab = LoadAssets.LoadBundle(Mo_Controls.instance, "mo_controls.unity3d");
+                AssetBundle ab = LoadAssets.LoadBundle(MoControlsMod.instance, "mo_controls.unity3d");
                 // Buttons
                 this.A.texture = ab.LoadAsset<Texture2D>("XboxOne_A.png");
                 this.B.texture = ab.LoadAsset<Texture2D>("XboxOne_B.png");
