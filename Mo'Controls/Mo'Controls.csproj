@@ -57,40 +57,41 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChangeInput.cs" />
-    <Compile Include="ControlManager.cs" />
-    <Compile Include="DebugConsoleCommand.cs" />
-    <Compile Include="Input.cs" />
-    <Compile Include="McGUI\MainGUIMenuEnum.cs" />
-    <Compile Include="McGUI\GUIMenuEnumExtentions.cs" />
-    <Compile Include="McGUI\MoControlsGUI.cs" />
-    <Compile Include="McGUI\SettingsMenuEnum.cs" />
-    <Compile Include="MoControlsGO.cs" />
-    <Compile Include="MoControlsSaveData.cs" />
-    <Compile Include="MonitorInputData.cs" />
-    <Compile Include="MouseEmulation\NativeMethods.cs" />
-    <Compile Include="PlayerModeEnum.cs" />
-    <Compile Include="XboxController\DeadzoneTypeEnum.cs" />
-    <Compile Include="MouseEmulation\InputData.cs" />
-    <Compile Include="MouseEmulation\InputTypeEnum.cs" />
-    <Compile Include="MouseEmulation\MouseEmulator.cs" />
-    <Compile Include="MouseEmulation\MouseInput.cs" />
-    <Compile Include="MoControlsMod.cs" />
+    <Compile Include="TommoJProductions\MoControls\ChangeInput.cs" />
+    <Compile Include="TommoJProductions\MoControls\ControlManager.cs" />
+    <Compile Include="TommoJProductions\MoControls\DebugConsoleCommand.cs" />
+    <Compile Include="TommoJProductions\MoControls\Input.cs" />
+    <Compile Include="TommoJProductions\MoControls\GUI\MainGUIMenuEnum.cs" />
+    <Compile Include="TommoJProductions\MoControls\GUI\GUIMenuEnumExtentions.cs" />
+    <Compile Include="TommoJProductions\MoControls\GUI\MoControlsGUI.cs" />
+    <Compile Include="TommoJProductions\MoControls\GUI\SettingsMenuEnum.cs" />
+    <Compile Include="TommoJProductions\MoControls\MoControlsGO.cs" />
+    <Compile Include="TommoJProductions\MoControls\MoControlsSaveData.cs" />
+    <Compile Include="TommoJProductions\MoControls\MonitorInputData.cs" />
+    <Compile Include="TommoJProductions\MoControls\MouseEmulation\NativeMethods.cs" />
+    <Compile Include="TommoJProductions\MoControls\PlayerModeEnum.cs" />
+    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\DeadzoneTypeEnum.cs" />
+    <Compile Include="TommoJProductions\MoControls\MouseEmulation\InputData.cs" />
+    <Compile Include="TommoJProductions\MoControls\MouseEmulation\InputTypeEnum.cs" />
+    <Compile Include="TommoJProductions\MoControls\MouseEmulation\MouseEmulator.cs" />
+    <Compile Include="TommoJProductions\MoControls\MouseEmulation\MouseInput.cs" />
+    <Compile Include="TommoJProductions\MoControls\MoControlsMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="XboxController\ControllerConnectionEventArgs.cs" />
-    <Compile Include="XboxController\Monitoring\ControllerConnection.cs" />
-    <Compile Include="XboxController\Monitoring\MonitorControllerConnections.cs" />
-    <Compile Include="XboxController\XboxButton.cs" />
-    <Compile Include="XboxController\XboxButtonEnum.cs" />
-    <Compile Include="XboxController\XboxExtentions.cs" />
-    <Compile Include="XboxController\XboxControl.cs" />
-    <Compile Include="XboxController\XboxController.cs" />
-    <Compile Include="XboxController\XboxControllerManager.cs" />
-    <Compile Include="XboxController\XboxControlTypeEnum.cs" />
-    <Compile Include="XboxController\XboxRumble.cs" />
-    <Compile Include="XboxController\XboxJoyStick.cs" />
-    <Compile Include="XboxController\XboxTriggerState.cs" />
+    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\ControllerConnectionEventArgs.cs" />
+    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\Monitoring\ControllerConnection.cs" />
+    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\Monitoring\MonitorControllerConnections.cs" />
+    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxButton.cs" />
+    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxButtonEnum.cs" />
+    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxExtentions.cs" />
+    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxControl.cs" />
+    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxController.cs" />
+    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxControllerManager.cs" />
+    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxControlTypeEnum.cs" />
+    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxRumble.cs" />
+    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxJoyStick.cs" />
+    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxTriggerState.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
