@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using XInputDotNetPure;
 
 namespace TommoJProdutions.MoControls.XInputInterpreter
 {

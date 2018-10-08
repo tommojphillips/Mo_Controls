@@ -125,6 +125,7 @@ namespace TommoJProdutions.MoControls
                         { "fifth", "None", "None", },
                         { "sixth", "None", "None", },
                     },
+                    debugMode = false,
                 };
             }
         }
@@ -133,6 +134,11 @@ namespace TommoJProdutions.MoControls
 
         #region Fields
 
+        public bool debugMode
+        {
+            get;
+            set;
+        }
         public bool showXboxDebugGui
         {
             get;
@@ -206,8 +212,10 @@ namespace TommoJProdutions.MoControls
                 displayCurrentPlayerModeOverlay = MoControlsGO.controlManager.displayCurrentPlayerModeOverlay,
                 footControls = MoControlsGO.controlManager.footControls,
                 drivingControls = MoControlsGO.controlManager.drivingControls,
+                debugMode = false,
+                showXboxDebugGui = false,
             };
-            SaveLoad.SerializeSaveFile(MoControlsMod.instance, mcsd, fileName + fileExtention);
+            saveSettings(MoControlsMod.instance, mcsd);
         }
         /// <summary>
         /// Saves the settings.
@@ -217,6 +225,8 @@ namespace TommoJProdutions.MoControls
             // Written, 22.08.2018
 
             SaveLoad.SerializeSaveFile(mo_Controls, mcsd, fileName + fileExtention);
+            if (MoControlsMod.debug)
+                MoControlsMod.print("saved mo'controls data.");
         }
         /// <summary>
         /// Loads the settings.
@@ -235,9 +245,12 @@ namespace TommoJProdutions.MoControls
             catch (NullReferenceException)
             {
                 mcsd = defaultSave;
-                ModConsole.Print("<color=green>>></color> Save file does not exist, creating save file.");
+                if (MoControlsMod.debug)
+                    MoControlsMod.print("Save file does not exist, creating save file.");
                 saveSettings(MoControlsMod.instance, mcsd);
             }
+            if (MoControlsMod.debug)
+                MoControlsMod.print("loaded mo'controls data.");
             return mcsd;            
         }
 

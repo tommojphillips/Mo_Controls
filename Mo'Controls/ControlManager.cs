@@ -158,6 +158,16 @@ namespace TommoJProdutions.MoControls
         #region Methods
 
         /// <summary>
+        /// Occurs after game starts.
+        /// </summary>
+        private void Start()
+        {
+            // Written, 08.10.2018
+
+            if (MoControlsMod.debug)
+                MoControlsMod.print(nameof(ControlManager) + ": Started");
+        }
+        /// <summary>
         /// Occurs on update.
         /// </summary>
         private void Update()
@@ -168,7 +178,8 @@ namespace TommoJProdutions.MoControls
             {
                 this.currentPlayerMode = playerMode;
                 this.changeControlMode((PlayerModeEnum)currentPlayerMode);
-                ModConsole.Print("Control Mode changed: " + currentPlayerMode);
+                if (MoControlsMod.debug)
+                    MoControlsMod.print("Control Mode changed: " + currentPlayerMode);
             }
         }
         /// <summary>
@@ -187,11 +198,13 @@ namespace TommoJProdutions.MoControls
                 {
                     cInput.ChangeKey(inControlMode[i, 0], inControlMode[i, 1], inControlMode[i, 2]);
                 }
-                ModConsole.Print(String.Format("<b>[loadControlInputsToCInput]</b> - <b><color=green>Successfully</color></b> loaded {0} inputs to cInput.", controlListName));
+                if (MoControlsMod.debug)
+                    MoControlsMod.print(String.Format("<b><color=green>Successfully</color></b> loaded {0} inputs to cInput.", controlListName));
             }
             catch (NullReferenceException)
-            {                
-                ModConsole.Print(String.Format("<b>[loadControlInputsToCInput]</b> - control inputs was null; setting {0} inputs to current control settings.", controlListName));
+            {
+                if (MoControlsMod.debug)
+                    MoControlsMod.print(String.Format("control inputs was null; setting {0} inputs to current control settings.", controlListName));
                 if (inPlayerMode == PlayerModeEnum.OnFoot)
                     this.footControls = loadControlInputsFromCInput();
                 else
@@ -199,7 +212,8 @@ namespace TommoJProdutions.MoControls
             }
             catch
             {
-                ModConsole.Print(String.Format("<b>[loadControlInputsToCInput]</b> - <b><color=red>Unsuccessfully</color></b> loaded {0} inputs to cInput.", controlListName));
+                if (MoControlsMod.debug)
+                    MoControlsMod.print(String.Format("<b><color=red>Unsuccessfully</color></b> loaded {0} inputs to cInput.", controlListName));
                 throw;
             }            
         }
@@ -247,12 +261,14 @@ namespace TommoJProdutions.MoControls
                     controls[i, 1] = cInput.GetText(inputNames[i], 1);
                     controls[i, 2] = cInput.GetText(inputNames[i], 2);
                 }
-                ModConsole.Print("<b>[loadControlInputsFromCInput]</b> - <b><color=green>Successfully</color></b> loaded game control inputs from cInput.");
+                if (MoControlsMod.debug)
+                    MoControlsMod.print("<b><color=green>Successfully</color></b> loaded game control inputs from cInput.");
                 return controls;
             }
             catch (Exception ex)
             {
-                ModConsole.Print("<b>[loadControlInputsFromCInput]</b> - <b><color=red>Unsuccessfully</color></b> loaded game control inputs from cInput.");
+                if (MoControlsMod.debug)
+                    MoControlsMod.print("<b><color=red>Unsuccessfully</color></b> loaded game control inputs from cInput.");
                 ModConsole.Error(ex.ToString());
                 throw;
             }

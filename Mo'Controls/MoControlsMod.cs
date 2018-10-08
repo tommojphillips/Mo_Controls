@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Threading;
 using MSCLoader;
-using TommoJProdutions.MoControls.GUI;
-using TommoJProdutions.MoControls.MouseEmulation;
-using TommoJProdutions.MoControls.XInputInterpreter;
 using UnityEngine;
 
 namespace TommoJProdutions.MoControls
@@ -29,7 +25,7 @@ namespace TommoJProdutions.MoControls
         /// <summary>
         /// Represents whether or not to display debug data.
         /// </summary>
-        public static readonly bool Debug = true;
+        public static bool debug;
         /// <summary>
         /// Represents the supported/compatible version of mod loader.
         /// </summary>
@@ -96,6 +92,17 @@ namespace TommoJProdutions.MoControls
                     this.Name, this.Version, ModLoader.Version, SUPPORTED_MODLOADER_VERSION), "ModLoader Version not supported.");
             }
         }
+        /// <summary>
+        /// Prints a message to the console with the prefix of the mod name.
+        /// </summary>
+        /// <param name="inMessage"></param>
+        public static void print(string inMessage)
+        {
+            // Written, 08.10.2018
+
+            string _msg = String.Format("<i><color=grey>[{0}]</color> <b><color=green>>></color></b></i> {1}", instance.Name, inMessage);
+            ModConsole.Print(_msg);
+        }
 
         #endregion
 
@@ -105,9 +112,9 @@ namespace TommoJProdutions.MoControls
         {
             // Written, 06.07.2018    
 
+            ConsoleCommand.Add(new DebugConsoleCommand());
             moControlsGameObject = new GameObject(gameObjectName);
             moControlsGO = moControlsGameObject.AddComponent<MoControlsGO>();
-
             this.performModLoaderVersionCheck();
         }
 

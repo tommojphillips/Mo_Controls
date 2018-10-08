@@ -178,6 +178,16 @@ namespace TommoJProdutions.MoControls.GUI
         #region Methods
 
         /// <summary>
+        /// Occurs after game starts.
+        /// </summary>
+        private void Start()
+        {
+            // Written, 08.10.2018
+
+            if (MoControlsMod.debug)
+                MoControlsMod.print(nameof(MoControlsGUI) + ": Started");
+        }
+        /// <summary>
         /// on Update.
         /// </summary>
         private void Update()
@@ -746,6 +756,8 @@ namespace TommoJProdutions.MoControls.GUI
                     modKeybind.Key = (KeyCode)Enum.Parse(typeof(KeyCode), input);
                 }
                 ModSettings_menu.SaveModBinds(this.changeInputResult.mod);
+                if (MoControlsMod.debug)
+                    MoControlsMod.print("saved mo'controls MSCLoader mod keybinds.");
 
             }
             this.changeInputResult = new ChangeInput();

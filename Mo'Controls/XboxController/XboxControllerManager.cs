@@ -101,7 +101,8 @@ namespace TommoJProdutions.MoControls.XInputInterpreter
                     this.addController(new XboxController(i));
                 }
                 this.monitorControllerConnections = this.gameObject.AddComponent<MonitorControllerConnections>();
-                MSCLoader.ModConsole.Print(nameof(XboxControllerManager) + ": Loaded");
+                if (MoControlsMod.debug)
+                    MoControlsMod.print(nameof(XboxControllerManager) + ": Started");
             }
             catch (Exception ex)
             {

@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="ChangeInput.cs" />
     <Compile Include="ControlManager.cs" />
+    <Compile Include="DebugConsoleCommand.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="McGUI\MainGUIMenuEnum.cs" />
     <Compile Include="McGUI\GUIMenuEnumExtentions.cs" />

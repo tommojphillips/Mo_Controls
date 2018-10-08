@@ -81,11 +81,13 @@ namespace TommoJProdutions.MoControls.MouseEmulation
             {
                 if (value)
                 {
-                    ModConsole.Print(String.Format("<color=green>>></color> Started Emulating mouse as {0}.", this.inputType));
+                    if (MoControlsMod.debug)
+                        MoControlsMod.print(String.Format("Started Emulating mouse as {0}.", this.inputType));
                 }
                 else
                 {
-                    ModConsole.Print("<color=green>>></color> Stopped Emulating mouse..");
+                    if (MoControlsMod.debug)
+                        MoControlsMod.print("Stopped Emulating mouse..");
                 }
                 emulateMouse = value;
             }
@@ -203,6 +205,16 @@ namespace TommoJProdutions.MoControls.MouseEmulation
 
         #region Methods
 
+        /// <summary>
+        /// Occurs after game starts.
+        /// </summary>
+        private void Start()
+        {
+            // Written, 08.10.2018
+
+            if (MoControlsMod.debug)
+                MoControlsMod.print(nameof(MouseEmulator) + ": Started");
+        }
         /// <summary>
         /// Should be called every frame; on <see cref="Mod.Update()"/>.
         /// </summary>

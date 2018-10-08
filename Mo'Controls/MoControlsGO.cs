@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using TommoJProdutions.MoControls.GUI;
 using TommoJProdutions.MoControls.MouseEmulation;
@@ -93,7 +90,7 @@ namespace TommoJProdutions.MoControls
         #endregion
 
         #region Methods
-        
+
         /// <summary>
         /// Occurs when game starts.
         /// </summary>
@@ -107,8 +104,8 @@ namespace TommoJProdutions.MoControls
             mouseEmulator = this.gameObject.AddComponent<MouseEmulator>();
             XboxControllerManager.ControllerConnected += this.XboxControllerManager_ControllerConnected;
             XboxControllerManager.ControllerDisconnected += this.XboxControllerManager_ControllerDisconnected;
-            if (MoControlsMod.Debug)
-                MSCLoader.ModConsole.Print("MoControlsGo: Started");
+            if (MoControlsMod.debug)
+                MoControlsMod.print(nameof(MoControlsGO) + ": Started");
         }
         /// <summary>
         /// Occurs every frame.
@@ -123,7 +120,8 @@ namespace TommoJProdutions.MoControls
                 {
                     this.setLoadedSettings(MoControlsSaveData.loadSettings(), true);
                     this.settingsLoaded = true;
-                    MSCLoader.ModConsole.Print("All Modules have <b><color=green>successfully</color></b> been initilized.");
+                    if (MoControlsMod.debug)
+                        MoControlsMod.print("All Modules have <b><color=green>successfully</color></b> been initilized.");
                 }
             }
             else
@@ -154,9 +152,11 @@ namespace TommoJProdutions.MoControls
                 mouseEmulator.Emulating = inSaveData.emulateMouse;
                 controlManager.displayCurrentPlayerModeOverlay = inSaveData.displayCurrentPlayerModeOverlay;
                 controlManager.setControls(inSaveData.footControls, inSaveData.drivingControls);
+                MoControlsMod.debug = inSaveData.debugMode;
                 if (startUp)
                 {
-                    MSCLoader.ModConsole.Print("<color=green>>></color> Settings Loaded");
+                    if (MoControlsMod.debug)
+                        MoControlsMod.print("Settings Loaded");
                 }
             }
             catch (NullReferenceException ex)
@@ -173,14 +173,14 @@ namespace TommoJProdutions.MoControls
         {
             // Written, 08.10.2018
 
-            MSCLoader.ModConsole.Print("Controller " + e.xboxController.index + " <color=red>Disconnected</color");
+            MoControlsMod.print("Controller: " + e.xboxController.index + " <color=red>Disconnected</color");
         }
 
         private void XboxControllerManager_ControllerConnected(object sender, ControllerConnectionEventArgs e)
         {
             // Written, 08.10.2018
 
-            MSCLoader.ModConsole.Print("Controller " + e.xboxController.index + " <color=green>Connected</color>");
+            MoControlsMod.print("Controller " + e.xboxController.index + " <color=green>Connected</color>");
         }
 
         #endregion

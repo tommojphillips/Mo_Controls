@@ -1,6 +1,4 @@
-﻿using System.Threading;
-using MSCLoader;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace TommoJProdutions.MoControls.XInputInterpreter.Monitoring
 {
@@ -26,11 +24,13 @@ namespace TommoJProdutions.MoControls.XInputInterpreter.Monitoring
             {
                 if (value)
                 {
-                    ModConsole.Print("<color=green>>></color> Started Monitoring for controller connections...");
+                    if (MoControlsMod.debug)
+                        MoControlsMod.print("Started Monitoring for controller connections...");
                 }
                 else
                 {
-                    ModConsole.Print("<color=green>>></color> Stopped Monitoring for controller connections...");
+                    if (MoControlsMod.debug)
+                        MoControlsMod.print("Stopped Monitoring for controller connections...");
                 }
                 this.monitor = value;
             }

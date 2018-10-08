@@ -13,8 +13,90 @@ namespace TommoJProdutions.MoControls.XInputInterpreter
     {
         // Written, 16.07.2018
 
+        #region Fields
+
+        string buttonPrefix = "JoystickButton";
+
+        #endregion
+
         #region Properties
-        
+        /// <summary>
+        /// Represents the axis prefix.
+        /// </summary>
+        string axisPrefix => String.Format("Joy{0} Axis ", index);
+        /// <summary>
+        /// Represents the normal (go) xbox controls.
+        /// </summary>
+        public XboxControl[] normalXboxControls => new XboxControl[]
+        {
+                // Buttons
+                new XboxButton(String.Format("{0}0", buttonPrefix), "A", XboxControlTypeEnum.Button),
+                new XboxButton(String.Format("{0}1", buttonPrefix), "B", XboxControlTypeEnum.Button),
+                new XboxButton(String.Format("{0}2", buttonPrefix), "X", XboxControlTypeEnum.Button),
+                new XboxButton(String.Format("{0}3", buttonPrefix), "Y", XboxControlTypeEnum.Button),
+                new XboxButton(String.Format("{0}4", buttonPrefix), "LB", XboxControlTypeEnum.Button),
+                new XboxButton(String.Format("{0}5", buttonPrefix), "RB", XboxControlTypeEnum.Button),
+                new XboxButton(String.Format("{0}6", buttonPrefix), "Back", XboxControlTypeEnum.Button),
+                new XboxButton(String.Format("{0}7", buttonPrefix), "Start", XboxControlTypeEnum.Button),
+                new XboxButton(String.Format("{0}8", buttonPrefix), "LS", XboxControlTypeEnum.Button),
+                new XboxButton(String.Format("{0}9", buttonPrefix), "RS", XboxControlTypeEnum.Button),
+                // D-Pad
+                new XboxButton(String.Format("{0}7+", axisPrefix), "D-Pad Up", XboxControlTypeEnum.Axis),
+                new XboxButton(String.Format("{0}7-", axisPrefix), "D-Pad Down", XboxControlTypeEnum.Axis),
+                new XboxButton(String.Format("{0}6-", axisPrefix), "D-Pad Left", XboxControlTypeEnum.Axis),
+                new XboxButton(String.Format("{0}6+", axisPrefix), "D-Pad Right", XboxControlTypeEnum.Axis),
+                // Triggers
+                new XboxTriggerState(String.Format("{0}9+", axisPrefix), "LT"),
+                new XboxTriggerState(String.Format("{0}10+", axisPrefix), "RT"),
+                // LS
+                new XboxControl(String.Format("{0}1-", axisPrefix), "LS-Left", XboxControlTypeEnum.Axis),
+                new XboxControl(String.Format("{0}1+", axisPrefix), "LS-Right", XboxControlTypeEnum.Axis),
+                new XboxControl(String.Format("{0}2-", axisPrefix), "LS-Up", XboxControlTypeEnum.Axis),
+                new XboxControl(String.Format("{0}2+", axisPrefix), "LS-Down", XboxControlTypeEnum.Axis),
+                // RS
+                new XboxControl(String.Format("{0}4-", axisPrefix), "RS-Left", XboxControlTypeEnum.Axis),
+                new XboxControl(String.Format("{0}4+", axisPrefix), "RS-Right", XboxControlTypeEnum.Axis),
+                new XboxControl(String.Format("{0}5-", axisPrefix), "RS-Up", XboxControlTypeEnum.Axis),
+                new XboxControl(String.Format("{0}5+", axisPrefix), "RS-Down", XboxControlTypeEnum.Axis)
+        };
+        /// <summary>
+        /// Represents the alt Xbox Controls.
+        /// </summary>
+        XboxControl[] altXboxControls => new XboxControl[]
+        {                 
+                // Buttons
+                new XboxButton(Keys.XboxA, "A", XboxControlTypeEnum.Button),
+                new XboxButton(Keys.XboxB, "B", XboxControlTypeEnum.Button),
+                new XboxButton(Keys.XboxX, "X", XboxControlTypeEnum.Button),
+                new XboxButton(Keys.XboxY, "Y", XboxControlTypeEnum.Button),
+                new XboxButton(Keys.XboxBumperLeft, "LB", XboxControlTypeEnum.Button),
+                new XboxButton(Keys.XboxBumperRight, "RB", XboxControlTypeEnum.Button),
+                new XboxButton(Keys.XboxBack, "Back", XboxControlTypeEnum.Button),
+                new XboxButton(Keys.XboxStart, "Start", XboxControlTypeEnum.Button),
+                new XboxButton(Keys.XboxLStickButton, "LS", XboxControlTypeEnum.Button),
+                new XboxButton(Keys.XboxRStickButton, "RS", XboxControlTypeEnum.Button),
+                // D-Pad
+                new XboxButton(Keys.XboxDPadUp, "D-Pad Up", XboxControlTypeEnum.Axis),
+                new XboxButton(Keys.XboxDPadDown, "D-Pad Down", XboxControlTypeEnum.Axis),
+                new XboxButton(Keys.XboxDPadLeft, "D-Pad Left", XboxControlTypeEnum.Axis),
+                new XboxButton(Keys.XboxDPadRight, "D-Pad Right", XboxControlTypeEnum.Axis),
+                // Triggers
+                new XboxTriggerState(Keys.XboxTriggerLeft, "LT"),
+                new XboxTriggerState(Keys.XboxTriggerRight, "RT"),
+                // LS
+                new XboxControl(Keys.XboxLStickLeft, "LS-Left", XboxControlTypeEnum.Axis),
+                new XboxControl(Keys.XboxLStickRight, "LS-Right", XboxControlTypeEnum.Axis),
+                new XboxControl(Keys.XboxLStickUp, "LS-Up", XboxControlTypeEnum.Axis),
+                new XboxControl(Keys.XboxLStickDown, "LS-Down", XboxControlTypeEnum.Axis),
+                // RS
+                new XboxControl(Keys.XboxRStickLeft, "RS-Left", XboxControlTypeEnum.Axis),
+                new XboxControl(Keys.XboxRStickRight, "RS-Right", XboxControlTypeEnum.Axis),
+                new XboxControl(Keys.XboxRStickUp, "RS-Up", XboxControlTypeEnum.Axis),
+                new XboxControl(Keys.XboxRStickDown, "RS-Down", XboxControlTypeEnum.Axis)
+        };
+        /// <summary>
+        /// Represents whether or not the assets are loaded.
+        /// </summary>
         public bool assetsLoaded
         {
             get;
@@ -77,8 +159,8 @@ namespace TommoJProdutions.MoControls.XInputInterpreter
         /// </summary>
         private PlayerIndex playerIndex
         {
-           get;
-           set;
+            get;
+            set;
         }
         /// <summary>
         /// Represents the rumble events for the xbox controller.
@@ -300,73 +382,7 @@ namespace TommoJProdutions.MoControls.XInputInterpreter
 
             #region Initilize Xbox Buttons
 
-            string buttonPrefix = "JoystickButton";
-            string axisPrefix = String.Format("Joy{0} Axis ", index);
-
-            this.xboxControls = new XboxControl[]
-            { 
-                // Buttons
-                new XboxButton(String.Format("{0}0", buttonPrefix), "A", XboxControlTypeEnum.Button),
-                new XboxButton(String.Format("{0}1", buttonPrefix), "B", XboxControlTypeEnum.Button),
-                new XboxButton(String.Format("{0}2", buttonPrefix), "X", XboxControlTypeEnum.Button),
-                new XboxButton(String.Format("{0}3", buttonPrefix), "Y", XboxControlTypeEnum.Button),
-                new XboxButton(String.Format("{0}4", buttonPrefix), "LB", XboxControlTypeEnum.Button),
-                new XboxButton(String.Format("{0}5", buttonPrefix), "RB", XboxControlTypeEnum.Button),
-                new XboxButton(String.Format("{0}6", buttonPrefix), "Back", XboxControlTypeEnum.Button),
-                new XboxButton(String.Format("{0}7", buttonPrefix), "Start", XboxControlTypeEnum.Button),
-                new XboxButton(String.Format("{0}8", buttonPrefix), "LS", XboxControlTypeEnum.Button),
-                new XboxButton(String.Format("{0}9", buttonPrefix), "RS", XboxControlTypeEnum.Button),
-                // D-Pad
-                new XboxButton(String.Format("{0}7+", axisPrefix), "D-Pad Up", XboxControlTypeEnum.Axis),
-                new XboxButton(String.Format("{0}7-", axisPrefix), "D-Pad Down", XboxControlTypeEnum.Axis),
-                new XboxButton(String.Format("{0}6-", axisPrefix), "D-Pad Left", XboxControlTypeEnum.Axis),
-                new XboxButton(String.Format("{0}6+", axisPrefix), "D-Pad Right", XboxControlTypeEnum.Axis),
-                // Triggers
-                new XboxTriggerState(String.Format("{0}9+", axisPrefix), "LT"),
-                new XboxTriggerState(String.Format("{0}10+", axisPrefix), "RT"),
-                // LS
-                new XboxControl(String.Format("{0}1-", axisPrefix), "LS-Left", XboxControlTypeEnum.Axis),
-                new XboxControl(String.Format("{0}1+", axisPrefix), "LS-Right", XboxControlTypeEnum.Axis),
-                new XboxControl(String.Format("{0}2-", axisPrefix), "LS-Up", XboxControlTypeEnum.Axis),
-                new XboxControl(String.Format("{0}2+", axisPrefix), "LS-Down", XboxControlTypeEnum.Axis),
-                // RS
-                new XboxControl(String.Format("{0}4-", axisPrefix), "RS-Left", XboxControlTypeEnum.Axis),
-                new XboxControl(String.Format("{0}4+", axisPrefix), "RS-Right", XboxControlTypeEnum.Axis),
-                new XboxControl(String.Format("{0}5-", axisPrefix), "RS-Up", XboxControlTypeEnum.Axis),
-                new XboxControl(String.Format("{0}5+", axisPrefix), "RS-Down", XboxControlTypeEnum.Axis)
-
-                /*
-                // Buttons
-                new XboxButton(Keys.XboxA, "A", XboxControlTypeEnum.Button),
-                new XboxButton(Keys.XboxB, "B", XboxControlTypeEnum.Button),
-                new XboxButton(Keys.XboxX, "X", XboxControlTypeEnum.Button),
-                new XboxButton(Keys.XboxY, "Y", XboxControlTypeEnum.Button),
-                new XboxButton(Keys.XboxBumperLeft, "LB", XboxControlTypeEnum.Button),
-                new XboxButton(Keys.XboxBumperRight, "RB", XboxControlTypeEnum.Button),
-                new XboxButton(Keys.XboxBack, "Back", XboxControlTypeEnum.Button),
-                new XboxButton(Keys.XboxStart, "Start", XboxControlTypeEnum.Button),
-                new XboxButton(Keys.XboxLStickButton, "LS", XboxControlTypeEnum.Button),
-                new XboxButton(Keys.XboxRStickButton, "RS", XboxControlTypeEnum.Button),
-                // D-Pad
-                new XboxButton(Keys.XboxDPadUp, "D-Pad Up", XboxControlTypeEnum.Axis),
-                new XboxButton(Keys.XboxDPadDown, "D-Pad Down", XboxControlTypeEnum.Axis),
-                new XboxButton(Keys.XboxDPadLeft, "D-Pad Left", XboxControlTypeEnum.Axis),
-                new XboxButton(Keys.XboxDPadRight, "D-Pad Right", XboxControlTypeEnum.Axis),
-                // Triggers
-                new XboxTriggerState(Keys.XboxTriggerLeft, "LT"),
-                new XboxTriggerState(Keys.XboxTriggerRight, "RT"),
-                // LS
-                new XboxControl(Keys.XboxLStickLeft, "LS-Left", XboxControlTypeEnum.Axis),
-                new XboxControl(Keys.XboxLStickRight, "LS-Right", XboxControlTypeEnum.Axis),
-                new XboxControl(Keys.XboxLStickUp, "LS-Up", XboxControlTypeEnum.Axis),
-                new XboxControl(Keys.XboxLStickDown, "LS-Down", XboxControlTypeEnum.Axis),
-                // RS
-                new XboxControl(Keys.XboxRStickLeft, "RS-Left", XboxControlTypeEnum.Axis),
-                new XboxControl(Keys.XboxRStickRight, "RS-Right", XboxControlTypeEnum.Axis),
-                new XboxControl(Keys.XboxRStickUp, "RS-Up", XboxControlTypeEnum.Axis),
-                new XboxControl(Keys.XboxRStickDown, "RS-Down", XboxControlTypeEnum.Axis)
-                */
-            };
+            this.xboxControls = normalXboxControls;
             // Thumbsticks
             this.leftThumbstick = new XboxJoystick(
                 this.xboxControls[16],
@@ -659,7 +675,7 @@ namespace TommoJProdutions.MoControls.XInputInterpreter
                     XboxRumble currentXboxRumble = this.xboxRumbleEvents[i];
                     float timeLeft = Mathf.Clamp(currentXboxRumble.timer / currentXboxRumble.duration, 0f, 1f);
                     if (timeLeft > 0.0f)
-                    {                        
+                    {
                         currentPower = new Vector2(Mathf.Max(currentXboxRumble.power.x * timeLeft, currentPower.x), Mathf.Max(currentXboxRumble.power.y * timeLeft, currentPower.y));
                         GamePad.SetVibration(this.playerIndex, currentPower.x, currentPower.y);
                         currentXboxRumble.update();
