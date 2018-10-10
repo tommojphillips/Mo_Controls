@@ -2,6 +2,7 @@
 using System.Linq;
 using UnityEngine;
 using gui = UnityEngine.GUILayout;
+using ueGUI = UnityEngine.GUI;
 using MSCLoader;
 using HutongGames.PlayMaker;
 using TommoJProdutions.MoControls.MouseEmulation;
@@ -83,34 +84,13 @@ namespace TommoJProdutions.MoControls.GUI
 
         #endregion
 
-        /// <summary>
-        /// Represents the color of the button's text when selected (menu item).
-        /// </summary>
-        private Color buttonTextSelectedColor = new Color32(135, 135, 135, 255); // Light Gray
-        /// <summary>
-        /// Represents the color of the button's text when not selected (menu item).
-        /// </summary>
-        private Color buttonTextNotSelectedColor = new Color32(118, 159, 222, 255); // Light Blue
-        /// <summary>
-        /// Represents the color of the button's background when selected (menu item).
-        /// </summary>
-        private Color buttonSelectedColor = new Color32(118, 159, 222, 255); // Light Blue
-        /// <summary>
-        /// Represents the color of the button's background when not selected (menu item).
-        /// </summary>
-        private Color buttonNotSelectedColor = new Color32(135, 135, 135, 255); // Light Gray
-        /// <summary>
-        /// Represents the default color.
-        /// </summary>
-        private Color defaultColor => primaryBackgroundColor;//new Color(1, 1, 1, 1); // Some sort of dark-gray : black ratio
-        /// <summary>
-        /// Represents the primary background color.
-        /// </summary>
-        private Color primaryBackgroundColor = new Color(1, 1, 1, 0.868f); // transparent gray.
-        /// <summary>
-        /// Represents the background color.
-        /// </summary>
-        private Color secondaryBackgroundColor = new Color32(118, 159, 222, 226); // Light Blue
+        private Color32 backgroundColor = new Color32(88, 92, 133, 230); // #585C85 | light navel blue
+        private Color32 primaryItemColor = new Color32(113, 154, 195, 230); // #719AC3 | Light White Blue
+        private Color32 secondaryItemColor = new Color32(200, 216, 211, 230); // Sand
+        private Color32 unselectedMenuButtonColor = new Color32(113, 120, 216, 230); // #7178D8 | purple-blue
+        private Color32 selectedMenuButtonColor = new Color32(113, 154, 195, 230); // #719AC3 | Light White Blue
+        private Color32 defaultContentColor = new Color32(190, 194, 251, 230); // #BEC2FB | light purple-blue 
+        private Color32 moduleBackgroundColor = new Color32(68, 154, 219, 230); // #449ADB | Light blue
         /// <summary>
         /// Represents whether the instance has calculated the amount of keybinds yet.
         /// </summary>
@@ -304,10 +284,12 @@ namespace TommoJProdutions.MoControls.GUI
         {
             // Written, 22.08.2018
 
+            ueGUI.contentColor = this.defaultContentColor;
+            ueGUI.backgroundColor = this.backgroundColor;
             using (new gui.AreaScope(new Rect(MAIN_GUI_LEFT, (MENU_GUI_TOP + MENU_GUI_HEIGHT), this.mainGuiWidth, (Screen.height - (MAIN_GUI_TOP + MENU_GUI_TOP + MENU_GUI_HEIGHT)))))
             using (gui.ScrollViewScope scrollViewScope = new gui.ScrollViewScope(this.mainGUIScrollPosition, new GUILayoutOption[] { gui.Width(this.mainGuiWidth) }))
             using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width(this.mainGuiWidth - SCROLL_BAR_OFFSET), gui.MaxWidth(this.mainGuiWidth - SCROLL_BAR_OFFSET) }))
-            {
+            {                
                 this.mainGUIScrollPosition = scrollViewScope.scrollPosition;
                 gui.Label(String.Format("<b>{0} v{1} by {2}</b>", this.mod.Name, this.mod.Version, this.mod.Author));
                 if (this.mainGUIMenu != MainGUIMenuEnum.About)
@@ -354,6 +336,7 @@ namespace TommoJProdutions.MoControls.GUI
 
             gui.Space(5f);
 
+            ueGUI.backgroundColor = this.moduleBackgroundColor;
             using (new gui.HorizontalScope("box"))
                 gui.Label(String.Format("<b>About:</b>\r\n\r\n{0}", aboutMessage));
             gui.Space(5f);
@@ -362,6 +345,7 @@ namespace TommoJProdutions.MoControls.GUI
             gui.Space(10f);
             using (new gui.HorizontalScope("box"))
                 gui.Label(footerMessage);
+            ueGUI.backgroundColor = this.backgroundColor;
         }
         /// <summary>
         /// Draws foot controls content to the main gui.
@@ -424,8 +408,10 @@ namespace TommoJProdutions.MoControls.GUI
 
             using (new gui.HorizontalScope())
             {
+                ueGUI.backgroundColor = this.moduleBackgroundColor;
                 this.drawXboxControllerDebugContent();
                 this.drawControllerInputContent();
+                ueGUI.backgroundColor = this.backgroundColor;
             }
         }
         /// <summary>
@@ -434,7 +420,7 @@ namespace TommoJProdutions.MoControls.GUI
         private void drawControllerInputContent()
         {
             // Written, 09.10.2018
-
+            
             using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width((this.mainGuiWidth - SCROLL_BAR_OFFSET - 12.5f) / 2) }))
             {
                 gui.Label("<b>Xbox Controller Input Editor.</b>");
@@ -461,12 +447,12 @@ namespace TommoJProdutions.MoControls.GUI
                     if (j == 2)
                     {
                         j = 0;
-                        UnityEngine.GUI.backgroundColor = this.secondaryBackgroundColor;
+                        ueGUI.backgroundColor = this.primaryItemColor;
                     }
                     else
-                        UnityEngine.GUI.backgroundColor = this.defaultColor;
+                        ueGUI.backgroundColor = this.secondaryItemColor;
                     this.drawCommonControllerInputControl(xCon, _readonly: (this.xboxControllerInputOption != XboxControllerInputMapEnum.Custom));
-                }
+                }            
             }
         }
         /// <summary>
@@ -478,18 +464,19 @@ namespace TommoJProdutions.MoControls.GUI
 
             using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width((this.mainGuiWidth - SCROLL_BAR_OFFSET - 12.5f) / 2) }))
             {
-                gui.Label("Xbox Controller Debug");
+                gui.Label("<b>Xbox Controller Debug</b>");
                 gui.Space(5f);
-                gui.Label("Xbox Controller Status: " + (this.xboxController.isConnected ? "Connected" : "Disconnected"));
+                gui.Label("<i><b>Xbox Controller Status:</b> <color=" + (this.xboxController.isConnected ? "green>Connected" : "red>Disconnected") + "</color>.</i>");
                 if (this.xboxController.isConnected)
-                {
+                {                    
                     // Triggers
+                    ueGUI.backgroundColor = this.primaryItemColor;
                     using (new gui.VerticalScope("box"))
                     {
                         double leftRounded = Math.Round(this.xboxController.getLeftTrigger(), 2);
                         double rightRounded = Math.Round(this.xboxController.getRightTrigger(), 2);
-                        gui.Label("Triggers:");
-                        gui.Label(String.Format("Left: {0}, <b>{2}</b>\r\nRight: {1}, <b>{3}</b>",
+                        gui.Label("<b>Triggers:</b>");
+                        gui.Label(String.Format("Left: {0}, <b><color=white>{2}</color></b>\r\nRight: {1}, <b><color=white>{3}</color></b>",
                             leftRounded > 0.0f || leftRounded < 0.0f ? String.Format("<color=yellow>{0}</color>", leftRounded) : leftRounded.ToString(),
                             rightRounded > 0.0f || rightRounded < 0.0f ? String.Format("<color=yellow>{0}</color>", rightRounded) : rightRounded.ToString(),
                             this.xboxController.LT.inputName,
@@ -497,12 +484,13 @@ namespace TommoJProdutions.MoControls.GUI
                     }
                     // Bumpers
                     gui.Space(5f);
+                    ueGUI.backgroundColor = this.secondaryItemColor;
                     using (new gui.VerticalScope("box"))
                     {
                         ButtonState lb = this.xboxController.LB.state;
                         ButtonState rb = this.xboxController.RB.state;
-                        gui.Label("Bumpers:");
-                        gui.Label(String.Format("Left: {0}, <b>{2}</b>\r\nRight: {1}, <b>{3}</b>",
+                        gui.Label("<b>Bumpers:</b>");
+                        gui.Label(String.Format("Left: {0}, <b><color=white>{2}</color></b>\r\nRight: {1}, <b><color=white>{3}</color></b>",
                             lb == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", lb) : lb.ToString(),
                             rb == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", rb) : rb.ToString(),
                             this.xboxController.LB.inputName,
@@ -510,13 +498,14 @@ namespace TommoJProdutions.MoControls.GUI
                     }
                     // Left Thumbsick
                     gui.Space(5f);
+                    ueGUI.backgroundColor = this.primaryItemColor;
                     using (new gui.VerticalScope("box"))
                     {
                         double xRounded = Math.Round(this.xboxController.getLeftStick().X, 2);
                         double yRounded = Math.Round(this.xboxController.getLeftStick().Y, 2);
                         ButtonState ls = this.xboxController.LS.state;
-                        gui.Label("Left Thumbstick:");
-                        gui.Label(String.Format("X: {0}, <b>{3}/{4}</b>\r\nY: {1}, <b>{5}/{6}</b>\r\nLS: {2}, <b>{7}</b>",
+                        gui.Label("<b>Left Thumbstick:</b>");
+                        gui.Label(String.Format("X: {0}, <b><color=white>{3}/{4}</color></b>\r\nY: {1}, <b><color=white>{5}/{6}</color></b>\r\nLS: {2}, <b><color=white>{7}</color></b>",
                             xRounded > 0.0f || xRounded < 0.0f ? String.Format("<color=yellow>{0}</color>", xRounded) : xRounded.ToString(),
                             yRounded > 0.0f || yRounded < 0.0f ? String.Format("<color=yellow>{0}</color>", yRounded) : yRounded.ToString(),
                             ls == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", ls) : ls.ToString(),
@@ -528,13 +517,14 @@ namespace TommoJProdutions.MoControls.GUI
                     }
                     // Right Thumbstick
                     gui.Space(5f);
+                    ueGUI.backgroundColor = this.secondaryItemColor;
                     using (new gui.VerticalScope("box"))
                     {
                         double xRounded = Math.Round(this.xboxController.getRightStick().X, 2);
                         double yRounded = Math.Round(this.xboxController.getRightStick().Y, 2);
                         ButtonState rs = this.xboxController.RS.state;
-                        gui.Label("Right Thumbstick:");
-                        gui.Label(String.Format("X: {0}, <b>{3}/{4}</b>\r\nY: {1}, <b>{5}/{6}</b>\r\nRS: {2}, <b>{7}</b>",
+                        gui.Label("<b>Right Thumbstick:</b>");
+                        gui.Label(String.Format("X: {0}, <b><color=white>{3}/{4}</color></b>\r\nY: {1}, <b><color=white>{5}/{6}</color></b>\r\nRS: {2}, <b><color=white>{7}</color></b>",
                             xRounded > 0.0f || xRounded < 0.0f ? String.Format("<color=yellow>{0}</color>", xRounded) : xRounded.ToString(),
                             yRounded > 0.0f || yRounded < 0.0f ? String.Format("<color=yellow>{0}</color>", yRounded) : yRounded.ToString(),
                             rs == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", rs) : rs.ToString(),
@@ -547,6 +537,7 @@ namespace TommoJProdutions.MoControls.GUI
                     }
                     // Buttons
                     gui.Space(5f);
+                    ueGUI.backgroundColor = this.primaryItemColor;
                     using (new gui.VerticalScope("box"))
                     {
                         ButtonState a = this.xboxController.A.state;
@@ -555,8 +546,8 @@ namespace TommoJProdutions.MoControls.GUI
                         ButtonState y = this.xboxController.Y.state;
                         ButtonState start = this.xboxController.Start.state;
                         ButtonState back = this.xboxController.Back.state;
-                        gui.Label("Buttons");
-                        gui.Label(String.Format("A: {0}, <b>{6}</b>\r\nB: {1}, <b>{7}</b>\r\nX: {2}, <b>{8}</b>\r\nY: {3}, <b>{9}</b>\r\nStart: {4}, <b>{10}</b>\r\nBack: {5}, <b>{11}</b>",
+                        gui.Label("<b>Buttons:</b>");
+                        gui.Label(String.Format("A: {0}, <b><color=white>{6}</color></b>\r\nB: {1}, <b><color=white>{7}</color></b>\r\nX: {2}, <b><color=white>{8}</color></b>\r\nY: {3}, <b><color=white>{9}</color></b>\r\nStart: {4}, <b><color=white>{10}</color></b>\r\nBack: {5}, <b><color=white>{11}</color></b>",
                             a == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", a) : a.ToString(),
                             b == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", b) : b.ToString(),
                             x == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", x) : x.ToString(),
@@ -572,14 +563,15 @@ namespace TommoJProdutions.MoControls.GUI
                     }
                     // D-Pad
                     gui.Space(5f);
+                    ueGUI.backgroundColor = this.secondaryItemColor;
                     using (new gui.VerticalScope("box"))
                     {
                         ButtonState u = this.xboxController.DPadUp.state;
                         ButtonState d = this.xboxController.DPadDown.state;
                         ButtonState l = this.xboxController.DPadLeft.state;
                         ButtonState r = this.xboxController.DPadRight.state;
-                        gui.Label("D-Pad");
-                        gui.Label(String.Format("Up: {0}, <b>{4}</b>\r\nDown: {1}, <b>{5}</b>\r\nLeft: {2}, <b>{6}</b>\r\nRight: {3}, <b>{7}</b>",
+                        gui.Label("<b>D-Pad:</b>");
+                        gui.Label(String.Format("Up: {0}, <b><color=white>{4}</color></b>\r\nDown: {1}, <b><color=white>{5}</color></b>\r\nLeft: {2}, <b><color=white>{6}</color></b>\r\nRight: {3}, <b><color=white>{7}</color></b>",
                             u == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", u) : u.ToString(),
                             d == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", d) : d.ToString(),
                             l == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", l) : l.ToString(),
@@ -591,6 +583,7 @@ namespace TommoJProdutions.MoControls.GUI
                     }
                 }
             }
+            ueGUI.backgroundColor = this.backgroundColor;
         }
         /// <summary>
         /// Draws mouse emulation content to the main gui.
@@ -602,6 +595,7 @@ namespace TommoJProdutions.MoControls.GUI
             float tempValue;
             bool saveSettings = false;
 
+            ueGUI.backgroundColor = this.moduleBackgroundColor;
             gui.Label("<b>Mouse Emulation</b>");
             gui.Space(5f);
             using (new gui.HorizontalScope("box"))
@@ -673,7 +667,7 @@ namespace TommoJProdutions.MoControls.GUI
                             this.mouseEmulator.inputType = InputTypeEnum.DPad;
                             saveSettings = true;
                         }
-                    }
+                    }                    
                 }
             }
             gui.Space(5f);
@@ -703,47 +697,56 @@ namespace TommoJProdutions.MoControls.GUI
                 }
             }
             gui.Space(5f);
-            gui.Label("<i><b>Mouse inputs:</b></i>");
+            ueGUI.backgroundColor = this.moduleBackgroundColor;
             using (new gui.VerticalScope("box"))
             {
-                gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.lmbPrimaryInput.Name));
-                using (new gui.HorizontalScope())
+                gui.Label("<i><b>Mouse inputs:</b></i>");
+                ueGUI.backgroundColor = this.primaryItemColor;
+                using (new gui.VerticalScope("box"))
                 {
-                    this.drawCommonControl("Modifier", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Modifier.ToString(), 1, inMod: this.mod);
-                    this.drawCommonControl("Input", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Key.ToString(), 2, inMod: this.mod);
+                    gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.lmbPrimaryInput.Name));
+                    using (new gui.HorizontalScope())
+                    {
+                        this.drawCommonControl("Modifier", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Modifier.ToString(), 1, inMod: this.mod);
+                        this.drawCommonControl("Input", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Key.ToString(), 2, inMod: this.mod);
+                    }
+                }
+                
+                gui.Space(3f);
+                ueGUI.backgroundColor = this.secondaryItemColor;
+                using (new gui.VerticalScope("box"))
+                {
+                    gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.lmbSecondaryInput.Name));
+                    using (new gui.HorizontalScope())
+                    {
+                        this.drawCommonControl("Modifier", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Modifier.ToString(), 1, inMod: this.mod);
+                        this.drawCommonControl("Input", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Key.ToString(), 2, inMod: this.mod);
+                    }
+                };
+                gui.Space(3f);
+                ueGUI.backgroundColor = this.primaryItemColor;
+                using (new gui.VerticalScope("box"))
+                {
+                    gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.rmbPrimaryInput.Name));
+                    using (new gui.HorizontalScope())
+                    {
+                        this.drawCommonControl("Modifier", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Modifier.ToString(), 1, inMod: this.mod);
+                        this.drawCommonControl("Input", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Key.ToString(), 2, inMod: this.mod);
+                    }
+                }
+                gui.Space(3f);
+                ueGUI.backgroundColor = this.secondaryItemColor;
+                using (new gui.VerticalScope("box"))
+                {
+                    gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.rmbSecondaryInput.Name));
+                    using (new gui.HorizontalScope())
+                    {
+                        this.drawCommonControl("Modifier", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Modifier.ToString(), 1, inMod: this.mod);
+                        this.drawCommonControl("Input", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Key.ToString(), 2, inMod: this.mod);
+                    }
                 }
             }
-            gui.Space(3f);
-            using (new gui.VerticalScope("box"))
-            {
-                gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.lmbSecondaryInput.Name));
-                using (new gui.HorizontalScope())
-                {
-                    this.drawCommonControl("Modifier", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Modifier.ToString(), 1, inMod: this.mod);
-                    this.drawCommonControl("Input", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Key.ToString(), 2, inMod: this.mod);
-                }
-            }
-            gui.Space(3f);
-            using (new gui.VerticalScope("box"))
-            {
-                gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.rmbPrimaryInput.Name));
-                using (new gui.HorizontalScope())
-                {
-                    this.drawCommonControl("Modifier", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Modifier.ToString(), 1, inMod: this.mod);
-                    this.drawCommonControl("Input", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Key.ToString(), 2, inMod: this.mod);
-                }
-            }
-            gui.Space(3f);
-            using (new gui.VerticalScope("box"))
-            {
-                gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.rmbSecondaryInput.Name));
-                using (new gui.HorizontalScope())
-                {
-                    this.drawCommonControl("Modifier", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Modifier.ToString(), 1, inMod: this.mod);
-                    this.drawCommonControl("Input", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Key.ToString(), 2, inMod: this.mod);
-                }
-            }
-
+            ueGUI.backgroundColor = this.backgroundColor;
             gui.Space(5f);
             if (saveSettings)
             {
@@ -782,14 +785,23 @@ namespace TommoJProdutions.MoControls.GUI
         {
             // Written, 22.08.2018
 
+            ueGUI.backgroundColor = this.moduleBackgroundColor;
             bool _saveSettings = false;
 
-            if (gui.Toggle(this.controlManager.displayCurrentPlayerModeOverlay, "Display current player mode overlay") != this.controlManager.displayCurrentPlayerModeOverlay)
+            using (new gui.HorizontalScope("box"))
             {
-                this.controlManager.displayCurrentPlayerModeOverlay = !this.controlManager.displayCurrentPlayerModeOverlay;
-                _saveSettings = true;
+                if (gui.Toggle(this.controlManager.displayCurrentPlayerModeOverlay, "Display current player mode overlay") != this.controlManager.displayCurrentPlayerModeOverlay)
+                {
+                    this.controlManager.displayCurrentPlayerModeOverlay = !this.controlManager.displayCurrentPlayerModeOverlay;
+                    _saveSettings = true;
+                }
             }
-
+            using (new gui.HorizontalScope("box"))
+            {
+                gui.Label("<i><b><color=blue>C</color><color=yellow>o</color>lo<color=red>r</color> <color=purple>M</color>ix<color=green>e</color>r</b></i>");
+                gui.Space(3f);
+            }
+            ueGUI.backgroundColor = this.backgroundColor;
             if (_saveSettings)
             {
                 MoControlsSaveData.saveSettings(MoControlsMod.moControlsGO);
@@ -821,8 +833,7 @@ namespace TommoJProdutions.MoControls.GUI
                 && this.changeInputResult.mode == inMode ? "<b>Awaiting key input</b>" : null;
             XboxControl xboxControl = this.xboxController?.getXboxControlByInputName(inInputName);
             bool buttonClicked = false;
-            Color prevColor = UnityEngine.GUI.backgroundColor;
-            UnityEngine.GUI.backgroundColor = this.defaultColor;
+            ueGUI.backgroundColor = this.unselectedMenuButtonColor;
             if (xboxControl != null && reassignMessage == null && this.xboxController.assetsLoaded)
             {
                 if (gui.Button(xboxControl.texture))
@@ -837,7 +848,7 @@ namespace TommoJProdutions.MoControls.GUI
                     buttonClicked = true;
                 }
             }
-            UnityEngine.GUI.backgroundColor = prevColor;
+            ueGUI.backgroundColor = this.backgroundColor;
             if (buttonClicked)
             {
                 this.changeInputResult.changeToPollingState(inControlName, inIndex, inMode, inMod);
@@ -922,10 +933,10 @@ namespace TommoJProdutions.MoControls.GUI
                 if (j == 2)
                 {
                     j = 0;
-                    UnityEngine.GUI.backgroundColor = this.secondaryBackgroundColor;
+                    ueGUI.backgroundColor = this.primaryItemColor;
                 }
                 else
-                    UnityEngine.GUI.backgroundColor = this.defaultColor;
+                    ueGUI.backgroundColor = this.secondaryItemColor;
                 string controlName = inControlInputs[i, 0];
                 gui.Space(3f);
                 using (new gui.VerticalScope("box"))
@@ -951,6 +962,7 @@ namespace TommoJProdutions.MoControls.GUI
                     }
                 }
             }
+            ueGUI.backgroundColor = this.backgroundColor;
             gui.Space(3f);
         }
         /// <summary>
@@ -976,7 +988,7 @@ namespace TommoJProdutions.MoControls.GUI
                 if (modKeybinds.Count() > 0)
                 {
                     gui.Space(3f);
-                    UnityEngine.GUI.backgroundColor = this.secondaryBackgroundColor;
+                    ueGUI.backgroundColor = this.moduleBackgroundColor;
                     using (new gui.HorizontalScope("box"))
                     {
                         gui.Label(String.Format("<b>{0}</b>, by <b>{1}</b>:", _mod.Name, _mod.Author));
@@ -988,10 +1000,10 @@ namespace TommoJProdutions.MoControls.GUI
                                 if (j == 2)
                                 {
                                     j = 0;
-                                    UnityEngine.GUI.backgroundColor = this.secondaryBackgroundColor;
+                                    ueGUI.backgroundColor = this.primaryItemColor;
                                 }
                                 else
-                                    UnityEngine.GUI.backgroundColor = this.defaultColor;
+                                    ueGUI.backgroundColor = this.secondaryItemColor;
                                 using (new gui.VerticalScope("box"))
                                 {
                                     gui.Label(String.Format("<b>{0}:</b>", modKeybinds[i].Name));
@@ -1007,7 +1019,7 @@ namespace TommoJProdutions.MoControls.GUI
                     }
                 }
             }
-            UnityEngine.GUI.backgroundColor = this.defaultColor;
+            ueGUI.backgroundColor = this.backgroundColor;
         }
         /// <summary>
         /// Draws a menu with the provided Enum, <typeparamref name="T"/>.
@@ -1032,15 +1044,9 @@ namespace TommoJProdutions.MoControls.GUI
                         title = (_enum as MainGUIMenuEnum?).toString();
 
                     if (isSelected)
-                    {
-                        UnityEngine.GUI.contentColor = this.buttonTextSelectedColor;
-                        UnityEngine.GUI.backgroundColor = this.buttonSelectedColor;
-                    }
+                        ueGUI.backgroundColor = this.selectedMenuButtonColor;
                     else
-                    {
-                        UnityEngine.GUI.contentColor = this.buttonTextNotSelectedColor;
-                        UnityEngine.GUI.backgroundColor = this.buttonNotSelectedColor;
-                    }
+                        ueGUI.backgroundColor = this.unselectedMenuButtonColor;
 
                     if (gui.Button(title ?? _enum.ToString()) && !isSelected)
                     {
@@ -1048,8 +1054,7 @@ namespace TommoJProdutions.MoControls.GUI
                         return true;
                     }
                 }
-                UnityEngine.GUI.contentColor = this.defaultColor;
-                UnityEngine.GUI.backgroundColor = this.defaultColor;
+                ueGUI.backgroundColor = this.backgroundColor;
                 changedTo = inSelected;
                 return false;
             }
