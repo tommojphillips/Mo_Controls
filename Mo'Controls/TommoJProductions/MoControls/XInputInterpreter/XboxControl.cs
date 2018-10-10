@@ -59,5 +59,12 @@ namespace TommoJProdutions.MoControls.XInputInterpreter
         }
 
         #endregion
+
+        public void setInputName(string inInputName)
+        {
+            // Written, 09.10.2018
+
+           this.inputName = inInputName;
+        }
     }
 }

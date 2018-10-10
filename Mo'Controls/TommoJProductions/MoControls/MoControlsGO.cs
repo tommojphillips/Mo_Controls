@@ -153,6 +153,9 @@ namespace TommoJProdutions.MoControls
                 controlManager.displayCurrentPlayerModeOverlay = inSaveData.displayCurrentPlayerModeOverlay;
                 controlManager.setControls(inSaveData.footControls, inSaveData.drivingControls);
                 MoControlsMod.debug = inSaveData.debugMode;
+                xboxController.customXboxControls = inSaveData.customControllerInputControls;
+                xboxController.setControllerInputType(inSaveData.xboxControllerInput);
+
                 if (startUp)
                 {
                     if (MoControlsMod.debug)
@@ -173,7 +176,7 @@ namespace TommoJProdutions.MoControls
         {
             // Written, 08.10.2018
 
-            MoControlsMod.print("Controller: " + e.xboxController.index + " <color=red>Disconnected</color");
+            MoControlsMod.print("Controller: " + e.xboxController.index + " <color=red>Disconnected</color>");
         }
 
         private void XboxControllerManager_ControllerConnected(object sender, ControllerConnectionEventArgs e)

@@ -5,7 +5,7 @@ namespace TommoJProdutions.MoControls.GUI
 {
     public static class GUIMenuEnumExtentions
     {
-        public static string toString(this MainGUIMenuEnum mainGUIMenu)
+        public static string toString(this MainGUIMenuEnum? mainGUIMenu)
         {
             // Written, 22.08.2018
 
@@ -21,7 +21,7 @@ namespace TommoJProdutions.MoControls.GUI
                     return mainGUIMenu.ToString();
             }
         }
-        public static string toString(this SettingsMenuEnum settingsGUIMenu)
+        public static string toString(this SettingsMenuEnum? settingsGUIMenu)
         {
             // Written, 22.08.2018
 
@@ -29,8 +29,26 @@ namespace TommoJProdutions.MoControls.GUI
             {
                 case SettingsMenuEnum.MouseEmulation:
                     return "Mouse Emulation";
+                case SettingsMenuEnum.XboxController:
+                    return "Xbox Controller";
                 default:
                     return settingsGUIMenu.ToString();
+            }
+        }
+        public static string toString(this XInputInterpreter.XboxControllerInputMapEnum? inputMenu)
+        {
+            // Written, 22.08.2018
+
+            switch (inputMenu)
+            {
+                case XInputInterpreter.XboxControllerInputMapEnum.Norm:
+                    return "Normal input (dev)";
+                case XInputInterpreter.XboxControllerInputMapEnum.Alt:
+                    return "Alternative input (unity detection)";
+                case XInputInterpreter.XboxControllerInputMapEnum.Custom:
+                    return "Custom input";
+                default:
+                    return inputMenu.ToString();
             }
         }
         public static string getGameControlAlias(this string gameControlName, bool preserveAcronyms)

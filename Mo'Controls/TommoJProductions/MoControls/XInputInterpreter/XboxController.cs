@@ -15,19 +15,20 @@ namespace TommoJProdutions.MoControls.XInputInterpreter
 
         #region Fields
 
-        string buttonPrefix = "JoystickButton";
+        private static string buttonPrefix = "JoystickButton";
+        private static string axisPrefix = "Joy Axis ";
 
         #endregion
 
         #region Properties
+
         /// <summary>
         /// Represents the axis prefix.
         /// </summary>
-        string axisPrefix => String.Format("Joy{0} Axis ", index);
         /// <summary>
         /// Represents the normal (go) xbox controls.
         /// </summary>
-        public XboxControl[] normalXboxControls => new XboxControl[]
+        public static XboxControl[] normalXboxControls => new XboxControl[]
         {
                 // Buttons
                 new XboxButton(String.Format("{0}0", buttonPrefix), "A", XboxControlTypeEnum.Button),
@@ -62,7 +63,7 @@ namespace TommoJProdutions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the alt Xbox Controls.
         /// </summary>
-        XboxControl[] altXboxControls => new XboxControl[]
+        public static XboxControl[] altXboxControls => new XboxControl[]
         {                 
                 // Buttons
                 new XboxButton(Keys.XboxA, "A", XboxControlTypeEnum.Button),
@@ -94,6 +95,22 @@ namespace TommoJProdutions.MoControls.XInputInterpreter
                 new XboxControl(Keys.XboxRStickUp, "RS-Up", XboxControlTypeEnum.Axis),
                 new XboxControl(Keys.XboxRStickDown, "RS-Down", XboxControlTypeEnum.Axis)
         };
+        /// <summary>
+        /// Represents the type of input for the xbox controller.
+        /// </summary>
+        public XboxControllerInputMapEnum xboxControllerInput
+        {
+            get;
+            private set;
+        }
+        /// <summary>
+        /// Represents the custom xbox controls.
+        /// </summary>
+        public XboxControl[] customXboxControls
+        {
+            get;
+            set;
+        }
         /// <summary>
         /// Represents whether or not the assets are loaded.
         /// </summary>
@@ -777,6 +794,28 @@ namespace TommoJProdutions.MoControls.XInputInterpreter
             // Written, 22.07.2018
 
             return this.xboxControls;
+        }
+        /// <summary>
+        /// Sets the input mode.
+        /// </summary>
+        /// <param name="xboxControllerInputEnum">The mode to set.</param>
+        public void setControllerInputType(XboxControllerInputMapEnum xboxControllerInputEnum)
+        {
+            // Writte, 09.10.2018
+
+            this.xboxControllerInput = xboxControllerInputEnum;
+            switch (this.xboxControllerInput)
+            {
+                case XboxControllerInputMapEnum.Norm:
+                    this.xboxControls = normalXboxControls;
+                    break;
+                case XboxControllerInputMapEnum.Alt:
+                    this.xboxControls = altXboxControls;
+                    break;
+                case XboxControllerInputMapEnum.Custom:
+                    this.xboxControls = this.customXboxControls;
+                    break;
+            }
         }
 
         #endregion

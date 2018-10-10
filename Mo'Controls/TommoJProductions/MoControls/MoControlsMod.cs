@@ -6,6 +6,9 @@ namespace TommoJProdutions.MoControls
 {
     // XInputDotNetPure.dll - in folder: "My Summer Car/mysummercar_data/Managed"
     // XInputInterface.dll - in folder: "My Summer Car"
+    /// <summary>
+    /// Represents the mo'controls mod.
+    /// </summary>
     public class MoControlsMod : Mod
     {
         // Written, 06.07.2018        

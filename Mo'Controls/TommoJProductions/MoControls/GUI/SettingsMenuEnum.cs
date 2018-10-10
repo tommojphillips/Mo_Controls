@@ -3,7 +3,7 @@
     public enum SettingsMenuEnum
     {
         MouseEmulation,
-        Debug,
+        XboxController,
         Display,
     }
 }

@@ -82,6 +82,7 @@
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\Monitoring\MonitorControllerConnections.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxButton.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxButtonEnum.cs" />
+    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxControllerInputEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxExtentions.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxControl.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxController.cs" />

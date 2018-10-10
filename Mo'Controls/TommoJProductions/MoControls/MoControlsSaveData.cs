@@ -1,5 +1,6 @@
 ﻿using System;
 using TommoJProdutions.MoControls.MouseEmulation;
+using TommoJProdutions.MoControls.XInputInterpreter;
 using MSCLoader;
 
 namespace TommoJProdutions.MoControls
@@ -28,7 +29,6 @@ namespace TommoJProdutions.MoControls
                 string[,] currentControlInputs = ControlManager.loadControlInputsFromCInput();
                 return new MoControlsSaveData()
                 {
-                    showXboxDebugGui = false,
                     showXboxVirtualAxesGui = false,
                     monitiorXboxControllerConnectionStatus = true,
                     emulateMouse = false,
@@ -80,7 +80,6 @@ namespace TommoJProdutions.MoControls
                         { "fifth", "None", "None", },
                         { "sixth", "None", "None", },
                     },
-
                     drivingControls = new string[,]
                     {
                         { "Left", "A", "None", },
@@ -126,6 +125,8 @@ namespace TommoJProdutions.MoControls
                         { "sixth", "None", "None", },
                     },
                     debugMode = false,
+                    xboxControllerInput = XboxControllerInputMapEnum.Norm, 
+                    customControllerInputControls = new XboxControl[24],
                 };
             }
         }
@@ -134,12 +135,17 @@ namespace TommoJProdutions.MoControls
 
         #region Fields
 
-        public bool debugMode
+        public XboxControl[] customControllerInputControls
         {
             get;
             set;
         }
-        public bool showXboxDebugGui
+        public XboxControllerInputMapEnum xboxControllerInput
+        {
+            get;
+            set;
+        }
+        public bool debugMode
         {
             get;
             set;
@@ -212,8 +218,9 @@ namespace TommoJProdutions.MoControls
                 displayCurrentPlayerModeOverlay = MoControlsGO.controlManager.displayCurrentPlayerModeOverlay,
                 footControls = MoControlsGO.controlManager.footControls,
                 drivingControls = MoControlsGO.controlManager.drivingControls,
-                debugMode = false,
-                showXboxDebugGui = false,
+                debugMode = MoControlsMod.debug,
+                customControllerInputControls = MoControlsGO.xboxController.customXboxControls,
+                xboxControllerInput = MoControlsGO.xboxController.xboxControllerInput,
             };
             saveSettings(MoControlsMod.instance, mcsd);
         }
