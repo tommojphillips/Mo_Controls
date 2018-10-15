@@ -52,14 +52,21 @@
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\mysummercar_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\mysummercar_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
     <Reference Include="XInputDotNetPure">
       <HintPath>..\Required References\XInputDotNetPure.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TommoJProductions\AssetHolder.cs" />
     <Compile Include="TommoJProductions\MoControls\ChangeInput.cs" />
     <Compile Include="TommoJProductions\MoControls\ControlManager.cs" />
-    <Compile Include="TommoJProductions\MoControls\DebugConsoleCommand.cs" />
+    <Compile Include="TommoJProductions\MoControls\Debugging\Assets_DebugConsoleCommand.cs" />
+    <Compile Include="TommoJProductions\MoControls\Debugging\DebugConsoleCommand.cs" />
+    <Compile Include="TommoJProductions\MoControls\Debugging\BaseConsoleCommand.cs" />
     <Compile Include="TommoJProductions\MoControls\Input.cs" />
     <Compile Include="TommoJProductions\MoControls\GUI\MainGUIMenuEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\GUI\GUIMenuEnumExtentions.cs" />
