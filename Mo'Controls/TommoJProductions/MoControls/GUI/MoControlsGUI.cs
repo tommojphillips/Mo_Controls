@@ -222,13 +222,9 @@ namespace TommoJProductions.MoControls.GUI
                 }
                 else
                 {
-                    if (!MoControlsMod.menuLoad)
+                    if (this.controlManager.displayCurrentPlayerModeOverlay)
                     {
-
-                        if (this.controlManager.displayCurrentPlayerModeOverlay)
-                        {
-                            this.drawPlayerModeOverlayGUI();
-                        }
+                        this.drawPlayerModeOverlayGUI();
                     }
                 }
             }

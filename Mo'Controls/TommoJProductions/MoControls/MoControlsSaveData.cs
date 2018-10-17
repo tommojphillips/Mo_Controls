@@ -26,7 +26,7 @@ namespace TommoJProductions.MoControls
         {
             get
             {
-                string[,] currentControlInputs = MoControlsMod.menuLoad ? new string[ControlManager.inputNames.Length, 5] : ControlManager.loadControlInputsFromCInput();
+                string[,] currentControlInputs = ControlManager.loadControlInputsFromCInput();
                 return new MoControlsSaveData()
                 {
                     showXboxVirtualAxesGui = false,

@@ -35,24 +35,12 @@ namespace TommoJProductions.MoControls
         {
             get
             {
-                if (!MoControlsMod.menuLoad)
-                {
-
-                    if (moControlsGui != null
-                        && controlManager != null
-                        && mouseEmulator != null
-                        && xboxControllerManager != null
-                        && xboxController != null)
-                        return true;
-                }
-                else
-                {
-                    if (moControlsGui != null
-                       && mouseEmulator != null
-                       && xboxControllerManager != null
-                       && xboxController != null)
-                        return true;
-                }
+                if (moControlsGui != null
+                    && controlManager != null
+                    && mouseEmulator != null
+                    && xboxControllerManager != null
+                    && xboxController != null)
+                    return true;
                 return false;
             }
         }
@@ -110,8 +98,7 @@ namespace TommoJProductions.MoControls
         {
             // Written, 08.10.2018
 
-            if (!MoControlsMod.menuLoad)
-                controlManager = this.gameObject.AddComponent<ControlManager>();
+            controlManager = this.gameObject.AddComponent<ControlManager>();
             moControlsGui = this.gameObject.AddComponent<MoControlsGUI>();
             xboxControllerManager = this.gameObject.AddComponent<XboxControllerManager>();
             mouseEmulator = this.gameObject.AddComponent<MouseEmulator>();

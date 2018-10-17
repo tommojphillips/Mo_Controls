@@ -21,7 +21,6 @@ namespace TommoJProductions.MoControls
         public override string Author => "tommojphillips";
         public override string Version => "1.0.7";
         public override bool UseAssetsFolder => true;
-        public override bool LoadInMenu => true;
 
         #endregion
 
@@ -52,14 +51,6 @@ namespace TommoJProductions.MoControls
 
         #region Properties
 
-        /// <summary>
-        /// Represents if the the mod should load for menu.
-        /// </summary>
-        public static bool menuLoad
-        {
-            get;
-            private set;
-        }
         /// <summary>
         /// Represents whether or not the assets are loaded.
         /// </summary>
@@ -105,7 +96,6 @@ namespace TommoJProductions.MoControls
         {
             // Written, 20.08.2018
 
-            menuLoad = false;
             instance = this;
             ModConsole.Print(String.Format("<color=green>{0} <b>v{1}</b> Initialized</color>", this.Name, this.Version));
         }
@@ -219,20 +209,12 @@ namespace TommoJProductions.MoControls
             moControlsGameObject = new GameObject(gameObjectName);
             moControlsGO = moControlsGameObject.AddComponent<MoControlsGO>();
             moControlsGO.setLoadedSettings(MoControlsSaveData.loadSettings(), preload: true);
-            
+            this.initialize();
             this.performModLoaderVersionCheck();
             if (debugTypeEquals(DebugTypeEnum.full))
-                print("Assets returned: " + assets.result + "\r\nMenu load: " + menuLoad);
+                print("Assets returned: " + assets.result);
             if (debugTypeEquals(DebugTypeEnum.none))
                 print(this.Name + " v" + this.Version + ": Loaded.");
-        }
-        public override void OnMenuLoad()
-        {
-            // Written, 17.10.2018
-
-            menuLoad = true;
-            this.initialize();
-            this.OnLoad();
         }
 
         #endregion        
