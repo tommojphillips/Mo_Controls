@@ -1,4 +1,4 @@
-﻿namespace TommoJProdutions.MoControls
+﻿namespace TommoJProductions.MoControls
 {
     public enum PlayerModeEnum
     {

@@ -1,6 +1,6 @@
 ﻿using MSCLoader;
 
-namespace TommoJProdutions.MoControls
+namespace TommoJProductions.MoControls
 {
     /// <summary>
     /// Represents data about changing an input.

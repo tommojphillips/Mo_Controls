@@ -1,12 +1,32 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
-namespace TommoJProdutions.MoControls.XInputInterpreter
+namespace TommoJProductions.MoControls.XInputInterpreter
 {
     /// <summary>
     /// Represents extention methods for <see cref="XboxButtonEnum"/>.
     /// </summary>
     public static class XboxExtentions
     {
+        // Written, 09.10.2018
+
+        public static void forEach(this XboxControl[] inXboxControl, Func<XboxControl, bool> inFunc)
+        {
+            // Written, 09.10.2018
+            try
+            {
+                foreach (XboxControl xc in inXboxControl)
+                    inFunc?.Invoke(xc);                
+            }
+            catch (NullReferenceException ex)
+            {
+                if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
+                    MoControlsMod.print(String.Format("<i>[XboxExtentions.forEach(this XboxControl, Action)]</i> - <color=red>Action was null\r\n<b>StackTrace:</b> {0}</color>",
+                        ex.StackTrace));
+                return;
+            }
+        }
         /// <summary>
         /// Returns the string representation of the provided <see cref="XboxButtonEnum"/>.
         /// </summary>
@@ -98,6 +118,22 @@ namespace TommoJProdutions.MoControls.XInputInterpreter
 
             stickValue.Set(stickValue.x *= sensitivityThreshhold, stickValue.y *= sensitivityThreshhold);
             return stickValue;
+        }
+        /// <summary>
+        /// Gets the xbox control in the collection by name.
+        /// </summary>
+        /// <param name="inXboxControls">The xbox control collection.</param>
+        /// <param name="inName">The name of the xbox control to get.</param>
+        public static XboxControl getXboxControl(this IEnumerable<XboxControl> inXboxControls, string inName)
+        {
+            // Written, 15.10.2018
+
+            foreach (XboxControl xc in inXboxControls)
+            {
+                if (xc.name == inName)
+                    return xc;
+            }
+            return null;
         }
     }
 }

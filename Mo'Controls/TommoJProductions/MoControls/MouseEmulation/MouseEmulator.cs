@@ -4,10 +4,10 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using XInputDotNetPure;
 using MSCLoader;
-using TommoJProdutions.MoControls.XInputInterpreter;
-using NM = TommoJProdutions.MoControls.MouseEmulation.NativeMethods;
+using TommoJProductions.MoControls.XInputInterpreter;
+using NM = TommoJProductions.MoControls.MouseEmulation.NativeMethods;
 
-namespace TommoJProdutions.MoControls.MouseEmulation
+namespace TommoJProductions.MoControls.MouseEmulation
 {
     public class MouseEmulator : MonoBehaviour
     {
@@ -81,12 +81,12 @@ namespace TommoJProdutions.MoControls.MouseEmulation
             {
                 if (value)
                 {
-                    if (MoControlsMod.debug)
+                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
                         MoControlsMod.print(String.Format("Started Emulating mouse as {0}.", this.inputType));
                 }
                 else
                 {
-                    if (MoControlsMod.debug)
+                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
                         MoControlsMod.print("Stopped Emulating mouse..");
                 }
                 emulateMouse = value;
@@ -212,7 +212,7 @@ namespace TommoJProdutions.MoControls.MouseEmulation
         {
             // Written, 08.10.2018
 
-            if (MoControlsMod.debug)
+            if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
                 MoControlsMod.print(nameof(MouseEmulator) + ": Started");
         }
         /// <summary>
@@ -298,12 +298,14 @@ namespace TommoJProdutions.MoControls.MouseEmulation
         private static MouseInput createMouseInput(int x, int y, uint data, uint time, uint flag)
         {
             // create from the given data an object of the type MouseInput, which then can be send
-            MouseInput Result = new MouseInput();
-            Result.X = x;
-            Result.Y = y;
-            Result.mouseData = data;
-            Result.time = time;
-            Result.dwFlags = flag;
+            MouseInput Result = new MouseInput
+            {
+                X = x,
+                Y = y,
+                mouseData = data,
+                time = time,
+                dwFlags = flag
+            };
             return Result;
         }
         /// <summary>

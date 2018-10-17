@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TommoJProdutions.MoControls.MouseEmulation
+namespace TommoJProductions.MoControls.MouseEmulation
 {
     /// <summary>
     /// structure for mouse data

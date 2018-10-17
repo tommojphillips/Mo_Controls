@@ -1,4 +1,4 @@
-﻿namespace TommoJProdutions.MoControls.XInputInterpreter
+﻿namespace TommoJProductions.MoControls.XInputInterpreter
 {
     /// <summary>
     /// Represents types of xbox controller input namings. (axis + buttons).

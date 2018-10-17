@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace TommoJProdutions.MoControls.XInputInterpreter
+namespace TommoJProductions.MoControls.XInputInterpreter
 {
     public class XboxControl
     {

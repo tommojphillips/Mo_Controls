@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using XInputDotNetPure;
 using UnityEngine;
-using MSCLoader;
 
-namespace TommoJProdutions.MoControls.XInputInterpreter
+namespace TommoJProductions.MoControls.XInputInterpreter
 {
     /// <summary>
     /// Represents an xbox controller.
@@ -14,17 +13,20 @@ namespace TommoJProdutions.MoControls.XInputInterpreter
         // Written, 16.07.2018
 
         #region Fields
-
-        private static string buttonPrefix = "JoystickButton";
-        private static string axisPrefix = "Joy Axis ";
+        
+        /// <summary>
+        /// Represents the button prefix.
+        /// </summary>
+        private static readonly string buttonPrefix = "JoystickButton";
+        /// <summary>
+        /// Represents the axis prefix.
+        /// </summary>
+        private static readonly string axisPrefix = "Joy Axis ";
 
         #endregion
 
         #region Properties
 
-        /// <summary>
-        /// Represents the axis prefix.
-        /// </summary>
         /// <summary>
         /// Represents the normal (go) xbox controls.
         /// </summary>
@@ -110,14 +112,6 @@ namespace TommoJProdutions.MoControls.XInputInterpreter
         {
             get;
             set;
-        }
-        /// <summary>
-        /// Represents whether or not the assets are loaded.
-        /// </summary>
-        public bool assetsLoaded
-        {
-            get;
-            private set;
         }
         /// <summary>
         /// Represents all the controls of an xbox controller.
@@ -417,13 +411,7 @@ namespace TommoJProdutions.MoControls.XInputInterpreter
                 this.DPadUp,
                 this.DPadDown);
 
-            #endregion
-
-            try
-            {
-                this.loadControllerAssets();
-            }
-            catch (NullReferenceException) { }
+            #endregion            
         }
 
         #endregion
@@ -711,48 +699,38 @@ namespace TommoJProdutions.MoControls.XInputInterpreter
         {
             // Written, 20.07.2018
 
-            try
+            if (MoControlsMod.assetsLoaded)
             {
-                AssetBundle ab = LoadAssets.LoadBundle(MoControlsMod.instance, "mo_controls.unity3d");
-                // Buttons
-                this.A.texture = ab.LoadAsset<Texture2D>("XboxOne_A.png");
-                this.B.texture = ab.LoadAsset<Texture2D>("XboxOne_B.png");
-                this.X.texture = ab.LoadAsset<Texture2D>("XboxOne_X.png");
-                this.Y.texture = ab.LoadAsset<Texture2D>("XboxOne_Y.png");
-                this.Back.texture = ab.LoadAsset<Texture2D>("XboxOne_Windows.png");
-                this.Start.texture = ab.LoadAsset<Texture2D>("XboxOne_Menu.png");
-                this.LB.texture = ab.LoadAsset<Texture2D>("XboxOne_LB.png");
-                this.RB.texture = ab.LoadAsset<Texture2D>("XboxOne_RB.png");
-                // D-Pad
-                this.DPadUp.texture = ab.LoadAsset<Texture2D>("XboxOne_Dpad_Up.png");
-                this.DPadDown.texture = ab.LoadAsset<Texture2D>("XboxOne_Dpad_Down.png");
-                this.DPadLeft.texture = ab.LoadAsset<Texture2D>("XboxOne_Dpad_Left.png");
-                this.DPadRight.texture = ab.LoadAsset<Texture2D>("XboxOne_Dpad_Right.png");
-                // Thumbsticks
-                this.LS.texture = ab.LoadAsset<Texture2D>("XboxOne_Left_Stick.png");
-                this.RS.texture = ab.LoadAsset<Texture2D>("XboxOne_Right_Stick.png");
-                // Triggers
-                this.LT.texture = ab.LoadAsset<Texture2D>("XboxOne_LT.png");
-                this.RT.texture = ab.LoadAsset<Texture2D>("XboxOne_RT.png");
-                //  Thumbstick Left
-                this.leftThumbstick.left.texture = ab.LoadAsset<Texture2D>("XboxOne_Left_Stick_Left.png");
-                this.leftThumbstick.right.texture = ab.LoadAsset<Texture2D>("XboxOne_Left_Stick_Right.png");
-                this.leftThumbstick.up.texture = ab.LoadAsset<Texture2D>("XboxOne_Left_Stick_Up.png");
-                this.leftThumbstick.down.texture = ab.LoadAsset<Texture2D>("XboxOne_Left_Stick_Down.png");
-                // Thumbstick Right
-                this.rightThumbstick.left.texture = ab.LoadAsset<Texture2D>("XboxOne_Right_Stick_Left.png");
-                this.rightThumbstick.right.texture = ab.LoadAsset<Texture2D>("XboxOne_Right_Stick_Right.png");
-                this.rightThumbstick.up.texture = ab.LoadAsset<Texture2D>("XboxOne_Right_Stick_Up.png");
-                this.rightThumbstick.down.texture = ab.LoadAsset<Texture2D>("XboxOne_Right_Stick_Down.png");
-                ab.Unload(false);
+                this.A.texture = MoControlsMod.assets.a;
+                this.B.texture = MoControlsMod.assets.b;
+                this.X.texture = MoControlsMod.assets.x;
+                this.Y.texture = MoControlsMod.assets.y;
+                this.Start.texture = MoControlsMod.assets.start;
+                this.Back.texture = MoControlsMod.assets.back;
 
-                this.assetsLoaded = true;
+                this.LS.texture = MoControlsMod.assets.ls;
+                this.RS.texture = MoControlsMod.assets.rs;
+
+                this.LT.texture = MoControlsMod.assets.lt;
+                this.RT.texture = MoControlsMod.assets.rt;
+
+                this.DPadUp.texture = MoControlsMod.assets.dpup;
+                this.DPadDown.texture = MoControlsMod.assets.dpdown;
+                this.DPadLeft.texture = MoControlsMod.assets.dpleft;
+                this.DPadRight.texture = MoControlsMod.assets.dpright;
+
+                this.leftThumbstick.up.texture = MoControlsMod.assets.lsup;
+                this.leftThumbstick.down.texture = MoControlsMod.assets.lsdown;
+                this.leftThumbstick.left.texture = MoControlsMod.assets.lsleft;
+                this.leftThumbstick.right.texture = MoControlsMod.assets.lsright;
+
+                this.rightThumbstick.up.texture = MoControlsMod.assets.rsup;
+                this.rightThumbstick.down.texture = MoControlsMod.assets.rsdown;
+                this.rightThumbstick.left.texture = MoControlsMod.assets.rsleft;
+                this.rightThumbstick.right.texture = MoControlsMod.assets.rsright;
             }
-            catch (NullReferenceException)
-            {
-                this.assetsLoaded = false;
-                throw;
-            }
+            else
+                MoControlsMod.print("Assets cannot be loaded to instance of xbox controller as assets ain't loaded.");
         }
         /// <summary>
         /// Gets an xbox control by input name.

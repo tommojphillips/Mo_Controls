@@ -1,9 +1,10 @@
 ﻿using System;
 using HutongGames.PlayMaker;
 using MSCLoader;
+using TommoJProductions.MoControls.Debugging;
 using UnityEngine;
 
-namespace TommoJProdutions.MoControls
+namespace TommoJProductions.MoControls
 {
     public class ControlManager : MonoBehaviour
     {
@@ -164,7 +165,7 @@ namespace TommoJProdutions.MoControls
         {
             // Written, 08.10.2018
 
-            if (MoControlsMod.debug)
+            if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
                 MoControlsMod.print(nameof(ControlManager) + ": Started");
         }
         /// <summary>
@@ -178,7 +179,7 @@ namespace TommoJProdutions.MoControls
             {
                 this.currentPlayerMode = playerMode;
                 this.changeControlMode((PlayerModeEnum)currentPlayerMode);
-                if (MoControlsMod.debug)
+                if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
                     MoControlsMod.print("Control Mode changed: " + currentPlayerMode);
             }
         }
@@ -198,12 +199,12 @@ namespace TommoJProdutions.MoControls
                 {
                     cInput.ChangeKey(inControlMode[i, 0], inControlMode[i, 1], inControlMode[i, 2]);
                 }
-                if (MoControlsMod.debug)
+                if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
                     MoControlsMod.print(String.Format("<b><color=green>Successfully</color></b> loaded {0} inputs to cInput.", controlListName));
             }
             catch (NullReferenceException)
             {
-                if (MoControlsMod.debug)
+                if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
                     MoControlsMod.print(String.Format("control inputs was null; setting {0} inputs to current control settings.", controlListName));
                 if (inPlayerMode == PlayerModeEnum.OnFoot)
                     this.footControls = loadControlInputsFromCInput();
@@ -212,7 +213,7 @@ namespace TommoJProdutions.MoControls
             }
             catch
             {
-                if (MoControlsMod.debug)
+                if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
                     MoControlsMod.print(String.Format("<b><color=red>Unsuccessfully</color></b> loaded {0} inputs to cInput.", controlListName));
                 throw;
             }            
@@ -261,13 +262,13 @@ namespace TommoJProdutions.MoControls
                     controls[i, 1] = cInput.GetText(inputNames[i], 1);
                     controls[i, 2] = cInput.GetText(inputNames[i], 2);
                 }
-                if (MoControlsMod.debug)
+                if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
                     MoControlsMod.print("<b><color=green>Successfully</color></b> loaded game control inputs from cInput.");
                 return controls;
             }
             catch (Exception ex)
             {
-                if (MoControlsMod.debug)
+                if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
                     MoControlsMod.print("<b><color=red>Unsuccessfully</color></b> loaded game control inputs from cInput.");
                 ModConsole.Error(ex.ToString());
                 throw;
@@ -295,7 +296,8 @@ namespace TommoJProdutions.MoControls
 
             if (inIndex != 1 && inIndex != 2)
             {
-                ModConsole.Error("<b>C285 PControlManager</b>\r\nIndex out of range for game control editing...");
+                if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
+                    MoControlsMod.print("<b>C285 PControlManager</b>\r\nIndex out of range for game control editing...");
                 throw new IndexOutOfRangeException();
             }
             if (inMode == PlayerModeEnum.Driving)

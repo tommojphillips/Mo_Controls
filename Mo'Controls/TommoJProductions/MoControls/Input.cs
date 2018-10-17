@@ -2,9 +2,9 @@
 using UnityEngine;
 using uInput = UnityEngine.Input;
 using XInputDotNetPure;
-using TommoJProdutions.MoControls.XInputInterpreter;
+using TommoJProductions.MoControls.XInputInterpreter;
 
-namespace TommoJProdutions.MoControls
+namespace TommoJProductions.MoControls
 {
     public class Input
     {

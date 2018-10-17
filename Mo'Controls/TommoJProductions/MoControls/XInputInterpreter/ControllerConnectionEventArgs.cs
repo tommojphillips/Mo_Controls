@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TommoJProdutions.MoControls.XInputInterpreter
+namespace TommoJProductions.MoControls.XInputInterpreter
 {
     /// <summary>
     /// Represents event data for the when the controllers connection changes.

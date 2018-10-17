@@ -5,39 +5,12 @@ using gui = UnityEngine.GUILayout;
 using ueGUI = UnityEngine.GUI;
 using MSCLoader;
 using HutongGames.PlayMaker;
-using TommoJProdutions.MoControls.MouseEmulation;
-using TommoJProdutions.MoControls.XInputInterpreter;
+using TommoJProductions.MoControls.MouseEmulation;
+using TommoJProductions.MoControls.XInputInterpreter;
 using XInputDotNetPure;
 
-namespace TommoJProdutions.MoControls.GUI
+namespace TommoJProductions.MoControls.GUI
 {
-    /// <summary>
-    /// Represents xbox extention methods.
-    /// </summary>
-    public static class XboxExtentions
-    {
-        // Written, 09.10.2018
-
-        public static void forEach(this XboxControl[] inXboxControl, Func<Action<XboxControl>> inFunc)
-        {
-            // Written, 09.10.2018
-            try
-            {
-
-                if (inFunc is null)
-                    throw new NullReferenceException();
-                inFunc?.Invoke();
-            }
-            catch (NullReferenceException ex)
-            {
-                if (MoControlsMod.debug)
-                    MoControlsMod.print(String.Format("<i>[XboxExtentions.forEach(this XboxControl, Action)]</i> - <color=red>Action was null\r\n<b>StackTrace:</b> {0}</color>",
-                        ex.StackTrace));
-                return;
-            }
-        }
-    }
-
     /// <summary>
     /// Represents the GUI for the mod, <see cref="MoControlsMod"/>.
     /// </summary>
@@ -199,7 +172,7 @@ namespace TommoJProdutions.MoControls.GUI
         {
             // Written, 08.10.2018
 
-            if (MoControlsMod.debug)
+            if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
                 MoControlsMod.print(nameof(MoControlsGUI) + ": Started");
         }
         /// <summary>
@@ -241,7 +214,7 @@ namespace TommoJProdutions.MoControls.GUI
 
             try
             {
-                UnityEngine.GUI.skin = ModLoader.guiskin;
+                ueGUI.skin = ModLoader.guiskin;
                 if (this.controlsGuiOpened)
                 {
                     this.drawMainMenuGUI();
@@ -249,9 +222,13 @@ namespace TommoJProdutions.MoControls.GUI
                 }
                 else
                 {
-                    if (this.controlManager.displayCurrentPlayerModeOverlay)
+                    if (!MoControlsMod.menuLoad)
                     {
-                        this.drawPlayerModeOverlayGUI();
+
+                        if (this.controlManager.displayCurrentPlayerModeOverlay)
+                        {
+                            this.drawPlayerModeOverlayGUI();
+                        }
                     }
                 }
             }
@@ -289,7 +266,7 @@ namespace TommoJProdutions.MoControls.GUI
             using (new gui.AreaScope(new Rect(MAIN_GUI_LEFT, (MENU_GUI_TOP + MENU_GUI_HEIGHT), this.mainGuiWidth, (Screen.height - (MAIN_GUI_TOP + MENU_GUI_TOP + MENU_GUI_HEIGHT)))))
             using (gui.ScrollViewScope scrollViewScope = new gui.ScrollViewScope(this.mainGUIScrollPosition, new GUILayoutOption[] { gui.Width(this.mainGuiWidth) }))
             using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width(this.mainGuiWidth - SCROLL_BAR_OFFSET), gui.MaxWidth(this.mainGuiWidth - SCROLL_BAR_OFFSET) }))
-            {                
+            {
                 this.mainGUIScrollPosition = scrollViewScope.scrollPosition;
                 gui.Label(String.Format("<b>{0} v{1} by {2}</b>", this.mod.Name, this.mod.Version, this.mod.Author));
                 if (this.mainGUIMenu != MainGUIMenuEnum.About)
@@ -420,7 +397,7 @@ namespace TommoJProdutions.MoControls.GUI
         private void drawControllerInputContent()
         {
             // Written, 09.10.2018
-            
+
             using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width((this.mainGuiWidth - SCROLL_BAR_OFFSET - 12.5f) / 2) }))
             {
                 gui.Label("<b>Xbox Controller Input Editor.</b>");
@@ -452,7 +429,7 @@ namespace TommoJProdutions.MoControls.GUI
                     else
                         ueGUI.backgroundColor = this.secondaryItemColor;
                     this.drawCommonControllerInputControl(xCon, _readonly: (this.xboxControllerInputOption != XboxControllerInputMapEnum.Custom));
-                }            
+                }
             }
         }
         /// <summary>
@@ -468,7 +445,7 @@ namespace TommoJProdutions.MoControls.GUI
                 gui.Space(5f);
                 gui.Label("<i><b>Xbox Controller Status:</b> <color=" + (this.xboxController.isConnected ? "green>Connected" : "red>Disconnected") + "</color>.</i>");
                 if (this.xboxController.isConnected)
-                {                    
+                {
                     // Triggers
                     ueGUI.backgroundColor = this.primaryItemColor;
                     using (new gui.VerticalScope("box"))
@@ -667,7 +644,7 @@ namespace TommoJProdutions.MoControls.GUI
                             this.mouseEmulator.inputType = InputTypeEnum.DPad;
                             saveSettings = true;
                         }
-                    }                    
+                    }
                 }
             }
             gui.Space(5f);
@@ -711,7 +688,7 @@ namespace TommoJProdutions.MoControls.GUI
                         this.drawCommonControl("Input", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Key.ToString(), 2, inMod: this.mod);
                     }
                 }
-                
+
                 gui.Space(3f);
                 ueGUI.backgroundColor = this.secondaryItemColor;
                 using (new gui.VerticalScope("box"))
@@ -834,7 +811,7 @@ namespace TommoJProdutions.MoControls.GUI
             XboxControl xboxControl = this.xboxController?.getXboxControlByInputName(inInputName);
             bool buttonClicked = false;
             ueGUI.backgroundColor = this.unselectedMenuButtonColor;
-            if (xboxControl != null && reassignMessage == null && this.xboxController.assetsLoaded)
+            if (xboxControl?.texture != null && reassignMessage == null && MoControlsMod.assetsLoaded)
             {
                 if (gui.Button(xboxControl.texture))
                 {
@@ -843,7 +820,7 @@ namespace TommoJProdutions.MoControls.GUI
             }
             else
             {
-                if (gui.Button(reassignMessage ?? (!this.xboxController.assetsLoaded ? "Asset not loaded" : "") + inInputName))
+                if (gui.Button(reassignMessage ?? (!MoControlsMod.assetsLoaded && xboxControl?.texture == null ? "<b><color=red>Asset not loaded</color></b> " : "") + inInputName))
                 {
                     buttonClicked = true;
                 }
@@ -909,7 +886,7 @@ namespace TommoJProdutions.MoControls.GUI
                     modKeybind.Key = (KeyCode)Enum.Parse(typeof(KeyCode), input);
                 }
                 ModSettings_menu.SaveModBinds(this.changeInputResult.mod);
-                if (MoControlsMod.debug)
+                if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
                     MoControlsMod.print("saved mo'controls MSCLoader mod keybinds.");
 
             }

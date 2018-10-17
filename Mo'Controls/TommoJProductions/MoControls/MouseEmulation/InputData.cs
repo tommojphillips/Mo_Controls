@@ -1,4 +1,4 @@
-﻿namespace TommoJProdutions.MoControls.MouseEmulation
+﻿namespace TommoJProductions.MoControls.MouseEmulation
 {
     /// <summary>
     /// Represents a super structure for input data of the C++ function SendInput

@@ -1,6 +1,6 @@
 ﻿using XInputDotNetPure;
 
-namespace TommoJProdutions.MoControls.XInputInterpreter
+namespace TommoJProductions.MoControls.XInputInterpreter
 {
     /// <summary>
     /// Represents an xbox controller button.

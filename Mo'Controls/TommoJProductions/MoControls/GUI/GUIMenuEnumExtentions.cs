@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Text;
+using System.Linq;
 
-namespace TommoJProdutions.MoControls.GUI
+namespace TommoJProductions.MoControls.GUI
 {
     public static class GUIMenuEnumExtentions
     {
@@ -76,6 +77,10 @@ namespace TommoJProdutions.MoControls.GUI
                     break;
                 case "Smoking":
                     alias = "Smoke";
+                    break;
+                case "Handbrake":
+                    MSCLoader.Mod mod = MSCLoader.ModLoader.LoadedMods.Where(_mod => _mod.ID == "handbrakemod").ToArray()?[0];
+                        alias = mod is null ? "Handbrake" : "Handbrake; <color=green>Using Handbrake Mod v" + mod.Version + "</color>";
                     break;
                 default:
                     if (String.IsNullOrEmpty(gameControlName))

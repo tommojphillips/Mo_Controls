@@ -1,4 +1,4 @@
-﻿namespace TommoJProdutions.MoControls.GUI
+﻿namespace TommoJProductions.MoControls.GUI
 {
     public enum MainGUIMenuEnum
     {

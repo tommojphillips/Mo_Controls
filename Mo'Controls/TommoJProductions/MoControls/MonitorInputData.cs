@@ -1,4 +1,4 @@
-﻿namespace TommoJProdutions.MoControls
+﻿namespace TommoJProductions.MoControls
 {
     /// <summary>
     /// Reprsents monitor input data for <see cref="Input.monitorForInput"/>.

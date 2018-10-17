@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace TommoJProdutions.MoControls.XInputInterpreter.Monitoring
+namespace TommoJProductions.MoControls.XInputInterpreter.Monitoring
 {
     /// <summary>
     /// Represents monitoring methods for monitoring controller connections.
@@ -24,12 +24,12 @@ namespace TommoJProdutions.MoControls.XInputInterpreter.Monitoring
             {
                 if (value)
                 {
-                    if (MoControlsMod.debug)
+                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
                         MoControlsMod.print("Started Monitoring for controller connections...");
                 }
                 else
                 {
-                    if (MoControlsMod.debug)
+                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
                         MoControlsMod.print("Stopped Monitoring for controller connections...");
                 }
                 this.monitor = value;

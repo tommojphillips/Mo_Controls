@@ -61,12 +61,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TommoJProductions\AssetHolder.cs" />
+    <Compile Include="TommoJProductions\MoControls\AssetHolder.cs" />
     <Compile Include="TommoJProductions\MoControls\ChangeInput.cs" />
     <Compile Include="TommoJProductions\MoControls\ControlManager.cs" />
-    <Compile Include="TommoJProductions\MoControls\Debugging\Assets_DebugConsoleCommand.cs" />
-    <Compile Include="TommoJProductions\MoControls\Debugging\DebugConsoleCommand.cs" />
-    <Compile Include="TommoJProductions\MoControls\Debugging\BaseConsoleCommand.cs" />
+    <Compile Include="TommoJProductions\MoControls\DebugConsoleCommand.cs" />
+    <Compile Include="TommoJProductions\MoControls\Debugging\DebugTypeEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\Input.cs" />
     <Compile Include="TommoJProductions\MoControls\GUI\MainGUIMenuEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\GUI\GUIMenuEnumExtentions.cs" />

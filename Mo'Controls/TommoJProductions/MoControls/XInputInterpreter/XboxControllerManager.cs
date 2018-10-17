@@ -1,8 +1,8 @@
 ﻿using System;
-using TommoJProdutions.MoControls.XInputInterpreter.Monitoring;
+using TommoJProductions.MoControls.XInputInterpreter.Monitoring;
 using UnityEngine;
 
-namespace TommoJProdutions.MoControls.XInputInterpreter
+namespace TommoJProductions.MoControls.XInputInterpreter
 {
     /// <summary>
     /// Represents an xbox controller manager, that manages xbox controllers that are added to it.
@@ -101,7 +101,7 @@ namespace TommoJProdutions.MoControls.XInputInterpreter
                     this.addController(new XboxController(i));
                 }
                 this.monitorControllerConnections = this.gameObject.AddComponent<MonitorControllerConnections>();
-                if (MoControlsMod.debug)
+                if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
                     MoControlsMod.print(nameof(XboxControllerManager) + ": Started");
             }
             catch (Exception ex)

@@ -1,4 +1,4 @@
-﻿namespace TommoJProdutions.MoControls.XInputInterpreter
+﻿namespace TommoJProductions.MoControls.XInputInterpreter
 {
     public class XboxJoystick
     {

@@ -1,9 +1,9 @@
 ﻿using System;
-using TommoJProdutions.MoControls.MouseEmulation;
-using TommoJProdutions.MoControls.XInputInterpreter;
+using TommoJProductions.MoControls.MouseEmulation;
+using TommoJProductions.MoControls.XInputInterpreter;
 using MSCLoader;
 
-namespace TommoJProdutions.MoControls
+namespace TommoJProductions.MoControls
 {
     public class MoControlsSaveData
     {
@@ -26,7 +26,7 @@ namespace TommoJProdutions.MoControls
         {
             get
             {
-                string[,] currentControlInputs = ControlManager.loadControlInputsFromCInput();
+                string[,] currentControlInputs = MoControlsMod.menuLoad ? new string[ControlManager.inputNames.Length, 5] : ControlManager.loadControlInputsFromCInput();
                 return new MoControlsSaveData()
                 {
                     showXboxVirtualAxesGui = false,
@@ -124,17 +124,28 @@ namespace TommoJProdutions.MoControls
                         { "fifth", "None", "None", },
                         { "sixth", "None", "None", },
                     },
-                    debugMode = false,
+                    debugMode = Debugging.DebugTypeEnum.none,
                     xboxControllerInput = XboxControllerInputMapEnum.Norm, 
                     customControllerInputControls = new XboxControl[24],
+                    playerSeenMscLoaderVersionError = false
                 };
             }
         }
 
         #endregion
 
-        #region Fields
+        #region Properties
 
+        public static MoControlsSaveData loadedSaveData
+        {
+            get;
+            private set;
+        }
+        public bool playerSeenMscLoaderVersionError
+        {
+            get;
+            set;
+        }
         public XboxControl[] customControllerInputControls
         {
             get;
@@ -145,7 +156,7 @@ namespace TommoJProdutions.MoControls
             get;
             set;
         }
-        public bool debugMode
+        public Debugging.DebugTypeEnum debugMode
         {
             get;
             set;
@@ -221,6 +232,7 @@ namespace TommoJProdutions.MoControls
                 debugMode = MoControlsMod.debug,
                 customControllerInputControls = MoControlsGO.xboxController.customXboxControls,
                 xboxControllerInput = MoControlsGO.xboxController.xboxControllerInput,
+                playerSeenMscLoaderVersionError = MoControlsMod.instance.playerSeenMscLoaderVersionError,
             };
             saveSettings(MoControlsMod.instance, mcsd);
         }
@@ -232,7 +244,7 @@ namespace TommoJProdutions.MoControls
             // Written, 22.08.2018
 
             SaveLoad.SerializeSaveFile(mo_Controls, mcsd, fileName + fileExtention);
-            if (MoControlsMod.debug)
+            if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
                 MoControlsMod.print("saved mo'controls data.");
         }
         /// <summary>
@@ -242,23 +254,43 @@ namespace TommoJProdutions.MoControls
         {
             // Written, 20.08.2018
 
-            MoControlsSaveData mcsd;
-            try
+            if (loadedSaveData is null)
             {
-                mcsd = SaveLoad.DeserializeSaveFile<MoControlsSaveData>(MoControlsMod.instance, fileName + fileExtention);
-                if (mcsd == null)
-                    throw new NullReferenceException();
+                bool createNewSaveFile = false;
+                MoControlsSaveData mcsd = null;
+                try
+                {
+                    mcsd = SaveLoad.DeserializeSaveFile<MoControlsSaveData>(MoControlsMod.instance, fileName + fileExtention);
+                    if (mcsd == null)
+                        throw new NullReferenceException();
+                }
+                catch (NullReferenceException)
+                {
+                    createNewSaveFile = true;                    
+                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
+                        MoControlsMod.print("Save file does not exist, creating save file.");
+                }
+                catch (Exception ex)
+                {
+                    createNewSaveFile = true;
+                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
+                        MoControlsMod.print("an error occured while loading the file.. overriding with new save file.");
+                }
+                if (createNewSaveFile)
+                {
+                    mcsd = defaultSave;
+                    saveSettings(MoControlsMod.instance, mcsd);
+                }
+                if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
+                    MoControlsMod.print("loaded mo'controls data.");
+                return mcsd;
             }
-            catch (NullReferenceException)
+            else
             {
-                mcsd = defaultSave;
-                if (MoControlsMod.debug)
-                    MoControlsMod.print("Save file does not exist, creating save file.");
-                saveSettings(MoControlsMod.instance, mcsd);
+                if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
+                    MoControlsMod.print("Mo'Controls save data was already loaded; passed the save data on.");
+                return loadedSaveData;
             }
-            if (MoControlsMod.debug)
-                MoControlsMod.print("loaded mo'controls data.");
-            return mcsd;            
         }
 
         #endregion
