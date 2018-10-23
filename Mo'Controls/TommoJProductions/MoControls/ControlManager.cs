@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using HutongGames.PlayMaker;
 using MSCLoader;
 using TommoJProductions.MoControls.Debugging;
@@ -41,6 +42,7 @@ namespace TommoJProductions.MoControls
             "Zoom",
             "Use",
             "Crouch",
+            "Watch",
             "ReachLeft",
             "ReachRight",
             "Hitchhike",
@@ -287,7 +289,7 @@ namespace TommoJProductions.MoControls
             this.drivingControls = inDrivingControls;
         }
         /// <summary>
-        /// 
+        /// Sets the provided game control in provided mode.
         /// </summary>
         /// <param name="inMode"></param>
         public void setGameControl(PlayerModeEnum inMode, string inControlName, int inIndex, string inInput)
@@ -300,34 +302,96 @@ namespace TommoJProductions.MoControls
                     MoControlsMod.print("<b>C285 PControlManager</b>\r\nIndex out of range for game control editing...");
                 throw new IndexOutOfRangeException();
             }
-            if (inMode == PlayerModeEnum.Driving)
+            switch (inMode)
             {
-                for (int i = 0; i < this.drivingControls.GetLength(0); i++)
-                {
-                    string _controlName = this.drivingControls[i, 0];
-                    if (inControlName == _controlName)
+                case PlayerModeEnum.Driving:
+                    for (int i = 0; i < this.drivingControls.GetLength(0); i++)
                     {
-                        this.drivingControls[i, inIndex] = inInput;
-                        break;
+                        string _controlName = this.drivingControls[i, 0];
+                        if (inControlName == _controlName)
+                        {
+                            this.drivingControls[i, inIndex] = inInput;
+                            break;
+                        }
                     }
+                    if (this.currentPlayerMode == inMode)
+                        this.loadControlModeToCInput(inMode, this.drivingControls);
+                    break;
+                case PlayerModeEnum.OnFoot:
+                    for (int i = 0; i < this.footControls.GetLength(0); i++)
+                    {
+                        string _controlName = this.footControls[i, 0];
+                        if (inControlName == _controlName)
+                        {
+                            this.footControls[i, inIndex] = inInput;
+                            break;
+                        }
+                    }
+                    if (this.currentPlayerMode == inMode)
+                        this.loadControlModeToCInput(inMode, this.footControls);
+                    break;
+            }
+        }
+        /// <summary>
+        /// Changes the input for a control defined in <see cref="changeInputResult"/> to the provided input string, <paramref name="input"/>.
+        /// </summary>
+        /// <param name="input">The input to assign.</param>
+        public void changeInput(string input)
+        {
+            // Written, 09.07.2018
+
+            if (!this.changeInputResult.isModKeybind)
+            {
+                // Treat as a game control.
+
+                PlayerModeEnum? playerMode = this.changeInputResult?.mode;
+
+                if (playerMode == null)
+                {
+                    bool mistake = true;
+                    ModUI.ShowYesNoMessage("Player Mode was null, is that right?", "Mistake?", delegate ()
+                    {
+                        mistake = false;
+                    });
+                    if (!mistake)
+                    {
+
+                        if (this.changeInputResult.index == 1)
+                            cInput.ChangeKey(this.changeInputResult.controlName, input, cInput.GetText(this.changeInputResult.controlName, 2));
+                        else
+                            cInput.ChangeKey(this.changeInputResult.controlName, cInput.GetText(this.changeInputResult.controlName, 1), input);
+                        this.currentControls = loadControlInputsFromCInput();
+                    }
+                    if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
+                        MoControlsMod.print("Player mode wasa null while attempting to change input..");
                 }
-                if (this.currentPlayerMode == inMode)
-                    this.loadControlModeToCInput(inMode, this.drivingControls);
+                else
+                {
+                        this.setGameControl((PlayerModeEnum)playerMode, this.changeInputResult.controlName, this.changeInputResult.index, input);                  
+                    if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
+                        MoControlsMod.print("Player mode was equal to <b>" + this.changeInputResult.mode + "</b> whiling setting '" + this.changeInputResult.controlName + "' to '" + input + "'.");
+                    MoControlsSaveData.saveSettings(MoControlsMod.moControlsGO);
+                }
             }
             else
             {
-                for (int i = 0; i < this.footControls.GetLength(0); i++)
+                // Treat as a mod keybind.
+
+                Keybind modKeybind = Keybind.Get(this.changeInputResult.mod).Where(kb => kb.ID == this.changeInputResult.controlName).First();
+                if (this.changeInputResult.index == 1)
                 {
-                    string _controlName = this.footControls[i, 0];
-                    if (inControlName == _controlName)
-                    {
-                        this.footControls[i, inIndex] = inInput;
-                        break;
-                    }
+                    modKeybind.Modifier = (KeyCode)Enum.Parse(typeof(KeyCode), input);
                 }
-                if (this.currentPlayerMode == inMode)
-                    this.loadControlModeToCInput(inMode, this.footControls);
+                else
+                {
+                    modKeybind.Key = (KeyCode)Enum.Parse(typeof(KeyCode), input);
+                }
+                ModSettings_menu.SaveModBinds(this.changeInputResult.mod);
+                if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
+                    MoControlsMod.print("saved <i>" + modKeybind.Mod.Name + "</i> mod keybinds.");
+
             }
+            this.changeInputResult = new ChangeInput();
         }
 
         #endregion

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using TommoJProductions.MoControls.XInputInterpreter;
 using UnityEngine;
 using XInputDotNetPure;
 using MSCLoader;
-using TommoJProductions.MoControls.XInputInterpreter;
 using NM = TommoJProductions.MoControls.MouseEmulation.NativeMethods;
 
 namespace TommoJProductions.MoControls.MouseEmulation
@@ -13,45 +13,6 @@ namespace TommoJProductions.MoControls.MouseEmulation
     {
         // Written, 01.08.2018
 
-        #region Properties / Fields
-
-        #region MSCLoader Settings
-
-        /// <summary>
-        /// Represents whether the mod should emulate the mouse.
-        /// </summary>
-        public static bool emulateMouse;
-        /// <summary>
-        /// Represents whether the mod should use the left thumbstick for mouse emulation.
-        /// </summary>
-        public static bool emulateMouse_useLeftThumbstick;
-        /// <summary>
-        /// Represents whether the mod should use the right thumbstick for mouse emulation.
-        /// </summary>
-        public static bool emulateMouse_useRightThumbstick;
-        /// <summary>
-        /// Represents whether the mod should use the d-pad for mouse emulation.
-        /// </summary>
-        public static bool emulateMouse_useDPad;
-        /// <summary>
-        /// Represents the current sensitivity for the mouse.
-        /// </summary>
-        public static float mouseSensitivity;
-        /// <summary>
-        /// Represents the current deadzone for the mouse.
-        /// </summary>
-        public static float mouseDeadzone;
-
-        #endregion
-
-        /// <summary>
-        /// Represents LMB input name.
-        /// </summary>
-        public const string LMB_INPUT_NAME = "LMB";
-        /// <summary>
-        /// Represents RMB input name.
-        /// </summary>
-        public const string RMB_INPUT_NAME = "RMB";
         /// <summary>
         /// Represents the primary input for LMB
         /// </summary>
@@ -68,6 +29,34 @@ namespace TommoJProductions.MoControls.MouseEmulation
         /// Represents the secondary input for RMB
         /// </summary>
         public Keybind rmbSecondaryInput = new Keybind(RMB_INPUT_NAME + "2", "RMB Secondary", KeyCode.Keypad2);
+
+        #region Properties / Fields
+
+
+        /// <summary>
+        /// Returns the current position of the cursor.
+        /// </summary>
+        public static Point getCursorPosition
+        {
+            get
+            {
+                Point point = new Point();
+                NativeMethods.GetCursorPos(out point);
+                return point;
+            }
+        }
+        /// <summary>
+        /// Represents whether the mod should emulate the mouse.
+        /// </summary>
+        public static bool emulateMouse;
+        /// <summary>
+        /// Represents the current sensitivity for the mouse.
+        /// </summary>
+        public static float mouseSensitivity;
+        /// <summary>
+        /// Represents the current deadzone for the mouse.
+        /// </summary>
+        public static float mouseDeadzone;
         /// <summary>
         /// Represents whether the current instance is emulating mouse movement.
         /// </summary>
@@ -90,18 +79,6 @@ namespace TommoJProductions.MoControls.MouseEmulation
                         MoControlsMod.print("Stopped Emulating mouse..");
                 }
                 emulateMouse = value;
-            }
-        }
-        /// <summary>
-        /// Returns the current position of the cursor.
-        /// </summary>
-        public static Point getCursorPosition
-        {
-            get
-            {
-                Point point = new Point();
-                NativeMethods.GetCursorPos(out point);
-                return point;
             }
         }
         /// <summary>
@@ -147,7 +124,7 @@ namespace TommoJProductions.MoControls.MouseEmulation
             {
                 mouseSensitivity = value;
             }
-        }
+        }        
 
         // Mouse Constants
         /// <summary>
@@ -174,12 +151,34 @@ namespace TommoJProductions.MoControls.MouseEmulation
         /// Represents the max sensitivity.
         /// </summary>
         public const float MAX_SENSITIVITY = 100f;        
-
+        /// <summary>
+        /// Represents the mouse move event.
+        /// </summary>
         private const uint MOUSEEVENTF_MOVE = 0x0001;
+        /// <summary>
+        /// Represents the mouse left down event.
+        /// </summary>
         private const int MOUSEEVENTF_LEFTDOWN = 0x02;
+        /// <summary>
+        /// Represents the mouse left up event.
+        /// </summary>
         private const int MOUSEEVENTF_LEFTUP = 0x04;
+        /// <summary>
+        /// Represents the mouse right down event
+        /// </summary>
         private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
+        /// <summary>
+        /// Represents the mouse right up event
+        /// </summary>
         private const int MOUSEEVENTF_RIGHTUP = 0x10;
+        /// <summary>
+        /// Represents LMB input name.
+        /// </summary>
+        public const string LMB_INPUT_NAME = "mocontrolsLMB";
+        /// <summary>
+        /// Represents RMB input name.
+        /// </summary>
+        public const string RMB_INPUT_NAME = "mocontrolsRMB";
 
         #endregion
 
@@ -343,7 +342,7 @@ namespace TommoJProductions.MoControls.MouseEmulation
             int X = tempCursPos.X;
             int Y = tempCursPos.Y;
             NM.mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, X, Y, 0, 0);
-        }
+        }        
 
         #endregion
     }

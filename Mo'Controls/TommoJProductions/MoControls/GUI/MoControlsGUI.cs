@@ -201,7 +201,7 @@ namespace TommoJProductions.MoControls.GUI
                 {
                     MonitorInputData mid = Input.monitorForInput();
                     if (mid.foundInput)
-                        this.changeInput(mid.input);
+                        this.controlManager.changeInput(mid.input);
                 }
             }
         }
@@ -744,7 +744,7 @@ namespace TommoJProductions.MoControls.GUI
                         {
                             if (this.changeInputResult.reassignKey)
                             {
-                                this.changeInput(xboxControl.inputName);
+                                this.controlManager.changeInput(xboxControl.inputName);
                             }
                         }
                     }
@@ -828,67 +828,6 @@ namespace TommoJProductions.MoControls.GUI
             }
         }
         /// <summary>
-        /// Changes the input for a control defined in <see cref="changeInputResult"/> to the provided input string, <paramref name="input"/>.
-        /// </summary>
-        /// <param name="input"></param>
-        private void changeInput(string input)
-        {
-            // Written, 09.07.2018
-
-            if (!this.changeInputResult.isModKeybind)
-            {
-                // Treat as a game control.
-
-                PlayerModeEnum? playerMode = this.changeInputResult?.mode;
-
-                if (playerMode == null)
-                {
-                    bool mistake = true;
-                    ModUI.ShowYesNoMessage("Player Mode was null, is that right?", "Mistake?", delegate ()
-                    {
-                        mistake = false;
-                    });
-                    if (!mistake)
-                    {
-
-                        if (this.changeInputResult.index == 1)
-                        {
-                            cInput.ChangeKey(this.changeInputResult.controlName, input, cInput.GetText(this.changeInputResult.controlName, 2));
-                        }
-                        else
-                        {
-                            cInput.ChangeKey(this.changeInputResult.controlName, cInput.GetText(this.changeInputResult.controlName, 1), input);
-                        }
-                        this.controlManager.currentControls = ControlManager.loadControlInputsFromCInput();
-                    }
-                }
-                else
-                {
-                    this.controlManager.setGameControl((PlayerModeEnum)playerMode, this.changeInputResult.controlName, this.changeInputResult.index, input);
-                    MoControlsSaveData.saveSettings(MoControlsMod.moControlsGO);
-                }
-            }
-            else
-            {
-                // Treat as a mod keybind.
-
-                Keybind modKeybind = Keybind.Get(this.changeInputResult.mod).Where(kb => kb.ID == this.changeInputResult.controlName).First();
-                if (this.changeInputResult.index == 1)
-                {
-                    modKeybind.Modifier = (KeyCode)Enum.Parse(typeof(KeyCode), input);
-                }
-                else
-                {
-                    modKeybind.Key = (KeyCode)Enum.Parse(typeof(KeyCode), input);
-                }
-                ModSettings_menu.SaveModBinds(this.changeInputResult.mod);
-                if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                    MoControlsMod.print("saved mo'controls MSCLoader mod keybinds.");
-
-            }
-            this.changeInputResult = new ChangeInput();
-        }
-        /// <summary>
         /// draws the control input list.
         /// </summary>
         /// <param name="inControlInputs">The list to draw.</param>
@@ -967,26 +906,36 @@ namespace TommoJProductions.MoControls.GUI
                         gui.Label(String.Format("<b>{0}</b>, by <b>{1}</b>:", _mod.Name, _mod.Author));
                         using (new gui.VerticalScope())
                         {
+                            bool ignoreKb = false;
                             for (int i = 0; i < modKeybinds.Length; i++)
                             {
-                                j++;
-                                if (j == 2)
+
+                                if (_mod is MoControlsMod)
                                 {
-                                    j = 0;
-                                    ueGUI.backgroundColor = this.primaryItemColor;
+                                    if (modKeybinds[i].ID != this.openControlsGui.ID)
+                                        ignoreKb = true;
                                 }
-                                else
-                                    ueGUI.backgroundColor = this.secondaryItemColor;
-                                using (new gui.VerticalScope("box"))
+                                if (!ignoreKb)
                                 {
-                                    gui.Label(String.Format("<b>{0}:</b>", modKeybinds[i].Name));
-                                    using (new gui.HorizontalScope())
+                                    j++;
+                                    if (j == 2)
                                     {
-                                        this.drawCommonControl("Modifier", modKeybinds[i].ID, modKeybinds[i].Modifier.ToString(), 1, inMod: _mod);
-                                        this.drawCommonControl("Input", modKeybinds[i].ID, modKeybinds[i].Key.ToString(), 2, inMod: _mod);
+                                        j = 0;
+                                        ueGUI.backgroundColor = this.primaryItemColor;
                                     }
+                                    else
+                                        ueGUI.backgroundColor = this.secondaryItemColor;
+                                    using (new gui.VerticalScope("box"))
+                                    {
+                                        gui.Label(String.Format("<b>{0}:</b>", modKeybinds[i].Name));
+                                        using (new gui.HorizontalScope())
+                                        {
+                                            this.drawCommonControl("Modifier", modKeybinds[i].ID, modKeybinds[i].Modifier.ToString(), 1, inMod: _mod);
+                                            this.drawCommonControl("Input", modKeybinds[i].ID, modKeybinds[i].Key.ToString(), 2, inMod: _mod);
+                                        }
+                                    }
+                                    gui.Space(3f);
                                 }
-                                gui.Space(3f);
                             }
                         }
                     }

@@ -26,7 +26,7 @@ namespace TommoJProductions.MoControls
         {
             get
             {
-                string[,] currentControlInputs = ControlManager.loadControlInputsFromCInput();
+                ControlManager.loadControlInputsFromCInput();
                 return new MoControlsSaveData()
                 {
                     showXboxVirtualAxesGui = false,
@@ -62,6 +62,7 @@ namespace TommoJProductions.MoControls
                         { "Zoom", "None", "None", },
                         { "Use", "F", "None", },
                         { "Crouch", "C", "None", },
+                        { "Watch", "U", "None"},
                         { "ReachLeft", "Q", "None", },
                         { "ReachRight", "E", "None", },
                         { "Hitchhike", "O", "None", },
@@ -106,6 +107,7 @@ namespace TommoJProductions.MoControls
                         { "Zoom", "None", "None", },
                         { "Use", "F", "None", },
                         { "Crouch", "None", "None", },
+                        { "Watch", "U", "None"},
                         { "ReachLeft", "Q", "None", },
                         { "ReachRight", "E", "None", },
                         { "Hitchhike", "None", "None", },
@@ -125,9 +127,9 @@ namespace TommoJProductions.MoControls
                         { "sixth", "None", "None", },
                     },
                     debugMode = Debugging.DebugTypeEnum.none,
-                    xboxControllerInput = XboxControllerInputMapEnum.Norm, 
+                    xboxControllerInput = XboxControllerInputMapEnum.Norm,
                     customControllerInputControls = new XboxControl[24],
-                    playerSeenMscLoaderVersionError = false
+                    playerSeenMscLoaderVersionError = false,
                 };
             }
         }
@@ -206,7 +208,7 @@ namespace TommoJProductions.MoControls
             get;
             set;
         }
-
+        
         #endregion
 
         #region Methods
@@ -270,11 +272,11 @@ namespace TommoJProductions.MoControls
                     if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
                         MoControlsMod.print("Save file does not exist, creating save file.");
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     createNewSaveFile = true;
-                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                        MoControlsMod.print("an error occured while loading the file.. overriding with new save file.");
+                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.none))
+                        MoControlsMod.print("An error occured while loading the save file.. overriding with new save file. Maybe mod updated?");
                 }
                 if (createNewSaveFile)
                 {
