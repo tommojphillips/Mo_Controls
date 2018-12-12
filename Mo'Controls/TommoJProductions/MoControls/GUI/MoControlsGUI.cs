@@ -892,7 +892,7 @@ namespace TommoJProductions.MoControls.GUI
                     this.modKeybindCount += Keybind.Get(_mod).Count;
             }
             gui.Space(3f);
-            gui.Label(String.Format("<b>Total Mod Keybinds: {0}</b>", modKeybindCount));
+            gui.Label(String.Format("<b>Total Mod Keybinds: {0}</b>", modKeybindCount - 4 /* There are 4 hidden kb's for mouse buttons as of 13.12.2018, correcting stats with constant value. */));
             foreach (Mod _mod in ModLoader.LoadedMods)
             {
                 Keybind[] modKeybinds = Keybind.Get(_mod).ToArray();
@@ -906,16 +906,16 @@ namespace TommoJProductions.MoControls.GUI
                         gui.Label(String.Format("<b>{0}</b>, by <b>{1}</b>:", _mod.Name, _mod.Author));
                         using (new gui.VerticalScope())
                         {
-                            bool ignoreKb = false;
+                            bool ignoreKeybind = false;
                             for (int i = 0; i < modKeybinds.Length; i++)
                             {
 
                                 if (_mod is MoControlsMod)
                                 {
                                     if (modKeybinds[i].ID != this.openControlsGui.ID)
-                                        ignoreKb = true;
+                                        ignoreKeybind = true;
                                 }
-                                if (!ignoreKb)
+                                if (!ignoreKeybind)
                                 {
                                     j++;
                                     if (j == 2)

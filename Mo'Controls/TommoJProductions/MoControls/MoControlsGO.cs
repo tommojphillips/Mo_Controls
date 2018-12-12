@@ -149,7 +149,7 @@ namespace TommoJProductions.MoControls
                 MoControlsMod.debug = inSaveData.debugMode;
                 MoControlsMod.instance.playerSeenMscLoaderVersionError = inSaveData.playerSeenMscLoaderVersionError;
                 if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                    MoControlsMod.print("Pre-Settings Loaded");
+                    MoControlsMod.print("Pre-Settings loaded");
             }
             else
             {
@@ -169,14 +169,14 @@ namespace TommoJProductions.MoControls
                     if (startUp)
                     {
                         if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.partial))
-                            MoControlsMod.print("Settings Loaded");
+                            MoControlsMod.print("Start-Up settings loaded");
                     }
 
                 }
                 catch (NullReferenceException ex)
                 {
                     if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                        MSCLoader.ModConsole.Error("[MoControlsMod.setLoadedSettings] - " + ex.StackTrace);
+                        MSCLoader.ModConsole.Error("[MoControlsGO.setLoadedSettings] - " + ex.StackTrace);
                 }
             }
         }

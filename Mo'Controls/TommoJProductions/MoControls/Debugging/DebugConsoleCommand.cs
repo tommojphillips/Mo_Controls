@@ -1,6 +1,6 @@
 ﻿using MSCLoader;
 
-namespace TommoJProductions.MoControls
+namespace TommoJProductions.MoControls.Debugging
 {
     /// <summary>
     /// Represents the debug command for <see cref="MoControlsMod"/>.
@@ -20,22 +20,22 @@ namespace TommoJProductions.MoControls
                 switch (args[0])
                 {
                     case "0":
-                        MoControlsMod.debug = Debugging.DebugTypeEnum.none;
+                        MoControlsMod.debug = DebugTypeEnum.none;
                         break;
                     case "1":
-                        MoControlsMod.debug = Debugging.DebugTypeEnum.partial;
+                        MoControlsMod.debug = DebugTypeEnum.partial;
                         break;
                     case "2":
-                        MoControlsMod.debug = Debugging.DebugTypeEnum.full;
+                        MoControlsMod.debug = DebugTypeEnum.full;
                         break;
                     case "none":
-                        MoControlsMod.debug = Debugging.DebugTypeEnum.none;
+                        MoControlsMod.debug = DebugTypeEnum.none;
                         break;
                     case "partial":
-                        MoControlsMod.debug = Debugging.DebugTypeEnum.partial;
+                        MoControlsMod.debug = DebugTypeEnum.partial;
                         break;
                     case "full":
-                        MoControlsMod.debug = Debugging.DebugTypeEnum.full;
+                        MoControlsMod.debug = DebugTypeEnum.full;
                         break;
                     default:
                         MoControlsMod.print("debug mode does not exist.. Use:\r\n1.) none or '0'\r\n2.) partial or '1'\r\n3.) full or '2'");
