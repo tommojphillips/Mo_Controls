@@ -714,6 +714,9 @@ namespace TommoJProductions.MoControls.XInputInterpreter
                 this.LT.texture = MoControlsMod.assets.lt;
                 this.RT.texture = MoControlsMod.assets.rt;
 
+                this.RB.texture = MoControlsMod.assets.rb;
+                this.LB.texture = MoControlsMod.assets.lb;
+
                 this.DPadUp.texture = MoControlsMod.assets.dpup;
                 this.DPadDown.texture = MoControlsMod.assets.dpdown;
                 this.DPadLeft.texture = MoControlsMod.assets.dpleft;
