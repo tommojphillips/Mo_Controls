@@ -699,41 +699,50 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 20.07.2018
 
-            if (MoControlsMod.assetsLoaded)
+            try
             {
-                this.A.texture = MoControlsMod.assets.a;
-                this.B.texture = MoControlsMod.assets.b;
-                this.X.texture = MoControlsMod.assets.x;
-                this.Y.texture = MoControlsMod.assets.y;
-                this.Start.texture = MoControlsMod.assets.start;
-                this.Back.texture = MoControlsMod.assets.back;
+                if (MoControlsMod.assetsLoaded)
+                {
+                    this.A.texture = MoControlsMod.assets.a;
+                    this.B.texture = MoControlsMod.assets.b;
+                    this.X.texture = MoControlsMod.assets.x;
+                    this.Y.texture = MoControlsMod.assets.y;
+                    this.Start.texture = MoControlsMod.assets.start;
+                    this.Back.texture = MoControlsMod.assets.back;
 
-                this.LS.texture = MoControlsMod.assets.ls;
-                this.RS.texture = MoControlsMod.assets.rs;
+                    this.LS.texture = MoControlsMod.assets.ls;
+                    this.RS.texture = MoControlsMod.assets.rs;
 
-                this.LT.texture = MoControlsMod.assets.lt;
-                this.RT.texture = MoControlsMod.assets.rt;
+                    this.LT.texture = MoControlsMod.assets.lt;
+                    this.RT.texture = MoControlsMod.assets.rt;
 
-                this.RB.texture = MoControlsMod.assets.rb;
-                this.LB.texture = MoControlsMod.assets.lb;
+                    this.RB.texture = MoControlsMod.assets.rb;
+                    this.LB.texture = MoControlsMod.assets.lb;
 
-                this.DPadUp.texture = MoControlsMod.assets.dpup;
-                this.DPadDown.texture = MoControlsMod.assets.dpdown;
-                this.DPadLeft.texture = MoControlsMod.assets.dpleft;
-                this.DPadRight.texture = MoControlsMod.assets.dpright;
+                    this.DPadUp.texture = MoControlsMod.assets.dpup;
+                    this.DPadDown.texture = MoControlsMod.assets.dpdown;
+                    this.DPadLeft.texture = MoControlsMod.assets.dpleft;
+                    this.DPadRight.texture = MoControlsMod.assets.dpright;
 
-                this.leftThumbstick.up.texture = MoControlsMod.assets.lsup;
-                this.leftThumbstick.down.texture = MoControlsMod.assets.lsdown;
-                this.leftThumbstick.left.texture = MoControlsMod.assets.lsleft;
-                this.leftThumbstick.right.texture = MoControlsMod.assets.lsright;
+                    this.xboxControls[16].texture = MoControlsMod.assets.lsup;
+                    this.xboxControls[17].texture = MoControlsMod.assets.lsdown;
+                    this.xboxControls[18].texture = MoControlsMod.assets.lsleft;
+                    this.xboxControls[19].texture = MoControlsMod.assets.lsright;
 
-                this.rightThumbstick.up.texture = MoControlsMod.assets.rsup;
-                this.rightThumbstick.down.texture = MoControlsMod.assets.rsdown;
-                this.rightThumbstick.left.texture = MoControlsMod.assets.rsleft;
-                this.rightThumbstick.right.texture = MoControlsMod.assets.rsright;
+                    this.xboxControls[20].texture = MoControlsMod.assets.rsup;
+                    this.xboxControls[21].texture = MoControlsMod.assets.rsdown;
+                    this.xboxControls[22].texture = MoControlsMod.assets.rsleft;
+                    this.xboxControls[23].texture = MoControlsMod.assets.rsright;
+                }
+                else
+                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
+                        MoControlsMod.print("Assets cannot be loaded to instance of xbox controller as assets ain't loaded.");
             }
-            else
-                MoControlsMod.print("Assets cannot be loaded to instance of xbox controller as assets ain't loaded.");
+            catch (Exception ex)
+            {
+                if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
+                    MoControlsMod.print("An error occured while trying to load xbox controller assets.. Stacktrace:\r\n " + ex.StackTrace);
+            }
         }
         /// <summary>
         /// Gets an xbox control by input name.
