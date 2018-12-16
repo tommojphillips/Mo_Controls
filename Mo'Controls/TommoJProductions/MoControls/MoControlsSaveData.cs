@@ -127,9 +127,7 @@ namespace TommoJProductions.MoControls
                         { "sixth", "None", "None", },
                     },
                     debugMode = Debugging.DebugTypeEnum.none,
-                    xboxControllerInput = XboxControllerInputMapEnum.Norm,
-                    customControllerInputControls = new XboxControl[24],
-                    playerSeenMscLoaderVersionError = false,
+                    playerSeenMscLoaderVersionError = false
                 };
             }
         }
@@ -144,16 +142,6 @@ namespace TommoJProductions.MoControls
             private set;
         }
         public bool playerSeenMscLoaderVersionError
-        {
-            get;
-            set;
-        }
-        public XboxControl[] customControllerInputControls
-        {
-            get;
-            set;
-        }
-        public XboxControllerInputMapEnum xboxControllerInput
         {
             get;
             set;
@@ -232,8 +220,6 @@ namespace TommoJProductions.MoControls
                 footControls = MoControlsGO.controlManager.footControls,
                 drivingControls = MoControlsGO.controlManager.drivingControls,
                 debugMode = MoControlsMod.debug,
-                customControllerInputControls = MoControlsGO.xboxController.customXboxControls,
-                xboxControllerInput = MoControlsGO.xboxController.xboxControllerInput,
                 playerSeenMscLoaderVersionError = MoControlsMod.instance.playerSeenMscLoaderVersionError,
             };
             saveSettings(MoControlsMod.instance, mcsd);

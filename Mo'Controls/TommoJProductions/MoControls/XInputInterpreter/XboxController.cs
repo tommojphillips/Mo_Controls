@@ -22,15 +22,10 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// Represents the axis prefix.
         /// </summary>
         private static readonly string axisPrefix = "Joy Axis ";
-
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Represents the normal (go) xbox controls.
         /// </summary>
-        public static XboxControl[] normalXboxControls => new XboxControl[]
+        private static readonly XboxControl[] normalXboxControls = new XboxControl[]
         {
                 // Buttons
                 new XboxButton(String.Format("{0}0", buttonPrefix), "A", XboxControlTypeEnum.Button),
@@ -62,57 +57,11 @@ namespace TommoJProductions.MoControls.XInputInterpreter
                 new XboxControl(String.Format("{0}5-", axisPrefix), "RS-Up", XboxControlTypeEnum.Axis),
                 new XboxControl(String.Format("{0}5+", axisPrefix), "RS-Down", XboxControlTypeEnum.Axis)
         };
-        /// <summary>
-        /// Represents the alt Xbox Controls.
-        /// </summary>
-        public static XboxControl[] altXboxControls => new XboxControl[]
-        {                 
-                // Buttons
-                new XboxButton(Keys.XboxA, "A", XboxControlTypeEnum.Button),
-                new XboxButton(Keys.XboxB, "B", XboxControlTypeEnum.Button),
-                new XboxButton(Keys.XboxX, "X", XboxControlTypeEnum.Button),
-                new XboxButton(Keys.XboxY, "Y", XboxControlTypeEnum.Button),
-                new XboxButton(Keys.XboxBumperLeft, "LB", XboxControlTypeEnum.Button),
-                new XboxButton(Keys.XboxBumperRight, "RB", XboxControlTypeEnum.Button),
-                new XboxButton(Keys.XboxBack, "Back", XboxControlTypeEnum.Button),
-                new XboxButton(Keys.XboxStart, "Start", XboxControlTypeEnum.Button),
-                new XboxButton(Keys.XboxLStickButton, "LS", XboxControlTypeEnum.Button),
-                new XboxButton(Keys.XboxRStickButton, "RS", XboxControlTypeEnum.Button),
-                // D-Pad
-                new XboxButton(Keys.XboxDPadUp, "D-Pad Up", XboxControlTypeEnum.Axis),
-                new XboxButton(Keys.XboxDPadDown, "D-Pad Down", XboxControlTypeEnum.Axis),
-                new XboxButton(Keys.XboxDPadLeft, "D-Pad Left", XboxControlTypeEnum.Axis),
-                new XboxButton(Keys.XboxDPadRight, "D-Pad Right", XboxControlTypeEnum.Axis),
-                // Triggers
-                new XboxTriggerState(Keys.XboxTriggerLeft, "LT"),
-                new XboxTriggerState(Keys.XboxTriggerRight, "RT"),
-                // LS
-                new XboxControl(Keys.XboxLStickLeft, "LS-Left", XboxControlTypeEnum.Axis),
-                new XboxControl(Keys.XboxLStickRight, "LS-Right", XboxControlTypeEnum.Axis),
-                new XboxControl(Keys.XboxLStickUp, "LS-Up", XboxControlTypeEnum.Axis),
-                new XboxControl(Keys.XboxLStickDown, "LS-Down", XboxControlTypeEnum.Axis),
-                // RS
-                new XboxControl(Keys.XboxRStickLeft, "RS-Left", XboxControlTypeEnum.Axis),
-                new XboxControl(Keys.XboxRStickRight, "RS-Right", XboxControlTypeEnum.Axis),
-                new XboxControl(Keys.XboxRStickUp, "RS-Up", XboxControlTypeEnum.Axis),
-                new XboxControl(Keys.XboxRStickDown, "RS-Down", XboxControlTypeEnum.Axis)
-        };
-        /// <summary>
-        /// Represents the type of input for the xbox controller.
-        /// </summary>
-        public XboxControllerInputMapEnum xboxControllerInput
-        {
-            get;
-            private set;
-        }
-        /// <summary>
-        /// Represents the custom xbox controls.
-        /// </summary>
-        public XboxControl[] customXboxControls
-        {
-            get;
-            set;
-        }
+
+        #endregion
+
+        #region Properties
+
         /// <summary>
         /// Represents all the controls of an xbox controller.
         /// </summary>
@@ -784,28 +733,6 @@ namespace TommoJProductions.MoControls.XInputInterpreter
             // Written, 22.07.2018
 
             return this.xboxControls;
-        }
-        /// <summary>
-        /// Sets the input mode.
-        /// </summary>
-        /// <param name="xboxControllerInputEnum">The mode to set.</param>
-        public void setControllerInputType(XboxControllerInputMapEnum xboxControllerInputEnum)
-        {
-            // Writte, 09.10.2018
-
-            this.xboxControllerInput = xboxControllerInputEnum;
-            switch (this.xboxControllerInput)
-            {
-                case XboxControllerInputMapEnum.Norm:
-                    this.xboxControls = normalXboxControls;
-                    break;
-                case XboxControllerInputMapEnum.Alt:
-                    this.xboxControls = altXboxControls;
-                    break;
-                case XboxControllerInputMapEnum.Custom:
-                    this.xboxControls = this.customXboxControls;
-                    break;
-            }
         }
 
         #endregion

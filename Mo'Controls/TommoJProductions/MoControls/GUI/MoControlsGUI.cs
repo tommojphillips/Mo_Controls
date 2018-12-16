@@ -81,10 +81,6 @@ namespace TommoJProductions.MoControls.GUI
         /// </summary>
         private MainGUIMenuEnum mainGUIMenu;
         /// <summary>
-        /// Represents the option of input for the xbox controller*.
-        /// </summary>
-        private XboxControllerInputMapEnum xboxControllerInputOption;
-        /// <summary>
         /// Represent whether the mod should display the virtual gui.
         /// </summary>
         public bool showVirtualGui;
@@ -396,25 +392,9 @@ namespace TommoJProductions.MoControls.GUI
 
             using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width((this.mainGuiWidth - SCROLL_BAR_OFFSET - 12.5f) / 2) }))
             {
-                gui.Label("<b>Xbox Controller Input Editor.</b>");
-                this.drawConInputMenu();
-                XboxControl[] xboxControls = null;
-
-                switch (this.xboxControllerInputOption)
-                {
-                    case XboxControllerInputMapEnum.Norm:
-                        xboxControls = XboxController.normalXboxControls;
-                        break;
-                    case XboxControllerInputMapEnum.Alt:
-                        xboxControls = XboxController.altXboxControls;
-                        break;
-                    case XboxControllerInputMapEnum.Custom:
-                        xboxControls = xboxController.customXboxControls;
-                        break;
-                }
-                gui.Label((this.xboxControllerInputOption as XboxControllerInputMapEnum?).toString());
+                gui.Label("<b>Xbox Controller Input Viewer.</b>");               
                 int j = 0;
-                foreach (XboxControl xCon in xboxControls)
+                foreach (XboxControl xCon in this.xboxController.getXboxControls())
                 {
                     j++;
                     if (j == 2)
@@ -424,7 +404,13 @@ namespace TommoJProductions.MoControls.GUI
                     }
                     else
                         ueGUI.backgroundColor = this.secondaryItemColor;
-                    this.drawCommonControllerInputControl(xCon, _readonly: (this.xboxControllerInputOption != XboxControllerInputMapEnum.Custom));
+
+                    using (new gui.VerticalScope("box"))
+                    using (new gui.HorizontalScope())
+                    {
+                        gui.Label(xCon.texture);
+                        gui.Label(xCon.inputName);
+                    }
                 }
             }
         }
@@ -727,31 +713,6 @@ namespace TommoJProductions.MoControls.GUI
             }
         }
         /// <summary>
-        /// Draws the virtual xbox controller axes gui.
-        /// </summary>
-        private void drawVirtualXboxControllerAxesContent()
-        {
-            // Written, 10.07.2018
-
-            gui.Label("Virtual xbox controller axes");
-            foreach (XboxControl xboxControl in this.xboxController.getXboxControls())
-            {
-                if (xboxControl.controlType == XboxControlTypeEnum.Axis)
-                {
-                    using (new gui.VerticalScope("box"))
-                    {
-                        if (gui.Button(xboxControl.texture))
-                        {
-                            if (this.changeInputResult.reassignKey)
-                            {
-                                this.controlManager.changeInput(xboxControl.inputName);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        /// <summary>
         /// Draws display settings content to the main gui.
         /// </summary>
         private void drawDisplayContent()
@@ -981,41 +942,7 @@ namespace TommoJProductions.MoControls.GUI
                 return false;
             }
         }
-        /// <summary>
-        /// Represents common controller input control.
-        /// </summary>
-        /// <param name="inXboxControl"></param>
-        private void drawCommonControllerInputControl(XboxControl inXboxControl, bool _readonly)
-        {
-            // Written, 09.10.2018
-
-            using (new gui.VerticalScope("box"))
-            {
-                XboxControl xC = this.xboxController.getXboxControlByInputName(inXboxControl.inputName);
-                using (new gui.HorizontalScope())
-                {
-                    gui.Label(xC.texture);
-                    if (_readonly)
-                        gui.Label(xC.inputName);
-                    else
-                        inXboxControl.setInputName(gui.TextField(xC.inputName));
-                }
-            }
-        }
-        /// <summary>
-        /// Draws menu for controller input.
-        /// </summary>
-        private void drawConInputMenu()
-        {
-            // Written, 09.10.2018
-
-            if (this.drawGeneralMenu(this.xboxControllerInputOption, out XboxControllerInputMapEnum changedTo))
-            {
-                if (changedTo != XboxControllerInputMapEnum.Custom) // not implemented yet.
-                    this.xboxControllerInputOption = changedTo;
-            }
-        }
-
+       
         #endregion
     }
 }

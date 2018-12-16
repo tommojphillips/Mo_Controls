@@ -163,8 +163,6 @@ namespace TommoJProductions.MoControls
                     mouseEmulator.Emulating = inSaveData.emulateMouse;
                     controlManager.displayCurrentPlayerModeOverlay = inSaveData.displayCurrentPlayerModeOverlay;
                     controlManager.setControls(inSaveData.footControls, inSaveData.drivingControls);
-                    xboxController.customXboxControls = inSaveData.customControllerInputControls;
-                    xboxController.setControllerInputType(inSaveData.xboxControllerInput);
 
                     if (startUp)
                     {
