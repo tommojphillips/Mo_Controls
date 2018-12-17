@@ -64,7 +64,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="XInputDotNetPure">
-      <HintPath>..\Packages\Mo'Controls v1.0.7 Installation Package\Required References\XInputDotNetPure.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Summer Car\mysummercar_Data\Managed\XInputDotNetPure.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

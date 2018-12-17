@@ -673,15 +673,15 @@ namespace TommoJProductions.MoControls.XInputInterpreter
                     this.DPadLeft.texture = MoControlsMod.assets.dpleft;
                     this.DPadRight.texture = MoControlsMod.assets.dpright;
 
-                    this.xboxControls[16].texture = MoControlsMod.assets.lsup;
-                    this.xboxControls[17].texture = MoControlsMod.assets.lsdown;
-                    this.xboxControls[18].texture = MoControlsMod.assets.lsleft;
-                    this.xboxControls[19].texture = MoControlsMod.assets.lsright;
+                    this.xboxControls[16].texture = MoControlsMod.assets.lsleft;
+                    this.xboxControls[17].texture = MoControlsMod.assets.lsright;
+                    this.xboxControls[18].texture = MoControlsMod.assets.lsup;
+                    this.xboxControls[19].texture = MoControlsMod.assets.lsdown;
 
-                    this.xboxControls[20].texture = MoControlsMod.assets.rsup;
-                    this.xboxControls[21].texture = MoControlsMod.assets.rsdown;
-                    this.xboxControls[22].texture = MoControlsMod.assets.rsleft;
-                    this.xboxControls[23].texture = MoControlsMod.assets.rsright;
+                    this.xboxControls[20].texture = MoControlsMod.assets.rsleft;
+                    this.xboxControls[21].texture = MoControlsMod.assets.rsright;
+                    this.xboxControls[22].texture = MoControlsMod.assets.rsup;
+                    this.xboxControls[23].texture = MoControlsMod.assets.rsdown;
                 }
                 else
                     if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
