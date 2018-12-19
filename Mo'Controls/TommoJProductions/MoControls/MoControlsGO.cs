@@ -155,7 +155,6 @@ namespace TommoJProductions.MoControls
             {
                 try
                 {
-                    moControlsGui.showVirtualGui = inSaveData.showXboxVirtualAxesGui;
                     xboxControllerManager.monitorControllerConnections.Monitor = inSaveData.monitiorXboxControllerConnectionStatus;
                     mouseEmulator.deadzone = inSaveData.mouseDeadzone;
                     mouseEmulator.sensitivity = inSaveData.mouseSensitivity;

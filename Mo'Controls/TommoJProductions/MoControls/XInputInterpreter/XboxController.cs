@@ -25,7 +25,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the normal (go) xbox controls.
         /// </summary>
-        private static readonly XboxControl[] normalXboxControls = new XboxControl[]
+        internal static readonly XboxControl[] normalXboxControls = new XboxControl[]
         {
                 // Buttons
                 new XboxButton(String.Format("{0}0", buttonPrefix), "A", XboxControlTypeEnum.Button),
@@ -463,6 +463,21 @@ namespace TommoJProductions.MoControls.XInputInterpreter
 
             XboxButton button = this.inputMap[xboxButton.toString()];
             if (button.previousState == ButtonState.Released && button.state == ButtonState.Pressed)
+            {
+                return true;
+            }
+            return false;
+        }
+        /// <summary>
+        /// Returns true if the provided <see cref="XboxButtonEnum"/> has been pressed and released.
+        /// </summary>
+        /// <param name="xboxButton">The button to check.</param>
+        public bool getButtonUp(XboxButtonEnum xboxButton)
+        {
+            // Written, 20.12.2018
+
+            XboxButton button = this.inputMap[xboxButton.toString()];
+            if (button.previousState == ButtonState.Pressed && button.state == ButtonState.Released)
             {
                 return true;
             }

@@ -29,7 +29,6 @@ namespace TommoJProductions.MoControls
                 ControlManager.loadControlInputsFromCInput();
                 return new MoControlsSaveData()
                 {
-                    showXboxVirtualAxesGui = false,
                     monitiorXboxControllerConnectionStatus = true,
                     emulateMouse = false,
                     mouseDeadzone = MouseEmulator.DEFAULT_DEADZONE,
@@ -151,11 +150,6 @@ namespace TommoJProductions.MoControls
             get;
             set;
         }
-        public bool showXboxVirtualAxesGui
-        {
-            get;
-            set;
-        }
         public bool monitiorXboxControllerConnectionStatus
         {
             get;
@@ -210,7 +204,6 @@ namespace TommoJProductions.MoControls
 
             MoControlsSaveData mcsd = new MoControlsSaveData()
             {
-                showXboxVirtualAxesGui = MoControlsGO.moControlsGui.showVirtualGui,
                 monitiorXboxControllerConnectionStatus = MoControlsGO.xboxControllerManager.monitorControllerConnections.Monitor,
                 emulateMouse = MoControlsGO.mouseEmulator.Emulating,
                 mouseDeadzone = MoControlsGO.mouseEmulator.deadzone,

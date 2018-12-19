@@ -79,8 +79,15 @@ namespace TommoJProductions.MoControls.GUI
                     alias = "Smoke";
                     break;
                 case "Handbrake":
-                    MSCLoader.Mod mod = MSCLoader.ModLoader.LoadedMods.Where(_mod => _mod.ID == "handbrakemod").ToArray()?[0];
-                        alias = mod is null ? "Handbrake" : "Handbrake; <color=green>Using Handbrake Mod v" + mod.Version + "</color>";
+                    try
+                    {
+                        MSCLoader.Mod mod = MSCLoader.ModLoader.LoadedMods.Where(_mod => _mod.ID == "handbrakemod").ToArray()[0];
+                        alias = "Handbrake; <color=green>Using Handbrake Mod v" + mod.Version + "</color>";
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                        alias = "Handbrake";
+                    }
                     break;
                 default:
                     if (String.IsNullOrEmpty(gameControlName))

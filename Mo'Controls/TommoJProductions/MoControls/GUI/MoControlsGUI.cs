@@ -81,10 +81,6 @@ namespace TommoJProductions.MoControls.GUI
         /// </summary>
         private MainGUIMenuEnum mainGUIMenu;
         /// <summary>
-        /// Represent whether the mod should display the virtual gui.
-        /// </summary>
-        public bool showVirtualGui;
-        /// <summary>
         /// Represents a keybind to open/close the gui for the mod.
         /// </summary>
         public readonly Keybind openControlsGui = new Keybind("OpenControls", "Open Controls GUI", KeyCode.F12);
@@ -93,6 +89,20 @@ namespace TommoJProductions.MoControls.GUI
 
         #region Properties
 
+        /// <summary>
+        /// Shows/closes the msc menu.
+        /// </summary>
+        private bool mscMenu
+        {
+            get
+            {
+                return GameObject.Find("Systems/OptionsMenu").activeSelf;
+            }
+            set
+            {
+                GameObject.Find("Systems/OptionsMenu").SetActive(value);
+            }
+        }
         /// <summary>
         /// Represents the instance of the mod.
         /// </summary>
@@ -162,12 +172,53 @@ namespace TommoJProductions.MoControls.GUI
         #region Methods
 
         /// <summary>
+        /// Changes boolean to open/close the msc menu gui. 
+        /// </summary>
+        private void toggleMscMenu()
+        {
+            // Written, 20.12.2018
+
+            this.mscMenu = !this.mscMenu;
+
+            if (this.mscMenu)
+            {
+                FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = true;
+            }
+            else
+            {
+                FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = false;
+            }
+        }
+        /// <summary>
+        /// Changes boolean to open/close the gui. 
+        /// </summary>
+        private void toggleGui()
+        {
+            // Written, 18.12.2018
+
+            this.controlsGuiOpened = !this.controlsGuiOpened;
+
+            if (this.controlsGuiOpened)
+            {
+                FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = true;
+            }
+            else
+            {
+                FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = false;
+            }
+        }
+        /// <summary>
         /// Occurs after game starts.
         /// </summary>
         private void Start()
-        {
+        {        
             // Written, 08.10.2018
 
+            HoldInputMono him = this.gameObject.AddComponent<HoldInputMono>();
+            him.setData("Open Mod GUI",
+                XboxButtonEnum.Back,
+                0.5f,
+                this.toggleGui);
             if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
                 MoControlsMod.print(nameof(MoControlsGUI) + ": Started");
         }
@@ -179,18 +230,7 @@ namespace TommoJProductions.MoControls.GUI
             // Written, 22.08.2018
 
             if (this.openControlsGui.IsDown())
-            {
-                this.controlsGuiOpened = !this.controlsGuiOpened;
-
-                if (this.controlsGuiOpened)
-                {
-                    FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = true;
-                }
-                else
-                {
-                    FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = false;
-                }
-            }
+                this.toggleGui();
             if (this.controlsGuiOpened)
             {
                 if (this.changeInputResult.reassignKey)
