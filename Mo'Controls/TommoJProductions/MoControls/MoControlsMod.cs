@@ -19,7 +19,7 @@ namespace TommoJProductions.MoControls
         public override string ID => "Mo_Controls";
         public override string Name => "Mo'Controls";
         public override string Author => "tommojphillips";
-        public override string Version => "1.0.7";
+        public override string Version => "1.0.8";
         public override bool UseAssetsFolder => true;
 
         #endregion

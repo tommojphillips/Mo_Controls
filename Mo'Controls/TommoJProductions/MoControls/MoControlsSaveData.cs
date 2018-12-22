@@ -1,6 +1,5 @@
 ﻿using System;
 using TommoJProductions.MoControls.MouseEmulation;
-using TommoJProductions.MoControls.XInputInterpreter;
 using MSCLoader;
 
 namespace TommoJProductions.MoControls
