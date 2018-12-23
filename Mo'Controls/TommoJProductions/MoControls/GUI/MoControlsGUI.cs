@@ -947,7 +947,7 @@ namespace TommoJProductions.MoControls.GUI
         /// <summary>
         /// Draws a menu with the provided Enum, <typeparamref name="T"/>.
         /// </summary>
-        private bool drawGeneralMenu<T>(T inSelected, out T changedTo)
+        private bool drawGeneralMenu<T>(T inSelected, out T inChangedTo)
         {
             // Written, 09.10.2018
 
@@ -973,12 +973,12 @@ namespace TommoJProductions.MoControls.GUI
 
                     if (gui.Button(title ?? _enum.ToString()) && !isSelected)
                     {
-                        changedTo = _enum;
+                        inChangedTo = _enum;
                         return true;
                     }
                 }
                 ueGUI.backgroundColor = this.backgroundColor;
-                changedTo = inSelected;
+                inChangedTo = inSelected;
                 return false;
             }
         }

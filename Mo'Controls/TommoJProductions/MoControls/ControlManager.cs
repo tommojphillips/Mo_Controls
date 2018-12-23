@@ -333,10 +333,10 @@ namespace TommoJProductions.MoControls
             }
         }
         /// <summary>
-        /// Changes the input for a control defined in <see cref="changeInputResult"/> to the provided input string, <paramref name="input"/>.
+        /// Changes the input for a control defined in <see cref="changeInputResult"/> to the provided input string, <paramref name="inInput"/>.
         /// </summary>
-        /// <param name="input">The input to assign.</param>
-        public void changeInput(string input)
+        /// <param name="inInput">The input to assign.</param>
+        public void changeInput(string inInput)
         {
             // Written, 09.07.2018
 
@@ -357,9 +357,9 @@ namespace TommoJProductions.MoControls
                     {
 
                         if (this.changeInputResult.index == 1)
-                            cInput.ChangeKey(this.changeInputResult.controlName, input, cInput.GetText(this.changeInputResult.controlName, 2));
+                            cInput.ChangeKey(this.changeInputResult.controlName, inInput, cInput.GetText(this.changeInputResult.controlName, 2));
                         else
-                            cInput.ChangeKey(this.changeInputResult.controlName, cInput.GetText(this.changeInputResult.controlName, 1), input);
+                            cInput.ChangeKey(this.changeInputResult.controlName, cInput.GetText(this.changeInputResult.controlName, 1), inInput);
                         this.currentControls = loadControlInputsFromCInput();
                     }
                     if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
@@ -367,9 +367,9 @@ namespace TommoJProductions.MoControls
                 }
                 else
                 {
-                        this.setGameControl((PlayerModeEnum)playerMode, this.changeInputResult.controlName, this.changeInputResult.index, input);                  
+                        this.setGameControl((PlayerModeEnum)playerMode, this.changeInputResult.controlName, this.changeInputResult.index, inInput);                  
                     if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
-                        MoControlsMod.print("Player mode was equal to <b>" + this.changeInputResult.mode + "</b> whiling setting '" + this.changeInputResult.controlName + "' to '" + input + "'.");
+                        MoControlsMod.print("Player mode was equal to <b>" + this.changeInputResult.mode + "</b> whiling setting '" + this.changeInputResult.controlName + "' to '" + inInput + "'.");
                     MoControlsSaveData.saveSettings(MoControlsMod.moControlsGO);
                 }
             }
@@ -380,11 +380,11 @@ namespace TommoJProductions.MoControls
                 Keybind modKeybind = Keybind.Get(this.changeInputResult.mod).Where(kb => kb.ID == this.changeInputResult.controlName).First();
                 if (this.changeInputResult.index == 1)
                 {
-                    modKeybind.Modifier = (KeyCode)Enum.Parse(typeof(KeyCode), input);
+                    modKeybind.Modifier = (KeyCode)Enum.Parse(typeof(KeyCode), inInput);
                 }
                 else
                 {
-                    modKeybind.Key = (KeyCode)Enum.Parse(typeof(KeyCode), input);
+                    modKeybind.Key = (KeyCode)Enum.Parse(typeof(KeyCode), inInput);
                 }
                 ModSettings_menu.SaveModBinds(this.changeInputResult.mod);
                 if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))

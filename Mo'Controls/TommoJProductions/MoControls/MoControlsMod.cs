@@ -97,7 +97,7 @@ namespace TommoJProductions.MoControls
             // Written, 20.08.2018
 
             instance = this;
-            ModConsole.Print(String.Format("<color=green>{0} <b>v{1}</b> ready</color>", this.Name, this.Version));
+            ModConsole.Print(String.Format("<color=green>{0} ready</color>", this.gameObjectName));
         }
 
         #endregion
@@ -218,5 +218,6 @@ namespace TommoJProductions.MoControls
         }
 
         #endregion        
+
     }
 }   
