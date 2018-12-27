@@ -33,7 +33,7 @@ namespace TommoJProductions.MoControls.GUI
         /// <summary>
         /// Represents the main gui's width.
         /// </summary>
-        private readonly float mainGuiWidth = (Screen.width - (MAIN_GUI_LEFT * 2));
+        private readonly float mainGuiWidth = Screen.width - (MAIN_GUI_LEFT * 2);
         /// <summary>
         /// Represents the main gui's left.
         /// </summary>
@@ -295,7 +295,7 @@ namespace TommoJProductions.MoControls.GUI
 
             ueGUI.contentColor = this.defaultContentColor;
             ueGUI.backgroundColor = this.backgroundColor;
-            using (new gui.AreaScope(new Rect(MAIN_GUI_LEFT, (MENU_GUI_TOP + MENU_GUI_HEIGHT), this.mainGuiWidth, (Screen.height - (MAIN_GUI_TOP + MENU_GUI_TOP + MENU_GUI_HEIGHT)))))
+            using (new gui.AreaScope(new Rect(MAIN_GUI_LEFT, MENU_GUI_TOP + MENU_GUI_HEIGHT, this.mainGuiWidth, Screen.height - (MAIN_GUI_TOP + MENU_GUI_TOP + MENU_GUI_HEIGHT))))
             using (gui.ScrollViewScope scrollViewScope = new gui.ScrollViewScope(this.mainGUIScrollPosition, new GUILayoutOption[] { gui.Width(this.mainGuiWidth) }))
             using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width(this.mainGuiWidth - SCROLL_BAR_OFFSET), gui.MaxWidth(this.mainGuiWidth - SCROLL_BAR_OFFSET) }))
             {
@@ -640,7 +640,7 @@ namespace TommoJProductions.MoControls.GUI
                 {
                     gui.Label("<i><b>Emulate mouse on joystick:</b></i>");
                     // As left + right thumb stick settings are grouped; need to manually change other value..
-                    bool _asInput = (this.mouseEmulator.inputType == InputTypeEnum.LS);
+                    bool _asInput = this.mouseEmulator.inputType == InputTypeEnum.LS;
                     if (gui.Toggle(_asInput, String.Format("Left Stick: {0}", _asInput ? "ON" : "")) != _asInput)
                     {
                         if (this.mouseEmulator.inputType != InputTypeEnum.LS)
@@ -649,7 +649,7 @@ namespace TommoJProductions.MoControls.GUI
                             saveSettings = true;
                         }
                     }
-                    _asInput = (this.mouseEmulator.inputType == InputTypeEnum.RS);
+                    _asInput = this.mouseEmulator.inputType == InputTypeEnum.RS;
                     if (gui.Toggle(_asInput, String.Format("Right Stick: {0}", _asInput ? "ON" : "")) != _asInput)
                     {
                         if (this.mouseEmulator.inputType != InputTypeEnum.RS)
@@ -658,7 +658,7 @@ namespace TommoJProductions.MoControls.GUI
                             saveSettings = true;
                         }
                     }
-                    _asInput = (this.mouseEmulator.inputType == InputTypeEnum.DPad);
+                    _asInput = this.mouseEmulator.inputType == InputTypeEnum.DPad;
                     if (gui.Toggle(_asInput, String.Format("Directional Pad: {0}", _asInput ? "ON" : "")) != _asInput)
                     {
                         if (this.mouseEmulator.inputType != InputTypeEnum.DPad)
@@ -675,7 +675,7 @@ namespace TommoJProductions.MoControls.GUI
                 using (new gui.VerticalScope())
                 {
                     gui.Label("<i><b>Deadzone type:</b></i>");
-                    bool _asInput = (this.mouseEmulator.deadzoneType == DeadzoneTypeEnum.Radial);
+                    bool _asInput = this.mouseEmulator.deadzoneType == DeadzoneTypeEnum.Radial;
                     if (gui.Toggle(_asInput, String.Format("Radial: {0}", _asInput ? "ON" : "")) != _asInput)
                     {
                         if (this.mouseEmulator.deadzoneType != DeadzoneTypeEnum.Radial)
@@ -684,7 +684,7 @@ namespace TommoJProductions.MoControls.GUI
                             saveSettings = true;
                         }
                     }
-                    _asInput = (this.mouseEmulator.deadzoneType == DeadzoneTypeEnum.ScaledRadial);
+                    _asInput = this.mouseEmulator.deadzoneType == DeadzoneTypeEnum.ScaledRadial;
                     if (gui.Toggle(_asInput, String.Format("Scaled Radial: {0}", _asInput ? "ON" : "")) != _asInput)
                     {
                         if (this.mouseEmulator.deadzoneType != DeadzoneTypeEnum.ScaledRadial)
@@ -788,7 +788,7 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 22.08.2018
 
-            using (new gui.AreaScope(new Rect((Screen.width / 2), 1, 50, 20)))
+            using (new gui.AreaScope(new Rect(Screen.width / 2, 1, 50, 20)))
             {
                 gui.Label(ControlManager.playerMode.ToString());
             }
@@ -857,13 +857,13 @@ namespace TommoJProductions.MoControls.GUI
                     gui.Label(String.Format("<b>{0}:</b>", controlName.getGameControlAlias(true)));
                     using (new gui.HorizontalScope())
                     {
-                        bool isControls = (this.mainGUIMenu == MainGUIMenuEnum.FootControls);
+                        bool isControls = this.mainGUIMenu == MainGUIMenuEnum.FootControls;
                         PlayerModeEnum? playerMode;
                         if (isControls)
                             playerMode = PlayerModeEnum.OnFoot;
                         else
                         {
-                            isControls = (this.mainGUIMenu == MainGUIMenuEnum.DrivingControls);
+                            isControls = this.mainGUIMenu == MainGUIMenuEnum.DrivingControls;
                             if (isControls)
                                 playerMode = PlayerModeEnum.Driving;
                             else
