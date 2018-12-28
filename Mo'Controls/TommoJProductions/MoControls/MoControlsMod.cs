@@ -27,17 +27,36 @@ namespace TommoJProductions.MoControls
         #region Fields
 
         /// <summary>
-        /// Represents whether or not to display debug data.
-        /// </summary>
-        public static DebugTypeEnum debug;
-        /// <summary>
         /// Represents the supported/compatible version of mod loader.
         /// </summary>
         public const string SUPPORTED_MODLOADER_VERSION = "0.4.7";
         /// <summary>
+        /// Represents whether this is a release version
+        /// </summary>
+        public const bool RELEASE_VERSION = false;
+        /// <summary>
         /// Represents the moControls gameobject.
         /// </summary>
         private static GameObject moControlsGameObject;
+        /// <summary>
+        /// Represents whether or not to display debug data.
+        /// </summary>
+        public static DebugTypeEnum debug;
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Represents the release version name.
+        /// </summary>
+        public string releaseVersionName
+        {
+            get
+            {
+                return "<color=" + (RELEASE_VERSION ? "blue>Release" : "red>Pre-Release") + "</color>";
+            }
+        }
         /// <summary>
         /// Player seen error message?
         /// </summary>
@@ -46,11 +65,6 @@ namespace TommoJProductions.MoControls
             get;
             set;
         }
-
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Represents whether or not the assets are loaded.
         /// </summary>
@@ -97,7 +111,8 @@ namespace TommoJProductions.MoControls
             // Written, 20.08.2018
 
             instance = this;
-            ModConsole.Print(String.Format("<color=green>{0} <b>v{1}</b> ready</color>", this.Name, this.Version));
+            this.performDebugCheck();
+            ModConsole.Print(String.Format("<color=green>{0} <b>v{1}</b> ready</color> ({2})", this.Name, this.Version, this.releaseVersionName));
         }
 
         #endregion
@@ -195,7 +210,32 @@ namespace TommoJProductions.MoControls
             // Written, 17.10.2018
 
             ConsoleCommand.Add(new DebugConsoleCommand());
+            ConsoleCommand.Add(new DebugStatsCommand());
             this.loadControllerAssets();
+        }
+        /// <summary>
+        /// Represents a debug/release mode check.
+        /// </summary>
+        private void performDebugCheck()
+        {
+            // Written, 28.12.2018
+
+#if DEBUG
+            if (RELEASE_VERSION)
+                ModUI.ShowMessage("<color=orange>Warning</color>: Debug Configuration invaild. Was this intentional Tommo? (dev message)" +
+                    "\r\n" +
+                    "\r\nRelease version: " + RELEASE_VERSION +
+                    "\r\nDebug Config: True",
+                    "<color=orange>Warning</color>: <b>Incorrect Debug/Releaase Configuration</b>");
+#else 
+            if (!RELEASE_VERSION)
+                ModUI.ShowMessage("<color=orange>Warning</color>: Release Configuration invaild" +
+                    "\r\nWas this intentional Tommo? (dev message)" +
+                    "\r\n" +
+                    "\r\nRelease version: " + RELEASE_VERSION +
+                    "\r\nDebug Config: False",
+                    "<color=orange>Warning</color>: <b>Incorrect Release/Debug Configuration</b>");
+#endif
         }
 
         #endregion
@@ -217,7 +257,7 @@ namespace TommoJProductions.MoControls
                 print(this.Name + " v" + this.Version + ": Loaded.");
         }
 
-        #endregion        
+#endregion
 
     }
 }   

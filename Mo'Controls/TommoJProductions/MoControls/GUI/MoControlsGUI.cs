@@ -57,6 +57,8 @@ namespace TommoJProductions.MoControls.GUI
 
         #endregion
 
+        #region GUI Colors
+
         private Color32 backgroundColor = new Color32(88, 92, 133, 230); // #585C85 | light navel blue
         private Color32 primaryItemColor = new Color32(113, 154, 195, 230); // #719AC3 | Light White Blue
         private Color32 secondaryItemColor = new Color32(200, 216, 211, 230); // Sand
@@ -64,6 +66,9 @@ namespace TommoJProductions.MoControls.GUI
         private Color32 selectedMenuButtonColor = new Color32(113, 154, 195, 230); // #719AC3 | Light White Blue
         private Color32 defaultContentColor = new Color32(190, 194, 251, 230); // #BEC2FB | light purple-blue 
         private Color32 moduleBackgroundColor = new Color32(68, 154, 219, 230); // #449ADB | Light blue
+
+        #endregion
+
         /// <summary>
         /// Represents whether the instance has calculated the amount of keybinds yet.
         /// </summary>
@@ -89,20 +94,6 @@ namespace TommoJProductions.MoControls.GUI
 
         #region Properties
 
-        /// <summary>
-        /// Shows/closes the msc menu.
-        /// </summary>
-        private bool mscMenu
-        {
-            get
-            {
-                return GameObject.Find("Systems/OptionsMenu").activeSelf;
-            }
-            set
-            {
-                GameObject.Find("Systems/OptionsMenu").SetActive(value);
-            }
-        }
         /// <summary>
         /// Represents the instance of the mod.
         /// </summary>
@@ -171,24 +162,6 @@ namespace TommoJProductions.MoControls.GUI
 
         #region Methods
 
-        /// <summary>
-        /// Changes boolean to open/close the msc menu gui. 
-        /// </summary>
-        private void toggleMscMenu()
-        {
-            // Written, 20.12.2018
-
-            this.mscMenu = !this.mscMenu;
-
-            if (this.mscMenu)
-            {
-                FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = true;
-            }
-            else
-            {
-                FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = false;
-            }
-        }
         /// <summary>
         /// Changes boolean to open/close the gui. 
         /// </summary>
@@ -300,7 +273,7 @@ namespace TommoJProductions.MoControls.GUI
             using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width(this.mainGuiWidth - SCROLL_BAR_OFFSET), gui.MaxWidth(this.mainGuiWidth - SCROLL_BAR_OFFSET) }))
             {
                 this.mainGUIScrollPosition = scrollViewScope.scrollPosition;
-                gui.Label(String.Format("<b>{0} v{1} by {2}</b>", this.mod.Name, this.mod.Version, this.mod.Author));
+                gui.Label(String.Format("<b>{0} v{1} ({3}) by {2}</b>", this.mod.Name, this.mod.Version, this.mod.Author, MoControlsMod.instance.releaseVersionName));
                 if (this.mainGUIMenu != MainGUIMenuEnum.About)
                     gui.Label(String.Format("<b>{0}</b> is a forbidden key (GUI key bind).\r\n<b>{1}</b> Sets as None.\r\n<b>LMB</b> Selects.\r\n<b>RMB</b> Cancels.", this.openControlsGui.Key, Input.noneKey));
                 gui.Space(3.0f);
