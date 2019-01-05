@@ -78,14 +78,6 @@ namespace TommoJProductions.MoControls.GUI
         /// </summary>
         private int modKeybindCount = 0;
         /// <summary>
-        /// Represents the currently selected setting menu item.
-        /// </summary>
-        private SettingsMenuEnum settingsMenu;
-        /// <summary>
-        /// Represents the currently selected main menu item.
-        /// </summary>
-        private MainGUIMenuEnum mainGUIMenu;
-        /// <summary>
         /// Represents a keybind to open/close the gui for the mod.
         /// </summary>
         public readonly Keybind openControlsGui = new Keybind("OpenControls", "Open Controls GUI", KeyCode.F12);
@@ -142,6 +134,22 @@ namespace TommoJProductions.MoControls.GUI
                 return MoControlsGO.xboxController;
             }
         }
+        /// <summary>
+        /// Represents the currently selected setting menu item.
+        /// </summary>
+        internal SettingsMenuEnum settingsMenu
+        {
+            get;
+            set;
+        }
+        /// <summary>
+        /// Represents the currently selected main menu item.
+        /// </summary>
+        internal MainGUIMenuEnum mainGUIMenu
+        {
+            get;
+            set;
+        }
 
         #endregion
 
@@ -174,10 +182,12 @@ namespace TommoJProductions.MoControls.GUI
             if (this.controlsGuiOpened)
             {
                 FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = true;
+                this.gameObject.GetComponent<GuiNav>().enabled = true;
             }
             else
             {
                 FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = false;
+                this.gameObject.GetComponent<GuiNav>().enabled = false;
             }
         }
         /// <summary>
@@ -187,11 +197,16 @@ namespace TommoJProductions.MoControls.GUI
         {        
             // Written, 08.10.2018
 
+            // Gui hold button set up
             HoldInputMono him = this.gameObject.AddComponent<HoldInputMono>();
             him.setData("Open Mod GUI",
                 XboxButtonEnum.Back,
-                0.5f,
+                0.3f,
                 this.toggleGui);
+            // GUI Nav set up
+            GuiNav gNav = this.gameObject.AddComponent<GuiNav>();
+            gNav.enabled = false;
+
             if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
                 MoControlsMod.print(nameof(MoControlsGUI) + ": Started");
         }

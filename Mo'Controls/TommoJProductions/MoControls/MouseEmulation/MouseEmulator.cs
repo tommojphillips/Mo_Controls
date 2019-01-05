@@ -171,6 +171,7 @@ namespace TommoJProductions.MoControls.MouseEmulation
         /// Represents the mouse right up event
         /// </summary>
         private const int MOUSEEVENTF_RIGHTUP = 0x10;
+        private const int MOUSEEVENTF_WHEEL = 0x0800;
         /// <summary>
         /// Represents LMB input name.
         /// </summary>
@@ -342,7 +343,20 @@ namespace TommoJProductions.MoControls.MouseEmulation
             int X = tempCursPos.X;
             int Y = tempCursPos.Y;
             NM.mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, X, Y, 0, 0);
-        }        
+        }
+        /// <summary>
+        /// Simulates scrolling of the mouse wheel. (One mouse click = 120). Positive = Scroll up | Negitive = Scroll doen.
+        /// </summary>
+        /// <param name="inScrollAmount">The amount to scroll. default 120.</param>
+        internal static void simulateScroll(int inScrollAmount)
+        {
+            // Written, 28.12.2018
+
+            Point tempCursPos = getCursorPosition;
+            int X = tempCursPos.X;
+            int Y = tempCursPos.Y;
+            NM.mouse_event(MOUSEEVENTF_WHEEL, X, Y, (uint)inScrollAmount, 0);
+        }
 
         #endregion
     }

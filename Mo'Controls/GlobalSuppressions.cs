@@ -21,4 +21,5 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0051:Remove unused private members", Justification = "<Pending>", Scope = "member", Target = "~M:TommoJProductions.MoControls.XInputInterpreter.XboxControllerManager.Start")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0051:Remove unused private members", Justification = "<Pending>", Scope = "member", Target = "~M:TommoJProductions.MoControls.XInputInterpreter.XboxControllerManager.Update")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~M:TommoJProductions.MoControls.MoControlsGO.XboxControllerManager_ControllerDisconnected(System.Object,TommoJProductions.MoControls.XInputInterpreter.ControllerConnectionEventArgs)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0051:Remove unused private members", Justification = "<Pending>", Scope = "member", Target = "~M:TommoJProductions.MoControls.GUI.GuiNav.Update")]
 

@@ -96,10 +96,10 @@ namespace TommoJProductions.MoControls
             this.keyName = inKeyName;
             this.action = inAction;
             this.hiName = inName;
-            this.id = ("hld_inpt_"+ this.hiName +"_K" + inKeyName).ToLower().Trim();
+            this.id = ("hld_inpt_"+ this.hiName.ToLower().Replace(" ", "") +"_K" + inKeyName).ToLower().Trim();
 
             if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                MoControlsMod.print("<b>[SD CALL]</b> - hld_inpt: " + this.hiName + "initiliazed as '" + this.id + "'.");
+                MoControlsMod.print("hld_inpt: " + this.hiName + " initiliazed as '" + this.id + "'.");
         }
         
         #endregion
