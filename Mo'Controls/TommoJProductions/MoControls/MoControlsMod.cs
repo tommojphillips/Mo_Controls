@@ -5,8 +5,10 @@ using UnityEngine;
 
 namespace TommoJProductions.MoControls
 {
+    // Mod References
     // XInputDotNetPure.dll - in folder: "My Summer Car/mysummercar_data/Managed"
     // XInputInterface.dll - in folder: "My Summer Car"
+
     /// <summary>
     /// Represents the mo'controls mod.
     /// </summary>
@@ -19,7 +21,7 @@ namespace TommoJProductions.MoControls
         public override string ID => "Mo_Controls";
         public override string Name => "Mo'Controls";
         public override string Author => "tommojphillips";
-        public override string Version => "1.0.8";
+        public override string Version => "1.0.9";
         public override bool UseAssetsFolder => true;
 
         #endregion
@@ -112,7 +114,7 @@ namespace TommoJProductions.MoControls
 
             instance = this;
             this.performDebugCheck();
-            ModConsole.Print(String.Format("<color=green>{0} <b>v{1}</b> ready</color> ({2})", this.Name, this.Version, this.releaseVersionName));
+            ModConsole.Print(String.Format("<color=green>{0} <b>v{1}</b> ({2}) ready</color>", this.Name, this.Version, this.releaseVersionName));
         }
 
         #endregion
