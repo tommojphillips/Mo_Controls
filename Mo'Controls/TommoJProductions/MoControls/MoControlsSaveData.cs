@@ -197,7 +197,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Saves the settings.
         /// </summary>
-        public static void saveSettings(MoControlsGO mo_Controls)
+        public static void saveSettings(MoControlsGO inMo_Controls)
         {
             // Written, 20.08.2018
 
@@ -219,13 +219,12 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Saves the settings.
         /// </summary>
-        public static void saveSettings(MoControlsMod mo_Controls, MoControlsSaveData mcsd)
+        public static void saveSettings(MoControlsMod inMo_Controls, MoControlsSaveData inMcsd)
         {
             // Written, 22.08.2018
 
-            SaveLoad.SerializeSaveFile(mo_Controls, mcsd, fileName + fileExtention);
-            if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                MoControlsMod.print("saved mo'controls data.");
+            SaveLoad.SerializeSaveFile(inMo_Controls, inMcsd, fileName + fileExtention);
+            MoControlsMod.print("saved mo'controls data.", Debugging.DebugTypeEnum.full);
         }
         /// <summary>
         /// Loads the settings.
@@ -233,6 +232,8 @@ namespace TommoJProductions.MoControls
         public static MoControlsSaveData loadSettings()
         {
             // Written, 20.08.2018
+
+            float time = UnityEngine.Time.time;
 
             if (loadedSaveData is null)
             {
@@ -247,28 +248,24 @@ namespace TommoJProductions.MoControls
                 catch (NullReferenceException)
                 {
                     createNewSaveFile = true;                    
-                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                        MoControlsMod.print("Save file does not exist, creating save file.");
+                        MoControlsMod.print("Save file does not exist, creating save file.", Debugging.DebugTypeEnum.full);
                 }
                 catch (Exception)
                 {
                     createNewSaveFile = true;
-                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.none))
-                        MoControlsMod.print("An error occured while loading the save file.. overriding with new save file. Maybe mod updated?");
+                    MoControlsMod.print("An error occured while loading the save file.. overriding with new save file. Maybe mod updated?", Debugging.DebugTypeEnum.none);
                 }
                 if (createNewSaveFile)
                 {
                     mcsd = defaultSave;
                     saveSettings(MoControlsMod.instance, mcsd);
                 }
-                if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                    MoControlsMod.print("loaded mo'controls data.");
+                MoControlsMod.print("loaded mo'controls data in <b>" + (time - UnityEngine.Time.time) + "s</b>.", Debugging.DebugTypeEnum.full);
                 return mcsd;
             }
             else
             {
-                if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                    MoControlsMod.print("Mo'Controls save data was already loaded; passed the save data on.");
+                MoControlsMod.print("Mo'Controls save data was already loaded; passed the save data on.", Debugging.DebugTypeEnum.full);
                 return loadedSaveData;
             }
         }

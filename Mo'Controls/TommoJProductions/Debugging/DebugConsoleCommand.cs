@@ -1,6 +1,7 @@
 ﻿using MSCLoader;
+using TommoJProductions.MoControls;
 
-namespace TommoJProductions.MoControls.Debugging
+namespace TommoJProductions.Debugging
 {
     /// <summary>
     /// Represents the debug command for <see cref="MoControlsMod"/>.
@@ -11,13 +12,13 @@ namespace TommoJProductions.MoControls.Debugging
 
         public override string Help => "Enables/Disables debug mode for the mod, Mo'Controls.\r\n<color=grey>1.) <i>none or '0'</i>\r\n2.) <i>partial or '1'</i>\r\n3.) <i>full or '2'</i></color>";
 
-        public override void Run(string[] args)
+        public override void Run(string[] inArgs)
         {
             // Written, 08.10.2018
 
-            if (args.Length == 1)
+            if (inArgs.Length == 1)
             {
-                switch (args[0])
+                switch (inArgs[0])
                 {
                     case "0":
                         MoControlsMod.debug = DebugTypeEnum.none;
@@ -38,12 +39,12 @@ namespace TommoJProductions.MoControls.Debugging
                         MoControlsMod.debug = DebugTypeEnum.full;
                         break;
                     default:
-                        MoControlsMod.print("debug mode does not exist.. Use:\r\n1.) none or '0'\r\n2.) partial or '1'\r\n3.) full or '2'");
+                        MoControlsMod.print("debug mode does not exist.. Use:\r\n1.) none or '0'\r\n2.) partial or '1'\r\n3.) full or '2'", DebugTypeEnum.none);
                         break;
                 }
                 //MoControlsMod.debug = !MoControlsMod.debug;
                 MoControlsSaveData.saveSettings(MoControlsMod.moControlsGO);
-                MoControlsMod.print("Debug Mode set to <b>" + MoControlsMod.debug + "</b>.");
+                MoControlsMod.print("Debug Mode set to <b>" + MoControlsMod.debug + "</b>.", DebugTypeEnum.none);
             }
         }
     }

@@ -21,22 +21,21 @@ namespace TommoJProductions.MoControls.XInputInterpreter
             }
             catch (NullReferenceException ex)
             {
-                if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                    MoControlsMod.print(String.Format("<i>[XboxExtentions.forEach(this XboxControl, Action)]</i> - <color=red>Action was null\r\n<b>StackTrace:</b> {0}</color>",
-                        ex.StackTrace));
+                MoControlsMod.print(String.Format("<i>[XboxExtentions.forEach(this XboxControl, Action)]</i> - <color=red>Action was null\r\n<b>StackTrace:</b> {0}</color>",
+                        ex.StackTrace), Debugging.DebugTypeEnum.full);
                 return;
             }
         }
         /// <summary>
         /// Returns the string representation of the provided <see cref="XboxButtonEnum"/>.
         /// </summary>
-        /// <param name="xboxButtonEnum">The xbox button to convert to string.</param>
-        public static string toString(this XboxButtonEnum xboxButtonEnum)
+        /// <param name="inXboxButtonEnum">The xbox button to convert to string.</param>
+        public static string toString(this XboxButtonEnum inXboxButtonEnum)
         {
             // Written, 17.07.2018
 
             string value = null;
-            switch (xboxButtonEnum)
+            switch (inXboxButtonEnum)
             {
                 case XboxButtonEnum.A:
                     value = "A";
@@ -89,35 +88,35 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Performs a deadzone check.
         /// </summary>
-        /// <param name="stickValue">The values to perform the check on.</param>
-        public static Vector2 doDeadzoneCheck(this Vector2 stickValue, float deadzoneThreshhold, DeadzoneTypeEnum deadzoneType)
+        /// <param name="inStickValue">The values to perform the check on.</param>
+        public static Vector2 doDeadzoneCheck(this Vector2 inStickValue, float inDeadzoneThreshhold, DeadzoneTypeEnum inDeadzoneType)
         {
             // Written, 02.08.2018
 
-            switch (deadzoneType)
+            switch (inDeadzoneType)
             {
                 case DeadzoneTypeEnum.Radial:
-                    if (stickValue.magnitude < deadzoneThreshhold)
-                        stickValue = Vector2.zero;
+                    if (inStickValue.magnitude < inDeadzoneThreshhold)
+                        inStickValue = Vector2.zero;
                     break;
                 case DeadzoneTypeEnum.ScaledRadial:
-                    if (stickValue.magnitude < deadzoneThreshhold)
-                        stickValue = Vector2.zero;
-                    stickValue = stickValue.normalized * ((stickValue.magnitude - deadzoneThreshhold) / (1 - deadzoneThreshhold));
+                    if (inStickValue.magnitude < inDeadzoneThreshhold)
+                        inStickValue = Vector2.zero;
+                    inStickValue = inStickValue.normalized * ((inStickValue.magnitude - inDeadzoneThreshhold) / (1 - inDeadzoneThreshhold));
                     break;
             }
-            return stickValue;
+            return inStickValue;
         }
         /// <summary>
         /// Performs sensitivity operation.
         /// </summary>
-        /// <param name="stickValue">inValue.</param>
-        public static Vector2 doSensitivityOperation(this Vector2 stickValue, float sensitivityThreshhold)
+        /// <param name="inStickValue">inValue.</param>
+        public static Vector2 doSensitivityOperation(this Vector2 inStickValue, float inSensitivityThreshhold)
         {
             // Written, 07.08.2018
 
-            stickValue.Set(stickValue.x *= sensitivityThreshhold, stickValue.y *= sensitivityThreshhold);
-            return stickValue;
+            inStickValue.Set(inStickValue.x *= inSensitivityThreshhold, inStickValue.y *= inSensitivityThreshhold);
+            return inStickValue;
         }
         /// <summary>
         /// Gets the xbox control in the collection by name.

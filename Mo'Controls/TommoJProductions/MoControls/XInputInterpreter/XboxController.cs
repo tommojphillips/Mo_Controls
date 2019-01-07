@@ -699,13 +699,11 @@ namespace TommoJProductions.MoControls.XInputInterpreter
                     this.xboxControls[23].texture = MoControlsMod.assets.rsdown;
                 }
                 else
-                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                        MoControlsMod.print("Assets cannot be loaded to instance of xbox controller as assets ain't loaded.");
+                    MoControlsMod.print("Assets cannot be loaded to instance of xbox controller as assets ain't loaded.", Debugging.DebugTypeEnum.full);
             }
             catch (Exception ex)
             {
-                if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                    MoControlsMod.print("An error occured while trying to load xbox controller assets.. Stacktrace:\r\n " + ex.StackTrace);
+                MoControlsMod.print("An error occured while trying to load xbox controller assets.. Stacktrace:\r\n " + ex.StackTrace, Debugging.DebugTypeEnum.full);
             }
         }
         /// <summary>

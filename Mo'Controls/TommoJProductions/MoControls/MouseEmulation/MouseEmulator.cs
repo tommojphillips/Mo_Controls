@@ -70,13 +70,11 @@ namespace TommoJProductions.MoControls.MouseEmulation
             {
                 if (value)
                 {
-                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                        MoControlsMod.print(String.Format("Started Emulating mouse as {0}.", this.inputType));
+                    MoControlsMod.print(String.Format("Started Emulating mouse as {0}.", this.inputType), Debugging.DebugTypeEnum.full);
                 }
                 else
                 {
-                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                        MoControlsMod.print("Stopped Emulating mouse..");
+                    MoControlsMod.print("Stopped Emulating mouse..", Debugging.DebugTypeEnum.full);
                 }
                 emulateMouse = value;
             }
@@ -212,8 +210,7 @@ namespace TommoJProductions.MoControls.MouseEmulation
         {
             // Written, 08.10.2018
 
-            if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                MoControlsMod.print(nameof(MouseEmulator) + ": Started");
+            MoControlsMod.print(nameof(MouseEmulator) + ": Started", Debugging.DebugTypeEnum.full);
         }
         /// <summary>
         /// Should be called every frame; on <see cref="Mod.Update()"/>.

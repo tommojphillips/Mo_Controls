@@ -2,7 +2,7 @@
 using System.Linq;
 using HutongGames.PlayMaker;
 using MSCLoader;
-using TommoJProductions.MoControls.Debugging;
+using TommoJProductions.Debugging;
 using UnityEngine;
 
 namespace TommoJProductions.MoControls
@@ -167,8 +167,7 @@ namespace TommoJProductions.MoControls
         {
             // Written, 08.10.2018
 
-            if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
-                MoControlsMod.print(nameof(ControlManager) + ": Started");
+            MoControlsMod.print(nameof(ControlManager) + ": Started", DebugTypeEnum.full);
         }
         /// <summary>
         /// Occurs on update.
@@ -181,8 +180,7 @@ namespace TommoJProductions.MoControls
             {
                 this.currentPlayerMode = playerMode;
                 this.changeControlMode((PlayerModeEnum)currentPlayerMode);
-                if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
-                    MoControlsMod.print("Control Mode changed: " + currentPlayerMode);
+                MoControlsMod.print("Control Mode changed: " + currentPlayerMode, DebugTypeEnum.full);
             }
         }
         /// <summary>
@@ -201,13 +199,11 @@ namespace TommoJProductions.MoControls
                 {
                     cInput.ChangeKey(inControlMode[i, 0], inControlMode[i, 1], inControlMode[i, 2]);
                 }
-                if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
-                    MoControlsMod.print(String.Format("<b><color=green>Successfully</color></b> loaded {0} inputs to cInput.", controlListName));
+                    MoControlsMod.print(String.Format("<b><color=green>Successfully</color></b> loaded {0} inputs to cInput.", controlListName), DebugTypeEnum.full);
             }
             catch (NullReferenceException)
             {
-                if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
-                    MoControlsMod.print(String.Format("control inputs was null; setting {0} inputs to current control settings.", controlListName));
+                MoControlsMod.print(String.Format("control inputs was null; setting {0} inputs to current control settings.", controlListName), DebugTypeEnum.full);
                 if (inPlayerMode == PlayerModeEnum.OnFoot)
                     this.footControls = loadControlInputsFromCInput();
                 else
@@ -215,8 +211,7 @@ namespace TommoJProductions.MoControls
             }
             catch
             {
-                if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
-                    MoControlsMod.print(String.Format("<b><color=red>Unsuccessfully</color></b> loaded {0} inputs to cInput.", controlListName));
+                MoControlsMod.print(String.Format("<b><color=red>Unsuccessfully</color></b> loaded {0} inputs to cInput.", controlListName), DebugTypeEnum.full);
                 throw;
             }            
         }
@@ -264,14 +259,12 @@ namespace TommoJProductions.MoControls
                     controls[i, 1] = cInput.GetText(inputNames[i], 1);
                     controls[i, 2] = cInput.GetText(inputNames[i], 2);
                 }
-                if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
-                    MoControlsMod.print("<b><color=green>Successfully</color></b> loaded game control inputs from cInput.");
+                    MoControlsMod.print("<b><color=green>Successfully</color></b> loaded game control inputs from cInput.", DebugTypeEnum.full);
                 return controls;
             }
             catch (Exception ex)
             {
-                if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
-                    MoControlsMod.print("<b><color=red>Unsuccessfully</color></b> loaded game control inputs from cInput.");
+                MoControlsMod.print("<b><color=red>Unsuccessfully</color></b> loaded game control inputs from cInput.", DebugTypeEnum.full);
                 ModConsole.Error(ex.ToString());
                 throw;
             }
@@ -298,8 +291,7 @@ namespace TommoJProductions.MoControls
 
             if (inIndex != 1 && inIndex != 2)
             {
-                if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
-                    MoControlsMod.print("<b>C285 PControlManager</b>\r\nIndex out of range for game control editing...");
+                MoControlsMod.print("<b>C285 PControlManager</b>\r\nIndex out of range for game control editing...", DebugTypeEnum.full);
                 throw new IndexOutOfRangeException();
             }
             switch (inMode)
@@ -362,14 +354,12 @@ namespace TommoJProductions.MoControls
                             cInput.ChangeKey(this.changeInputResult.controlName, cInput.GetText(this.changeInputResult.controlName, 1), inInput);
                         this.currentControls = loadControlInputsFromCInput();
                     }
-                    if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
-                        MoControlsMod.print("Player mode wasa null while attempting to change input..");
+                    MoControlsMod.print("Player mode wasa null while attempting to change input..", DebugTypeEnum.full);
                 }
                 else
                 {
-                        this.setGameControl((PlayerModeEnum)playerMode, this.changeInputResult.controlName, this.changeInputResult.index, inInput);                  
-                    if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
-                        MoControlsMod.print("Player mode was equal to <b>" + this.changeInputResult.mode + "</b> whiling setting '" + this.changeInputResult.controlName + "' to '" + inInput + "'.");
+                        this.setGameControl((PlayerModeEnum)playerMode, this.changeInputResult.controlName, this.changeInputResult.index, inInput);
+                        MoControlsMod.print("Player mode was equal to <b>" + this.changeInputResult.mode + "</b> whiling setting '" + this.changeInputResult.controlName + "' to '" + inInput + "'.", DebugTypeEnum.full);
                     MoControlsSaveData.saveSettings(MoControlsMod.moControlsGO);
                 }
             }
@@ -387,8 +377,7 @@ namespace TommoJProductions.MoControls
                     modKeybind.Key = (KeyCode)Enum.Parse(typeof(KeyCode), inInput);
                 }
                 ModSettings_menu.SaveModBinds(this.changeInputResult.mod);
-                if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
-                    MoControlsMod.print("saved <i>" + modKeybind.Mod.Name + "</i> mod keybinds.");
+                    MoControlsMod.print("saved <i>" + modKeybind.Mod.Name + "</i> mod keybinds.", DebugTypeEnum.full);
 
             }
             this.changeInputResult = new ChangeInput();

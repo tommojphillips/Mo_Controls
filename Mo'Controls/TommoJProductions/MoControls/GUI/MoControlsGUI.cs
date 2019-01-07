@@ -207,8 +207,7 @@ namespace TommoJProductions.MoControls.GUI
             GuiNav gNav = this.gameObject.AddComponent<GuiNav>();
             gNav.enabled = false;
 
-            if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                MoControlsMod.print(nameof(MoControlsGUI) + ": Started");
+            MoControlsMod.print(nameof(MoControlsGUI) + ": Started", Debugging.DebugTypeEnum.full);
         }
         /// <summary>
         /// on Update.

@@ -104,8 +104,7 @@ namespace TommoJProductions.MoControls
             mouseEmulator = this.gameObject.AddComponent<MouseEmulator>();
             XboxControllerManager.ControllerConnected += this.XboxControllerManager_ControllerConnected;
             XboxControllerManager.ControllerDisconnected += this.XboxControllerManager_ControllerDisconnected;
-            if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                MoControlsMod.print(nameof(MoControlsGO) + ": Started");
+            MoControlsMod.print(nameof(MoControlsGO) + ": Started", Debugging.DebugTypeEnum.full);
         }
         /// <summary>
         /// Occurs every frame.
@@ -118,11 +117,10 @@ namespace TommoJProductions.MoControls
             {
                 if (!this.settingsLoaded && GameObject.Find(MoControlsMod.instance.gameObjectName) != null)
                 {
-                    this.setLoadedSettings(MoControlsSaveData.loadSettings(), startUp: true);
+                    this.setLoadedSettings(MoControlsSaveData.loadSettings(), inStartUp: true);
                     xboxController.loadControllerAssets();
                     this.settingsLoaded = true;
-                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.partial))
-                        MoControlsMod.print("All Modules have <b><color=green>successfully</color></b> been initilized.");
+                    MoControlsMod.print("All Modules have <b><color=green>successfully</color></b> been initilized.", Debugging.DebugTypeEnum.partial);
                 }
             }
             else
@@ -130,8 +128,7 @@ namespace TommoJProductions.MoControls
                 if (!this.moduleError)
                 {
                     this.moduleError = true;
-                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.partial))
-                        MoControlsMod.print("Some modules have <b>not</b> been initilized.");
+                    MoControlsMod.print("Some modules have <b>not</b> been initilized.", Debugging.DebugTypeEnum.partial);
                 }
             }
         }
@@ -139,17 +136,16 @@ namespace TommoJProductions.MoControls
         /// sets the settings.
         /// </summary>
         /// <param name="inSaveData">The save data to set as loaded.</param>
-        /// <param name="startUp">the</param>
-        public void setLoadedSettings(MoControlsSaveData inSaveData, bool startUp = false, bool preload = false)
+        /// <param name="inStartUp">the</param>
+        public void setLoadedSettings(MoControlsSaveData inSaveData, bool inStartUp = false, bool inPreload = false)
         {
             // Written, 22.08.2018
 
-            if (preload)
+            if (inPreload)
             {
                 MoControlsMod.debug = inSaveData.debugMode;
                 MoControlsMod.instance.playerSeenMscLoaderVersionError = inSaveData.playerSeenMscLoaderVersionError;
-                if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                    MoControlsMod.print("Pre-Settings loaded");
+                MoControlsMod.print("Pre-Settings loaded", Debugging.DebugTypeEnum.full);
             }
             else
             {
@@ -163,17 +159,15 @@ namespace TommoJProductions.MoControls
                     controlManager.displayCurrentPlayerModeOverlay = inSaveData.displayCurrentPlayerModeOverlay;
                     controlManager.setControls(inSaveData.footControls, inSaveData.drivingControls);
 
-                    if (startUp)
+                    if (inStartUp)
                     {
-                        if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.partial))
-                            MoControlsMod.print("Start-Up settings loaded");
+                        MoControlsMod.print("Start-Up settings loaded", Debugging.DebugTypeEnum.partial);
                     }
 
                 }
                 catch (NullReferenceException ex)
                 {
-                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                        MSCLoader.ModConsole.Error("[MoControlsGO.setLoadedSettings] - " + ex.StackTrace);
+                    MoControlsMod.print("[MoControlsGO.setLoadedSettings] - " + ex.StackTrace, Debugging.DebugTypeEnum.full);
                 }
             }
         }
@@ -186,14 +180,14 @@ namespace TommoJProductions.MoControls
         {
             // Written, 08.10.2018
 
-            MoControlsMod.print("<color=grey><i>Controller: " + e.xboxController.index + "</i></color> <color=red>Disconnected</color>");
+            MoControlsMod.print("<color=grey><i>Controller: " + e.xboxController.index + "</i></color> <color=red>Disconnected</color>", Debugging.DebugTypeEnum.none);
         }
 
-        private void XboxControllerManager_ControllerConnected(object sender, ControllerConnectionEventArgs e)
+        private void XboxControllerManager_ControllerConnected(object inSender, ControllerConnectionEventArgs inE)
         {
             // Written, 08.10.2018
 
-            MoControlsMod.print("<color=grey><i>Controller " + e.xboxController.index + "</i></color> <color=green>Connected</color>");
+            MoControlsMod.print("<color=grey><i>Controller " + inE.xboxController.index + "</i></color> <color=green>Connected</color>", Debugging.DebugTypeEnum.none);
         }
 
         #endregion

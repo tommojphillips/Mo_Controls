@@ -1,4 +1,4 @@
-﻿namespace TommoJProductions.MoControls.Debugging
+﻿namespace TommoJProductions.Debugging
 {
     /// <summary>
     /// Represents debug data to display in the mod console.
