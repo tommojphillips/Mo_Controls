@@ -161,7 +161,7 @@ namespace TommoJProductions.MoControls
         /// Prints a message to the console with the prefix of the mod name.
         /// </summary>
         /// <param name="inMessage"></param>
-        public static void print(string inMessage, DebugTypeEnum inDebugType)
+        internal static void print(string inMessage, DebugTypeEnum inDebugType)
         {
             // Written, 08.10.2018
 
@@ -301,7 +301,7 @@ namespace TommoJProductions.MoControls
             print(this.Name + " v" + this.Version + ": Loaded.", DebugTypeEnum.none);
         }
 
-#endregion
+        #endregion
 
     }
 }   

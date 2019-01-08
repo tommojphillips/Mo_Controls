@@ -287,9 +287,21 @@ namespace TommoJProductions.MoControls.GUI
             using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width(this.mainGuiWidth - SCROLL_BAR_OFFSET), gui.MaxWidth(this.mainGuiWidth - SCROLL_BAR_OFFSET) }))
             {
                 this.mainGUIScrollPosition = scrollViewScope.scrollPosition;
-                gui.Label(String.Format("<b>{0} v{1} ({3}) by {2}</b>", this.mod.Name, this.mod.Version, this.mod.Author, MoControlsMod.instance.releaseVersionName));
+                gui.Label(String.Format("<b>{0} v{1} ({3}) by {2}</b>", 
+                    this.mod.Name, 
+                    this.mod.Version, 
+                    this.mod.Author,
+                    MoControlsMod.instance.releaseVersionName));
                 if (this.mainGUIMenu != MainGUIMenuEnum.About)
-                    gui.Label(String.Format("<b>{0}</b> is a forbidden key (GUI key bind).\r\n<b>{1}</b> Sets as None.\r\n<b>LMB</b> Selects.\r\n<b>RMB</b> Cancels.", this.openControlsGui.Key, Input.noneKey));
+                    gui.Label(String.Format("<b>{0}</b> GUI key bind." +
+                        "\r\n<b>{1}</b> Sets as None." +
+                        "\r\n<b>LMB</b> Selects." +
+                        "\r\n<b>RMB</b> Cancels.", 
+                        this.openControlsGui.Key,
+                        Input.noneKey));
+                else
+                    if (MoControlsMod.instance.modApiData.runningModApi)
+                        gui.Label("Running <b>Mod Api <i><color=green>v" + MoControlsMod.instance.modApiData.version + "</color></i></b>");
                 gui.Space(3.0f);
                 switch (this.mainGUIMenu)
                 {
@@ -368,6 +380,9 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 20.08.2018
 
+            gui.Space(3f);
+            gui.Label("<b>Settings</b>");
+            gui.Space(5f);
             this.drawSettingsMenu();
 
             switch (this.settingsMenu)
@@ -402,10 +417,12 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 09.10.2018
 
+            gui.Label("<b>Xbox Controller</b>");
+            gui.Space(5f);
             using (new gui.HorizontalScope())
             {
                 ueGUI.backgroundColor = this.moduleBackgroundColor;
-                this.drawXboxControllerDebugContent();
+                //this.drawXboxControllerDebugContent();
                 this.drawControllerInputContent();
                 ueGUI.backgroundColor = this.backgroundColor;
             }
@@ -417,27 +434,35 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 09.10.2018
 
-            using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width((this.mainGuiWidth - SCROLL_BAR_OFFSET - 12.5f) / 2) }))
+            using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width((this.mainGuiWidth - SCROLL_BAR_OFFSET - 12.5f)/* / 2*/) }))
             {
                 gui.Label("<b>Xbox Controller Input Viewer.</b>");               
                 int j = 0;
-                foreach (XboxControl xCon in this.xboxController.getXboxControls())
-                {
-                    j++;
-                    if (j == 2)
-                    {
-                        j = 0;
-                        ueGUI.backgroundColor = this.primaryItemColor;
-                    }
-                    else
-                        ueGUI.backgroundColor = this.secondaryItemColor;
 
-                    using (new gui.VerticalScope("box"))
+                XboxControl[] xboxControls = this.xboxController.getXboxControls();
+
+                for (int i = 1; i < xboxControls.Length; i++)
+                {
+                    i--;
                     using (new gui.HorizontalScope())
-                    {
-                        gui.Label(xCon.texture);
-                        gui.Label(xCon.inputName);
-                    }
+                        for (int n = 0; n < 2; n++)
+                        {
+                            j++;
+                            if (j == 2)
+                            {
+                                j = 0;
+                                ueGUI.backgroundColor = this.primaryItemColor;
+                            }
+                            else
+                                ueGUI.backgroundColor = this.secondaryItemColor;
+                            using (new gui.VerticalScope("box"))
+                            using (new gui.HorizontalScope())
+                            {
+                                gui.Label(xboxControls[i].texture);
+                                gui.Label(xboxControls[i].inputName);
+                            }
+                            i++;
+                        }
                 }
             }
         }
@@ -607,11 +632,21 @@ namespace TommoJProductions.MoControls.GUI
                 }
             }
             gui.Space(5f);
-            using (new gui.HorizontalScope("box"))
+            using (new gui.VerticalScope("box"))
             {
                 using (new gui.VerticalScope())
                 {
-                    gui.Label(String.Format("Sensitivity: {0}", this.mouseEmulator.sensitivity));
+                    gui.Label(String.Format("Game Sensitivity: {0}", this.mouseEmulator.sensitivity));
+                    tempValue = gui.HorizontalSlider(this.mouseEmulator.sensitivity, MouseEmulator.MIN_SENSITIVITY, MouseEmulator.MAX_SENSITIVITY);
+                    if (tempValue != this.mouseEmulator.sensitivity) // Value Changed.
+                    {
+                        this.mouseEmulator.sensitivity = tempValue;
+                        saveSettings = true;
+                    }
+                }
+                using (new gui.VerticalScope())
+                {
+                    gui.Label(String.Format("GUI Sensitivity: {0}", this.mouseEmulator.sensitivity));
                     tempValue = gui.HorizontalSlider(this.mouseEmulator.sensitivity, MouseEmulator.MIN_SENSITIVITY, MouseEmulator.MAX_SENSITIVITY);
                     if (tempValue != this.mouseEmulator.sensitivity) // Value Changed.
                     {
