@@ -84,6 +84,8 @@
     <Compile Include="TommoJProductions\Debugging\DebugStatsCommand.cs" />
     <Compile Include="TommoJProductions\Debugging\DebugTypeEnum.cs" />
     <Compile Include="TommoJProductions\Debugging\ListLoadedAssembliesConsoleCommand.cs" />
+    <Compile Include="TommoJProductions\MoControls\Extentions.cs" />
+    <Compile Include="TommoJProductions\MoControls\GameControlsEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\GUI\GuiNav.cs" />
     <Compile Include="TommoJProductions\MoControls\HoldInputMono.cs" />
     <Compile Include="TommoJProductions\MoControls\Input.cs" />

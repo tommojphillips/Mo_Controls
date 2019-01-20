@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace TommoJProductions.MoControls.XInputInterpreter
@@ -11,21 +10,6 @@ namespace TommoJProductions.MoControls.XInputInterpreter
     {
         // Written, 09.10.2018
 
-        public static void forEach(this XboxControl[] inXboxControl, Func<XboxControl, bool> inFunc)
-        {
-            // Written, 09.10.2018
-            try
-            {
-                foreach (XboxControl xc in inXboxControl)
-                    inFunc?.Invoke(xc);                
-            }
-            catch (NullReferenceException ex)
-            {
-                MoControlsMod.print(String.Format("<i>[XboxExtentions.forEach(this XboxControl, Action)]</i> - <color=red>Action was null\r\n<b>StackTrace:</b> {0}</color>",
-                        ex.StackTrace), Debugging.DebugTypeEnum.full);
-                return;
-            }
-        }
         /// <summary>
         /// Returns the string representation of the provided <see cref="XboxButtonEnum"/>.
         /// </summary>

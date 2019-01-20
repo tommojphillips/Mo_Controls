@@ -187,7 +187,7 @@ namespace TommoJProductions.MoControls
         /// Loads provided control list to cInput.
         /// </summary>
         /// <param name="inControlMode">The control mode.</param>
-        public void loadControlModeToCInput(PlayerModeEnum inPlayerMode, string[,] inControlMode)
+        internal void loadControlModeToCInput(PlayerModeEnum inPlayerMode, string[,] inControlMode)
         {
             // Written, 31.08.2018
 
@@ -246,7 +246,7 @@ namespace TommoJProductions.MoControls
         /// Loads control inputs (defined in <see cref="inputNames"/>) from the class, <see cref="cInput"/> and adds each one to <see cref="controlInputs"/> with it's primary
         /// and secondary input.
         /// </summary>
-        public static string[,] loadControlInputsFromCInput()
+        internal static string[,] loadControlInputsFromCInput()
         {
             // Written, 31.08.2018
 
@@ -274,7 +274,7 @@ namespace TommoJProductions.MoControls
         /// </summary>
         /// <param name="inFootControls">The group of foot controls to assign.</param>
         /// <param name="inDrivingControls">The group of driving controls to assign.</param>
-        public void setControls(string[,] inFootControls, string[,] inDrivingControls)
+        internal void setControls(string[,] inFootControls, string[,] inDrivingControls)
         {
             // Written, 22.08.2018
 
@@ -285,7 +285,7 @@ namespace TommoJProductions.MoControls
         /// Sets the provided game control in provided mode.
         /// </summary>
         /// <param name="inMode"></param>
-        public void setGameControl(PlayerModeEnum inMode, string inControlName, int inIndex, string inInput)
+        internal void setGameControl(PlayerModeEnum inMode, string inControlName, int inIndex, string inInput)
         {
             // Written, 02.09.2018
 
@@ -328,7 +328,7 @@ namespace TommoJProductions.MoControls
         /// Changes the input for a control defined in <see cref="changeInputResult"/> to the provided input string, <paramref name="inInput"/>.
         /// </summary>
         /// <param name="inInput">The input to assign.</param>
-        public void changeInput(string inInput)
+        internal void changeInput(string inInput)
         {
             // Written, 09.07.2018
 

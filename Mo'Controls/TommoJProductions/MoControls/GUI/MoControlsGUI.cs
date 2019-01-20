@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 using gui = UnityEngine.GUILayout;
 using ueGUI = UnityEngine.GUI;
@@ -81,6 +82,73 @@ namespace TommoJProductions.MoControls.GUI
         /// Represents a keybind to open/close the gui for the mod.
         /// </summary>
         public readonly Keybind openControlsGui = new Keybind("OpenControls", "Open Controls GUI", KeyCode.F12);
+               
+        /// <summary>
+        /// Represents all relevant controls when in "on foot mode".
+        /// </summary>
+        private List<GameControlsEnum> relevantFootControls = new List<GameControlsEnum>()
+        {
+            GameControlsEnum.PlayerUp,
+            GameControlsEnum.PlayerDown,
+            GameControlsEnum.PlayerLeft,
+            GameControlsEnum.PlayerRight,
+            GameControlsEnum.DrivingMode,
+            GameControlsEnum.Drunk,
+            GameControlsEnum.Crouch,
+            GameControlsEnum.Hit,
+            GameControlsEnum.Hitchhike,
+            GameControlsEnum.Jump,
+            GameControlsEnum.Push,
+            GameControlsEnum.ReachLeft,
+            GameControlsEnum.Run,
+            GameControlsEnum.Smoke,
+            GameControlsEnum.Swear,
+            GameControlsEnum.Use,
+            GameControlsEnum.Urinate,
+            GameControlsEnum.WristWatch,
+            GameControlsEnum.Zoom
+        };
+        /// <summary>
+        /// Represents all relevant controls when in "driving mode".
+        /// </summary>
+        private List<GameControlsEnum> relevantDrivingControls = new List<GameControlsEnum>()
+        {
+            GameControlsEnum.Boost,
+            GameControlsEnum.Brake,
+            GameControlsEnum.Clutch,
+            GameControlsEnum.DrivingMode,
+            GameControlsEnum.Drunk,
+            GameControlsEnum.Fifth,
+            GameControlsEnum.Finger,
+            GameControlsEnum.First,
+            GameControlsEnum.Fourth,
+            GameControlsEnum.Handbrake,
+            GameControlsEnum.HighBeam,
+            GameControlsEnum.IndicatorLeft,
+            GameControlsEnum.IndicatorRight,
+            GameControlsEnum.Left,
+            GameControlsEnum.Range,
+            GameControlsEnum.ReachLeft,
+            GameControlsEnum.ReachRight,
+            GameControlsEnum.Reverse,
+            GameControlsEnum.Right,
+            GameControlsEnum.Second,
+            GameControlsEnum.ShiftDown,
+            GameControlsEnum.ShiftUp,
+            GameControlsEnum.Sixth,
+            GameControlsEnum.Smoke,
+            GameControlsEnum.Swear,
+            GameControlsEnum.Third,
+            GameControlsEnum.Throttle,
+            GameControlsEnum.Use,
+            GameControlsEnum.Wipers,
+            GameControlsEnum.WristWatch,
+            GameControlsEnum.Zoom
+        };
+        /// <summary>
+        /// Represents whether to show relevant controls.
+        /// </summary>
+        private bool onlyShowRelevantControls = true;
 
         #endregion
 
@@ -861,45 +929,72 @@ namespace TommoJProductions.MoControls.GUI
 
             gui.Space(3f);
             gui.Label(String.Format("<b>{0}</b>", inTitle));
+            this.onlyShowRelevantControls = gui.Toggle(this.onlyShowRelevantControls, "Show Relevant Controls");
             gui.Space(5f);
             int j = 0;
             for (int i = 0; i < inControlInputs.GetLength(0); i++)
             {
-                j++;
-                if (j == 2)
+                string gameControlName = inControlInputs[i, 0];
+                GameControlsEnum gameControl = gameControlName.getGameControl();
+                bool drawControl = false;
+                if (this.onlyShowRelevantControls)
                 {
-                    j = 0;
-                    ueGUI.backgroundColor = this.primaryItemColor;
-                }
-                else
-                    ueGUI.backgroundColor = this.secondaryItemColor;
-                string controlName = inControlInputs[i, 0];
-                gui.Space(3f);
-                using (new gui.VerticalScope("box"))
-                {
-                    gui.Label(String.Format("<b>{0}:</b>", controlName.getGameControlAlias(true)));
-                    using (new gui.HorizontalScope())
+                    if (this.mainGUIMenu == MainGUIMenuEnum.DrivingControls)
                     {
-                        bool isControls = this.mainGUIMenu == MainGUIMenuEnum.FootControls;
-                        PlayerModeEnum? playerMode;
-                        if (isControls)
-                            playerMode = PlayerModeEnum.OnFoot;
-                        else
+                        if (this.relevantDrivingControls.Contains(gameControl))
+                            drawControl = true;
+                    }
+                    else
+                    {
+                        if (this.mainGUIMenu == MainGUIMenuEnum.FootControls)
                         {
-                            isControls = this.mainGUIMenu == MainGUIMenuEnum.DrivingControls;
-                            if (isControls)
-                                playerMode = PlayerModeEnum.Driving;
-                            else
-                                playerMode = null;
+                            if (this.relevantFootControls.Contains(gameControl))
+                                drawControl = true;
                         }
-
-                        this.drawCommonControl("Primary Input", controlName, inControlInputs[i, 1], 1, playerMode);
-                        this.drawCommonControl("Secondary Input", controlName, inControlInputs[i, 2], 2, playerMode);
                     }
                 }
+                else
+                    drawControl = true;
+                if (drawControl)
+                {
+                    j++;
+                    if (j == 2)
+                    {
+                        j = 0;
+                        ueGUI.backgroundColor = this.primaryItemColor;
+                    }
+                    else
+                        ueGUI.backgroundColor = this.secondaryItemColor;
+
+                    gui.Space(3f);
+                    using (new gui.VerticalScope("box"))
+                    {
+                        gui.Label(String.Format("<b>{0}:</b>", gameControl.getGameControlAlias(true)));
+                        using (new gui.HorizontalScope())
+                        {
+                            bool isControls = this.mainGUIMenu == MainGUIMenuEnum.FootControls;
+                            PlayerModeEnum? playerMode;
+                            if (isControls)
+                                playerMode = PlayerModeEnum.OnFoot;
+                            else
+                            {
+                                isControls = this.mainGUIMenu == MainGUIMenuEnum.DrivingControls;
+                                if (isControls)
+                                    playerMode = PlayerModeEnum.Driving;
+                                else
+                                    playerMode = null;
+                            }
+
+                            this.drawCommonControl("Primary Input", gameControlName, inControlInputs[i, 1], 1, playerMode);
+                            this.drawCommonControl("Secondary Input", gameControlName, inControlInputs[i, 2], 2, playerMode);
+                        }
+
+
+                    }
+                    ueGUI.backgroundColor = this.backgroundColor;
+                    gui.Space(3f);
+                }
             }
-            ueGUI.backgroundColor = this.backgroundColor;
-            gui.Space(3f);
         }
         /// <summary>
         /// Draws all mod keybinds.
