@@ -4,9 +4,13 @@ using TommoJProductions.MoControls;
 
 namespace TommoJProductions.Debugging
 {
-    public class DebugStatsCommand : ConsoleCommand
+    /// <summary>
+    /// Represents a command that lists all debug stats.
+    /// </summary>
+    internal class DebugStatsCommand : ConsoleCommand
     {
         // Written, 28.12.2018
+
         public override string Name => "mcdebugstats";
 
         public override string Help => "Displays mo'controls debug Configuration";

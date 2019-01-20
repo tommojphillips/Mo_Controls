@@ -144,7 +144,7 @@ namespace TommoJProductions.MoControls
             get;
             set;
         }
-        public Debugging.DebugTypeEnum debugMode
+        internal Debugging.DebugTypeEnum debugMode
         {
             get;
             set;

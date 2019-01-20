@@ -99,6 +99,7 @@ namespace TommoJProductions.MoControls.GUI
             GameControlsEnum.Hitchhike,
             GameControlsEnum.Jump,
             GameControlsEnum.Push,
+            GameControlsEnum.Finger,
             GameControlsEnum.ReachLeft,
             GameControlsEnum.Run,
             GameControlsEnum.Smoke,

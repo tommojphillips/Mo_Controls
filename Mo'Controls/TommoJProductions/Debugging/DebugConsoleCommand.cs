@@ -8,9 +8,11 @@ namespace TommoJProductions.Debugging
     /// </summary>
     internal class DebugConsoleCommand : ConsoleCommand
     {
+        // Written, 08.10.2018
+
         public override string Name => "mcdebug";
 
-        public override string Help => "Enables/Disables debug mode for the mod, Mo'Controls.\r\n<color=grey>1.) <i>none or '0'</i>\r\n2.) <i>partial or '1'</i>\r\n3.) <i>full or '2'</i></color>";
+        public override string Help => "Enables/Disables debug mode for the mod, Mo'Controls. <color=grey>1.) <i>none or '0'</i>, 2.) <i>partial or '1'</i>, 3.) <i>full or '2'</i></color>";
 
         public override void Run(string[] inArgs)
         {
