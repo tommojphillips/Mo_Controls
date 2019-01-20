@@ -203,9 +203,6 @@ namespace TommoJProductions.MoControls.GUI
                 XboxButtonEnum.Back,
                 0.3f,
                 this.toggleGui);
-            // GUI Nav set up
-            GuiNav gNav = this.gameObject.AddComponent<GuiNav>();
-            gNav.enabled = false;
 
             MoControlsMod.print(nameof(MoControlsGUI) + ": Started", Debugging.DebugTypeEnum.full);
         }
@@ -222,9 +219,13 @@ namespace TommoJProductions.MoControls.GUI
             {
                 if (this.changeInputResult.reassignKey)
                 {
+                    MoControlsGO.guiNav.enabled = false;
                     MonitorInputData mid = Input.monitorForInput();
                     if (mid.foundInput)
+                    {
                         this.controlManager.changeInput(mid.input);
+                        MoControlsGO.guiNav.enabled = true;
+                    }
                 }
             }
         }

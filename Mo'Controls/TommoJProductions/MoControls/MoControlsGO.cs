@@ -47,7 +47,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents the GUI for the mod.
         /// </summary>
-        public static MoControlsGUI moControlsGui
+        internal static MoControlsGUI moControlsGui
         {
             get;
             private set;
@@ -55,7 +55,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents the control manager.
         /// </summary>
-        public static ControlManager controlManager
+        internal static ControlManager controlManager
         {
             get;
             private set;
@@ -63,7 +63,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents an emulator for the mouse.
         /// </summary>
-        public static MouseEmulator mouseEmulator
+        internal static MouseEmulator mouseEmulator
         {
             get;
             private set;
@@ -71,7 +71,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents the xbox controller manager.
         /// </summary>
-        public static XboxControllerManager xboxControllerManager
+        internal static XboxControllerManager xboxControllerManager
         {
             get;
             private set;
@@ -79,12 +79,20 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents an xbox controller.
         /// </summary>
-        public static XboxController xboxController
+        internal static XboxController xboxController
         {
             get
             {
                 return xboxControllerManager.controllers[0];
             }
+        }
+        /// <summary>
+        /// Represents the gui navigation system for the GUI.
+        /// </summary>
+        internal static GuiNav guiNav
+        {
+            get;
+            private set;
         }
 
         #endregion
@@ -102,6 +110,8 @@ namespace TommoJProductions.MoControls
             moControlsGui = this.gameObject.AddComponent<MoControlsGUI>();
             xboxControllerManager = this.gameObject.AddComponent<XboxControllerManager>();
             mouseEmulator = this.gameObject.AddComponent<MouseEmulator>();
+            guiNav = this.gameObject.AddComponent<GuiNav>();
+            guiNav.enabled = false;
             XboxControllerManager.ControllerConnected += this.XboxControllerManager_ControllerConnected;
             XboxControllerManager.ControllerDisconnected += this.XboxControllerManager_ControllerDisconnected;
             MoControlsMod.print(nameof(MoControlsGO) + ": Started", Debugging.DebugTypeEnum.full);
@@ -137,7 +147,7 @@ namespace TommoJProductions.MoControls
         /// </summary>
         /// <param name="inSaveData">The save data to set as loaded.</param>
         /// <param name="inStartUp">the</param>
-        public void setLoadedSettings(MoControlsSaveData inSaveData, bool inStartUp = false, bool inPreload = false)
+        internal void setLoadedSettings(MoControlsSaveData inSaveData, bool inStartUp = false, bool inPreload = false)
         {
             // Written, 22.08.2018
 

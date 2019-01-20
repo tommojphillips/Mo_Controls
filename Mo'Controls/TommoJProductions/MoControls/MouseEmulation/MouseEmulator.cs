@@ -213,7 +213,7 @@ namespace TommoJProductions.MoControls.MouseEmulation
             MoControlsMod.print(nameof(MouseEmulator) + ": Started", Debugging.DebugTypeEnum.full);
         }
         /// <summary>
-        /// Should be called every frame; on <see cref="Mod.Update()"/>.
+        /// Occurs every frame
         /// </summary>
         private void Update()
         {
