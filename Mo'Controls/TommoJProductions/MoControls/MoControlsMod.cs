@@ -185,6 +185,7 @@ namespace TommoJProductions.MoControls
                 if (debugTypeEquals(DebugTypeEnum.full))
                     print("<color=grey>Running supported modloader version, <color=green>" + SUPPORTED_MODLOADER_VERSION + "</color></color>");
                 this.playerSeenMscLoaderVersionError = false;
+                MoControlsSaveData.saveSettings(moControlsGO);
             }
         }
         /// <summary>
