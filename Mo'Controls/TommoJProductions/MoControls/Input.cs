@@ -6,7 +6,7 @@ using TommoJProductions.MoControls.XInputInterpreter;
 
 namespace TommoJProductions.MoControls
 {
-    public class Input
+    internal class Input
     {
         #region Keys
 
@@ -30,7 +30,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Monitors for input from both an xbox controller, the keyboard and the mouse.
         /// </summary>
-        public static MonitorInputData monitorForInput()
+        internal static MonitorInputData monitorForInput()
         {
             // Written, 09.07.2018
 
