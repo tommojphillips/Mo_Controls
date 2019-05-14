@@ -250,7 +250,6 @@ namespace TommoJProductions.MoControls.GUI
 
             try
             {
-                ueGUI.skin = ModLoader.guiskin;
                 if (this.controlsGuiOpened)
                 {
                     this.drawMainMenuGUI();
