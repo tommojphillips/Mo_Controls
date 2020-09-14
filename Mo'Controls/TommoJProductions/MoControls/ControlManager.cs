@@ -370,7 +370,7 @@ namespace TommoJProductions.MoControls
                         this.setGameControl((PlayerModeEnum)playerMode, this.changeInputResult.controlName, this.changeInputResult.index, input);                  
                     if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
                         MoControlsMod.print("Player mode was equal to <b>" + this.changeInputResult.mode + "</b> whiling setting '" + this.changeInputResult.controlName + "' to '" + input + "'.");
-                    MoControlsSaveData.saveSettings(MoControlsMod.moControlsGO);
+                    MoControlsSaveData.saveSettings();
                 }
             }
             else

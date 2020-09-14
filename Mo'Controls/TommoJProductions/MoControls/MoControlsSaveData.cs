@@ -195,31 +195,47 @@ namespace TommoJProductions.MoControls
         #region Methods
 
         /// <summary>
-        /// Saves the settings.
+        /// Gathers data and saves the settings.
         /// </summary>
-        public static void saveSettings(MoControlsGO mo_Controls)
+        public static void saveSettings()
         {
-            // Written, 20.08.2018
+            // Written, 20.08.2018  | 16.08.2020
 
-            MoControlsSaveData mcsd = new MoControlsSaveData()
+            bool _error = false;
+
+            MoControlsSaveData mcsd = new MoControlsSaveData();
+
+            if (MoControlsGO.xboxControllerManager != null)
+                mcsd.monitiorXboxControllerConnectionStatus = MoControlsGO.xboxControllerManager.monitorControllerConnections.Monitor;
+            else
+                _error = true;
+            if (MoControlsGO.mouseEmulator != null) 
             {
-                monitiorXboxControllerConnectionStatus = MoControlsGO.xboxControllerManager.monitorControllerConnections.Monitor,
-                emulateMouse = MoControlsGO.mouseEmulator.Emulating,
-                mouseDeadzone = MoControlsGO.mouseEmulator.deadzone,
-                mouseSensitivity = MoControlsGO.mouseEmulator.sensitivity,
-                mouseInputType = MoControlsGO.mouseEmulator.inputType,
-                displayCurrentPlayerModeOverlay = MoControlsGO.controlManager.displayCurrentPlayerModeOverlay,
-                footControls = MoControlsGO.controlManager.footControls,
-                drivingControls = MoControlsGO.controlManager.drivingControls,
-                debugMode = MoControlsMod.debug,
-                playerSeenMscLoaderVersionError = MoControlsMod.instance.playerSeenMscLoaderVersionError,
-            };
-            saveSettings(MoControlsMod.instance, mcsd);
+                mcsd.emulateMouse = MoControlsGO.mouseEmulator.Emulating;
+                mcsd.mouseDeadzone = MoControlsGO.mouseEmulator.deadzone;
+                mcsd.mouseSensitivity = MoControlsGO.mouseEmulator.sensitivity;
+                mcsd.mouseInputType = MoControlsGO.mouseEmulator.inputType;                
+            }
+            else
+                _error = true;
+            if (MoControlsGO.controlManager != null) 
+            {
+                mcsd.displayCurrentPlayerModeOverlay = MoControlsGO.controlManager.displayCurrentPlayerModeOverlay;
+                mcsd.footControls = MoControlsGO.controlManager.footControls;
+                mcsd.drivingControls = MoControlsGO.controlManager.drivingControls;                
+            }
+            else
+                _error = true;
+            mcsd.debugMode = MoControlsMod.debug;
+            mcsd.playerSeenMscLoaderVersionError = MoControlsMod.instance.playerSeenMscLoaderVersionError;
+
+            if (!_error)
+                _saveSettings(MoControlsMod.instance, mcsd);
         }
         /// <summary>
         /// Saves the settings.
         /// </summary>
-        public static void saveSettings(MoControlsMod mo_Controls, MoControlsSaveData mcsd)
+        private static void _saveSettings(MoControlsMod mo_Controls, MoControlsSaveData mcsd)
         {
             // Written, 22.08.2018
 
@@ -259,7 +275,7 @@ namespace TommoJProductions.MoControls
                 if (createNewSaveFile)
                 {
                     mcsd = defaultSave;
-                    saveSettings(MoControlsMod.instance, mcsd);
+                    _saveSettings(MoControlsMod.instance, mcsd);
                 }
                 if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
                     MoControlsMod.print("loaded mo'controls data.");

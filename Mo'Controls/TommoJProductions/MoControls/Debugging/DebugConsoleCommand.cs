@@ -42,7 +42,7 @@ namespace TommoJProductions.MoControls.Debugging
                         break;
                 }
                 //MoControlsMod.debug = !MoControlsMod.debug;
-                MoControlsSaveData.saveSettings(MoControlsMod.moControlsGO);
+                MoControlsSaveData.saveSettings();
                 MoControlsMod.print("Debug Mode set to <b>" + MoControlsMod.debug + "</b>.");
             }
         }

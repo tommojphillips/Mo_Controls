@@ -225,11 +225,11 @@ namespace TommoJProductions.MoControls.MouseEmulation
             {
                 XboxController xboxController = MoControlsGO.xboxController;
 
-                if (this.lmbPrimaryInput.IsDown() || this.lmbSecondaryInput.IsDown())
+                if (this.lmbPrimaryInput.GetKeybindDown() || this.lmbSecondaryInput.GetKeybindDown())
                 {
                     simulateLeftClick();
                 }
-                if (this.rmbPrimaryInput.IsDown() || this.rmbSecondaryInput.IsDown())
+                if (this.rmbPrimaryInput.GetKeybindDown() || this.rmbSecondaryInput.GetKeybindDown())
                 {
                     simulateRightClick();
                 }

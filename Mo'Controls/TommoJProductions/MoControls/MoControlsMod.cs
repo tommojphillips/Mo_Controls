@@ -19,7 +19,7 @@ namespace TommoJProductions.MoControls
         public override string ID => "Mo_Controls";
         public override string Name => "Mo'Controls";
         public override string Author => "tommojphillips";
-        public override string Version => "1.0.8";
+        public override string Version => "1.1";
         public override bool UseAssetsFolder => true;
 
         #endregion
@@ -33,7 +33,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents the supported/compatible version of mod loader.
         /// </summary>
-        public const string SUPPORTED_MODLOADER_VERSION = "0.4.7";
+        public const string SUPPORTED_MODLOADER_VERSION = "1.1.7";
         /// <summary>
         /// Represents the moControls gameobject.
         /// </summary>
@@ -166,26 +166,26 @@ namespace TommoJProductions.MoControls
             // Written, 03.08.2018
 
             // Modloader supported version check.
-            if (SUPPORTED_MODLOADER_VERSION != ModLoader.Version)
+            if (SUPPORTED_MODLOADER_VERSION != ModLoader.MSCLoader_Ver)
             {
                 if (!this.playerSeenMscLoaderVersionError)
                 {
                     ModUI.ShowMessage(
                         String.Format("<b>[{0} <color=orange>v{1}]</color></b> - NOTE: modloader v{2} may not be <color=orange>compatible</color>.\r\nSupported " +
                         "modloader version is <color=orange>v{3}</color>.",
-                        this.Name, this.Version, ModLoader.Version, SUPPORTED_MODLOADER_VERSION), "ModLoader Version not supported.");
+                        this.Name, this.Version, ModLoader.MSCLoader_Ver, SUPPORTED_MODLOADER_VERSION), "ModLoader Version not supported.");
                     this.playerSeenMscLoaderVersionError = true;
-                    MoControlsSaveData.saveSettings(moControlsGO);
+                    MoControlsSaveData.saveSettings();
                 }
                 if (debugTypeEquals(DebugTypeEnum.partial))
-                    print("<color=orange>Warning</color> <color=grey>Supported modloader version is <b>v" + SUPPORTED_MODLOADER_VERSION + "</b>; you're running version <b>" + ModLoader.Version + "</b>. May not be compatible with current version.</color>.");
+                    print("<color=orange>Warning</color> <color=grey>Supported modloader version is <b>v" + SUPPORTED_MODLOADER_VERSION + "</b>; you're running version <b>" + ModLoader.MSCLoader_Ver + "</b>. May not be compatible with current version.</color>.");
             }
             else
             {
                 if (debugTypeEquals(DebugTypeEnum.full))
                     print("<color=grey>Running supported modloader version, <color=green>" + SUPPORTED_MODLOADER_VERSION + "</color></color>");
                 this.playerSeenMscLoaderVersionError = false;
-                MoControlsSaveData.saveSettings(moControlsGO);
+                MoControlsSaveData.saveSettings();
             }
         }
         /// <summary>

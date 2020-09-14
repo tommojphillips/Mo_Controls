@@ -229,7 +229,7 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 22.08.2018
 
-            if (this.openControlsGui.IsDown())
+            if (this.openControlsGui.GetKeybindDown())
                 this.toggleGui();
             if (this.controlsGuiOpened)
             {
@@ -748,7 +748,7 @@ namespace TommoJProductions.MoControls.GUI
             gui.Space(5f);
             if (saveSettings)
             {
-                MoControlsSaveData.saveSettings(MoControlsMod.moControlsGO);
+                MoControlsSaveData.saveSettings();
             }
         }
         /// <summary>
@@ -777,7 +777,7 @@ namespace TommoJProductions.MoControls.GUI
             ueGUI.backgroundColor = this.backgroundColor;
             if (_saveSettings)
             {
-                MoControlsSaveData.saveSettings(MoControlsMod.moControlsGO);
+                MoControlsSaveData.saveSettings();
             }
         }
         /// <summary>
