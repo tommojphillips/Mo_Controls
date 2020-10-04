@@ -1,9 +1,9 @@
-﻿namespace TommoJProductions.MoControls.Debugging
+﻿namespace TommoJProductions.Debugging
 {
     /// <summary>
     /// Represents debug data to display in the mod console.
     /// </summary>
-    public enum DebugTypeEnum
+    internal enum DebugTypeEnum
     {
         /// <summary>
         /// Represents no debugging data.

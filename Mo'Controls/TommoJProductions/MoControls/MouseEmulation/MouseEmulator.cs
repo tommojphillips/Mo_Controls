@@ -16,7 +16,7 @@ namespace TommoJProductions.MoControls.MouseEmulation
         /// <summary>
         /// Represents the primary input for LMB
         /// </summary>
-        public Keybind lmbPrimaryInput = new Keybind(LMB_INPUT_NAME + "1", "LMB Primary Input", KeyCode.Joystick1Button0);
+        public Keybind lmbPrimaryInput = new Keybind(LMB_INPUT_NAME + "1", "LMB Primary Input", KeyCode.JoystickButton0);
         /// <summary>
         /// Represents the secondary input for LMB
         /// </summary>
@@ -24,7 +24,7 @@ namespace TommoJProductions.MoControls.MouseEmulation
         /// <summary>
         /// Represents the primary input for RMB
         /// </summary>
-        public Keybind rmbPrimaryInput = new Keybind(RMB_INPUT_NAME + "1", "RMB Primary Input", KeyCode.Joystick1Button2);
+        public Keybind rmbPrimaryInput = new Keybind(RMB_INPUT_NAME + "1", "RMB Primary Input", KeyCode.JoystickButton2);
         /// <summary>
         /// Represents the secondary input for RMB
         /// </summary>
@@ -41,7 +41,7 @@ namespace TommoJProductions.MoControls.MouseEmulation
             get
             {
                 Point point = new Point();
-                NativeMethods.GetCursorPos(out point);
+                NM.GetCursorPos(out point);
                 return point;
             }
         }
@@ -70,13 +70,11 @@ namespace TommoJProductions.MoControls.MouseEmulation
             {
                 if (value)
                 {
-                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                        MoControlsMod.print(String.Format("Started Emulating mouse as {0}.", this.inputType));
+                    MoControlsMod.print(String.Format("Started Emulating mouse as {0}.", this.inputType), Debugging.DebugTypeEnum.full);
                 }
                 else
                 {
-                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                        MoControlsMod.print("Stopped Emulating mouse..");
+                    MoControlsMod.print("Stopped Emulating mouse..", Debugging.DebugTypeEnum.full);
                 }
                 emulateMouse = value;
             }
@@ -172,6 +170,10 @@ namespace TommoJProductions.MoControls.MouseEmulation
         /// </summary>
         private const int MOUSEEVENTF_RIGHTUP = 0x10;
         /// <summary>
+        /// Represents the mouse wheel event.
+        /// </summary>
+        private const int MOUSEEVENTF_WHEEL = 0x0800;
+        /// <summary>
         /// Represents LMB input name.
         /// </summary>
         public const string LMB_INPUT_NAME = "mocontrolsLMB";
@@ -211,11 +213,10 @@ namespace TommoJProductions.MoControls.MouseEmulation
         {
             // Written, 08.10.2018
 
-            if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                MoControlsMod.print(nameof(MouseEmulator) + ": Started");
+            MoControlsMod.print(nameof(MouseEmulator) + ": Started", Debugging.DebugTypeEnum.full);
         }
         /// <summary>
-        /// Should be called every frame; on <see cref="Mod.Update()"/>.
+        /// Occurs every frame
         /// </summary>
         private void Update()
         {
@@ -342,7 +343,20 @@ namespace TommoJProductions.MoControls.MouseEmulation
             int X = tempCursPos.X;
             int Y = tempCursPos.Y;
             NM.mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, X, Y, 0, 0);
-        }        
+        }
+        /// <summary>
+        /// Simulates scrolling of the mouse wheel. (One mouse click = 120). Positive = Scroll up | Negitive = Scroll doen.
+        /// </summary>
+        /// <param name="inScrollAmount">The amount to scroll. default 120.</param>
+        internal static void simulateScroll(int inScrollAmount)
+        {
+            // Written, 28.12.2018
+
+            Point tempCursPos = getCursorPosition;
+            int X = tempCursPos.X;
+            int Y = tempCursPos.Y;
+            NM.mouse_event(MOUSEEVENTF_WHEEL, X, Y, (uint)inScrollAmount, 0);
+        }
 
         #endregion
     }

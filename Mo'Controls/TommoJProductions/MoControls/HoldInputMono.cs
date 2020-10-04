@@ -14,7 +14,7 @@ namespace TommoJProductions.MoControls
         #region Fields 
 
         /// <summary>
-        /// 
+        /// The start time.
         /// </summary>
         private float startTime = 0f;
         /// <summary>
@@ -51,7 +51,7 @@ namespace TommoJProductions.MoControls
         #region Methods
 
         /// <summary>
-        /// 
+        /// Updates every frame.
         /// </summary>
         private void Update()
         {
@@ -82,12 +82,12 @@ namespace TommoJProductions.MoControls
             }
         }
         /// <summary>
-        /// 
+        /// Sets and initializes hold input mono
         /// </summary>
-        /// <param name="inName"></param>
-        /// <param name="inKeyName"></param>
-        /// <param name="inHoldTime"></param>
-        /// <param name="inAction"></param>
+        /// <param name="inName">The name to set the hold input</param>
+        /// <param name="inKeyName">The Xbox Button to assign the hold</param>
+        /// <param name="inHoldTime">How long the xbox button needs to be held down for before action execution.</param>
+        /// <param name="inAction">The action to perform.</param>
         internal void setData(string inName, XboxButtonEnum inKeyName, float inHoldTime, Action inAction)
         {
             // Written, 19.12.2018
@@ -96,10 +96,9 @@ namespace TommoJProductions.MoControls
             this.keyName = inKeyName;
             this.action = inAction;
             this.hiName = inName;
-            this.id = ("hld_inpt_"+ this.hiName +"_K" + inKeyName).ToLower().Trim();
+            this.id = ("hld_inpt_"+ this.hiName.ToLower().Replace(" ", "") +"_K" + inKeyName).ToLower().Trim();
 
-            if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                MoControlsMod.print("<b>[SD CALL]</b> - hld_inpt: " + this.hiName + "initiliazed as '" + this.id + "'.");
+            MoControlsMod.print("hld_inpt: " + this.hiName + " initiliazed as '" + this.id + "'.", Debugging.DebugTypeEnum.full);
         }
         
         #endregion

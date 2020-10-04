@@ -1,12 +1,16 @@
 ﻿using System;
-using TommoJProductions.MoControls.Debugging;
+using System.Linq;
+using TommoJProductions.Debugging;
+using TommoJProductions.ModAPI;
 using MSCLoader;
 using UnityEngine;
 
 namespace TommoJProductions.MoControls
 {
+    // Mod References
     // XInputDotNetPure.dll - in folder: "My Summer Car/mysummercar_data/Managed"
     // XInputInterface.dll - in folder: "My Summer Car"
+
     /// <summary>
     /// Represents the mo'controls mod.
     /// </summary>
@@ -19,7 +23,7 @@ namespace TommoJProductions.MoControls
         public override string ID => "Mo_Controls";
         public override string Name => "Mo'Controls";
         public override string Author => "tommojphillips";
-        public override string Version => "1.1";
+        public override string Version => "1.1.1";
         public override bool UseAssetsFolder => true;
 
         #endregion
@@ -27,34 +31,66 @@ namespace TommoJProductions.MoControls
         #region Fields
 
         /// <summary>
-        /// Represents whether or not to display debug data.
+        /// Represents the moControls gameobject.
         /// </summary>
-        public static DebugTypeEnum debug;
+        private static GameObject moControlsGameObject;
+        /// <summary>
+        /// Represents all supported modapi names.
+        /// </summary>
+        private static readonly string[] MODAPI_NAMES = new string[] 
+        {
+            "modapi_v0114-alpha",
+            "modapi_v0120-alpha"
+        };
         /// <summary>
         /// Represents the supported/compatible version of mod loader.
         /// </summary>
         public const string SUPPORTED_MODLOADER_VERSION = "1.1.7";
         /// <summary>
-        /// Represents the moControls gameobject.
+        /// Represents whether or not to display debug data.
         /// </summary>
-        private static GameObject moControlsGameObject;
+        internal static DebugTypeEnum debug;
         /// <summary>
-        /// Player seen error message?
+        /// Represents whether the user is running modapi.
         /// </summary>
-        public bool playerSeenMscLoaderVersionError
-        {
-            get;
-            set;
-        }
+        internal ModApiData modApiData = null;
 
         #endregion
 
         #region Properties
 
         /// <summary>
+        /// Represents whether this is a release version
+        /// </summary>
+        internal static bool isReleaseVersion
+        {
+            get
+            {
+                return false;
+            }
+        }
+        /// <summary>
+        /// Represents the release version name.
+        /// </summary>
+        internal string releaseVersionName
+        {
+            get
+            {
+                return "<color=" + (isReleaseVersion ? "blue>Release" : "red>Pre-Release") + "</color>";
+            }
+        }
+        /// <summary>
+        /// Player seen error message?
+        /// </summary>
+        internal bool playerSeenMscLoaderVersionError
+        {
+            get;
+            set;
+        }
+        /// <summary>
         /// Represents whether or not the assets are loaded.
         /// </summary>
-        public static bool assetsLoaded
+        internal static bool assetsLoaded
         {
             get;
             private set;
@@ -62,7 +98,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents all assets for the mod.
         /// </summary>
-        public static AssetHolder assets
+        internal static AssetHolder assets
         {
             get;
             private set;
@@ -70,11 +106,11 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents the <see cref="moControlsGO"/> name.
         /// </summary>
-        public string gameObjectName => String.Format("{0} v{1}", this.ID, this.Version);
+        internal string gameObjectName => String.Format("{0} v{1}", this.ID, this.Version);
         /// <summary>
         /// Represents the current instance of <see cref="MoControlsMod"/>.
         /// </summary>
-        public static MoControlsMod instance
+        internal static MoControlsMod instance
         {
             get;
             private set;
@@ -82,7 +118,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents the mo_controls game object instance.
         /// </summary>
-        public static MoControlsGO moControlsGO
+        internal static MoControlsGO moControlsGO
         {
             get;
             private set;
@@ -97,7 +133,8 @@ namespace TommoJProductions.MoControls
             // Written, 20.08.2018
 
             instance = this;
-            ModConsole.Print(String.Format("<color=green>{0} <b>v{1}</b> ready</color>", this.Name, this.Version));
+            this.performDebugCheck();
+            ModConsole.Print(String.Format("<color=green>{0} <b>v{1}</b> ({2}) ready</color>", this.Name, this.Version, this.releaseVersionName));
         }
 
         #endregion
@@ -108,7 +145,7 @@ namespace TommoJProductions.MoControls
         /// checks if type equals debug.
         /// </summary>
         /// <param name="inDebugType">the debug type to compare.</param>
-        public static bool debugTypeEquals(DebugTypeEnum inDebugType)
+        private static bool debugTypeEquals(DebugTypeEnum inDebugType)
         {
             // Written, 15.10.2018
             
@@ -125,12 +162,15 @@ namespace TommoJProductions.MoControls
         /// Prints a message to the console with the prefix of the mod name.
         /// </summary>
         /// <param name="inMessage"></param>
-        public static void print(string inMessage)
+        internal static void print(string inMessage, DebugTypeEnum inDebugType)
         {
             // Written, 08.10.2018
 
-            string _msg = String.Format("<i><color=grey>[{0}]</color> <b><color=green>>></color></b></i> {1}", instance.Name, inMessage);
-            ModConsole.Print(_msg);
+            if (debugTypeEquals(inDebugType))
+            {
+                string _msg = String.Format("<i><color=grey>[{0}]</color> <b><color=green>>></color></b></i> {1}", instance.Name, inMessage);
+                ModConsole.Print(_msg);
+            }
         }
         /// <summary>
         /// Loads control asset textures.
@@ -142,19 +182,16 @@ namespace TommoJProductions.MoControls
             try
             {
                 AssetBundle ab = LoadAssets.LoadBundle(this, "mo_controls.unity3d");
-                if (debugTypeEquals(DebugTypeEnum.partial))
-                    print("Asset bundle loaded successfully.");
+                print("Asset bundle loaded successfully.", DebugTypeEnum.partial);
                 assets = new AssetHolder(ab.LoadAllAssets<Texture2D>()) ?? throw new Exception("asset holder return an error");
                 ab.Unload(false);
                 assetsLoaded = true;
 
-                if (debugTypeEquals(DebugTypeEnum.full))
-                    print("Asset bundle unloaded successfully.");
+                print("Asset bundle unloaded successfully.", DebugTypeEnum.full);
             }
             catch (Exception ex)
             {
-                if (debugTypeEquals(DebugTypeEnum.partial))
-                    print("<color=red>asset bundle threw error: " + ex.ToString() + ".</color>");
+                print("<color=red>asset bundle threw error: " + ex.ToString() + ".</color>", DebugTypeEnum.partial);
                 assetsLoaded = false;
             }
         }
@@ -177,13 +214,11 @@ namespace TommoJProductions.MoControls
                     this.playerSeenMscLoaderVersionError = true;
                     MoControlsSaveData.saveSettings();
                 }
-                if (debugTypeEquals(DebugTypeEnum.partial))
-                    print("<color=orange>Warning</color> <color=grey>Supported modloader version is <b>v" + SUPPORTED_MODLOADER_VERSION + "</b>; you're running version <b>" + ModLoader.MSCLoader_Ver + "</b>. May not be compatible with current version.</color>.");
+                print("<color=orange>Warning</color> <color=grey>Supported modloader version is <b>v" + SUPPORTED_MODLOADER_VERSION + "</b>; you're running version <b>" + ModLoader.MSCLoader_Ver + "</b>. May not be compatible with current version.</color>.", DebugTypeEnum.partial);
             }
             else
             {
-                if (debugTypeEquals(DebugTypeEnum.full))
-                    print("<color=grey>Running supported modloader version, <color=green>" + SUPPORTED_MODLOADER_VERSION + "</color></color>");
+                print("<color=grey>Running supported modloader version, <color=green>" + SUPPORTED_MODLOADER_VERSION + "</color></color>", DebugTypeEnum.full);
                 this.playerSeenMscLoaderVersionError = false;
                 MoControlsSaveData.saveSettings();
             }
@@ -196,9 +231,61 @@ namespace TommoJProductions.MoControls
             // Written, 17.10.2018
 
             ConsoleCommand.Add(new DebugConsoleCommand());
+            ConsoleCommand.Add(new DebugStatsCommand());
+            ConsoleCommand.Add(new ListLoadedAssembliesConsoleCommand());
+            ConsoleCommand.Add(new WriteCinputExternInputsCommand());
             this.loadControllerAssets();
         }
+        /// <summary>
+        /// Represents a debug/release mode check.
+        /// </summary>
+        private void performDebugCheck()
+        {
+            // Written, 28.12.2018
 
+#if DEBUG
+            if (isReleaseVersion)
+                ModUI.ShowMessage("<color=orange>Warning</color>: Debug Configuration invaild. Was this intentional Tommo? (dev message)" +
+                    "\r\n" +
+                    "\r\nRelease version: " + isReleaseVersion +
+                    "\r\nDebug Config: True",
+                    "<color=orange>Warning</color>: <b>Incorrect Debug/Releaase Configuration</b>");
+#else 
+            if (!isReleaseVersion)
+                ModUI.ShowMessage("<color=orange>Warning</color>: Release Configuration invaild" +
+                    "\r\nWas this intentional Tommo? (dev message)" +
+                    "\r\n" +
+                    "\r\nRelease version: " + isReleaseVersion +
+                    "\r\nDebug Config: False",
+                    "<color=orange>Warning</color>: <b>Incorrect Release/Debug Configuration</b>");
+#endif
+        }
+        /// <summary>
+        /// Checks if the end user is running a version of mod api.
+        /// </summary>
+        private void checkUserRunningModAPI()
+        {
+            // Written, 05.01.2019
+
+            try
+            {
+                System.Reflection.Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                assemblies = assemblies.Where(assem => MODAPI_NAMES.Any(mpn => mpn == assem.GetName().Name)).ToArray();
+                bool loadedModApiAssembly = assemblies.Count() > 0;
+                if (loadedModApiAssembly)
+                {           
+                    this.modApiData = new ModApiData(true);
+                    print("Running Mod Api v" + this.modApiData.version, DebugTypeEnum.partial);
+                }
+                else
+                    throw new System.IO.FileNotFoundException("modapi file not found.");
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                this.modApiData = new ModApiData(false, null);
+                print("Not Running Mod Api", DebugTypeEnum.partial);
+            }
+        }
         #endregion
 
         #region Override Methods
@@ -206,18 +293,18 @@ namespace TommoJProductions.MoControls
         public override void OnLoad()
         {
             // Written, 06.07.2018    
-                        
+
             moControlsGameObject = new GameObject(gameObjectName);
             moControlsGO = moControlsGameObject.AddComponent<MoControlsGO>();
-            moControlsGO.setLoadedSettings(MoControlsSaveData.loadSettings(), preload: true);
+            moControlsGO.setLoadedSettings(MoControlsSaveData.loadSettings(), inPreload: true);
             this.initialize();
             this.performModLoaderVersionCheck();
-            if (debugTypeEquals(DebugTypeEnum.full))
-                print("Assets returned: " + assets.result);
-            if (debugTypeEquals(DebugTypeEnum.none))
-                print(this.Name + " v" + this.Version + ": Loaded.");
+            this.checkUserRunningModAPI();
+            print("Assets returned: " + assets.result, DebugTypeEnum.full);
+            print(this.Name + " v" + this.Version + ": Loaded.", DebugTypeEnum.none);
         }
 
-        #endregion        
+        #endregion
+
     }
 }   

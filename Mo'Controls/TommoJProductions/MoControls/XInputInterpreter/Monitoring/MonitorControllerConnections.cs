@@ -24,13 +24,11 @@ namespace TommoJProductions.MoControls.XInputInterpreter.Monitoring
             {
                 if (value)
                 {
-                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                        MoControlsMod.print("Started Monitoring for controller connections...");
+                    MoControlsMod.print("Started Monitoring for controller connections...", Debugging.DebugTypeEnum.full);
                 }
                 else
                 {
-                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                        MoControlsMod.print("Stopped Monitoring for controller connections...");
+                    MoControlsMod.print("Stopped Monitoring for controller connections...", Debugging.DebugTypeEnum.full);
                 }
                 this.monitor = value;
             }

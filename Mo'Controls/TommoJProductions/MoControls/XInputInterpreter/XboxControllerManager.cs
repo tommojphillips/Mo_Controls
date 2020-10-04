@@ -101,8 +101,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
                     this.addController(new XboxController(i));
                 }
                 this.monitorControllerConnections = this.gameObject.AddComponent<MonitorControllerConnections>();
-                if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                    MoControlsMod.print(nameof(XboxControllerManager) + ": Started");
+                MoControlsMod.print(nameof(XboxControllerManager) + ": Started", Debugging.DebugTypeEnum.full);
             }
             catch (Exception ex)
             {
@@ -136,8 +135,8 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Adds the specified xbox controller to the manager.
         /// </summary>
-        /// <param name="xboxController">The controller to add.</param>
-        public void addController(XboxController xboxController)
+        /// <param name="inXboxController">The controller to add.</param>
+        public void addController(XboxController inXboxController)
         {
             // Written, 16.07.2018
 
@@ -146,14 +145,14 @@ namespace TommoJProductions.MoControls.XInputInterpreter
             {
                 if (this.controllers[i] == null)
                 {
-                    this.controllers[i] = xboxController;
+                    this.controllers[i] = inXboxController;
                     isControllerAssigned = true;
                     break;
                 }
             }
             if (!isControllerAssigned)
             {
-                string errorMessage = String.Format("This instance of {2} only supports {0} controller{1}. You have attempted to add another controller which cannot be executed.", numOfControllersSupported, (numOfControllersSupported > 1 ? "s" : ""), nameof(XboxControllerManager));
+                string errorMessage = String.Format("This instance of {2} only supports {0} controller{1}. You have attempted to add another controller which cannot be executed.", numOfControllersSupported, numOfControllersSupported > 1 ? "s" : "", nameof(XboxControllerManager));
                 MSCLoader.ModConsole.Error(errorMessage);
                 throw new Exception(errorMessage);
             }
@@ -166,24 +165,24 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Raises the <see cref="ControllerConnected"/> event.
         /// </summary>
-        /// <param name="eventArgs">The event data.</param>
-        internal static void onControllerConnected(ControllerConnectionEventArgs eventArgs)
+        /// <param name="inEventArgs">The event data.</param>
+        internal static void onControllerConnected(ControllerConnectionEventArgs inEventArgs)
         {
             // Written, 16.07.2018
 
             if (ControllerConnected != null)
-                ControllerConnected.Invoke(null, eventArgs);
+                ControllerConnected.Invoke(null, inEventArgs);
         }
         /// <summary>
         /// Raises the <see cref="ControllerDisconnected"/> event.
         /// </summary>
-        /// <param name="eventArgs">The event data.</param>
-        internal static void onControllerDisconnected(ControllerConnectionEventArgs eventArgs)
+        /// <param name="inEventArgs">The event data.</param>
+        internal static void onControllerDisconnected(ControllerConnectionEventArgs inEventArgs)
         {
             // Written, 16.07.2018
 
             if (ControllerDisconnected != null)
-                ControllerDisconnected.Invoke(null, eventArgs);
+                ControllerDisconnected.Invoke(null, inEventArgs);
         }
 
         #endregion

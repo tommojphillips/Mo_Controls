@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 using gui = UnityEngine.GUILayout;
 using ueGUI = UnityEngine.GUI;
@@ -27,13 +28,9 @@ namespace TommoJProductions.MoControls.GUI
         /// </summary>
         private Vector2 mainGUIScrollPosition;
         /// <summary>
-        /// Represents whether the gui should be opened or closed.
-        /// </summary>
-        private bool controlsGuiOpened = false;
-        /// <summary>
         /// Represents the main gui's width.
         /// </summary>
-        private readonly float mainGuiWidth = (Screen.width - (MAIN_GUI_LEFT * 2));
+        private readonly float mainGuiWidth = Screen.width - (MAIN_GUI_LEFT * 2);
         /// <summary>
         /// Represents the main gui's left.
         /// </summary>
@@ -57,13 +54,18 @@ namespace TommoJProductions.MoControls.GUI
 
         #endregion
 
-        private Color32 backgroundColor = new Color32(88, 92, 133, 230); // #585C85 | light navel blue
-        private Color32 primaryItemColor = new Color32(113, 154, 195, 230); // #719AC3 | Light White Blue
-        private Color32 secondaryItemColor = new Color32(200, 216, 211, 230); // Sand
-        private Color32 unselectedMenuButtonColor = new Color32(113, 120, 216, 230); // #7178D8 | purple-blue
-        private Color32 selectedMenuButtonColor = new Color32(113, 154, 195, 230); // #719AC3 | Light White Blue
-        private Color32 defaultContentColor = new Color32(190, 194, 251, 230); // #BEC2FB | light purple-blue 
-        private Color32 moduleBackgroundColor = new Color32(68, 154, 219, 230); // #449ADB | Light blue
+        #region GUI Colors
+
+        private Color32 backgroundColor = new Color32(88, 92, 133, 230);
+        private Color32 primaryItemColor = new Color32(113, 154, 195, 230);
+        private Color32 secondaryItemColor = new Color32(200, 216, 211, 230);
+        private Color32 unselectedMenuButtonColor = new Color32(164, 192, 234, 230);
+        private Color32 selectedMenuButtonColor = new Color32(80, 237, 90, 230);
+        private Color32 defaultContentColor = new Color32(190, 194, 251, 230);
+        private Color32 moduleBackgroundColor = new Color32(68, 154, 219, 230);
+
+        #endregion
+
         /// <summary>
         /// Represents whether the instance has calculated the amount of keybinds yet.
         /// </summary>
@@ -73,36 +75,82 @@ namespace TommoJProductions.MoControls.GUI
         /// </summary>
         private int modKeybindCount = 0;
         /// <summary>
-        /// Represents the currently selected setting menu item.
-        /// </summary>
-        private SettingsMenuEnum settingsMenu;
-        /// <summary>
-        /// Represents the currently selected main menu item.
-        /// </summary>
-        private MainGUIMenuEnum mainGUIMenu;
-        /// <summary>
         /// Represents a keybind to open/close the gui for the mod.
         /// </summary>
-        public readonly Keybind openControlsGui = new Keybind("OpenControls", "Open Controls GUI", KeyCode.F12);
+        public readonly Keybind openControlsGui = new Keybind("OpenControls", "Open Controls GUI", KeyCode.Home);
+               
+        /// <summary>
+        /// Represents all relevant controls when in "on foot mode".
+        /// </summary>
+        private List<GameControlsEnum> relevantFootControls = new List<GameControlsEnum>()
+        {
+            GameControlsEnum.PlayerUp,
+            GameControlsEnum.PlayerDown,
+            GameControlsEnum.PlayerLeft,
+            GameControlsEnum.PlayerRight,
+            GameControlsEnum.DrivingMode,
+            GameControlsEnum.Drunk,
+            GameControlsEnum.Crouch,
+            GameControlsEnum.Hit,
+            GameControlsEnum.Hitchhike,
+            GameControlsEnum.Jump,
+            GameControlsEnum.Push,
+            GameControlsEnum.Finger,
+            GameControlsEnum.ReachLeft,
+            GameControlsEnum.Run,
+            GameControlsEnum.Smoke,
+            GameControlsEnum.Swear,
+            GameControlsEnum.Use,
+            GameControlsEnum.Urinate,
+            GameControlsEnum.WristWatch,
+            GameControlsEnum.Zoom
+        };
+        /// <summary>
+        /// Represents all relevant controls when in "driving mode".
+        /// </summary>
+        private List<GameControlsEnum> relevantDrivingControls = new List<GameControlsEnum>()
+        {
+            GameControlsEnum.Boost,
+            GameControlsEnum.Brake,
+            GameControlsEnum.Clutch,
+            GameControlsEnum.DrivingMode,
+            GameControlsEnum.Drunk,
+            GameControlsEnum.Fifth,
+            GameControlsEnum.Finger,
+            GameControlsEnum.First,
+            GameControlsEnum.Fourth,
+            GameControlsEnum.Handbrake,
+            GameControlsEnum.HighBeam,
+            GameControlsEnum.IndicatorLeft,
+            GameControlsEnum.IndicatorRight,
+            GameControlsEnum.Left,
+            GameControlsEnum.Range,
+            GameControlsEnum.ReachLeft,
+            GameControlsEnum.ReachRight,
+            GameControlsEnum.Reverse,
+            GameControlsEnum.Right,
+            GameControlsEnum.Second,
+            GameControlsEnum.ShiftDown,
+            GameControlsEnum.ShiftUp,
+            GameControlsEnum.Sixth,
+            GameControlsEnum.Smoke,
+            GameControlsEnum.Swear,
+            GameControlsEnum.Third,
+            GameControlsEnum.Throttle,
+            GameControlsEnum.Use,
+            GameControlsEnum.Wipers,
+            GameControlsEnum.WristWatch,
+            GameControlsEnum.Zoom
+        };
+        /// <summary>
+        /// Represents whether to show relevant controls.
+        /// </summary>
+        private bool onlyShowRelevantControls = true;
 
         #endregion
 
         #region Properties
 
-        /// <summary>
-        /// Shows/closes the msc menu.
-        /// </summary>
-        private bool mscMenu
-        {
-            get
-            {
-                return GameObject.Find("Systems/OptionsMenu").activeSelf;
-            }
-            set
-            {
-                GameObject.Find("Systems/OptionsMenu").SetActive(value);
-            }
-        }
         /// <summary>
         /// Represents the instance of the mod.
         /// </summary>
@@ -151,6 +199,38 @@ namespace TommoJProductions.MoControls.GUI
                 return MoControlsGO.xboxController;
             }
         }
+        /// <summary>
+        /// Represents the currently selected setting menu item.
+        /// </summary>
+        internal SettingsMenuEnum settingsMenu
+        {
+            get;
+            set;
+        }
+        /// <summary>
+        /// Represents the currently selected main menu item.
+        /// </summary>
+        internal MainGUIMenuEnum mainGUIMenu
+        {
+            get;
+            set;
+        }
+        /// <summary>
+        /// Represents whether this should display the overlay.
+        /// </summary>
+        internal static bool displayCurrentPlayerModeOverlay
+        {
+            get;
+            set;
+        }
+        /// <summary>
+        /// Represents whether the gui should be opened or closed.
+        /// </summary>
+        internal bool controlsGuiOpened 
+        {
+            get;
+            private set;
+        } = false;
 
         #endregion
 
@@ -172,24 +252,6 @@ namespace TommoJProductions.MoControls.GUI
         #region Methods
 
         /// <summary>
-        /// Changes boolean to open/close the msc menu gui. 
-        /// </summary>
-        private void toggleMscMenu()
-        {
-            // Written, 20.12.2018
-
-            this.mscMenu = !this.mscMenu;
-
-            if (this.mscMenu)
-            {
-                FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = true;
-            }
-            else
-            {
-                FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = false;
-            }
-        }
-        /// <summary>
         /// Changes boolean to open/close the gui. 
         /// </summary>
         private void toggleGui()
@@ -201,10 +263,12 @@ namespace TommoJProductions.MoControls.GUI
             if (this.controlsGuiOpened)
             {
                 FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = true;
+                this.gameObject.GetComponent<GuiNav>().enabled = true;
             }
             else
             {
                 FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = false;
+                this.gameObject.GetComponent<GuiNav>().enabled = false;
             }
         }
         /// <summary>
@@ -214,13 +278,14 @@ namespace TommoJProductions.MoControls.GUI
         {        
             // Written, 08.10.2018
 
+            // Gui hold button set up
             HoldInputMono him = this.gameObject.AddComponent<HoldInputMono>();
             him.setData("Open Mod GUI",
                 XboxButtonEnum.Back,
-                0.5f,
+                0.3f,
                 this.toggleGui);
-            if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                MoControlsMod.print(nameof(MoControlsGUI) + ": Started");
+
+            MoControlsMod.print(nameof(MoControlsGUI) + ": Started", Debugging.DebugTypeEnum.full);
         }
         /// <summary>
         /// on Update.
@@ -235,9 +300,13 @@ namespace TommoJProductions.MoControls.GUI
             {
                 if (this.changeInputResult.reassignKey)
                 {
+                    MoControlsGO.guiNav.enabled = false;
                     MonitorInputData mid = Input.monitorForInput();
                     if (mid.foundInput)
+                    {
                         this.controlManager.changeInput(mid.input);
+                        MoControlsGO.guiNav.enabled = true;
+                    }
                 }
             }
         }
@@ -257,7 +326,7 @@ namespace TommoJProductions.MoControls.GUI
                 }
                 else
                 {
-                    if (this.controlManager.displayCurrentPlayerModeOverlay)
+                    if (displayCurrentPlayerModeOverlay)
                     {
                         this.drawPlayerModeOverlayGUI();
                     }
@@ -294,14 +363,26 @@ namespace TommoJProductions.MoControls.GUI
 
             ueGUI.contentColor = this.defaultContentColor;
             ueGUI.backgroundColor = this.backgroundColor;
-            using (new gui.AreaScope(new Rect(MAIN_GUI_LEFT, (MENU_GUI_TOP + MENU_GUI_HEIGHT), this.mainGuiWidth, (Screen.height - (MAIN_GUI_TOP + MENU_GUI_TOP + MENU_GUI_HEIGHT)))))
+            using (new gui.AreaScope(new Rect(MAIN_GUI_LEFT, MENU_GUI_TOP + MENU_GUI_HEIGHT, this.mainGuiWidth, Screen.height - (MAIN_GUI_TOP + MENU_GUI_TOP + MENU_GUI_HEIGHT))))
             using (gui.ScrollViewScope scrollViewScope = new gui.ScrollViewScope(this.mainGUIScrollPosition, new GUILayoutOption[] { gui.Width(this.mainGuiWidth) }))
             using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width(this.mainGuiWidth - SCROLL_BAR_OFFSET), gui.MaxWidth(this.mainGuiWidth - SCROLL_BAR_OFFSET) }))
             {
                 this.mainGUIScrollPosition = scrollViewScope.scrollPosition;
-                gui.Label(String.Format("<b>{0} v{1} by {2}</b>", this.mod.Name, this.mod.Version, this.mod.Author));
+                gui.Label(String.Format("<b>{0} v{1} ({3}) by {2}</b>", 
+                    this.mod.Name, 
+                    this.mod.Version, 
+                    this.mod.Author,
+                    MoControlsMod.instance.releaseVersionName));
                 if (this.mainGUIMenu != MainGUIMenuEnum.About)
-                    gui.Label(String.Format("<b>{0}</b> is a forbidden key (GUI key bind).\r\n<b>{1}</b> Sets as None.\r\n<b>LMB</b> Selects.\r\n<b>RMB</b> Cancels.", this.openControlsGui.Key, Input.noneKey));
+                    gui.Label(String.Format("<b>{0}</b> GUI key bind." +
+                        "\r\n<b>{1}</b> Sets as None." +
+                        "\r\n<b>LMB</b> Selects." +
+                        "\r\n<b>RMB</b> Cancels.", 
+                        this.openControlsGui.Key,
+                        Input.noneKey));
+                else
+                    if (MoControlsMod.instance.modApiData.runningModApi)
+                        gui.Label("Running <b>Mod Api <i><color=green>v" + MoControlsMod.instance.modApiData.version + "</color></i></b>");
                 gui.Space(3.0f);
                 switch (this.mainGUIMenu)
                 {
@@ -380,6 +461,9 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 20.08.2018
 
+            gui.Space(3f);
+            gui.Label("<b>Settings</b>");
+            gui.Space(5f);
             this.drawSettingsMenu();
 
             switch (this.settingsMenu)
@@ -414,10 +498,12 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 09.10.2018
 
+            gui.Label("<b>Xbox Controller</b>");
+            gui.Space(5f);
             using (new gui.HorizontalScope())
             {
                 ueGUI.backgroundColor = this.moduleBackgroundColor;
-                this.drawXboxControllerDebugContent();
+                //this.drawXboxControllerDebugContent();
                 this.drawControllerInputContent();
                 ueGUI.backgroundColor = this.backgroundColor;
             }
@@ -429,27 +515,35 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 09.10.2018
 
-            using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width((this.mainGuiWidth - SCROLL_BAR_OFFSET - 12.5f) / 2) }))
+            using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width((this.mainGuiWidth - SCROLL_BAR_OFFSET - 12.5f)/* / 2*/) }))
             {
                 gui.Label("<b>Xbox Controller Input Viewer.</b>");               
                 int j = 0;
-                foreach (XboxControl xCon in this.xboxController.getXboxControls())
-                {
-                    j++;
-                    if (j == 2)
-                    {
-                        j = 0;
-                        ueGUI.backgroundColor = this.primaryItemColor;
-                    }
-                    else
-                        ueGUI.backgroundColor = this.secondaryItemColor;
 
-                    using (new gui.VerticalScope("box"))
+                XboxControl[] xboxControls = this.xboxController.getXboxControls();
+
+                for (int i = 1; i < xboxControls.Length; i++)
+                {
+                    i--;
                     using (new gui.HorizontalScope())
-                    {
-                        gui.Label(xCon.texture);
-                        gui.Label(xCon.inputName);
-                    }
+                        for (int n = 0; n < 2; n++)
+                        {
+                            j++;
+                            if (j == 2)
+                            {
+                                j = 0;
+                                ueGUI.backgroundColor = this.primaryItemColor;
+                            }
+                            else
+                                ueGUI.backgroundColor = this.secondaryItemColor;
+                            using (new gui.VerticalScope("box"))
+                            using (new gui.HorizontalScope())
+                            {
+                                gui.Label(xboxControls[i].texture);
+                                gui.Label(xboxControls[i].inputName);
+                            }
+                            i++;
+                        }
                 }
             }
         }
@@ -619,11 +713,21 @@ namespace TommoJProductions.MoControls.GUI
                 }
             }
             gui.Space(5f);
-            using (new gui.HorizontalScope("box"))
+            using (new gui.VerticalScope("box"))
             {
                 using (new gui.VerticalScope())
                 {
-                    gui.Label(String.Format("Sensitivity: {0}", this.mouseEmulator.sensitivity));
+                    gui.Label(String.Format("Game Sensitivity: {0}", this.mouseEmulator.sensitivity));
+                    tempValue = gui.HorizontalSlider(this.mouseEmulator.sensitivity, MouseEmulator.MIN_SENSITIVITY, MouseEmulator.MAX_SENSITIVITY);
+                    if (tempValue != this.mouseEmulator.sensitivity) // Value Changed.
+                    {
+                        this.mouseEmulator.sensitivity = tempValue;
+                        saveSettings = true;
+                    }
+                }
+                using (new gui.VerticalScope())
+                {
+                    gui.Label(String.Format("GUI Sensitivity: {0}", this.mouseEmulator.sensitivity));
                     tempValue = gui.HorizontalSlider(this.mouseEmulator.sensitivity, MouseEmulator.MIN_SENSITIVITY, MouseEmulator.MAX_SENSITIVITY);
                     if (tempValue != this.mouseEmulator.sensitivity) // Value Changed.
                     {
@@ -639,7 +743,7 @@ namespace TommoJProductions.MoControls.GUI
                 {
                     gui.Label("<i><b>Emulate mouse on joystick:</b></i>");
                     // As left + right thumb stick settings are grouped; need to manually change other value..
-                    bool _asInput = (this.mouseEmulator.inputType == InputTypeEnum.LS);
+                    bool _asInput = this.mouseEmulator.inputType == InputTypeEnum.LS;
                     if (gui.Toggle(_asInput, String.Format("Left Stick: {0}", _asInput ? "ON" : "")) != _asInput)
                     {
                         if (this.mouseEmulator.inputType != InputTypeEnum.LS)
@@ -648,7 +752,7 @@ namespace TommoJProductions.MoControls.GUI
                             saveSettings = true;
                         }
                     }
-                    _asInput = (this.mouseEmulator.inputType == InputTypeEnum.RS);
+                    _asInput = this.mouseEmulator.inputType == InputTypeEnum.RS;
                     if (gui.Toggle(_asInput, String.Format("Right Stick: {0}", _asInput ? "ON" : "")) != _asInput)
                     {
                         if (this.mouseEmulator.inputType != InputTypeEnum.RS)
@@ -657,7 +761,7 @@ namespace TommoJProductions.MoControls.GUI
                             saveSettings = true;
                         }
                     }
-                    _asInput = (this.mouseEmulator.inputType == InputTypeEnum.DPad);
+                    _asInput = this.mouseEmulator.inputType == InputTypeEnum.DPad;
                     if (gui.Toggle(_asInput, String.Format("Directional Pad: {0}", _asInput ? "ON" : "")) != _asInput)
                     {
                         if (this.mouseEmulator.inputType != InputTypeEnum.DPad)
@@ -674,7 +778,7 @@ namespace TommoJProductions.MoControls.GUI
                 using (new gui.VerticalScope())
                 {
                     gui.Label("<i><b>Deadzone type:</b></i>");
-                    bool _asInput = (this.mouseEmulator.deadzoneType == DeadzoneTypeEnum.Radial);
+                    bool _asInput = this.mouseEmulator.deadzoneType == DeadzoneTypeEnum.Radial;
                     if (gui.Toggle(_asInput, String.Format("Radial: {0}", _asInput ? "ON" : "")) != _asInput)
                     {
                         if (this.mouseEmulator.deadzoneType != DeadzoneTypeEnum.Radial)
@@ -683,7 +787,7 @@ namespace TommoJProductions.MoControls.GUI
                             saveSettings = true;
                         }
                     }
-                    _asInput = (this.mouseEmulator.deadzoneType == DeadzoneTypeEnum.ScaledRadial);
+                    _asInput = this.mouseEmulator.deadzoneType == DeadzoneTypeEnum.ScaledRadial;
                     if (gui.Toggle(_asInput, String.Format("Scaled Radial: {0}", _asInput ? "ON" : "")) != _asInput)
                     {
                         if (this.mouseEmulator.deadzoneType != DeadzoneTypeEnum.ScaledRadial)
@@ -763,9 +867,9 @@ namespace TommoJProductions.MoControls.GUI
 
             using (new gui.HorizontalScope("box"))
             {
-                if (gui.Toggle(this.controlManager.displayCurrentPlayerModeOverlay, "Display current player mode overlay") != this.controlManager.displayCurrentPlayerModeOverlay)
+                if (gui.Toggle(displayCurrentPlayerModeOverlay, "Display current player mode overlay") != displayCurrentPlayerModeOverlay)
                 {
-                    this.controlManager.displayCurrentPlayerModeOverlay = !this.controlManager.displayCurrentPlayerModeOverlay;
+                    displayCurrentPlayerModeOverlay = !displayCurrentPlayerModeOverlay;
                     _saveSettings = true;
                 }
             }
@@ -787,7 +891,7 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 22.08.2018
 
-            using (new gui.AreaScope(new Rect((Screen.width / 2), 1, 50, 20)))
+            using (new gui.AreaScope(new Rect(Screen.width / 2, 1, 50, 20)))
             {
                 gui.Label(ControlManager.playerMode.ToString());
             }
@@ -837,45 +941,72 @@ namespace TommoJProductions.MoControls.GUI
 
             gui.Space(3f);
             gui.Label(String.Format("<b>{0}</b>", inTitle));
+            this.onlyShowRelevantControls = gui.Toggle(this.onlyShowRelevantControls, "Show Relevant Controls");
             gui.Space(5f);
             int j = 0;
             for (int i = 0; i < inControlInputs.GetLength(0); i++)
             {
-                j++;
-                if (j == 2)
+                string gameControlName = inControlInputs[i, 0];
+                GameControlsEnum gameControl = gameControlName.getGameControl();
+                bool drawControl = false;
+                if (this.onlyShowRelevantControls)
                 {
-                    j = 0;
-                    ueGUI.backgroundColor = this.primaryItemColor;
-                }
-                else
-                    ueGUI.backgroundColor = this.secondaryItemColor;
-                string controlName = inControlInputs[i, 0];
-                gui.Space(3f);
-                using (new gui.VerticalScope("box"))
-                {
-                    gui.Label(String.Format("<b>{0}:</b>", controlName.getGameControlAlias(true)));
-                    using (new gui.HorizontalScope())
+                    if (this.mainGUIMenu == MainGUIMenuEnum.DrivingControls)
                     {
-                        bool isControls = (this.mainGUIMenu == MainGUIMenuEnum.FootControls);
-                        PlayerModeEnum? playerMode;
-                        if (isControls)
-                            playerMode = PlayerModeEnum.OnFoot;
-                        else
+                        if (this.relevantDrivingControls.Contains(gameControl))
+                            drawControl = true;
+                    }
+                    else
+                    {
+                        if (this.mainGUIMenu == MainGUIMenuEnum.FootControls)
                         {
-                            isControls = (this.mainGUIMenu == MainGUIMenuEnum.DrivingControls);
-                            if (isControls)
-                                playerMode = PlayerModeEnum.Driving;
-                            else
-                                playerMode = null;
+                            if (this.relevantFootControls.Contains(gameControl))
+                                drawControl = true;
                         }
-
-                        this.drawCommonControl("Primary Input", controlName, inControlInputs[i, 1], 1, playerMode);
-                        this.drawCommonControl("Secondary Input", controlName, inControlInputs[i, 2], 2, playerMode);
                     }
                 }
+                else
+                    drawControl = true;
+                if (drawControl)
+                {
+                    j++;
+                    if (j == 2)
+                    {
+                        j = 0;
+                        ueGUI.backgroundColor = this.primaryItemColor;
+                    }
+                    else
+                        ueGUI.backgroundColor = this.secondaryItemColor;
+
+                    gui.Space(3f);
+                    using (new gui.VerticalScope("box"))
+                    {
+                        gui.Label(String.Format("<b>{0}:</b>", gameControl.getGameControlAlias(true)));
+                        using (new gui.HorizontalScope())
+                        {
+                            bool isControls = this.mainGUIMenu == MainGUIMenuEnum.FootControls;
+                            PlayerModeEnum? playerMode;
+                            if (isControls)
+                                playerMode = PlayerModeEnum.OnFoot;
+                            else
+                            {
+                                isControls = this.mainGUIMenu == MainGUIMenuEnum.DrivingControls;
+                                if (isControls)
+                                    playerMode = PlayerModeEnum.Driving;
+                                else
+                                    playerMode = null;
+                            }
+
+                            this.drawCommonControl("Primary Input", gameControlName, inControlInputs[i, 1], 1, playerMode);
+                            this.drawCommonControl("Secondary Input", gameControlName, inControlInputs[i, 2], 2, playerMode);
+                        }
+
+
+                    }
+                    ueGUI.backgroundColor = this.backgroundColor;
+                    gui.Space(3f);
+                }
             }
-            ueGUI.backgroundColor = this.backgroundColor;
-            gui.Space(3f);
         }
         /// <summary>
         /// Draws all mod keybinds.
@@ -946,7 +1077,7 @@ namespace TommoJProductions.MoControls.GUI
         /// <summary>
         /// Draws a menu with the provided Enum, <typeparamref name="T"/>.
         /// </summary>
-        private bool drawGeneralMenu<T>(T inSelected, out T changedTo)
+        private bool drawGeneralMenu<T>(T inSelected, out T inChangedTo)
         {
             // Written, 09.10.2018
 
@@ -972,12 +1103,12 @@ namespace TommoJProductions.MoControls.GUI
 
                     if (gui.Button(title ?? _enum.ToString()) && !isSelected)
                     {
-                        changedTo = _enum;
+                        inChangedTo = _enum;
                         return true;
                     }
                 }
                 ueGUI.backgroundColor = this.backgroundColor;
-                changedTo = inSelected;
+                inChangedTo = inSelected;
                 return false;
             }
         }

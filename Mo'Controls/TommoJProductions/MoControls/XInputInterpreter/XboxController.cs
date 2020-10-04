@@ -330,12 +330,12 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Initializes a new instance of <see cref="XboxController"/> and sets the index of the controller (1 - 4).
         /// </summary>
-        /// <param name="index">The controller index to set, 1 - 4.</param>
-        public XboxController(int index)
+        /// <param name="inIndex">The controller index to set, 1 - 4.</param>
+        public XboxController(int inIndex)
         {
             // Written, 16.07.2018
 
-            this.gamePadIndex = index - 1;
+            this.gamePadIndex = inIndex - 1;
             this.playerIndex = (PlayerIndex)this.gamePadIndex;
             this.xboxRumbleEvents = new List<XboxRumble>();
             this.inputMap = new Dictionary<string, XboxButton>();
@@ -441,13 +441,13 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Returns true if the provided <see cref="XboxButtonEnum"/> has been pressed.
         /// </summary>
-        /// <param name="xboxButton">The button to check</param>
+        /// <param name="inXboxButton">The button to check</param>
         /// <returns></returns>
-        public bool getButtonPressed(XboxButtonEnum xboxButton)
+        public bool getButtonPressed(XboxButtonEnum inXboxButton)
         {
             // Written, 16.07.2018
 
-            if (this.inputMap[xboxButton.toString()].state == ButtonState.Pressed)
+            if (this.inputMap[inXboxButton.toString()].state == ButtonState.Pressed)
             {
                 return true;
             }
@@ -456,12 +456,12 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Returns true if the provided <see cref="XboxButtonEnum"/> has been pressed and held down.
         /// </summary>
-        /// <param name="xboxButton">The button to check.</param>
-        public bool getButtonDown(XboxButtonEnum xboxButton)
+        /// <param name="inXboxButton">The button to check.</param>
+        public bool getButtonDown(XboxButtonEnum inXboxButton)
         {
             // Written, 16.07.2018
 
-            XboxButton button = this.inputMap[xboxButton.toString()];
+            XboxButton button = this.inputMap[inXboxButton.toString()];
             if (button.previousState == ButtonState.Released && button.state == ButtonState.Pressed)
             {
                 return true;
@@ -471,12 +471,12 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Returns true if the provided <see cref="XboxButtonEnum"/> has been pressed and released.
         /// </summary>
-        /// <param name="xboxButton">The button to check.</param>
-        public bool getButtonUp(XboxButtonEnum xboxButton)
+        /// <param name="inXboxButton">The button to check.</param>
+        public bool getButtonUp(XboxButtonEnum inXboxButton)
         {
             // Written, 20.12.2018
 
-            XboxButton button = this.inputMap[xboxButton.toString()];
+            XboxButton button = this.inputMap[inXboxButton.toString()];
             if (button.previousState == ButtonState.Pressed && button.state == ButtonState.Released)
             {
                 return true;
@@ -582,30 +582,30 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Adds a rumble to the xbox controller.
         /// </summary>
-        /// <param name="timer">The time in seconds to rumble for.</param>
-        /// <param name="power">The power of the rumble.</param>
-        /// <param name="duration">The duration until the fade-time comes.</param>
-        public void addRumble(float timer, Vector2 power, float duration)
+        /// <param name="inTimer">The time in seconds to rumble for.</param>
+        /// <param name="inPower">The power of the rumble.</param>
+        /// <param name="inDuration">The duration until the fade-time comes.</param>
+        public void addRumble(float inTimer, Vector2 inPower, float inDuration)
         {
             // Written, 16.07.2018
 
             XboxRumble xboxRumble = new XboxRumble()
             {
-                timer = timer,
-                power = power,
-                duration = duration,
+                timer = inTimer,
+                power = inPower,
+                duration = inDuration,
             };
             this.addRumble(xboxRumble);
         }
         /// <summary>
         /// Adds the provided rumble to the xbox controller.
         /// </summary>
-        /// <param name="xboxRumble">The rumble to add.</param>
-        public void addRumble(XboxRumble xboxRumble)
+        /// <param name="inXboxRumble">The rumble to add.</param>
+        public void addRumble(XboxRumble inXboxRumble)
         {
             // Written, 16.07.2018
 
-            this.xboxRumbleEvents.Add(xboxRumble);
+            this.xboxRumbleEvents.Add(inXboxRumble);
         }
         /// <summary>
         /// Updates the input map.
@@ -699,40 +699,38 @@ namespace TommoJProductions.MoControls.XInputInterpreter
                     this.xboxControls[23].texture = MoControlsMod.assets.rsdown;
                 }
                 else
-                    if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                        MoControlsMod.print("Assets cannot be loaded to instance of xbox controller as assets ain't loaded.");
+                    MoControlsMod.print("Assets cannot be loaded to instance of xbox controller as assets ain't loaded.", Debugging.DebugTypeEnum.full);
             }
             catch (Exception ex)
             {
-                if (MoControlsMod.debugTypeEquals(Debugging.DebugTypeEnum.full))
-                    MoControlsMod.print("An error occured while trying to load xbox controller assets.. Stacktrace:\r\n " + ex.StackTrace);
+                MoControlsMod.print("An error occured while trying to load xbox controller assets.. Stacktrace:\r\n " + ex.StackTrace, Debugging.DebugTypeEnum.full);
             }
         }
         /// <summary>
         /// Gets an xbox control by input name.
         /// </summary>
-        public XboxControl getXboxControlByInputName(string inputName)
+        public XboxControl getXboxControlByInputName(string inInputName)
         {
             // Written, 20.07.2018
-            if (inputName != KeyCode.None.ToString()) // no point enumerating..
+            if (inInputName != KeyCode.None.ToString()) // no point enumerating..
             {
                 foreach (XboxControl xboxControl in this.xboxControls)
                 {
-                    if (xboxControl.inputName == inputName)
+                    if (xboxControl.inputName == inInputName)
                     {
                         return xboxControl;
                     }
                 }
                 foreach (XboxControl xboxControl in this.leftThumbstick.controls)
                 {
-                    if (xboxControl.inputName == inputName)
+                    if (xboxControl.inputName == inInputName)
                     {
                         return xboxControl;
                     }
                 }
                 foreach (XboxControl xboxControl in this.rightThumbstick.controls)
                 {
-                    if (xboxControl.inputName == inputName)
+                    if (xboxControl.inputName == inInputName)
                     {
                         return xboxControl;
                     }

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using TommoJProductions.MoControls.Debugging;
+using TommoJProductions.Debugging;
 using UnityEngine;
 
 namespace TommoJProductions.MoControls
@@ -145,28 +143,26 @@ namespace TommoJProductions.MoControls
             set;
         }
 
-        public AssetHolder(UnityEngine.Object[] assets)
+        public AssetHolder(UnityEngine.Object[] inAssets)
         {
             // Written, 15.10.2018
 
-            if (assets.Count() == 25)
+            if (inAssets.Count() == 25)
             {
-                Texture2D[] textures = new Texture2D[assets.Length];
-                for (int i = 0; i < assets.Length; i++)
+                Texture2D[] textures = new Texture2D[inAssets.Length];
+                for (int i = 0; i < inAssets.Length; i++)
                 {
-                    if (assets[i] is Texture2D)
+                    if (inAssets[i] is Texture2D)
                     {
-                        textures[i] = assets[i] as Texture2D;
-                        if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
-                            if (textures[i] is null)
-                                MoControlsMod.print("<color=red>Unsuccessfully</color> loaded texture, texure is null" + textures[i].name);
-                            else
-                                MoControlsMod.print("<color=green>successfully</color> loaded texture, " + textures[i].name);
+                        textures[i] = inAssets[i] as Texture2D;
+                        if (textures[i] is null)
+                            MoControlsMod.print("<color=red>Unsuccessfully</color> loaded texture, texure is null" + textures[i].name, DebugTypeEnum.full);
+                        else
+                            MoControlsMod.print("<color=green>successfully</color> loaded texture, " + textures[i].name, DebugTypeEnum.full);
                     }
                     else
                     {
-                        if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
-                            MoControlsMod.print("<color=red>Error loading texture</color>, <color=grey><b><i>" + (assets[i]?.name ?? "[Asset name null]") + ".</i></b></color>");
+                        MoControlsMod.print("<color=red>Error loading texture</color>, <color=grey><b><i>" + (inAssets[i]?.name ?? "[Asset name null]") + ".</i></b></color>", DebugTypeEnum.full);
                     }
                 }
                 this.textures = textures;
@@ -213,16 +209,14 @@ namespace TommoJProductions.MoControls
                 catch (NullReferenceException ex)
                 {
                     this.result = false;
-                    if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
-                        MoControlsMod.print("<color=red>Error occured when setting asset textures...</color>.\r\n<b>Message:</b>" + ex.Message + "\r\nStacktrace:\r\n" + ex.StackTrace);
+                    MoControlsMod.print("<color=red>Error occured when setting asset textures...</color>.\r\n<b>Message:</b>" + ex.Message + "\r\nStacktrace:\r\n" + ex.StackTrace, DebugTypeEnum.full);
                     throw;
                 }
             }
             else
             {
                 this.result = false;
-                if (MoControlsMod.debugTypeEquals(DebugTypeEnum.full))
-                    MoControlsMod.print("<color=red>Error not all assets could be found..</color>.");
+                MoControlsMod.print("<color=red>Error not all assets could be found..</color>.", DebugTypeEnum.full);
             }
             this.result = true;
         }
