@@ -40,7 +40,6 @@ namespace TommoJProductions.MoControls
         private static readonly string[] MODAPI_NAMES = new string[] 
         {
             "modapi_v0114-alpha",
-            "modapi_v0120-alpha"
         };
         /// <summary>
         /// Represents the supported/compatible version of mod loader.
@@ -66,7 +65,7 @@ namespace TommoJProductions.MoControls
         {
             get
             {
-                return false;
+                return true;
             }
         }
         /// <summary>
@@ -299,7 +298,7 @@ namespace TommoJProductions.MoControls
             moControlsGO.setLoadedSettings(MoControlsSaveData.loadSettings(), inPreload: true);
             this.initialize();
             this.performModLoaderVersionCheck();
-            this.checkUserRunningModAPI();
+            //this.checkUserRunningModAPI();
             print("Assets returned: " + assets.result, DebugTypeEnum.full);
             print(this.Name + " v" + this.Version + ": Loaded.", DebugTypeEnum.none);
         }

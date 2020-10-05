@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
@@ -389,9 +389,6 @@ namespace TommoJProductions.MoControls.GUI
                         "\r\n<b>RMB</b> Cancels.", 
                         this.openControlsGui.Key,
                         Input.noneKey));
-                else
-                    if (MoControlsMod.instance.modApiData.runningModApi)
-                        gui.Label("Running <b>Mod Api <i><color=green>v" + MoControlsMod.instance.modApiData.version + "</color></i></b>");
                 gui.Space(3.0f);
                 switch (this.mainGUIMenu)
                 {
@@ -420,16 +417,21 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 20.08.2018
 
-            string aboutMessage = "<b>Mo'Controls</b>, assign your driving controls to both, the keyboard and an Xbox controller at the same time! Control/Move the players " +
-                "camera/head around with an Xbox Controller!";
+            string aboutMessage = "<b>Mo'Controls</b> allows the player to have a primary and secondary input for each in-game control," +
+                " the player could set all primary inputs to the keyboard and all secondary inputs to an Xbox Controller to have a seamless" +
+                " swap of the keyboard to Xbox Controller. Mo'Controls also allows the player to have different control profiles for when " +
+                "on foot and when in driving mode! So you can get more out of your controller! Default key to toggle the GUI is " + this.openControlsGui.Key +
+                " or <b>hold down the back button on a connected xbox controller. (> 0.5sec)</b>";
             string[] features = new string[]
             {
                 "Xbox Controller Support",
                 "Assign two inputs to each game control",
                 "Mouse Emulation; Use your Xbox Controller to control the mouse",
                 "Split control modes for driving & walking",
+                "Hold down the back button on an xbox controller to open the gui.",
+                "Controller GUI Navigation"
             };
-            string footerMessage = "Developed by <b>Tommo J. Armytage</b>";
+            string footerMessage = "Developed by <b>Tommo J. Armytage. | Latest release: 05.10.2020</b>";
             string joinPrefix = "\r\n# ";
 
             gui.Space(5f);
