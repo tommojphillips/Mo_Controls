@@ -5,7 +5,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
     /// <summary>
     /// Represents an xbox controller button.
     /// </summary>
-    public class XboxButton : XboxControl
+    public class XboxBoolState : XboxControl
     {
         // Written, 16.07.2018
 
@@ -32,11 +32,20 @@ namespace TommoJProductions.MoControls.XInputInterpreter
 
         #region Constructors
 
-        public XboxButton(string inInputName, string inXboxButtonName, XboxControlTypeEnum inType) : base(inInputName, inXboxButtonName, inType)
+        public XboxBoolState(string inInputName, string inXboxButtonName, XboxControlTypeEnum inType) : base(inInputName, inXboxButtonName, inType)
         {
             // Written, 20.07.2018
+
         }
 
         #endregion
+
+        /// <summary>
+        /// Returns the current state pressed or release. Colored yellow if pressed.
+        /// </summary>
+        public override string ToString()
+        {
+            return string.Format("<color={0}><b>{1}</b></color>", this.state == ButtonState.Pressed ? "yellow" : "white", this.state);
+        }
     }
 }

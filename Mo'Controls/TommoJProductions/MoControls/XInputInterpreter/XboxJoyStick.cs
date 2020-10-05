@@ -9,7 +9,7 @@
         /// <summary>
         /// Represents all the thumbsticks <see cref="XboxControl"/>s in order of; left, right, up, down.
         /// </summary>
-        public XboxControl[] controls
+        public XboxFloatState[] controls
         {
             get;
             private set;
@@ -17,7 +17,7 @@
         /// <summary>
         /// Represents the left input for the thumbstick.
         /// </summary>
-        public XboxControl left
+        public XboxFloatState left
         {
             get
             {
@@ -27,7 +27,7 @@
         /// <summary>
         /// Represents the right input for the thumbstick.
         /// </summary>
-        public XboxControl right
+        public XboxFloatState right
         {
             get
             {
@@ -37,7 +37,7 @@
         /// <summary>
         /// Represents the up input for the thumbstick.
         /// </summary>
-        public XboxControl up
+        public XboxFloatState up
         {
             get
             {
@@ -47,7 +47,7 @@
         /// <summary>
         /// Represents the down input for the thumbstick.
         /// </summary>
-        public XboxControl down
+        public XboxFloatState down
         {
             get
             {
@@ -66,11 +66,11 @@
         /// <param name="inRight">The right input.</param>
         /// <param name="inUp">The up input.</param>
         /// <param name="inDown">The down input.</param>
-        public XboxJoystick(XboxControl inLeft, XboxControl inRight, XboxControl inUp, XboxControl inDown)
+        public XboxJoystick(XboxFloatState inLeft, XboxFloatState inRight, XboxFloatState inUp, XboxFloatState inDown)
         {
             // Written, 21.07.2018
 
-            this.controls = new XboxControl[]
+            this.controls = new XboxFloatState[]
             {
                 inLeft,
                 inRight,

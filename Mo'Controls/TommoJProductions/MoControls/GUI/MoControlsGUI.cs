@@ -30,11 +30,11 @@ namespace TommoJProductions.MoControls.GUI
         /// <summary>
         /// Represents the main gui's width.
         /// </summary>
-        private readonly float mainGuiWidth = Screen.width - (MAIN_GUI_LEFT * 2);
+        private readonly float mainGuiWidth = Screen.width - (mainGuiLeft * 2);
         /// <summary>
         /// Represents the main gui's left.
         /// </summary>
-        private const float MAIN_GUI_LEFT = 100f;
+        private static readonly float mainGuiLeft = Screen.currentResolution.width / 10.8f;
         /// <summary>
         /// Represents the main gui's top.
         /// </summary>
@@ -56,15 +56,18 @@ namespace TommoJProductions.MoControls.GUI
 
         #region GUI Colors
 
-        private Color32 backgroundColor = new Color32(88, 92, 133, 230);
-        private Color32 primaryItemColor = new Color32(113, 154, 195, 230);
-        private Color32 secondaryItemColor = new Color32(200, 216, 211, 230);
-        private Color32 unselectedMenuButtonColor = new Color32(164, 192, 234, 230);
-        private Color32 selectedMenuButtonColor = new Color32(80, 237, 90, 230);
-        private Color32 defaultContentColor = new Color32(190, 194, 251, 230);
-        private Color32 moduleBackgroundColor = new Color32(68, 154, 219, 230);
+        private Color32 backgroundColor = new Color32(112, 112, 255, 255); // | Light-ist Blue
+        private Color32 primaryItemColor = new Color32(133, 162, 250, 255); // | Light-Vague Blue
+        private Color32 secondaryItemColor = new Color32(69, 114, 247, 255); // | Light Blue
+        private Color32 unselectedMenuButtonColor = new Color32(133, 162, 250, 255); // | Light-Vague Blue
+        private Color32 selectedMenuButtonColor = new Color32(80, 237, 90, 255); // Green
+        private Color32 defaultContentColor = new Color32(255, 255, 255, 255); // | White
+        private Color xboxButtonPressedColor = Color.gray;
+        private Color32 moduleBackgroundColor = new Color32(85, 125, 170, 255); // | Soild Light-tone blue
 
         #endregion
+
+        #region KeyBind fields
 
         /// <summary>
         /// Represents whether the instance has calculated the amount of keybinds yet.
@@ -78,7 +81,11 @@ namespace TommoJProductions.MoControls.GUI
         /// Represents a keybind to open/close the gui for the mod.
         /// </summary>
         public readonly Keybind openControlsGui = new Keybind("OpenControls", "Open Controls GUI", KeyCode.Home);
-               
+
+        #endregion
+
+        #region Relevant controls 
+
         /// <summary>
         /// Represents all relevant controls when in "on foot mode".
         /// </summary>
@@ -146,6 +153,8 @@ namespace TommoJProductions.MoControls.GUI
         /// Represents whether to show relevant controls.
         /// </summary>
         private bool onlyShowRelevantControls = true;
+
+        #endregion
 
         #endregion
 
@@ -345,7 +354,7 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 22.08.2018
 
-            using (new gui.AreaScope(new Rect(MAIN_GUI_LEFT + 5f, MENU_GUI_TOP, this.mainGuiWidth - SCROLL_BAR_OFFSET, MENU_GUI_HEIGHT)))
+            using (new gui.AreaScope(new Rect(mainGuiLeft + 5f, MENU_GUI_TOP, this.mainGuiWidth - SCROLL_BAR_OFFSET, MENU_GUI_HEIGHT)))
             using (new gui.HorizontalScope())
             {
                 if (this.drawGeneralMenu(this.mainGUIMenu, out MainGUIMenuEnum changedTo))
@@ -363,7 +372,7 @@ namespace TommoJProductions.MoControls.GUI
 
             ueGUI.contentColor = this.defaultContentColor;
             ueGUI.backgroundColor = this.backgroundColor;
-            using (new gui.AreaScope(new Rect(MAIN_GUI_LEFT, MENU_GUI_TOP + MENU_GUI_HEIGHT, this.mainGuiWidth, Screen.height - (MAIN_GUI_TOP + MENU_GUI_TOP + MENU_GUI_HEIGHT))))
+            using (new gui.AreaScope(new Rect(mainGuiLeft, MENU_GUI_TOP + MENU_GUI_HEIGHT, this.mainGuiWidth, Screen.height - (MAIN_GUI_TOP + MENU_GUI_TOP + MENU_GUI_HEIGHT))))
             using (gui.ScrollViewScope scrollViewScope = new gui.ScrollViewScope(this.mainGUIScrollPosition, new GUILayoutOption[] { gui.Width(this.mainGuiWidth) }))
             using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width(this.mainGuiWidth - SCROLL_BAR_OFFSET), gui.MaxWidth(this.mainGuiWidth - SCROLL_BAR_OFFSET) }))
             {
@@ -503,7 +512,6 @@ namespace TommoJProductions.MoControls.GUI
             using (new gui.HorizontalScope())
             {
                 ueGUI.backgroundColor = this.moduleBackgroundColor;
-                //this.drawXboxControllerDebugContent();
                 this.drawControllerInputContent();
                 ueGUI.backgroundColor = this.backgroundColor;
             }
@@ -515,18 +523,20 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 09.10.2018
 
-            using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width((this.mainGuiWidth - SCROLL_BAR_OFFSET - 12.5f)/* / 2*/) }))
+            using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width((this.mainGuiWidth) - SCROLL_BAR_OFFSET - 12.5f) }))
             {
-                gui.Label("<b>Xbox Controller Input Viewer.</b>");               
+                gui.Label("<b>Xbox Controller Input Viewer: " + (xboxController.isConnected ? "<color=green>Connected</color></b>" : "<color=red>Disconnected</color></b>"));               
                 int j = 0;
-
+                int itemWidth = 160;
+                int maxItemsPerRow = (int)(mainGuiWidth / itemWidth);
                 XboxControl[] xboxControls = this.xboxController.getXboxControls();
 
                 for (int i = 1; i < xboxControls.Length; i++)
                 {
                     i--;
                     using (new gui.HorizontalScope())
-                        for (int n = 0; n < 2; n++)
+                    {
+                        for (int n = 0; n < maxItemsPerRow; n++)
                         {
                             j++;
                             if (j == 2)
@@ -536,146 +546,44 @@ namespace TommoJProductions.MoControls.GUI
                             }
                             else
                                 ueGUI.backgroundColor = this.secondaryItemColor;
-                            using (new gui.VerticalScope("box"))
-                            using (new gui.HorizontalScope())
+                            using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width(itemWidth), gui.Height(32) }))
                             {
-                                gui.Label(xboxControls[i].texture);
-                                gui.Label(xboxControls[i].inputName);
+                                using (new gui.HorizontalScope())
+                                {
+                                    bool isBoolState = xboxControls[i] is XboxBoolState;
+                                    if (isBoolState && this.xboxController.isConnected && (xboxControls[i] as XboxBoolState).state == ButtonState.Pressed)
+                                        ueGUI.contentColor = this.xboxButtonPressedColor;
+                                    if (this.xboxController.LS == xboxControls[i])
+                                    {
+                                        GamePadThumbSticks.StickValue ls = this.xboxController.getLeftStick();
+                                        gui.Label(xboxControls[i].texture, style: new GUIStyle() { contentOffset = new Vector2(ls.X * 3, -(ls.Y * 3)) });
+                                    }
+                                    else if (this.xboxController.RS == xboxControls[i])
+                                    {
+                                        GamePadThumbSticks.StickValue rs = this.xboxController.getRightStick();
+                                        gui.Label(xboxControls[i].texture, style: new GUIStyle() { contentOffset = new Vector2(rs.X * 3, -(rs.Y * 3)) });
+                                    }
+                                    else
+                                        gui.Label(xboxControls[i].texture);
+                                    ueGUI.contentColor = this.defaultContentColor;
+                                    using (new gui.VerticalScope())
+                                    {
+                                        gui.Label(xboxControls[i].inputName);
+                                        if (this.xboxController.isConnected)
+                                        {
+                                            if (isBoolState)
+                                                gui.Label((xboxControls[i] as XboxBoolState).ToString());
+                                            else if (xboxControls[i] is XboxFloatState)
+                                                gui.Label((xboxControls[i] as XboxFloatState).ToString());
+                                        }
+                                    }
+                                }
                             }
                             i++;
                         }
-                }
-            }
-        }
-        /// <summary>
-        /// Draws debug content to the main gui.
-        /// </summary>
-        private void drawXboxControllerDebugContent()
-        {
-            // Written, 20.08.2018
-
-            using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width((this.mainGuiWidth - SCROLL_BAR_OFFSET - 12.5f) / 2) }))
-            {
-                gui.Label("<b>Xbox Controller Debug</b>");
-                gui.Space(5f);
-                gui.Label("<i><b>Xbox Controller Status:</b> <color=" + (this.xboxController.isConnected ? "green>Connected" : "red>Disconnected") + "</color>.</i>");
-                if (this.xboxController.isConnected)
-                {
-                    // Triggers
-                    ueGUI.backgroundColor = this.primaryItemColor;
-                    using (new gui.VerticalScope("box"))
-                    {
-                        double leftRounded = Math.Round(this.xboxController.getLeftTrigger(), 2);
-                        double rightRounded = Math.Round(this.xboxController.getRightTrigger(), 2);
-                        gui.Label("<b>Triggers:</b>");
-                        gui.Label(String.Format("Left: {0}, <b><color=white>{2}</color></b>\r\nRight: {1}, <b><color=white>{3}</color></b>",
-                            leftRounded > 0.0f || leftRounded < 0.0f ? String.Format("<color=yellow>{0}</color>", leftRounded) : leftRounded.ToString(),
-                            rightRounded > 0.0f || rightRounded < 0.0f ? String.Format("<color=yellow>{0}</color>", rightRounded) : rightRounded.ToString(),
-                            this.xboxController.LT.inputName,
-                            this.xboxController.RT.inputName));
-                    }
-                    // Bumpers
-                    gui.Space(5f);
-                    ueGUI.backgroundColor = this.secondaryItemColor;
-                    using (new gui.VerticalScope("box"))
-                    {
-                        ButtonState lb = this.xboxController.LB.state;
-                        ButtonState rb = this.xboxController.RB.state;
-                        gui.Label("<b>Bumpers:</b>");
-                        gui.Label(String.Format("Left: {0}, <b><color=white>{2}</color></b>\r\nRight: {1}, <b><color=white>{3}</color></b>",
-                            lb == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", lb) : lb.ToString(),
-                            rb == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", rb) : rb.ToString(),
-                            this.xboxController.LB.inputName,
-                            this.xboxController.RB.inputName));
-                    }
-                    // Left Thumbsick
-                    gui.Space(5f);
-                    ueGUI.backgroundColor = this.primaryItemColor;
-                    using (new gui.VerticalScope("box"))
-                    {
-                        double xRounded = Math.Round(this.xboxController.getLeftStick().X, 2);
-                        double yRounded = Math.Round(this.xboxController.getLeftStick().Y, 2);
-                        ButtonState ls = this.xboxController.LS.state;
-                        gui.Label("<b>Left Thumbstick:</b>");
-                        gui.Label(String.Format("X: {0}, <b><color=white>{3}/{4}</color></b>\r\nY: {1}, <b><color=white>{5}/{6}</color></b>\r\nLS: {2}, <b><color=white>{7}</color></b>",
-                            xRounded > 0.0f || xRounded < 0.0f ? String.Format("<color=yellow>{0}</color>", xRounded) : xRounded.ToString(),
-                            yRounded > 0.0f || yRounded < 0.0f ? String.Format("<color=yellow>{0}</color>", yRounded) : yRounded.ToString(),
-                            ls == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", ls) : ls.ToString(),
-                            this.xboxController.leftThumbstick.left.inputName,
-                            this.xboxController.leftThumbstick.right.inputName,
-                            this.xboxController.leftThumbstick.up.inputName,
-                            this.xboxController.leftThumbstick.down.inputName,
-                            this.xboxController.LS.inputName));
-                    }
-                    // Right Thumbstick
-                    gui.Space(5f);
-                    ueGUI.backgroundColor = this.secondaryItemColor;
-                    using (new gui.VerticalScope("box"))
-                    {
-                        double xRounded = Math.Round(this.xboxController.getRightStick().X, 2);
-                        double yRounded = Math.Round(this.xboxController.getRightStick().Y, 2);
-                        ButtonState rs = this.xboxController.RS.state;
-                        gui.Label("<b>Right Thumbstick:</b>");
-                        gui.Label(String.Format("X: {0}, <b><color=white>{3}/{4}</color></b>\r\nY: {1}, <b><color=white>{5}/{6}</color></b>\r\nRS: {2}, <b><color=white>{7}</color></b>",
-                            xRounded > 0.0f || xRounded < 0.0f ? String.Format("<color=yellow>{0}</color>", xRounded) : xRounded.ToString(),
-                            yRounded > 0.0f || yRounded < 0.0f ? String.Format("<color=yellow>{0}</color>", yRounded) : yRounded.ToString(),
-                            rs == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", rs) : rs.ToString(),
-                            this.xboxController.rightThumbstick.left.inputName,
-                            this.xboxController.rightThumbstick.right.inputName,
-                            this.xboxController.rightThumbstick.up.inputName,
-                            this.xboxController.rightThumbstick.down.inputName,
-                            this.xboxController.RS.inputName
-                            ));
-                    }
-                    // Buttons
-                    gui.Space(5f);
-                    ueGUI.backgroundColor = this.primaryItemColor;
-                    using (new gui.VerticalScope("box"))
-                    {
-                        ButtonState a = this.xboxController.A.state;
-                        ButtonState b = this.xboxController.B.state;
-                        ButtonState x = this.xboxController.X.state;
-                        ButtonState y = this.xboxController.Y.state;
-                        ButtonState start = this.xboxController.Start.state;
-                        ButtonState back = this.xboxController.Back.state;
-                        gui.Label("<b>Buttons:</b>");
-                        gui.Label(String.Format("A: {0}, <b><color=white>{6}</color></b>\r\nB: {1}, <b><color=white>{7}</color></b>\r\nX: {2}, <b><color=white>{8}</color></b>\r\nY: {3}, <b><color=white>{9}</color></b>\r\nStart: {4}, <b><color=white>{10}</color></b>\r\nBack: {5}, <b><color=white>{11}</color></b>",
-                            a == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", a) : a.ToString(),
-                            b == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", b) : b.ToString(),
-                            x == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", x) : x.ToString(),
-                            y == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", y) : y.ToString(),
-                            start == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", start) : start.ToString(),
-                            back == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", back) : back.ToString(),
-                            this.xboxController.A.inputName,
-                            this.xboxController.B.inputName,
-                            this.xboxController.X.inputName,
-                            this.xboxController.Y.inputName,
-                            this.xboxController.Start.inputName,
-                            this.xboxController.Back.inputName));
-                    }
-                    // D-Pad
-                    gui.Space(5f);
-                    ueGUI.backgroundColor = this.secondaryItemColor;
-                    using (new gui.VerticalScope("box"))
-                    {
-                        ButtonState u = this.xboxController.DPadUp.state;
-                        ButtonState d = this.xboxController.DPadDown.state;
-                        ButtonState l = this.xboxController.DPadLeft.state;
-                        ButtonState r = this.xboxController.DPadRight.state;
-                        gui.Label("<b>D-Pad:</b>");
-                        gui.Label(String.Format("Up: {0}, <b><color=white>{4}</color></b>\r\nDown: {1}, <b><color=white>{5}</color></b>\r\nLeft: {2}, <b><color=white>{6}</color></b>\r\nRight: {3}, <b><color=white>{7}</color></b>",
-                            u == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", u) : u.ToString(),
-                            d == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", d) : d.ToString(),
-                            l == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", l) : l.ToString(),
-                            r == ButtonState.Pressed ? String.Format("<color=yellow>{0}</color>", r) : r.ToString(),
-                            this.xboxController.DPad.up.inputName,
-                            this.xboxController.DPad.down.inputName,
-                            this.xboxController.DPad.left.inputName,
-                            this.xboxController.DPad.right.inputName));
                     }
                 }
             }
-            ueGUI.backgroundColor = this.backgroundColor;
         }
         /// <summary>
         /// Draws mouse emulation content to the main gui.
@@ -690,61 +598,25 @@ namespace TommoJProductions.MoControls.GUI
             ueGUI.backgroundColor = this.moduleBackgroundColor;
             gui.Label("<b>Mouse Emulation</b>");
             gui.Space(5f);
+
             using (new gui.HorizontalScope("box"))
             {
-                if (gui.Toggle(this.mouseEmulator.Emulating, String.Format("{0}: Using {1}", "Emulate mouse for controller", this.mouseEmulator.inputType)) != this.mouseEmulator.Emulating)
+                gui.Label(this.mouseEmulator.Emulating ? "<color=green><b>ON</b></color>" : "<color=red><b>OFF</b></color>");
+                if (gui.Toggle(this.mouseEmulator.Emulating, String.Format("<b>Emulate mouse for controller:</b> Using {0}", this.mouseEmulator.inputType)) != this.mouseEmulator.Emulating)
                 {
                     this.mouseEmulator.Emulating = !this.mouseEmulator.Emulating;
                     saveSettings = true;
                 }
             }
-            gui.Space(5f);
-            using (new gui.HorizontalScope("box"))
+            using (new gui.HorizontalScope())
             {
-                using (new gui.VerticalScope())
-                {
-                    gui.Label(String.Format("Deadzone: {0}", this.mouseEmulator.deadzone));
-                    tempValue = gui.HorizontalSlider(this.mouseEmulator.deadzone, MouseEmulator.MIN_DEADZONE, MouseEmulator.MAX_DEADZONE);
-                    if (tempValue != this.mouseEmulator.deadzone) // Value Changed.
-                    {
-                        this.mouseEmulator.deadzone = tempValue;
-                        saveSettings = true;
-                    }
-                }
-            }
-            gui.Space(5f);
-            using (new gui.VerticalScope("box"))
-            {
-                using (new gui.VerticalScope())
-                {
-                    gui.Label(String.Format("Game Sensitivity: {0}", this.mouseEmulator.sensitivity));
-                    tempValue = gui.HorizontalSlider(this.mouseEmulator.sensitivity, MouseEmulator.MIN_SENSITIVITY, MouseEmulator.MAX_SENSITIVITY);
-                    if (tempValue != this.mouseEmulator.sensitivity) // Value Changed.
-                    {
-                        this.mouseEmulator.sensitivity = tempValue;
-                        saveSettings = true;
-                    }
-                }
-                using (new gui.VerticalScope())
-                {
-                    gui.Label(String.Format("GUI Sensitivity: {0}", this.mouseEmulator.sensitivity));
-                    tempValue = gui.HorizontalSlider(this.mouseEmulator.sensitivity, MouseEmulator.MIN_SENSITIVITY, MouseEmulator.MAX_SENSITIVITY);
-                    if (tempValue != this.mouseEmulator.sensitivity) // Value Changed.
-                    {
-                        this.mouseEmulator.sensitivity = tempValue;
-                        saveSettings = true;
-                    }
-                }
-            }
-            gui.Space(5f);
-            using (new gui.HorizontalScope("box"))
-            {
-                using (new gui.VerticalScope())
+                bool _asInput;
+                using (new gui.HorizontalScope("box"))
                 {
                     gui.Label("<i><b>Emulate mouse on joystick:</b></i>");
                     // As left + right thumb stick settings are grouped; need to manually change other value..
-                    bool _asInput = this.mouseEmulator.inputType == InputTypeEnum.LS;
-                    if (gui.Toggle(_asInput, String.Format("Left Stick: {0}", _asInput ? "ON" : "")) != _asInput)
+                    _asInput = this.mouseEmulator.inputType == InputTypeEnum.LS;
+                    if (gui.Toggle(_asInput, String.Format("<b>Left Stick:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
                         if (this.mouseEmulator.inputType != InputTypeEnum.LS)
                         {
@@ -753,7 +625,7 @@ namespace TommoJProductions.MoControls.GUI
                         }
                     }
                     _asInput = this.mouseEmulator.inputType == InputTypeEnum.RS;
-                    if (gui.Toggle(_asInput, String.Format("Right Stick: {0}", _asInput ? "ON" : "")) != _asInput)
+                    if (gui.Toggle(_asInput, String.Format("<b>Right Stick:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
                         if (this.mouseEmulator.inputType != InputTypeEnum.RS)
                         {
@@ -762,7 +634,7 @@ namespace TommoJProductions.MoControls.GUI
                         }
                     }
                     _asInput = this.mouseEmulator.inputType == InputTypeEnum.DPad;
-                    if (gui.Toggle(_asInput, String.Format("Directional Pad: {0}", _asInput ? "ON" : "")) != _asInput)
+                    if (gui.Toggle(_asInput, String.Format("<b>Directional Pad:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
                         if (this.mouseEmulator.inputType != InputTypeEnum.DPad)
                         {
@@ -771,15 +643,11 @@ namespace TommoJProductions.MoControls.GUI
                         }
                     }
                 }
-            }
-            gui.Space(5f);
-            using (new gui.HorizontalScope("box"))
-            {
-                using (new gui.VerticalScope())
+                using (new gui.HorizontalScope("box"))
                 {
                     gui.Label("<i><b>Deadzone type:</b></i>");
-                    bool _asInput = this.mouseEmulator.deadzoneType == DeadzoneTypeEnum.Radial;
-                    if (gui.Toggle(_asInput, String.Format("Radial: {0}", _asInput ? "ON" : "")) != _asInput)
+                    _asInput = this.mouseEmulator.deadzoneType == DeadzoneTypeEnum.Radial;
+                    if (gui.Toggle(_asInput, String.Format("<b>Radial:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
                         if (this.mouseEmulator.deadzoneType != DeadzoneTypeEnum.Radial)
                         {
@@ -788,7 +656,7 @@ namespace TommoJProductions.MoControls.GUI
                         }
                     }
                     _asInput = this.mouseEmulator.deadzoneType == DeadzoneTypeEnum.ScaledRadial;
-                    if (gui.Toggle(_asInput, String.Format("Scaled Radial: {0}", _asInput ? "ON" : "")) != _asInput)
+                    if (gui.Toggle(_asInput, String.Format("<b>Scaled Radial:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
                         if (this.mouseEmulator.deadzoneType != DeadzoneTypeEnum.ScaledRadial)
                         {
@@ -798,53 +666,88 @@ namespace TommoJProductions.MoControls.GUI
                     }
                 }
             }
+            using (new gui.HorizontalScope())
+            {
+                using (new gui.VerticalScope("box"))
+                {
+                    gui.Label(String.Format("<b>Mouse Deadzone:</b> {0}", this.mouseEmulator.deadzone));
+                    tempValue = gui.HorizontalSlider(this.mouseEmulator.deadzone, MouseEmulator.MIN_DEADZONE, MouseEmulator.MAX_DEADZONE);
+                    if (tempValue != this.mouseEmulator.deadzone) // Value Changed.
+                    {
+                        this.mouseEmulator.deadzone = tempValue;
+                        saveSettings = true;
+                    }
+                }                
+                using (new gui.VerticalScope("box"))
+                {
+                    gui.Label(String.Format("<b>Mouse Sensitivity:</b> {0}", this.mouseEmulator.sensitivity));
+                    tempValue = gui.HorizontalSlider(this.mouseEmulator.sensitivity, MouseEmulator.MIN_SENSITIVITY, MouseEmulator.MAX_SENSITIVITY);
+                    if (tempValue != this.mouseEmulator.sensitivity) // Value Changed.
+                    {
+                        this.mouseEmulator.sensitivity = tempValue;
+                        saveSettings = true;
+                    }
+                }
+                using (new gui.VerticalScope("box"))
+                {
+                    gui.Label(String.Format("<b>GUI Sensitivity:</b> {0}", this.mouseEmulator.sensitivity));
+                    tempValue = gui.HorizontalSlider(this.mouseEmulator.sensitivity, MouseEmulator.MIN_SENSITIVITY, MouseEmulator.MAX_SENSITIVITY);
+                    if (tempValue != this.mouseEmulator.sensitivity) // Value Changed.
+                    {
+                        this.mouseEmulator.sensitivity = tempValue;
+                        saveSettings = true;
+                    }
+                }
+            }
             gui.Space(5f);
             ueGUI.backgroundColor = this.moduleBackgroundColor;
-            using (new gui.VerticalScope("box"))
+            using (new gui.VerticalScope())
             {
                 gui.Label("<i><b>Mouse inputs:</b></i>");
                 ueGUI.backgroundColor = this.primaryItemColor;
-                using (new gui.VerticalScope("box"))
+                using (new gui.HorizontalScope())
                 {
-                    gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.lmbPrimaryInput.Name));
-                    using (new gui.HorizontalScope())
+                    using (new gui.VerticalScope("box"))
                     {
-                        this.drawCommonControl("Modifier", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Modifier.ToString(), 1, inMod: this.mod);
-                        this.drawCommonControl("Input", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Key.ToString(), 2, inMod: this.mod);
+                        gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.lmbPrimaryInput.Name));
+                        using (new gui.HorizontalScope())
+                        {
+                            this.drawCommonControl("Modifier", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Modifier.ToString(), 1, inMod: this.mod);
+                            this.drawCommonControl("Input", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Key.ToString(), 2, inMod: this.mod);
+                        }
+                    }
+                    ueGUI.backgroundColor = this.secondaryItemColor;
+                    using (new gui.VerticalScope("box"))
+                    {
+                        gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.lmbSecondaryInput.Name));
+                        using (new gui.HorizontalScope())
+                        {
+                            this.drawCommonControl("Modifier", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Modifier.ToString(), 1, inMod: this.mod);
+                            this.drawCommonControl("Input", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Key.ToString(), 2, inMod: this.mod);
+                        }
                     }
                 }
-
-                gui.Space(3f);
-                ueGUI.backgroundColor = this.secondaryItemColor;
-                using (new gui.VerticalScope("box"))
-                {
-                    gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.lmbSecondaryInput.Name));
-                    using (new gui.HorizontalScope())
-                    {
-                        this.drawCommonControl("Modifier", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Modifier.ToString(), 1, inMod: this.mod);
-                        this.drawCommonControl("Input", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Key.ToString(), 2, inMod: this.mod);
-                    }
-                };
-                gui.Space(3f);
                 ueGUI.backgroundColor = this.primaryItemColor;
-                using (new gui.VerticalScope("box"))
+                using (new gui.HorizontalScope())
                 {
-                    gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.rmbPrimaryInput.Name));
-                    using (new gui.HorizontalScope())
+                    using (new gui.VerticalScope("box"))
                     {
-                        this.drawCommonControl("Modifier", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Modifier.ToString(), 1, inMod: this.mod);
-                        this.drawCommonControl("Input", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Key.ToString(), 2, inMod: this.mod);
+                        gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.rmbPrimaryInput.Name));
+                        using (new gui.HorizontalScope())
+                        {
+                            this.drawCommonControl("Modifier", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Modifier.ToString(), 1, inMod: this.mod);
+                            this.drawCommonControl("Input", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Key.ToString(), 2, inMod: this.mod);
+                        }
                     }
-                }
-                gui.Space(3f);
-                ueGUI.backgroundColor = this.secondaryItemColor;
-                using (new gui.VerticalScope("box"))
-                {
-                    gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.rmbSecondaryInput.Name));
-                    using (new gui.HorizontalScope())
+                    ueGUI.backgroundColor = this.secondaryItemColor;
+                    using (new gui.VerticalScope("box"))
                     {
-                        this.drawCommonControl("Modifier", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Modifier.ToString(), 1, inMod: this.mod);
-                        this.drawCommonControl("Input", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Key.ToString(), 2, inMod: this.mod);
+                        gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.rmbSecondaryInput.Name));
+                        using (new gui.HorizontalScope())
+                        {
+                            this.drawCommonControl("Modifier", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Modifier.ToString(), 1, inMod: this.mod);
+                            this.drawCommonControl("Input", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Key.ToString(), 2, inMod: this.mod);
+                        }
                     }
                 }
             }

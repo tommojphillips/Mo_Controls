@@ -106,7 +106,7 @@
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\ControllerConnectionEventArgs.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\Monitoring\ControllerConnection.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\Monitoring\MonitorControllerConnections.cs" />
-    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxButton.cs" />
+    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxBoolState.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxButtonEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxControllerInputEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxExtentions.cs" />
@@ -116,7 +116,7 @@
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxControlTypeEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxRumble.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxJoyStick.cs" />
-    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxTriggerState.cs" />
+    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxFloatState.cs" />
     <Compile Include="TommoJProductions\ModAPI\ModApiData.cs" />
   </ItemGroup>
   <ItemGroup />
