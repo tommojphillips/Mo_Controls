@@ -4,11 +4,11 @@ using TommoJProductions.MoControls.InputEmulation;
 
 namespace TommoJProductions.Debugging
 {
-    class GetToolModeCommand : ConsoleCommand
+    class ChangeToolModeCommand : ConsoleCommand
     {
         public override string Name => "mctool";
 
-        public override string Help => "writes what tool and toolmode the player is in to the mod console.";
+        public override string Help => "Changes the tool mode based on argument, expecting either, 'hand' or 'tool'";
 
         public override void Run(string[] args)
         {
@@ -25,7 +25,7 @@ namespace TommoJProductions.Debugging
                     errorMess = "'" + args[0] + "' is not a vaild argument. Command expects either, 'hand' or 'tool'.";
             }
             else
-                errorMess = "Command expects 1 argument";
+                errorMess = "Command expects 1 argument!";
 
             if (errorMess != null)
                 MoControlsMod.print(errorMess, DebugTypeEnum.none);

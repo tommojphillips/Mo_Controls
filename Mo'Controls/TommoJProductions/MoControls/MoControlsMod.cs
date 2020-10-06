@@ -26,7 +26,7 @@ namespace TommoJProductions.MoControls
         public override string ID => "Mo_Controls";
         public override string Name => "Mo'Controls";
         public override string Author => "tommojphillips";
-        public override string Version => "1.1.1";
+        public override string Version => "1.1.2";
         public override bool UseAssetsFolder => true;
 
         #endregion
@@ -215,7 +215,7 @@ namespace TommoJProductions.MoControls
             ConsoleCommand.Add(new DebugStatsCommand());
             ConsoleCommand.Add(new ListLoadedAssembliesConsoleCommand());
             ConsoleCommand.Add(new WriteCinputExternInputsCommand());
-            ConsoleCommand.Add(new GetToolModeCommand());
+            ConsoleCommand.Add(new ChangeToolModeCommand());
             this.loadControllerAssets();
         }
         /// <summary>

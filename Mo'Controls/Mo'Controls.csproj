@@ -70,7 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="TommoJProductions\Debugging\GetToolModeCommand.cs" />
+    <Compile Include="TommoJProductions\Debugging\ChangeToolModeCommand.cs" />
     <Compile Include="TommoJProductions\Debugging\WriteCinputExternInputsCommand.cs" />
     <Compile Include="TommoJProductions\MoControls\AssetHolder.cs" />
     <Compile Include="TommoJProductions\MoControls\ChangeInput.cs" />
