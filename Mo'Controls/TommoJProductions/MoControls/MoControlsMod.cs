@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
 using TommoJProductions.Debugging;
-using TommoJProductions.ModAPI;
 using MSCLoader;
 using UnityEngine;
 
@@ -17,6 +15,11 @@ namespace TommoJProductions.MoControls
     public class MoControlsMod : Mod
     {
         // Written, 06.07.2018        
+
+        /// <summary>
+        /// Represents whether this is a release version
+        /// </summary>
+        internal static bool isReleaseVersion => false;
 
         #region Mod Fields
 
@@ -35,13 +38,6 @@ namespace TommoJProductions.MoControls
         /// </summary>
         private static GameObject moControlsGameObject;
         /// <summary>
-        /// Represents all supported modapi names.
-        /// </summary>
-        private static readonly string[] MODAPI_NAMES = new string[] 
-        {
-            "modapi_v0114-alpha",
-        };
-        /// <summary>
         /// Represents the supported/compatible version of mod loader.
         /// </summary>
         public const string SUPPORTED_MODLOADER_VERSION = "1.1.7";
@@ -49,25 +45,11 @@ namespace TommoJProductions.MoControls
         /// Represents whether or not to display debug data.
         /// </summary>
         internal static DebugTypeEnum debug;
-        /// <summary>
-        /// Represents whether the user is running modapi.
-        /// </summary>
-        internal ModApiData modApiData = null;
 
         #endregion
 
         #region Properties
 
-        /// <summary>
-        /// Represents whether this is a release version
-        /// </summary>
-        internal static bool isReleaseVersion
-        {
-            get
-            {
-                return true;
-            }
-        }
         /// <summary>
         /// Represents the release version name.
         /// </summary>
@@ -259,32 +241,7 @@ namespace TommoJProductions.MoControls
                     "<color=orange>Warning</color>: <b>Incorrect Release/Debug Configuration</b>");
 #endif
         }
-        /// <summary>
-        /// Checks if the end user is running a version of mod api.
-        /// </summary>
-        private void checkUserRunningModAPI()
-        {
-            // Written, 05.01.2019
-
-            try
-            {
-                System.Reflection.Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-                assemblies = assemblies.Where(assem => MODAPI_NAMES.Any(mpn => mpn == assem.GetName().Name)).ToArray();
-                bool loadedModApiAssembly = assemblies.Count() > 0;
-                if (loadedModApiAssembly)
-                {           
-                    this.modApiData = new ModApiData(true);
-                    print("Running Mod Api v" + this.modApiData.version, DebugTypeEnum.partial);
-                }
-                else
-                    throw new System.IO.FileNotFoundException("modapi file not found.");
-            }
-            catch (System.IO.FileNotFoundException)
-            {
-                this.modApiData = new ModApiData(false, null);
-                print("Not Running Mod Api", DebugTypeEnum.partial);
-            }
-        }
+        
         #endregion
 
         #region Override Methods
@@ -298,7 +255,6 @@ namespace TommoJProductions.MoControls
             moControlsGO.setLoadedSettings(MoControlsSaveData.loadSettings(), inPreload: true);
             this.initialize();
             this.performModLoaderVersionCheck();
-            //this.checkUserRunningModAPI();
             print("Assets returned: " + assets.result, DebugTypeEnum.full);
             print(this.Name + " v" + this.Version + ": Loaded.", DebugTypeEnum.none);
         }
