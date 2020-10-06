@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="TommoJProductions\Debugging\GetToolModeCommand.cs" />
     <Compile Include="TommoJProductions\Debugging\WriteCinputExternInputsCommand.cs" />
     <Compile Include="TommoJProductions\MoControls\AssetHolder.cs" />
     <Compile Include="TommoJProductions\MoControls\ChangeInput.cs" />
@@ -88,16 +89,25 @@
     <Compile Include="TommoJProductions\MoControls\GUI\GUIMenuEnumExtentions.cs" />
     <Compile Include="TommoJProductions\MoControls\GUI\MoControlsGUI.cs" />
     <Compile Include="TommoJProductions\MoControls\GUI\SettingsMenuEnum.cs" />
+    <Compile Include="TommoJProductions\MoControls\InputEmulation\HardwareInput.cs" />
+    <Compile Include="TommoJProductions\MoControls\InputEmulation\InputUnion.cs" />
+    <Compile Include="TommoJProductions\MoControls\InputEmulation\KeyBdInput.cs" />
+    <Compile Include="TommoJProductions\MoControls\InputEmulation\KeyboardEmulator.cs" />
+    <Compile Include="TommoJProductions\MoControls\InputEmulation\Input.cs" />
+    <Compile Include="TommoJProductions\MoControls\InputEmulation\KeyEventF.cs" />
+    <Compile Include="TommoJProductions\MoControls\InputEmulation\MouseEventDataXButtons.cs" />
+    <Compile Include="TommoJProductions\MoControls\InputEmulation\MouseEventF.cs" />
+    <Compile Include="TommoJProductions\MoControls\InputEmulation\ScanCodeShort.cs" />
+    <Compile Include="TommoJProductions\MoControls\InputEmulation\VirtualKeyShort.cs" />
     <Compile Include="TommoJProductions\MoControls\MoControlsGO.cs" />
     <Compile Include="TommoJProductions\MoControls\MoControlsSaveData.cs" />
     <Compile Include="TommoJProductions\MoControls\MonitorInputData.cs" />
-    <Compile Include="TommoJProductions\MoControls\MouseEmulation\NativeMethods.cs" />
+    <Compile Include="TommoJProductions\MoControls\InputEmulation\NativeMethods.cs" />
     <Compile Include="TommoJProductions\MoControls\PlayerModeEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\DeadzoneTypeEnum.cs" />
-    <Compile Include="TommoJProductions\MoControls\MouseEmulation\InputData.cs" />
-    <Compile Include="TommoJProductions\MoControls\MouseEmulation\InputTypeEnum.cs" />
-    <Compile Include="TommoJProductions\MoControls\MouseEmulation\MouseEmulator.cs" />
-    <Compile Include="TommoJProductions\MoControls\MouseEmulation\MouseInput.cs" />
+    <Compile Include="TommoJProductions\MoControls\InputEmulation\InputTypeEnum.cs" />
+    <Compile Include="TommoJProductions\MoControls\InputEmulation\MouseEmulator.cs" />
+    <Compile Include="TommoJProductions\MoControls\InputEmulation\MouseInput.cs" />
     <Compile Include="TommoJProductions\MoControls\MoControlsMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\ControllerConnectionEventArgs.cs" />

@@ -5,9 +5,9 @@ using TommoJProductions.MoControls.XInputInterpreter;
 using UnityEngine;
 using XInputDotNetPure;
 using MSCLoader;
-using NM = TommoJProductions.MoControls.MouseEmulation.NativeMethods;
+using NM = TommoJProductions.MoControls.InputEmulation.NativeMethods;
 
-namespace TommoJProductions.MoControls.MouseEmulation
+namespace TommoJProductions.MoControls.InputEmulation
 {
     public class MouseEmulator : MonoBehaviour
     {
@@ -24,7 +24,7 @@ namespace TommoJProductions.MoControls.MouseEmulation
         /// <summary>
         /// Represents the primary input for RMB
         /// </summary>
-        public Keybind rmbPrimaryInput = new Keybind(RMB_INPUT_NAME + "1", "RMB Primary Input", KeyCode.JoystickButton2);
+        public Keybind rmbPrimaryInput = new Keybind(RMB_INPUT_NAME + "1", "RMB Primary Input", KeyCode.JoystickButton1);
         /// <summary>
         /// Represents the secondary input for RMB
         /// </summary>
@@ -236,7 +236,7 @@ namespace TommoJProductions.MoControls.MouseEmulation
                 }
                 if (xboxController.isConnected)
                 {
-                    GamePadThumbSticks.StickValue stickValue_temp = default(GamePadThumbSticks.StickValue);
+                    GamePadThumbSticks.StickValue stickValue_temp = default;
                     Vector2 stickValue = Vector2.zero;
                     int moveX;
                     int moveY;
@@ -295,18 +295,22 @@ namespace TommoJProductions.MoControls.MouseEmulation
         /// <param name="data">Data to pass.</param>
         /// <param name="time">The time of event.</param>
         /// <param name="flag">flags to pass.</param>
-        private static MouseInput createMouseInput(int x, int y, uint data, uint time, uint flag)
+        private static InputUnion createMouseInput(int x, int y, MouseEventDataXButtons data, uint time, MouseEventF flag)
         {
-            // create from the given data an object of the type MouseInput, which then can be send
-            MouseInput Result = new MouseInput
+            // Written, 06.10.2020
+
+            InputUnion result = new InputUnion
             {
-                X = x,
-                Y = y,
-                mouseData = data,
-                time = time,
-                dwFlags = flag
+                mi = new MouseInput()
+                {
+                    dx = x,
+                    dy = y,
+                    mouseData = data,
+                    time = time,
+                    dwFlags = flag
+                }
             };
-            return Result;
+            return result;
         }
         /// <summary>
         /// Simulates mouse movement.
@@ -315,9 +319,9 @@ namespace TommoJProductions.MoControls.MouseEmulation
         /// <param name="y">The Y.</param>
         private static void simulateMouseMove(int x, int y)
         {
-            InputData[] MouseEvent = new InputData[1];
+            Input[] MouseEvent = new Input[1];
             MouseEvent[0].type = 0;
-            MouseEvent[0].data = createMouseInput(x, y, 0, 0, MOUSEEVENTF_MOVE);
+            MouseEvent[0].U = createMouseInput(x, y, 0, 0, MouseEventF.MOVE);
             NM.SendInput((uint)MouseEvent.Length, MouseEvent, Marshal.SizeOf(MouseEvent[0].GetType()));
         }
         /// <summary>

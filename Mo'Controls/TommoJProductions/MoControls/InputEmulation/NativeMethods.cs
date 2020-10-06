@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace TommoJProductions.MoControls.MouseEmulation
+namespace TommoJProductions.MoControls.InputEmulation
 {
     internal class NativeMethods
     {
@@ -10,6 +10,6 @@ namespace TommoJProductions.MoControls.MouseEmulation
         [DllImport("user32.dll")]
         internal static extern void mouse_event(uint dwFlags, int dx, int dy, uint dwData, int dwExtraInfo);
         [DllImport("user32.dll", SetLastError = true)]
-        internal static extern uint SendInput(uint nInputs, InputData[] pInputs, int cbSize);
+        internal static extern uint SendInput(uint nInputs, [MarshalAs(UnmanagedType.LPArray), In] Input[] pInputs, int cbSize);
     }
 }

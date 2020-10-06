@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using TommoJProductions.MoControls.GUI;
-using TommoJProductions.MoControls.MouseEmulation;
+using TommoJProductions.MoControls.InputEmulation;
 using TommoJProductions.MoControls.XInputInterpreter;
 
 namespace TommoJProductions.MoControls

@@ -6,7 +6,7 @@ using gui = UnityEngine.GUILayout;
 using ueGUI = UnityEngine.GUI;
 using MSCLoader;
 using HutongGames.PlayMaker;
-using TommoJProductions.MoControls.MouseEmulation;
+using TommoJProductions.MoControls.InputEmulation;
 using TommoJProductions.MoControls.XInputInterpreter;
 using XInputDotNetPure;
 

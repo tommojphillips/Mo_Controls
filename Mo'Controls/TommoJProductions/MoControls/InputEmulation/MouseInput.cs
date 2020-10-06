@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TommoJProductions.MoControls.MouseEmulation
+namespace TommoJProductions.MoControls.InputEmulation
 {
     /// <summary>
     /// structure for mouse data
@@ -12,19 +12,19 @@ namespace TommoJProductions.MoControls.MouseEmulation
         /// <summary>
         /// Represents X coordinate.
         /// </summary>
-        internal int X;
+        internal int dx;
         /// <summary>
         /// Represents Y coordinate.
         /// </summary>
-        internal int Y;
+        internal int dy;
         /// <summary>
         /// Represents mouse data, e.g. for mouse wheel.
         /// </summary>
-        internal uint mouseData;
+        internal MouseEventDataXButtons mouseData;
         /// <summary>
         /// Represents further mouse data, e.g. for mouse buttons.
         /// </summary>
-        internal uint dwFlags;
+        internal MouseEventF dwFlags;
         /// <summary>
         /// Represents the time of the event.
         /// </summary>

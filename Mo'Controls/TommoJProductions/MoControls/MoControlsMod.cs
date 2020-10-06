@@ -215,6 +215,7 @@ namespace TommoJProductions.MoControls
             ConsoleCommand.Add(new DebugStatsCommand());
             ConsoleCommand.Add(new ListLoadedAssembliesConsoleCommand());
             ConsoleCommand.Add(new WriteCinputExternInputsCommand());
+            ConsoleCommand.Add(new GetToolModeCommand());
             this.loadControllerAssets();
         }
         /// <summary>
