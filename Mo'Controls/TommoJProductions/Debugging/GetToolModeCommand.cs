@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MSCLoader;
+﻿using MSCLoader;
 using TommoJProductions.MoControls;
 using TommoJProductions.MoControls.InputEmulation;
 
@@ -18,24 +14,23 @@ namespace TommoJProductions.Debugging
         {
             // Written, 06.10.2020
 
-            bool error = false;
+            string errorMess = null;
             if (args.Length == 1)
             {
-                if (Int32.TryParse(args[0], out int intValue))
-                    if (intValue == 1) // Hand mode 
-                        KeyboardEmulator.Send(ScanCodeShort.KEY_1);
-                    else if (intValue == 2) // Tool mode
-                        KeyboardEmulator.Send(ScanCodeShort.KEY_2); 
-                    else
-                        error = true;
+                if (args[0].ToLower() == "hand") // Hand mode 
+                    KeyboardEmulator.Send(ScanCodeShort.KEY_1);
+                else if (args[0].ToLower() == "tool") // Tool mode
+                    KeyboardEmulator.Send(ScanCodeShort.KEY_2);
                 else
-                    error = true;
+                    errorMess = "'" + args[0] + "' is not a vaild argument. Command expects either, 'hand' or 'tool'.";
             }
             else
-                error = true;
+                errorMess = "Command expects 1 argument";
 
-            if (error)
-                MoControlsMod.print("the command did not execute correctly.. command expects 1 arg of type intger. check help command for more info", DebugTypeEnum.none);
+            if (errorMess != null)
+                MoControlsMod.print(errorMess, DebugTypeEnum.none);
+            else
+                MoControlsMod.print("Command executed successfully", DebugTypeEnum.none);
         }
     }
 }
