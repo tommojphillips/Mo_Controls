@@ -19,7 +19,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents whether this is a release version
         /// </summary>
-        internal static bool isReleaseVersion => false;
+        internal static bool isReleaseVersion => true;
 
         #region Mod Fields
 
