@@ -240,6 +240,14 @@ namespace TommoJProductions.MoControls.GUI
             get;
             private set;
         } = false;
+        /// <summary>
+        /// Represents the gui navigation system for the GUI.
+        /// </summary>
+        internal GuiNav guiNav
+        {
+            get;
+            private set;
+        }
 
         #endregion
 
@@ -272,21 +280,25 @@ namespace TommoJProductions.MoControls.GUI
             if (this.controlsGuiOpened)
             {
                 FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = true;
-                this.gameObject.GetComponent<GuiNav>().enabled = true;
+                this.guiNav.enabled = true;
             }
             else
             {
                 FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = false;
-                this.gameObject.GetComponent<GuiNav>().enabled = false;
+                if (!ControlManager.isInToolMode)
+                    this.guiNav.enabled = false;
             }
         }
         /// <summary>
         /// Occurs after game starts.
         /// </summary>
         private void Start()
-        {        
+        {
             // Written, 08.10.2018
 
+            // GUINav Set up
+            this.guiNav = this.gameObject.AddComponent<GuiNav>();
+            this.guiNav.enabled = false;
             // Gui hold button set up
             HoldInputMono him = this.gameObject.AddComponent<HoldInputMono>();
             him.setData("Open Mod GUI",
@@ -309,12 +321,12 @@ namespace TommoJProductions.MoControls.GUI
             {
                 if (this.changeInputResult.reassignKey)
                 {
-                    MoControlsGO.guiNav.enabled = false;
+                    this.guiNav.enabled = false;
                     MonitorInputData mid = Input.monitorForInput();
                     if (mid.foundInput)
                     {
                         this.controlManager.changeInput(mid.input);
-                        MoControlsGO.guiNav.enabled = true;
+                        this.guiNav.enabled = true;
                     }
                 }
             }
@@ -796,9 +808,9 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 22.08.2018
 
-            using (new gui.AreaScope(new Rect(Screen.width / 2, 1, 50, 20)))
+            using (new gui.AreaScope(new Rect(Screen.width / 2, 1, 180, 20)))
             {
-                gui.Label(ControlManager.playerMode.ToString());
+                gui.Label(String.Format("{0} ({1} mode)", ControlManager.playerMode.ToString(), ControlManager.isInToolMode ? "Tool" : "Hand"));
             }
         }
         /// <summary>

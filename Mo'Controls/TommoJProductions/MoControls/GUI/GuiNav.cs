@@ -46,7 +46,8 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 04.01.2019
 
-            this.controllerMenuChange();
+            if (this.moControlsGUI.controlsGuiOpened)
+                this.controllerMenuChange();
             this.controllerScroll();
         }
         /// <summary>

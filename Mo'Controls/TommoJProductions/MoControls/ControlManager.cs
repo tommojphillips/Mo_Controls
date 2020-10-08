@@ -4,6 +4,7 @@ using HutongGames.PlayMaker;
 using MSCLoader;
 using TommoJProductions.Debugging;
 using TommoJProductions.MoControls.GUI;
+using TommoJProductions.MoControls.InputEmulation;
 using UnityEngine;
 
 namespace TommoJProductions.MoControls
@@ -65,7 +66,22 @@ namespace TommoJProductions.MoControls
             "fifth",
             "sixth",
         };
-
+        /// <summary>
+        /// Represents the handmode gameobject 
+        /// </summary>
+        public const string handModeLocation = "PLAYER/Pivot/AnimPivot/Camera/FPSCamera/1Hand_Assemble";
+        /// <summary>
+        /// Represents the tool mode gameobject
+        /// </summary>
+        public const string toolModeLocation = "PLAYER/Pivot/AnimPivot/Camera/FPSCamera/2Spanner";
+        /// <summary>
+        /// Represents if the user has request toolmode change via, <see cref="HoldInputMono"/>. see:<see cref="toggleToolMode"/>.
+        /// </summary>
+        private bool _requestedModeChange;
+        /// <summary>
+        /// Represents logic to enable scroll to a connected xbox controllers' triggers. enabled when player is in tool mode.
+        /// </summary>
+        private GuiNav toolModeScroll;
         #endregion
 
         #region Properties
@@ -77,7 +93,7 @@ namespace TommoJProductions.MoControls
         {
             get
             {
-                return currentPlayerMode == PlayerModeEnum.Driving ? this.drivingControls : currentPlayerMode == PlayerModeEnum.OnFoot ? this.footControls : this.menuControls;
+                return currentPlayerMode == PlayerModeEnum.Driving ? this.drivingControls : currentPlayerMode == PlayerModeEnum.OnFoot ? this.footControls : this.blankControls;
             }
             set
             {
@@ -139,9 +155,9 @@ namespace TommoJProductions.MoControls
             private set;
         }
         /// <summary>
-        /// Represents the menu controls.
+        /// Represents blank controls.
         /// </summary>
-        internal string[,] menuControls
+        internal string[,] blankControls
         {
             get
             {
@@ -192,6 +208,32 @@ namespace TommoJProductions.MoControls
                 };
             }
         }
+        /// <summary>
+        /// Represents the hand mode gameobject.
+        /// </summary>
+        internal static GameObject handModeGameObject 
+        {
+            get;
+            private set;
+        }
+        /// <summary>
+        /// Represents the tool mode gameobject.
+        /// </summary>
+        internal static GameObject toolModeGameObject 
+        {
+            get;
+            private set;
+        }
+        /// <summary>
+        /// Returns true if player is in tool mode.
+        /// </summary>
+        internal static bool isInToolMode 
+        {
+            get 
+            {
+                return toolModeGameObject.activeSelf && !handModeGameObject.activeSelf;
+            }
+        }
 
         #endregion
 
@@ -221,6 +263,14 @@ namespace TommoJProductions.MoControls
         {
             // Written, 08.10.2018
 
+            toolModeGameObject = GameObject.Find(toolModeLocation);
+            handModeGameObject = GameObject.Find(handModeLocation);
+            // Tool mode hold button set up
+            HoldInputMono him = this.gameObject.AddComponent<HoldInputMono>();
+            him.setData("Toggle Tool Mode", XInputInterpreter.XboxButtonEnum.Start, 0.3f, this.requestedModeChange);
+            // Setting up guiNav "toolMode Scroll".
+            this.toolModeScroll = this.gameObject.AddComponent<GuiNav>();
+
             MoControlsMod.print(nameof(ControlManager) + ": Started", DebugTypeEnum.full);
         }
         /// <summary>
@@ -236,6 +286,13 @@ namespace TommoJProductions.MoControls
                 this.loadControlModeToCInput(this.currentPlayerMode, this.currentControls);
                 MoControlsMod.print("Control Mode changed: " + this.currentPlayerMode, DebugTypeEnum.full);
             }
+            if (this._requestedModeChange)
+            {
+                MoControlsMod.print("Identified changemode request.", DebugTypeEnum.full);
+                toggleToolMode();
+                this._requestedModeChange = false;
+            }
+            this.toolModeScroll.enabled = (isInToolMode || (!isInToolMode && !isPlayerHandEmpty()) && this.currentPlayerMode != PlayerModeEnum.Driving);
         }
         /// <summary>
         /// Loads provided control list to cInput.
@@ -415,6 +472,39 @@ namespace TommoJProductions.MoControls
                 MoControlsMod.print("saved <i>" + modKeybind.Mod.Name + "</i> mod keybinds.", DebugTypeEnum.full);
             }
             this.changeInputResult = new ChangeInput();
+        }
+        /// <summary>
+        /// Toggles toolmode eg. tool=>hand | hand=>tool
+        /// </summary>
+        internal void toggleToolMode()
+        {
+            // Written, 08.10.2020
+
+            VirtualKeyShort? wVk = null;
+
+            if (isInToolMode)
+                wVk = VirtualKeyShort.KEY_1;
+            else if (isPlayerHandEmpty())
+                wVk = VirtualKeyShort.KEY_2;
+            StartCoroutine(KeyboardEmulator.simulateKeyPress((VirtualKeyShort)wVk));
+        }
+        private void requestedModeChange()
+        {
+            // Written, 07.10.2020
+
+            this._requestedModeChange = true;
+        }
+        /// <summary>
+        /// Returns whether the players hand is empty (not holding anything).
+        /// </summary>
+        /// <returns></returns>
+        internal static bool isPlayerHandEmpty() 
+        {
+            // Written, 06.10.2020
+
+            GameObject gm = GameObject.Find(handModeLocation + "/Hand");
+            PlayMakerFSM pm = gm.GetComponents<PlayMakerFSM>().First(_pm => _pm.FsmName == "PickUp");
+            return pm.FsmVariables.FindFsmBool("HandEmpty").Value;
         }
 
         #endregion

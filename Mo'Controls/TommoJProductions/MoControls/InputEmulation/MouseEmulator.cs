@@ -6,6 +6,7 @@ using UnityEngine;
 using XInputDotNetPure;
 using MSCLoader;
 using NM = TommoJProductions.MoControls.InputEmulation.NativeMethods;
+using System.Collections;
 
 namespace TommoJProductions.MoControls.InputEmulation
 {
@@ -150,30 +151,6 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// </summary>
         public const float MAX_SENSITIVITY = 100f;        
         /// <summary>
-        /// Represents the mouse move event.
-        /// </summary>
-        private const uint MOUSEEVENTF_MOVE = 0x0001;
-        /// <summary>
-        /// Represents the mouse left down event.
-        /// </summary>
-        private const int MOUSEEVENTF_LEFTDOWN = 0x02;
-        /// <summary>
-        /// Represents the mouse left up event.
-        /// </summary>
-        private const int MOUSEEVENTF_LEFTUP = 0x04;
-        /// <summary>
-        /// Represents the mouse right down event
-        /// </summary>
-        private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
-        /// <summary>
-        /// Represents the mouse right up event
-        /// </summary>
-        private const int MOUSEEVENTF_RIGHTUP = 0x10;
-        /// <summary>
-        /// Represents the mouse wheel event.
-        /// </summary>
-        private const int MOUSEEVENTF_WHEEL = 0x0800;
-        /// <summary>
         /// Represents LMB input name.
         /// </summary>
         public const string LMB_INPUT_NAME = "mocontrolsLMB";
@@ -226,14 +203,8 @@ namespace TommoJProductions.MoControls.InputEmulation
             {
                 XboxController xboxController = MoControlsGO.xboxController;
 
-                if (this.lmbPrimaryInput.GetKeybindDown() || this.lmbSecondaryInput.GetKeybindDown())
-                {
-                    simulateLeftClick();
-                }
-                if (this.rmbPrimaryInput.GetKeybindDown() || this.rmbSecondaryInput.GetKeybindDown())
-                {
-                    simulateRightClick();
-                }
+                simulateLeftClick();
+                simulateRightClick();
                 if (xboxController.isConnected)
                 {
                     GamePadThumbSticks.StickValue stickValue_temp = default;
@@ -295,7 +266,7 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// <param name="data">Data to pass.</param>
         /// <param name="time">The time of event.</param>
         /// <param name="flag">flags to pass.</param>
-        private static InputUnion createMouseInput(int x, int y, MouseEventDataXButtons data, uint time, MouseEventF flag)
+        private static InputUnion createMouseInput(int x, int y, uint data, uint time, MouseEventF flag)
         {
             // Written, 06.10.2020
 
@@ -319,34 +290,66 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// <param name="y">The Y.</param>
         private static void simulateMouseMove(int x, int y)
         {
-            Input[] MouseEvent = new Input[1];
+            /*Input[] MouseEvent = new Input[1];
             MouseEvent[0].type = 0;
             MouseEvent[0].U = createMouseInput(x, y, 0, 0, MouseEventF.MOVE);
-            NM.SendInput((uint)MouseEvent.Length, MouseEvent, Marshal.SizeOf(MouseEvent[0].GetType()));
+            NM.SendInput((uint)MouseEvent.Length, MouseEvent, Input.Size);*/
+
+            // Written, 08.10.2020
+
+            send(new Point(x, y), (uint)MouseEventDataXButtons.Nothing, MouseEventF.MOVE);
         }
         /// <summary>
         /// Simulates a left mouse button click.
         /// </summary>
-        private static void simulateLeftClick()
+        private void simulateLeftClick()
         {
             // Written, 04.08.2018
 
-            Point tempCursPos = getCursorPosition;
-            int X = tempCursPos.X;
-            int Y = tempCursPos.Y;
-            NM.mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, X, Y, 0, 0);
+            /*Point tempCursPos = getCursorPosition;
+            Input[] inputs = new Input[1];
+            inputs[0].type = 0;
+            inputs[0].U = createMouseInput(tempCursPos.X, tempCursPos.Y, MouseEventDataXButtons.XBUTTON1, 0, MouseEventF.LEFTDOWN);
+            NM.SendInput((uint)inputs.Length, inputs, Input.Size);
+            NM.mouse_event(MouseEventF.LEFTDOWN | MouseEventF.LEFTUP, X, Y, 0, 0);*/
+
+            // Written, 08.10.2020
+
+            if (this.lmbPrimaryInput.GetKeybindDown() || this.lmbSecondaryInput.GetKeybindDown())
+            {
+                MoControlsMod.print("LMB Down", Debugging.DebugTypeEnum.full);
+                send(getCursorPosition, (uint)MouseEventDataXButtons.XBUTTON1, MouseEventF.LEFTDOWN);
+            }
+            if (this.lmbPrimaryInput.GetKeybindUp() || this.lmbSecondaryInput.GetKeybindUp())
+            {
+                MoControlsMod.print("LMB Up", Debugging.DebugTypeEnum.full);
+                send(getCursorPosition, (uint)MouseEventDataXButtons.XBUTTON1, MouseEventF.LEFTUP);
+            }
         }
         /// <summary>
         /// Simulates a right mouse button click
         /// </summary>
-        private static void simulateRightClick()
+        private void simulateRightClick()
         {
             // Written, 04.08.2018
 
-            Point tempCursPos = getCursorPosition;
+            /*Point tempCursPos = getCursorPosition;
             int X = tempCursPos.X;
             int Y = tempCursPos.Y;
-            NM.mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, X, Y, 0, 0);
+            NM.mouse_event(MouseEventF.RIGHTDOWN | MouseEventF.RIGHTUP, X, Y, 0, 0);*/
+
+            // Written, 08.10.2020
+
+            if (this.rmbPrimaryInput.GetKeybindDown() || this.rmbSecondaryInput.GetKeybindDown())
+            {
+                MoControlsMod.print("RMB Down", Debugging.DebugTypeEnum.full);
+                send(getCursorPosition, (uint)MouseEventDataXButtons.XBUTTON2, MouseEventF.RIGHTDOWN);
+            }
+            if (this.rmbPrimaryInput.GetKeybindUp() || this.rmbSecondaryInput.GetKeybindUp())
+            {
+                MoControlsMod.print("RMB Up", Debugging.DebugTypeEnum.full);
+                send(getCursorPosition, (uint)MouseEventDataXButtons.XBUTTON2, MouseEventF.RIGHTUP);
+            }
         }
         /// <summary>
         /// Simulates scrolling of the mouse wheel. (One mouse click = 120). Positive = Scroll up | Negitive = Scroll doen.
@@ -356,10 +359,29 @@ namespace TommoJProductions.MoControls.InputEmulation
         {
             // Written, 28.12.2018
 
-            Point tempCursPos = getCursorPosition;
+            /*Point tempCursPos = getCursorPosition;
             int X = tempCursPos.X;
             int Y = tempCursPos.Y;
-            NM.mouse_event(MOUSEEVENTF_WHEEL, X, Y, (uint)inScrollAmount, 0);
+            NM.mouse_event(MouseEventF.WHEEL, X, Y, (uint)inScrollAmount, 0);*/
+
+            // Written, 08.10.2020
+
+            send(getCursorPosition, (uint)inScrollAmount, MouseEventF.WHEEL);
+        }
+        /// <summary>
+        /// Sends mouse data to sendinput
+        /// </summary>
+        /// <param name="point">The position of the mouse.</param>
+        /// <param name="wData">mouse data</param>
+        /// <param name="eventF">mouse event flags.</param>
+        private static void send(Point point, uint wData, MouseEventF eventF) 
+        {
+            // Written, 08.10.2020
+
+            Input[] inputs = new Input[1];
+            inputs[0].type = 0;
+            inputs[0].U = createMouseInput(point.X, point.Y, wData, 0, eventF);
+            NM.SendInput((uint)inputs.Length, inputs, Input.Size);
         }
 
         #endregion

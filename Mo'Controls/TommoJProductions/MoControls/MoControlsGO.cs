@@ -86,14 +86,6 @@ namespace TommoJProductions.MoControls
                 return xboxControllerManager.controllers[0];
             }
         }
-        /// <summary>
-        /// Represents the gui navigation system for the GUI.
-        /// </summary>
-        internal static GuiNav guiNav
-        {
-            get;
-            private set;
-        }
 
         #endregion
 
@@ -110,8 +102,6 @@ namespace TommoJProductions.MoControls
             moControlsGui = this.gameObject.AddComponent<MoControlsGUI>();
             xboxControllerManager = this.gameObject.AddComponent<XboxControllerManager>();
             mouseEmulator = this.gameObject.AddComponent<MouseEmulator>();
-            guiNav = this.gameObject.AddComponent<GuiNav>();
-            guiNav.enabled = false;
             XboxControllerManager.ControllerConnected += this.XboxControllerManager_ControllerConnected;
             XboxControllerManager.ControllerDisconnected += this.XboxControllerManager_ControllerDisconnected;
             MoControlsMod.print(nameof(MoControlsGO) + ": Started", Debugging.DebugTypeEnum.full);

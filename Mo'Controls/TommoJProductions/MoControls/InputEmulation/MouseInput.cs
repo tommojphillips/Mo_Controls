@@ -20,7 +20,7 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// <summary>
         /// Represents mouse data, e.g. for mouse wheel.
         /// </summary>
-        internal MouseEventDataXButtons mouseData;
+        internal uint mouseData;
         /// <summary>
         /// Represents further mouse data, e.g. for mouse buttons.
         /// </summary>
