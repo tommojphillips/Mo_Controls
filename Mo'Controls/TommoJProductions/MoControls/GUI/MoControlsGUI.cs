@@ -273,21 +273,11 @@ namespace TommoJProductions.MoControls.GUI
         /// </summary>
         private void toggleGui()
         {
-            // Written, 18.12.2018
+            // Written, 18.12.2018 | Modified, 09.10.2020
 
             this.controlsGuiOpened = !this.controlsGuiOpened;
-
-            if (this.controlsGuiOpened)
-            {
-                FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = true;
-                this.guiNav.enabled = true;
-            }
-            else
-            {
-                FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = false;
-                if (!ControlManager.isInToolMode)
-                    this.guiNav.enabled = false;
-            }
+            FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = this.controlsGuiOpened;
+            this.guiNav.enabled = this.controlsGuiOpened;
         }
         /// <summary>
         /// Occurs after game starts.
