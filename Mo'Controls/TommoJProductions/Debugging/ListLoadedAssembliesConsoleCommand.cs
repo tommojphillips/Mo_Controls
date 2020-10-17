@@ -1,6 +1,6 @@
-﻿using System;
+﻿using MSCLoader;
+using System;
 using System.Reflection;
-using MSCLoader;
 using TommoJProductions.MoControls;
 
 namespace TommoJProductions.Debugging
@@ -38,7 +38,7 @@ namespace TommoJProductions.Debugging
                 bool invaildArgs = false;
 
                 if (inArgs.Length == 1)
-                {   
+                {
                     try
                     {
                         _index = int.Parse(inArgs[0]);

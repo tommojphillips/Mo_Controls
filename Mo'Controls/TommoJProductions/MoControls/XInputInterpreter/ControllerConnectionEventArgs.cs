@@ -10,8 +10,8 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         // Written, 16.07.2018
 
         /// <summary>
-       /// Represents the xbox controller that was connected.
-       /// </summary>
+        /// Represents the xbox controller that was connected.
+        /// </summary>
         public XboxController xboxController
         {
             get;

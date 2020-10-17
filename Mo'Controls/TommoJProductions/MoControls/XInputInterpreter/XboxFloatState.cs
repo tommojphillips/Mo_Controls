@@ -37,7 +37,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// </summary>
         /// <param name="inputName">The input for the trigger.</param>
         /// <param name="triggerName">The triggers name.</param>
-        public XboxFloatState(string inputName, string triggerName) : base (inputName, triggerName, XboxControlTypeEnum.Axis)
+        public XboxFloatState(string inputName, string triggerName) : base(inputName, triggerName, XboxControlTypeEnum.Axis)
         {
             // Written, 20.07.2018
         }

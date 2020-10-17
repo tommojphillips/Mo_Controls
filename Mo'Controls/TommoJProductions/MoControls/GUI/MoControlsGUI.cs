@@ -1,14 +1,14 @@
-﻿ using System;
-using System.Linq;
-using System.Collections.Generic;
-using UnityEngine;
-using gui = UnityEngine.GUILayout;
-using ueGUI = UnityEngine.GUI;
+﻿using HutongGames.PlayMaker;
 using MSCLoader;
-using HutongGames.PlayMaker;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using TommoJProductions.MoControls.InputEmulation;
 using TommoJProductions.MoControls.XInputInterpreter;
+using UnityEngine;
 using XInputDotNetPure;
+using gui = UnityEngine.GUILayout;
+using ueGUI = UnityEngine.GUI;
 
 namespace TommoJProductions.MoControls.GUI
 {
@@ -18,6 +18,11 @@ namespace TommoJProductions.MoControls.GUI
     public class MoControlsGUI : MonoBehaviour
     {
         // Written, 22.08.2018
+
+        private float playerV_axisDeadzone;
+        private float playerH_axisDeadzone;
+        private float vert_axisDeadzone;
+        private float hoz_axisDeadzone;
 
         #region Fields
 
@@ -89,7 +94,7 @@ namespace TommoJProductions.MoControls.GUI
         /// <summary>
         /// Represents all relevant controls when in "on foot mode".
         /// </summary>
-        private List<GameControlsEnum> relevantFootControls = new List<GameControlsEnum>()
+        private readonly List<GameControlsEnum> relevantFootControls = new List<GameControlsEnum>()
         {
             GameControlsEnum.PlayerUp,
             GameControlsEnum.PlayerDown,
@@ -115,7 +120,7 @@ namespace TommoJProductions.MoControls.GUI
         /// <summary>
         /// Represents all relevant controls when in "driving mode".
         /// </summary>
-        private List<GameControlsEnum> relevantDrivingControls = new List<GameControlsEnum>()
+        private readonly List<GameControlsEnum> relevantDrivingControls = new List<GameControlsEnum>()
         {
             GameControlsEnum.Boost,
             GameControlsEnum.Brake,
@@ -195,7 +200,7 @@ namespace TommoJProductions.MoControls.GUI
             }
             set
             {
-                this.controlManager.changeInputResult = value;
+                this.controlManager.setChangeInput(value);
             }
         }
         /// <summary>
@@ -235,7 +240,7 @@ namespace TommoJProductions.MoControls.GUI
         /// <summary>
         /// Represents whether the gui should be opened or closed.
         /// </summary>
-        internal bool controlsGuiOpened 
+        internal bool controlsGuiOpened
         {
             get;
             private set;
@@ -248,6 +253,10 @@ namespace TommoJProductions.MoControls.GUI
             get;
             private set;
         }
+        /// <summary>
+        /// Represents if forcefeed back overlay should be rendered.
+        /// </summary>
+        internal bool displayForceFeedbackOverlay { get; set; }
 
         #endregion
 
@@ -288,6 +297,11 @@ namespace TommoJProductions.MoControls.GUI
 
             // GUINav Set up
             this.guiNav = this.gameObject.AddComponent<GuiNav>();
+            this.guiNav.setControls(
+                XboxAxisEnum.rightTrigger, XboxButtonEnum.NULL,
+                XboxAxisEnum.leftTrigger, XboxButtonEnum.NULL,
+                XboxAxisEnum.NULL, XboxButtonEnum.RB,
+                XboxAxisEnum.NULL, XboxButtonEnum.LB);
             this.guiNav.enabled = false;
             // Gui hold button set up
             HoldInputMono him = this.gameObject.AddComponent<HoldInputMono>();
@@ -295,7 +309,7 @@ namespace TommoJProductions.MoControls.GUI
                 XboxButtonEnum.Back,
                 0.3f,
                 this.toggleGui);
-
+            // printing gui mono start to modconsole.
             MoControlsMod.print(nameof(MoControlsGUI) + ": Started", Debugging.DebugTypeEnum.full);
         }
         /// <summary>
@@ -338,9 +352,9 @@ namespace TommoJProductions.MoControls.GUI
                 else
                 {
                     if (displayCurrentPlayerModeOverlay)
-                    {
                         this.drawPlayerModeOverlayGUI();
-                    }
+                    if (displayForceFeedbackOverlay)
+                        this.drawForceFeedBackOverlayGUI();
                 }
             }
             catch (Exception ex)
@@ -379,16 +393,16 @@ namespace TommoJProductions.MoControls.GUI
             using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width(this.mainGuiWidth - SCROLL_BAR_OFFSET), gui.MaxWidth(this.mainGuiWidth - SCROLL_BAR_OFFSET) }))
             {
                 this.mainGUIScrollPosition = scrollViewScope.scrollPosition;
-                gui.Label(String.Format("<b>{0} v{1} ({3}) by {2}</b>", 
-                    this.mod.Name, 
-                    this.mod.Version, 
+                gui.Label(String.Format("<b>{0} v{1} ({3}) by {2}</b>",
+                    this.mod.Name,
+                    this.mod.Version,
                     this.mod.Author,
                     MoControlsMod.instance.releaseVersionName));
                 if (this.mainGUIMenu != MainGUIMenuEnum.About)
                     gui.Label(String.Format("<b>{0}</b> GUI key bind." +
                         "\r\n<b>{1}</b> Sets as None." +
                         "\r\n<b>LMB</b> Selects." +
-                        "\r\n<b>RMB</b> Cancels.", 
+                        "\r\n<b>RMB</b> Cancels.",
                         this.openControlsGui.Key,
                         Input.noneKey));
                 gui.Space(3.0f);
@@ -511,14 +525,57 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 09.10.2018
 
-            gui.Label("<b>Xbox Controller</b>");
+            bool _asInput;
+            UnityRuntimeUpdateSchemesEnum scheme = this.controlManager.ffbHandledOnUpdateScheme;
+            bool _saveSettings = false;
+            gui.Label(string.Format("<b>Xbox Controller</b>: {0}", this.xboxController.isConnected ? "<color=green>connected</color>" : "<color=red>disconnected</color>"));
             gui.Space(5f);
-            using (new gui.HorizontalScope())
+            using (new gui.VerticalScope())
             {
                 ueGUI.backgroundColor = this.moduleBackgroundColor;
+                bool ffbOn = this.controlManager.ffbOnXboxController;
+                string toggleString = ffbOn ? "<color=green>On</color>" : "<color=red>Off</color>";
+                if (gui.Toggle(ffbOn, String.Format("FFB: {0}", toggleString)) != ffbOn)
+                {
+                    this.controlManager.ffbOnXboxController = !ffbOn;
+                    _saveSettings = true;
+                }
+                using (new gui.HorizontalScope("box"))
+                {
+                    gui.Label("<i><b>FFB on update scheme:</b></i>");
+                    _asInput = this.controlManager.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.update;
+                    if (gui.Toggle(_asInput, String.Format("<b>Update:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
+                    {
+                        if (scheme != UnityRuntimeUpdateSchemesEnum.update)
+                        {
+                            this.controlManager.ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.update;
+                            _saveSettings = true;
+                        }
+                    }
+                    _asInput = this.controlManager.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.lateUpdate;
+                    if (gui.Toggle(_asInput, String.Format("<b>Late Update:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
+                    {
+                        if (scheme != UnityRuntimeUpdateSchemesEnum.lateUpdate)
+                        {
+                            this.controlManager.ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.lateUpdate;
+                            _saveSettings = true;
+                        }
+                    }
+                    _asInput = this.controlManager.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.fixedUpdate;
+                    if (gui.Toggle(_asInput, String.Format("<b>Fixed Update:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
+                    {
+                        if (scheme != UnityRuntimeUpdateSchemesEnum.fixedUpdate)
+                        {
+                            this.controlManager.ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.fixedUpdate;
+                            _saveSettings = true;
+                        }
+                    }
+                }
                 this.drawControllerInputContent();
                 ueGUI.backgroundColor = this.backgroundColor;
             }
+            if (_saveSettings)
+                MoControlsSaveData.saveSettings();
         }
         /// <summary>
         /// Draws controller input content.
@@ -529,7 +586,7 @@ namespace TommoJProductions.MoControls.GUI
 
             using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width((this.mainGuiWidth) - SCROLL_BAR_OFFSET - 12.5f) }))
             {
-                gui.Label("<b>Xbox Controller Input Viewer: " + (xboxController.isConnected ? "<color=green>Connected</color></b>" : "<color=red>Disconnected</color></b>"));               
+                gui.Label("<b>Xbox Controller Input Viewer: " + (xboxController.isConnected ? "<color=green>Connected</color></b>" : "<color=red>Disconnected</color></b>"));
                 int j = 0;
                 int itemWidth = 160;
                 int maxItemsPerRow = (int)(mainGuiWidth / itemWidth);
@@ -557,12 +614,12 @@ namespace TommoJProductions.MoControls.GUI
                                     bool isBoolState = xboxControls[i] is XboxBoolState;
                                     if (isBoolState && this.xboxController.isConnected && (xboxControls[i] as XboxBoolState).state == ButtonState.Pressed)
                                         ueGUI.contentColor = this.xboxButtonPressedColor;
-                                    if (this.xboxController.LS == xboxControls[i])
+                                    if (this.xboxController.lS == xboxControls[i])
                                     {
                                         GamePadThumbSticks.StickValue ls = this.xboxController.getLeftStick();
                                         gui.Label(xboxControls[i].texture, style: new GUIStyle() { contentOffset = new Vector2(ls.X * 3, -(ls.Y * 3)) });
                                     }
-                                    else if (this.xboxController.RS == xboxControls[i])
+                                    else if (this.xboxController.rS == xboxControls[i])
                                     {
                                         GamePadThumbSticks.StickValue rs = this.xboxController.getRightStick();
                                         gui.Label(xboxControls[i].texture, style: new GUIStyle() { contentOffset = new Vector2(rs.X * 3, -(rs.Y * 3)) });
@@ -605,10 +662,10 @@ namespace TommoJProductions.MoControls.GUI
 
             using (new gui.HorizontalScope("box"))
             {
-                gui.Label(this.mouseEmulator.Emulating ? "<color=green><b>ON</b></color>" : "<color=red><b>OFF</b></color>");
-                if (gui.Toggle(this.mouseEmulator.Emulating, String.Format("<b>Emulate mouse for controller:</b> Using {0}", this.mouseEmulator.inputType)) != this.mouseEmulator.Emulating)
+                gui.Label(this.mouseEmulator.emulating ? "<color=green><b>ON</b></color>" : "<color=red><b>OFF</b></color>");
+                if (gui.Toggle(this.mouseEmulator.emulating, String.Format("<b>Emulate mouse for controller:</b> Using {0}", this.mouseEmulator.inputType)) != this.mouseEmulator.emulating)
                 {
-                    this.mouseEmulator.Emulating = !this.mouseEmulator.Emulating;
+                    this.mouseEmulator.emulating = !this.mouseEmulator.emulating;
                     saveSettings = true;
                 }
             }
@@ -681,7 +738,7 @@ namespace TommoJProductions.MoControls.GUI
                         this.mouseEmulator.deadzone = tempValue;
                         saveSettings = true;
                     }
-                }                
+                }
                 using (new gui.VerticalScope("box"))
                 {
                     gui.Label(String.Format("<b>Mouse Sensitivity:</b> {0}", this.mouseEmulator.sensitivity));
@@ -779,6 +836,57 @@ namespace TommoJProductions.MoControls.GUI
                     displayCurrentPlayerModeOverlay = !displayCurrentPlayerModeOverlay;
                     _saveSettings = true;
                 }
+                if (gui.Toggle(this.displayForceFeedbackOverlay, "Display force feedback overlay") != this.displayForceFeedbackOverlay)
+                {
+                    this.displayForceFeedbackOverlay = !this.displayForceFeedbackOverlay;
+                    _saveSettings = true;
+                }
+            }
+            using (new gui.HorizontalScope("box"))
+            {
+                // player movement and mouse deadzones
+                /*external cinput control names = PlayerVertical*PlayerHorizontal*Horizontal*Vertical*/
+                gui.Label("Deadzones:");
+                float temp = 0;
+                string axisName = "PlayerVertical";
+                using (new gui.VerticalScope("box"))
+                {
+                    this.playerV_axisDeadzone = cInput.GetAxisDeadzone(axisName);
+                    gui.Label(axisName + " Deadzone: " + this.playerV_axisDeadzone);
+                    temp = gui.HorizontalSlider(this.playerV_axisDeadzone, 0.0f, 100.0f);
+                    if (temp != this.playerV_axisDeadzone)
+                        cInput.SetAxisDeadzone(axisName, temp);
+                }
+                temp = 0;
+                axisName = "PlayerHorizontal";
+                using (new gui.VerticalScope("box"))
+                {
+                    this.playerH_axisDeadzone = cInput.GetAxisDeadzone(axisName);
+                    gui.Label(axisName + " Deadzone: " + this.playerH_axisDeadzone);
+                    temp = gui.HorizontalSlider(this.playerH_axisDeadzone, 0.0f, 100.0f);
+                    if (temp != this.playerH_axisDeadzone)
+                        cInput.SetAxisDeadzone(axisName, temp);
+                }
+                temp = 0;
+                axisName = "Vertical";
+                using (new gui.VerticalScope("box"))
+                {
+                    this.vert_axisDeadzone = cInput.GetAxisDeadzone(axisName);
+                    gui.Label(axisName + " Deadzone: " + this.vert_axisDeadzone);
+                    temp = gui.HorizontalSlider(this.vert_axisDeadzone, 0.0f, 100.0f);
+                    if (temp != this.vert_axisDeadzone)
+                        cInput.SetAxisDeadzone(axisName, temp);
+                }
+                temp = 0;
+                axisName = "Horizontal";
+                using (new gui.VerticalScope("box"))
+                {
+                    this.hoz_axisDeadzone = cInput.GetAxisDeadzone(axisName);
+                    gui.Label(axisName + " Deadzone: " + this.hoz_axisDeadzone);
+                    temp = gui.HorizontalSlider(this.hoz_axisDeadzone, 0.0f, 100.0f);
+                    if (temp != this.hoz_axisDeadzone)
+                        cInput.SetAxisDeadzone(axisName, temp);
+                }
             }
             using (new gui.HorizontalScope("box"))
             {
@@ -800,7 +908,7 @@ namespace TommoJProductions.MoControls.GUI
 
             using (new gui.AreaScope(new Rect(Screen.width / 2, 1, 180, 20)))
             {
-                gui.Label(String.Format("{0} ({1} mode)", ControlManager.playerMode.ToString(), ControlManager.isInToolMode ? "Tool" : "Hand"));
+                gui.Label(String.Format("{0} ({1} mode)", ControlManager.getCurrentPlayerMode.ToString(), ControlManager.isInToolMode ? "Tool" : "Hand"));
             }
         }
         /// <summary>
@@ -1019,7 +1127,24 @@ namespace TommoJProductions.MoControls.GUI
                 return false;
             }
         }
-       
+        /// <summary>
+        /// Draws force feedback overlay
+        /// </summary>
+        private void drawForceFeedBackOverlayGUI()
+        {
+            // Written, 16.10.2020
+
+            using (new gui.AreaScope(new Rect(Screen.width / 2, 22, 180, 200)))
+            {
+                gui.Label(String.Format("FFB: {4}\nClamp: {0}\nFactor: {1}\nForce: {2}\nMultiplier: {3}",
+                    this.controlManager.forceFeedback.clampValue,
+                    this.controlManager.forceFeedback.factor,
+                    this.controlManager.forceFeedback.force,
+                    this.controlManager.forceFeedback.multiplier,
+                    this.controlManager.carDynamics.forceFeedback));
+            }
+        }
+
         #endregion
     }
 }

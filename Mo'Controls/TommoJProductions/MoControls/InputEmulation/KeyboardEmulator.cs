@@ -35,7 +35,7 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// Simulates a key press via User32.dll=>SendInput
         /// </summary>
         /// <param name="key">The key to send.</param>
-        public static IEnumerator simulateKeyPress(VirtualKeyShort wVk) 
+        public static IEnumerator simulateKeyPressCoroutine(VirtualKeyShort wVk)
         {
             // Written, 08.10.2020
 
@@ -51,7 +51,7 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// <param name="time">the time?</param>
         /// <param name="dwExtraInfo">dword extra info</param>
         /// <returns></returns>
-        private static InputUnion createKeyEvent(VirtualKeyShort wVk, KeyEventF dwFlags, int time, UIntPtr dwExtraInfo) 
+        private static InputUnion createKeyEvent(VirtualKeyShort wVk, KeyEventF dwFlags, int time, UIntPtr dwExtraInfo)
         {
             // Written, 08.10.2020
 

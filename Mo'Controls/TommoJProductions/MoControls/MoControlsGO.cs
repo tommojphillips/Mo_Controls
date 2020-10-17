@@ -1,8 +1,8 @@
 ﻿using System;
-using UnityEngine;
 using TommoJProductions.MoControls.GUI;
 using TommoJProductions.MoControls.InputEmulation;
 using TommoJProductions.MoControls.XInputInterpreter;
+using UnityEngine;
 
 namespace TommoJProductions.MoControls
 {
@@ -13,25 +13,20 @@ namespace TommoJProductions.MoControls
     {
         // Written, 08.10.2018
 
-        #region Fields
+        #region Properties
 
         /// <summary>
         /// Represents whether or not the modules had an error.
         /// </summary>
-        private bool moduleError;
+        internal bool moduleError { private get; set; }
         /// <summary>
         /// Represents whether or not the settings are loaded.
         /// </summary>
-        private bool settingsLoaded;
-
-        #endregion
-
-        #region Properties
-
+        internal bool settingsLoaded { get; private set; }
         /// <summary>
         /// Represents whether or not all the modules have started.
         /// </summary>
-        private bool modulesStarted
+        internal bool modulesStarted
         {
             get
             {
@@ -102,8 +97,8 @@ namespace TommoJProductions.MoControls
             moControlsGui = this.gameObject.AddComponent<MoControlsGUI>();
             xboxControllerManager = this.gameObject.AddComponent<XboxControllerManager>();
             mouseEmulator = this.gameObject.AddComponent<MouseEmulator>();
-            XboxControllerManager.ControllerConnected += this.XboxControllerManager_ControllerConnected;
-            XboxControllerManager.ControllerDisconnected += this.XboxControllerManager_ControllerDisconnected;
+            XboxControllerManager.ControllerConnected += this.xboxControllerManager_ControllerConnected;
+            XboxControllerManager.ControllerDisconnected += this.xboxControllerManager_ControllerDisconnected;
             MoControlsMod.print(nameof(MoControlsGO) + ": Started", Debugging.DebugTypeEnum.full);
         }
         /// <summary>
@@ -113,24 +108,7 @@ namespace TommoJProductions.MoControls
         {
             // Written, 08.10.2018
 
-            if (this.modulesStarted)
-            {
-                if (!this.settingsLoaded && GameObject.Find(MoControlsMod.instance.gameObjectName) != null)
-                {
-                    this.setLoadedSettings(MoControlsSaveData.loadSettings(), inStartUp: true);
-                    xboxController.loadControllerAssets();
-                    this.settingsLoaded = true;
-                    MoControlsMod.print("All Modules have <b><color=green>successfully</color></b> been initilized.", Debugging.DebugTypeEnum.partial);
-                }
-            }
-            else
-            {
-                if (!this.moduleError)
-                {
-                    this.moduleError = true;
-                    MoControlsMod.print("Some modules have <b>not</b> been initilized.", Debugging.DebugTypeEnum.partial);
-                }
-            }
+
         }
         /// <summary>
         /// sets the settings.
@@ -151,13 +129,17 @@ namespace TommoJProductions.MoControls
             {
                 try
                 {
-                    xboxControllerManager.monitorControllerConnections.Monitor = inSaveData.monitiorXboxControllerConnectionStatus;
+                    xboxControllerManager.monitorControllerConnections.monitor = inSaveData.monitiorXboxControllerConnectionStatus;
                     mouseEmulator.deadzone = inSaveData.mouseDeadzone;
                     mouseEmulator.sensitivity = inSaveData.mouseSensitivity;
                     mouseEmulator.inputType = inSaveData.mouseInputType;
-                    mouseEmulator.Emulating = inSaveData.emulateMouse;
+                    mouseEmulator.emulating = inSaveData.emulateMouse;
                     MoControlsGUI.displayCurrentPlayerModeOverlay = inSaveData.displayCurrentPlayerModeOverlay;
+                    moControlsGui.displayForceFeedbackOverlay = inSaveData.displayFfbOverlay;
+                    controlManager.ffbOnXboxController = inSaveData.ffbOnXboxController;
+                    controlManager.ffbHandledOnUpdateScheme = inSaveData.ffbHandledOnUpdateScheme;
                     controlManager.setControls(inSaveData.footControls, inSaveData.drivingControls);
+                    settingsLoaded = true;
 
                     if (inStartUp)
                     {
@@ -176,14 +158,14 @@ namespace TommoJProductions.MoControls
 
         #region Event handlers
 
-        private void XboxControllerManager_ControllerDisconnected(object sender, ControllerConnectionEventArgs e)
+        private void xboxControllerManager_ControllerDisconnected(object sender, ControllerConnectionEventArgs e)
         {
             // Written, 08.10.2018
 
             MoControlsMod.print("<color=grey><i>Controller: " + e.xboxController.index + "</i></color> <color=red>Disconnected</color>", Debugging.DebugTypeEnum.none);
         }
 
-        private void XboxControllerManager_ControllerConnected(object inSender, ControllerConnectionEventArgs inE)
+        private void xboxControllerManager_ControllerConnected(object inSender, ControllerConnectionEventArgs inE)
         {
             // Written, 08.10.2018
 

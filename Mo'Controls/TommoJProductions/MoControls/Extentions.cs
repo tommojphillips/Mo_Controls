@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace TommoJProductions.MoControls
+﻿namespace TommoJProductions.MoControls
 {
     internal static class Extentions
     {
@@ -15,7 +10,7 @@ namespace TommoJProductions.MoControls
         {
             // Written, 20.01.2019
 
-            GameControlsEnum? gameControl = null;
+            GameControlsEnum? gameControl;
             switch (inGameControlName)
             {
                 case "Left":

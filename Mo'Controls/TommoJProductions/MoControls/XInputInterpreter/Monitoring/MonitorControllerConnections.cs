@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 namespace TommoJProductions.MoControls.XInputInterpreter.Monitoring
 {
@@ -10,29 +11,16 @@ namespace TommoJProductions.MoControls.XInputInterpreter.Monitoring
         // Written, 16.07.2018
 
         #region Properties / Fields
-        
+
+        private XboxControllerManager xboxControllerManager;
         /// <summary>
         /// Represents whether the current instance is monitoring for controller connections changing.
         /// </summary>
-        public bool Monitor
+        public bool monitor
         {
-            get
-            {
-                return this.monitor;
-            }
-            set
-            {
-                if (value)
-                {
-                    MoControlsMod.print("Started Monitoring for controller connections...", Debugging.DebugTypeEnum.full);
-                }
-                else
-                {
-                    MoControlsMod.print("Stopped Monitoring for controller connections...", Debugging.DebugTypeEnum.full);
-                }
-                this.monitor = value;
-            }
-        }        
+            get;
+            set;
+        }
         /// <summary>
         /// Represents a List of xbox controllers to monitor.
         /// </summary>
@@ -40,7 +28,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter.Monitoring
         {
             get
             {
-                return this.gameObject.GetComponent<XboxControllerManager>().controllers;
+                return this.xboxControllerManager.controllers;
             }
         }
         /// <summary>
@@ -51,46 +39,24 @@ namespace TommoJProductions.MoControls.XInputInterpreter.Monitoring
             get;
             set;
         }
-        /// <summary>
-        /// Represents whether the current instance is monitoring.
-        /// </summary>
-        private bool monitor;
-
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="MonitorControllerConnections"/>.
-        /// </summary>
-        /// <param name="numOfSupportedControllers">Number of supported controllers.</param>
-        /// <param name="inMonitor">Monitor connection stautus?</param>
-        /// <param name="xboxControllers">An array of xbox controllers.</param>
-        public MonitorControllerConnections()
-        {
-            // Written, 16.07.2018
-            
-            this.controllerConnections = new ControllerConnection[XboxControllerManager.numOfControllersSupported];
-            for (int i = 0; i < XboxControllerManager.numOfControllersSupported; i++)
-            {
-                XboxController xboxController = xboxControllers[i];
-                if (xboxController != null)
-                {
-                    this.xboxControllers[i] = xboxController;
-                    this.controllerConnections[i] = new ControllerConnection() { currentConnectionStatus = xboxController.isConnected, previousConnectionStatus = null };
-                }
-            }
-        }
 
         #endregion
 
         #region Methods
 
-        private void Update()
+        private void Start() 
+        {
+            // Written, 17.10.2020
+
+            this.xboxControllerManager = GetComponent<XboxControllerManager>(); 
+            this.controllerConnections = new ControllerConnection[] { new ControllerConnection() /*{ currentConnectionStatus = xboxControllers[0].isConnected, previousConnectionStatus = null }*/ };
+            //Only supports 1 controller currently.. no point enumating.
+        }
+        private IEnumerator updateCoroutine()
         {
             // Written, 16.07.2018
 
-            if (this.Monitor)
+            if (this.monitor)
             {
                 for (int i = 0; i < this.xboxControllers.Length; i++)
                 {
@@ -117,7 +83,14 @@ namespace TommoJProductions.MoControls.XInputInterpreter.Monitoring
                         }
                     }
                 }
+                yield return new WaitForEndOfFrame();
             }
+        }
+        private void Update()
+        {
+            // Written, 16.10.2020
+
+            StartCoroutine(updateCoroutine());
         }
 
         #endregion

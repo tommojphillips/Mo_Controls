@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents debug data to display in the mod console.
     /// </summary>
-    internal enum DebugTypeEnum
+    public enum DebugTypeEnum
     {
         /// <summary>
         /// Represents no debugging data.

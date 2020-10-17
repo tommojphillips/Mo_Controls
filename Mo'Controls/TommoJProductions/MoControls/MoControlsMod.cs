@@ -1,6 +1,6 @@
-﻿using System;
+﻿using MSCLoader;
+using System;
 using TommoJProductions.Debugging;
-using MSCLoader;
 using UnityEngine;
 
 namespace TommoJProductions.MoControls
@@ -19,7 +19,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents whether this is a release version
         /// </summary>
-        internal static bool isReleaseVersion => true;
+        internal static bool isReleaseVersion => false;
 
         #region Mod Fields
 
@@ -28,6 +28,7 @@ namespace TommoJProductions.MoControls
         public override string Author => "tommojphillips";
         public override string Version => "1.1.2";
         public override bool UseAssetsFolder => true;
+        public override bool SecondPass => true;
 
         #endregion
 
@@ -129,7 +130,7 @@ namespace TommoJProductions.MoControls
         private static bool debugTypeEquals(DebugTypeEnum inDebugType)
         {
             // Written, 15.10.2018
-            
+
             if (debug == DebugTypeEnum.full)
                 return true;
             if (debug == DebugTypeEnum.partial)
@@ -205,7 +206,7 @@ namespace TommoJProductions.MoControls
             }
         }
         /// <summary>
-        /// Initializes.
+        /// Initializes all mscmodloader commands and loads controller assets. (textures)
         /// </summary>
         private void initialize()
         {
@@ -216,6 +217,7 @@ namespace TommoJProductions.MoControls
             ConsoleCommand.Add(new ListLoadedAssembliesConsoleCommand());
             ConsoleCommand.Add(new WriteCinputExternInputsCommand());
             ConsoleCommand.Add(new ChangeToolModeCommand());
+
             this.loadControllerAssets();
         }
         /// <summary>
@@ -242,7 +244,7 @@ namespace TommoJProductions.MoControls
                     "<color=orange>Warning</color>: <b>Incorrect Release/Debug Configuration</b>");
 #endif
         }
-        
+
         #endregion
 
         #region Override Methods
@@ -259,8 +261,27 @@ namespace TommoJProductions.MoControls
             print("Assets returned: " + assets.result, DebugTypeEnum.full);
             print(this.Name + " v" + this.Version + ": Loaded.", DebugTypeEnum.none);
         }
+        public override void SecondPassOnLoad()
+        {
+            // Written, 17.10.2020
+
+            if (moControlsGO.modulesStarted)
+            {
+                if (!moControlsGO.settingsLoaded && GameObject.Find(this.gameObjectName) != null)
+                {
+                    moControlsGO.setLoadedSettings(MoControlsSaveData.loadedSaveData, inStartUp: true);
+                    MoControlsGO.xboxController.loadControllerAssets();
+                    print("All Modules have <b><color=green>successfully</color></b> been initilized.", DebugTypeEnum.partial);
+                }
+            }
+            else
+            {
+                moControlsGO.moduleError = true;
+                print("Some modules have <b>not</b> been initilized.", DebugTypeEnum.partial);
+            }
+        }
 
         #endregion
 
     }
-}   
+}

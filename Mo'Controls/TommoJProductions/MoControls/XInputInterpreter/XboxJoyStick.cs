@@ -5,7 +5,7 @@
         // Written, 21.07.2018
 
         #region Properties
-        
+
         /// <summary>
         /// Represents all the thumbsticks <see cref="XboxControl"/>s in order of; left, right, up, down.
         /// </summary>

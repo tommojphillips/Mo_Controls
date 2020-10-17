@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Text;
 using System.Linq;
+using System.Text;
 
 namespace TommoJProductions.MoControls.GUI
 {
@@ -65,7 +65,7 @@ namespace TommoJProductions.MoControls.GUI
                     break;
                 case GameControlsEnum.Right:
                     alias = "Turn Right";
-                    break;                
+                    break;
                 case GameControlsEnum.Boost:
                     alias = "N2O";
                     break;
@@ -110,7 +110,7 @@ namespace TommoJProductions.MoControls.GUI
                     alias = newText.ToString();
                     break;
             }
-            return alias;           
+            return alias;
         }
     }
 }

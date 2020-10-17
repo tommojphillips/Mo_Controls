@@ -10,7 +10,7 @@ namespace TommoJProductions.MoControls
         // Written, 11.07.2018
 
         #region Properties
-        
+
         /// <summary>
         /// Returns whether the input to change is a mod keybind.
         /// </summary>
@@ -18,7 +18,7 @@ namespace TommoJProductions.MoControls
         {
             get
             {
-                return mod != null ? true : false;
+                return mod != null;
             }
         }
         /// <summary>

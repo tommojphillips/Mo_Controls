@@ -1,6 +1,6 @@
-﻿using System;
+﻿using MSCLoader;
+using System;
 using TommoJProductions.MoControls.InputEmulation;
-using MSCLoader;
 
 namespace TommoJProductions.MoControls
 {
@@ -25,7 +25,6 @@ namespace TommoJProductions.MoControls
         {
             get
             {
-                ControlManager.loadControlInputsFromCInput();
                 return new MoControlsSaveData()
                 {
                     monitiorXboxControllerConnectionStatus = true,
@@ -52,7 +51,7 @@ namespace TommoJProductions.MoControls
                         { "Handbrake", "None", "None", },
                         { "DrivingMode", "Return", "None", },
                         { "PlayerLeft", "A", "None", },
-                        {  "PlayerRight", "D", "None", },
+                        { "PlayerRight", "D", "None", },
                         { "PlayerUp", "W", "None", },
                         { "PlayerDown", "S", "None", },
                         { "Jump", "Space", "None", },
@@ -60,7 +59,7 @@ namespace TommoJProductions.MoControls
                         { "Zoom", "None", "None", },
                         { "Use", "F", "None", },
                         { "Crouch", "C", "None", },
-                        { "Watch", "U", "None"},
+                        { "Watch", "U", "None" },
                         { "ReachLeft", "Q", "None", },
                         { "ReachRight", "E", "None", },
                         { "Hitchhike", "O", "None", },
@@ -97,7 +96,7 @@ namespace TommoJProductions.MoControls
                         { "Handbrake", "Z", "None", },
                         { "DrivingMode", "Return", "None", },
                         { "PlayerLeft", "None", "None", },
-                        {  "PlayerRight", "None", "None", },
+                        { "PlayerRight", "None", "None", },
                         { "PlayerUp", "None", "None", },
                         { "PlayerDown", "None", "None", },
                         { "Jump", "None", "None", },
@@ -105,7 +104,7 @@ namespace TommoJProductions.MoControls
                         { "Zoom", "None", "None", },
                         { "Use", "F", "None", },
                         { "Crouch", "None", "None", },
-                        { "Watch", "U", "None"},
+                        { "Watch", "U", "None" },
                         { "ReachLeft", "Q", "None", },
                         { "ReachRight", "E", "None", },
                         { "Hitchhike", "None", "None", },
@@ -125,7 +124,11 @@ namespace TommoJProductions.MoControls
                         { "sixth", "None", "None", },
                     },
                     debugMode = Debugging.DebugTypeEnum.none,
-                    playerSeenMscLoaderVersionError = false
+                    playerSeenMscLoaderVersionError = false,
+                    displayFfbOverlay = false,
+                    ffbOnXboxController = false,
+                    ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.update,
+                    moControlsVersion = MoControlsMod.instance.Version,
                 };
             }
         }
@@ -134,17 +137,22 @@ namespace TommoJProductions.MoControls
 
         #region Properties
 
+        public string moControlsVersion
+        {
+            get;
+            set;
+        }
         public static MoControlsSaveData loadedSaveData
         {
             get;
-            private set;
+            set;
         }
         public bool playerSeenMscLoaderVersionError
         {
             get;
             set;
         }
-        internal Debugging.DebugTypeEnum debugMode
+        public Debugging.DebugTypeEnum debugMode
         {
             get;
             set;
@@ -189,7 +197,22 @@ namespace TommoJProductions.MoControls
             get;
             set;
         }
-        
+        public bool ffbOnXboxController
+        {
+            get;
+            set;
+        }
+        public bool displayFfbOverlay
+        {
+            get;
+            set;
+        }
+        public UnityRuntimeUpdateSchemesEnum ffbHandledOnUpdateScheme
+        {
+            get;
+            set;
+        }
+
         #endregion
 
         #region Methods
@@ -206,36 +229,45 @@ namespace TommoJProductions.MoControls
             MoControlsSaveData mcsd = new MoControlsSaveData();
 
             if (MoControlsGO.xboxControllerManager != null)
-                mcsd.monitiorXboxControllerConnectionStatus = MoControlsGO.xboxControllerManager.monitorControllerConnections.Monitor;
+                mcsd.monitiorXboxControllerConnectionStatus = MoControlsGO.xboxControllerManager.monitorControllerConnections.monitor;
             else
                 _error = true;
-            if (MoControlsGO.mouseEmulator != null) 
+            if (MoControlsGO.mouseEmulator != null)
             {
-                mcsd.emulateMouse = MoControlsGO.mouseEmulator.Emulating;
+                mcsd.emulateMouse = MoControlsGO.mouseEmulator.emulating;
                 mcsd.mouseDeadzone = MoControlsGO.mouseEmulator.deadzone;
                 mcsd.mouseSensitivity = MoControlsGO.mouseEmulator.sensitivity;
-                mcsd.mouseInputType = MoControlsGO.mouseEmulator.inputType;                
+                mcsd.mouseInputType = MoControlsGO.mouseEmulator.inputType;
             }
             else
                 _error = true;
-            if (MoControlsGO.controlManager != null) 
+            if (MoControlsGO.controlManager != null)
+            {
+                mcsd.footControls = MoControlsGO.controlManager.footControls;
+                mcsd.drivingControls = MoControlsGO.controlManager.drivingControls;
+                mcsd.ffbOnXboxController = MoControlsGO.controlManager.ffbOnXboxController;
+                mcsd.ffbHandledOnUpdateScheme = MoControlsGO.controlManager.ffbHandledOnUpdateScheme;
+            }
+            else
+                _error = true;
+            if (MoControlsGO.moControlsGui != null)
             {
                 mcsd.displayCurrentPlayerModeOverlay = GUI.MoControlsGUI.displayCurrentPlayerModeOverlay;
-                mcsd.footControls = MoControlsGO.controlManager.footControls;
-                mcsd.drivingControls = MoControlsGO.controlManager.drivingControls;                
+                mcsd.displayFfbOverlay = MoControlsGO.moControlsGui.displayForceFeedbackOverlay;
             }
             else
                 _error = true;
             mcsd.debugMode = MoControlsMod.debug;
             mcsd.playerSeenMscLoaderVersionError = MoControlsMod.instance.playerSeenMscLoaderVersionError;
+            mcsd.moControlsVersion = MoControlsMod.instance.Version;
 
             if (!_error)
-                _saveSettings(MoControlsMod.instance, mcsd);
+                saveSettings(MoControlsMod.instance, mcsd);
         }
         /// <summary>
         /// Saves the settings.
         /// </summary>
-        private static void _saveSettings(MoControlsMod inMo_Controls, MoControlsSaveData inMcsd)
+        private static void saveSettings(MoControlsMod inMo_Controls, MoControlsSaveData inMcsd)
         {
             // Written, 22.08.2018
 
@@ -251,7 +283,7 @@ namespace TommoJProductions.MoControls
 
             float time = UnityEngine.Time.time;
 
-            if (loadedSaveData is null)
+            if (loadedSaveData == null)
             {
                 bool createNewSaveFile = false;
                 MoControlsSaveData mcsd = null;
@@ -260,30 +292,28 @@ namespace TommoJProductions.MoControls
                     mcsd = SaveLoad.DeserializeSaveFile<MoControlsSaveData>(MoControlsMod.instance, fileName + fileExtention);
                     if (mcsd == null)
                         throw new NullReferenceException();
+                    if (mcsd.moControlsVersion != MoControlsMod.instance.Version)
+                        throw new Exception("Old mocontrols save file.");
                 }
                 catch (NullReferenceException)
                 {
-                    createNewSaveFile = true;                    
-                        MoControlsMod.print("Save file does not exist, creating save file.", Debugging.DebugTypeEnum.full);
+                    createNewSaveFile = true;
+                    MoControlsMod.print("Save file does not exist, creating save file.", Debugging.DebugTypeEnum.none);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     createNewSaveFile = true;
-                    MoControlsMod.print("An error occured while loading the save file.. overriding with new save file. Maybe mod updated?", Debugging.DebugTypeEnum.none);
+                    MoControlsMod.print("An error occured while loading the save file.. overriding with new save file. Maybe mod updated?\nERROR: " + e.Message, Debugging.DebugTypeEnum.none);
                 }
                 if (createNewSaveFile)
                 {
                     mcsd = defaultSave;
-                    _saveSettings(MoControlsMod.instance, mcsd);
+                    saveSettings(MoControlsMod.instance, mcsd);
                 }
-                MoControlsMod.print("loaded mo'controls data in <b>" + (time - UnityEngine.Time.time) + "s</b>.", Debugging.DebugTypeEnum.full);
-                return mcsd;
+                MoControlsMod.print("loaded mo'controls data in <b>" + (time - UnityEngine.Time.time) + "s</b>.", Debugging.DebugTypeEnum.none);
+                loadedSaveData = mcsd;
             }
-            else
-            {
-                MoControlsMod.print("Mo'Controls save data was already loaded; passed the save data on.", Debugging.DebugTypeEnum.full);
-                return loadedSaveData;
-            }
+            return loadedSaveData;
         }
 
         #endregion

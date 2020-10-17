@@ -94,7 +94,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         private void Start()
         {
             try
-            {                
+            {
                 this.controllers = new XboxController[numOfControllersSupported];
                 for (int i = 1; i <= numOfControllersSupported; i++)
                 {
@@ -117,7 +117,8 @@ namespace TommoJProductions.MoControls.XInputInterpreter
 
             foreach (XboxController controller in this.controllers)
             {
-                controller.update();
+                StartCoroutine(controller.updateStateCoroutine());
+                StartCoroutine(controller.handleRumbleCoroutine());
             }
         }
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿using System;
-using UnityEngine;
 using TommoJProductions.MoControls.XInputInterpreter;
+using UnityEngine;
 
 namespace TommoJProductions.MoControls
 {
@@ -96,11 +96,11 @@ namespace TommoJProductions.MoControls
             this.keyName = inKeyName;
             this.action = inAction;
             this.hiName = inName;
-            this.id = ("hld_inpt_"+ this.hiName.ToLower().Replace(" ", "") +"_K" + inKeyName).ToLower().Trim();
+            this.id = ("hld_inpt_" + this.hiName.ToLower().Replace(" ", "") + "_K" + inKeyName).ToLower().Trim();
 
             MoControlsMod.print("hld_inpt: " + this.hiName + " initiliazed as '" + this.id + "'.", Debugging.DebugTypeEnum.full);
         }
-        
+
         #endregion
     }
 }

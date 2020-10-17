@@ -10,7 +10,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         // Written, 16.07.2018
 
         #region Properties
-        
+
         /// <summary>
         /// Represents the previous state for the xbox button.
         /// </summary>

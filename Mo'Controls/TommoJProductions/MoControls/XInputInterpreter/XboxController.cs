@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using XInputDotNetPure;
 using UnityEngine;
+using XInputDotNetPure;
 
 namespace TommoJProductions.MoControls.XInputInterpreter
 {
@@ -13,7 +14,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         // Written, 16.07.2018
 
         #region Fields
-        
+
         /// <summary>
         /// Represents the button prefix.
         /// </summary>
@@ -57,6 +58,10 @@ namespace TommoJProductions.MoControls.XInputInterpreter
                 new XboxFloatState(String.Format("{0}5-", axisPrefix), "RS-Up"),
                 new XboxFloatState(String.Format("{0}5+", axisPrefix), "RS-Down")
         };
+        /// <summary>
+        /// Represents the max number of events that can be processed per frame.
+        /// </summary>
+        private const int MAX_RUMBLE_EVENTS_PER_FRAME = 5;
 
         #endregion
 
@@ -133,7 +138,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the input map for the controller.
         /// </summary>
-        private Dictionary<string, XboxBoolState> inputMap
+        private Dictionary<string, XboxControl> inputMap
         {
             get;
             set;
@@ -141,7 +146,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the A button on the xbox controller.
         /// </summary>
-        public XboxBoolState A
+        public XboxBoolState a
         {
             get
             {
@@ -151,7 +156,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the B button on the xbox controller.
         /// </summary>
-        public XboxBoolState B
+        public XboxBoolState b
         {
             get
             {
@@ -161,7 +166,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the X button on the xbox controller.
         /// </summary>
-        public XboxBoolState X
+        public XboxBoolState x
         {
             get
             {
@@ -171,7 +176,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the Y button on the xbox controller.
         /// </summary>
-        public XboxBoolState Y
+        public XboxBoolState y
         {
             get
             {
@@ -181,7 +186,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the D-Pad Up button on the xbox controller.
         /// </summary>
-        public XboxBoolState DPadUp
+        public XboxBoolState dPadUp
         {
             get
             {
@@ -191,7 +196,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the D-Pad Down button on the xbox controller.
         /// </summary>
-        public XboxBoolState DPadDown
+        public XboxBoolState dPadDown
         {
             get
             {
@@ -201,7 +206,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the D-Pad Left button on the xbox controller.
         /// </summary>
-        public XboxBoolState DPadLeft
+        public XboxBoolState dPadLeft
         {
             get
             {
@@ -211,7 +216,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the D-Pad Right button on the xbox controller.
         /// </summary>
-        public XboxBoolState DPadRight
+        public XboxBoolState dPadRight
         {
             get
             {
@@ -221,7 +226,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the Start button on the xbox controller.
         /// </summary>
-        public XboxBoolState Start
+        public XboxBoolState start
         {
             get
             {
@@ -231,7 +236,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the Back button on the xbox controller.
         /// </summary>
-        public XboxBoolState Back
+        public XboxBoolState back
         {
             get
             {
@@ -241,7 +246,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the Left-Stick button on the xbox controller.
         /// </summary>
-        public XboxBoolState LS
+        public XboxBoolState lS
         {
             get
             {
@@ -251,7 +256,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the Right-Stick button on the xbox controller.
         /// </summary>
-        public XboxBoolState RS
+        public XboxBoolState rS
         {
             get
             {
@@ -261,7 +266,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the Left-Bumper button on the xbox controller.
         /// </summary>
-        public XboxBoolState LB
+        public XboxBoolState lB
         {
             get
             {
@@ -271,7 +276,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the Right-Bumper button on the xbox controller.
         /// </summary>
-        public XboxBoolState RB
+        public XboxBoolState rB
         {
             get
             {
@@ -281,7 +286,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the Left Trigger on the xbox controller
         /// </summary>
-        public XboxFloatState LT
+        public XboxFloatState lT
         {
             get
             {
@@ -291,7 +296,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the Right Trigger on the xbox controller.
         /// </summary>
-        public XboxFloatState RT
+        public XboxFloatState rT
         {
             get
             {
@@ -330,7 +335,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
             this.gamePadIndex = inIndex - 1;
             this.playerIndex = (PlayerIndex)this.gamePadIndex;
             this.xboxRumbleEvents = new List<XboxRumble>();
-            this.inputMap = new Dictionary<string, XboxBoolState>();
+            this.inputMap = new Dictionary<string, XboxControl>();
 
             #region Initilize Xbox Buttons
 
@@ -357,34 +362,34 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Updates the controllers state as with the input map, and handles current rumbles.
         /// </summary>
-        public void update()
+        internal IEnumerator updateStateCoroutine()
         {
-            // Written, 16.07.2018
+            // Written, 16.10.2020
 
             this.state = GamePad.GetState(this.playerIndex);
 
             if (this.state.IsConnected)
             {
                 // Face Buttons
-                this.A.state = this.state.Buttons.A;
-                this.B.state = this.state.Buttons.B;
-                this.X.state = this.state.Buttons.X;
-                this.Y.state = this.state.Buttons.Y;
-                this.Start.state = this.state.Buttons.Start;
-                this.Back.state = this.state.Buttons.Back;
+                this.a.state = this.state.Buttons.A;
+                this.b.state = this.state.Buttons.B;
+                this.x.state = this.state.Buttons.X;
+                this.y.state = this.state.Buttons.Y;
+                this.start.state = this.state.Buttons.Start;
+                this.back.state = this.state.Buttons.Back;
                 // D-Pad
-                this.DPadUp.state = this.state.DPad.Up;
-                this.DPadDown.state = this.state.DPad.Down;
-                this.DPadLeft.state = this.state.DPad.Left;
-                this.DPadRight.state = this.state.DPad.Right;
+                this.dPadUp.state = this.state.DPad.Up;
+                this.dPadDown.state = this.state.DPad.Down;
+                this.dPadLeft.state = this.state.DPad.Left;
+                this.dPadRight.state = this.state.DPad.Right;
                 // Other
-                this.LB.state = this.state.Buttons.LeftShoulder;
-                this.RB.state = this.state.Buttons.RightShoulder;
-                this.LS.state = this.state.Buttons.LeftStick;
-                this.RS.state = this.state.Buttons.RightStick;
+                this.lB.state = this.state.Buttons.LeftShoulder;
+                this.rB.state = this.state.Buttons.RightShoulder;
+                this.lS.state = this.state.Buttons.LeftStick;
+                this.rS.state = this.state.Buttons.RightStick;
                 // Triggers
-                this.LT.state = this.state.Triggers.Left;
-                this.RT.state = this.state.Triggers.Right;
+                this.lT.state = this.state.Triggers.Left;
+                this.rT.state = this.state.Triggers.Right;
                 // Sticks
                 this.leftThumbstick.right.state = this.state.ThumbSticks.Left.X > 0 ? this.state.ThumbSticks.Left.X : 0;
                 this.leftThumbstick.left.state = this.state.ThumbSticks.Left.X < 0 ? this.state.ThumbSticks.Left.X : 0;
@@ -395,42 +400,52 @@ namespace TommoJProductions.MoControls.XInputInterpreter
                 this.rightThumbstick.left.state = this.state.ThumbSticks.Right.X < 0 ? this.state.ThumbSticks.Right.X : 0;
                 this.rightThumbstick.up.state = this.state.ThumbSticks.Right.Y > 0 ? this.state.ThumbSticks.Right.Y : 0;
                 this.rightThumbstick.down.state = this.state.ThumbSticks.Right.Y < 0 ? this.state.ThumbSticks.Right.Y : 0;
-                
+
                 this.updateInputMap();
-                this.handleRumble();
             }
+            yield return new WaitForEndOfFrame();
         }
         /// <summary>
         /// Refreshes the controllers previous state as with the input map.
         /// </summary>
         public void refresh()
         {
-            // Written, 16.07.2018
+            // Written, 16.07.2018 | Modified, 09.10.2020
 
             this.previousState = this.state;
 
             if (this.state.IsConnected)
             {
                 // Face Buttons
-                this.A.previousState = this.previousState.Buttons.A;
-                this.B.previousState = this.previousState.Buttons.B;
-                this.X.previousState = this.previousState.Buttons.X;
-                this.Y.previousState = this.previousState.Buttons.Y;
-                this.Start.previousState = this.previousState.Buttons.Start;
-                this.Back.previousState = this.previousState.Buttons.Back;
+                this.a.previousState = this.previousState.Buttons.A;
+                this.b.previousState = this.previousState.Buttons.B;
+                this.x.previousState = this.previousState.Buttons.X;
+                this.y.previousState = this.previousState.Buttons.Y;
+                this.start.previousState = this.previousState.Buttons.Start;
+                this.back.previousState = this.previousState.Buttons.Back;
                 // D-Pad
-                this.DPadUp.previousState = this.previousState.DPad.Up;
-                this.DPadDown.previousState = this.previousState.DPad.Down;
-                this.DPadLeft.previousState = this.previousState.DPad.Left;
-                this.DPadRight.previousState = this.previousState.DPad.Right;
+                this.dPadUp.previousState = this.previousState.DPad.Up;
+                this.dPadDown.previousState = this.previousState.DPad.Down;
+                this.dPadLeft.previousState = this.previousState.DPad.Left;
+                this.dPadRight.previousState = this.previousState.DPad.Right;
                 // Other
-                this.LB.previousState = this.previousState.Buttons.LeftShoulder;
-                this.RB.previousState = this.previousState.Buttons.RightShoulder;
-                this.LS.previousState = this.previousState.Buttons.LeftStick;
-                this.RS.previousState = this.previousState.Buttons.RightStick;
+                this.lB.previousState = this.previousState.Buttons.LeftShoulder;
+                this.rB.previousState = this.previousState.Buttons.RightShoulder;
+                this.lS.previousState = this.previousState.Buttons.LeftStick;
+                this.rS.previousState = this.previousState.Buttons.RightStick;
                 // Triggers
-                this.LT.previousState = this.previousState.Triggers.Left;
-                this.RT.previousState = this.previousState.Triggers.Right;
+                this.lT.previousState = this.previousState.Triggers.Left;
+                this.rT.previousState = this.previousState.Triggers.Right;
+                // Sticks
+                this.leftThumbstick.right.previousState = this.previousState.ThumbSticks.Left.X > 0 ? this.previousState.ThumbSticks.Left.X : 0;
+                this.leftThumbstick.left.previousState = this.previousState.ThumbSticks.Left.X < 0 ? this.previousState.ThumbSticks.Left.X : 0;
+                this.leftThumbstick.up.previousState = this.previousState.ThumbSticks.Left.Y > 0 ? this.previousState.ThumbSticks.Left.Y : 0;
+                this.leftThumbstick.down.previousState = this.previousState.ThumbSticks.Left.Y < 0 ? this.previousState.ThumbSticks.Left.Y : 0;
+                // Sticks
+                this.rightThumbstick.right.previousState = this.previousState.ThumbSticks.Right.X > 0 ? this.previousState.ThumbSticks.Right.X : 0;
+                this.rightThumbstick.left.previousState = this.previousState.ThumbSticks.Right.X < 0 ? this.previousState.ThumbSticks.Right.X : 0;
+                this.rightThumbstick.up.previousState = this.previousState.ThumbSticks.Right.Y > 0 ? this.previousState.ThumbSticks.Right.Y : 0;
+                this.rightThumbstick.down.previousState = this.previousState.ThumbSticks.Right.Y < 0 ? this.previousState.ThumbSticks.Right.Y : 0;
 
                 this.updateInputMap();
             }
@@ -444,7 +459,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 16.07.2018
 
-            if (this.inputMap[inXboxButton.toString()].state == ButtonState.Pressed)
+            if ((this.inputMap[inXboxButton.toString()] as XboxBoolState).state == ButtonState.Pressed)
             {
                 return true;
             }
@@ -458,7 +473,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 16.07.2018
 
-            XboxBoolState button = this.inputMap[inXboxButton.toString()];
+            XboxBoolState button = this.inputMap[inXboxButton.toString()] as XboxBoolState;
             if (button.previousState == ButtonState.Released && button.state == ButtonState.Pressed)
             {
                 return true;
@@ -473,7 +488,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 20.12.2018
 
-            XboxBoolState button = this.inputMap[inXboxButton.toString()];
+            XboxBoolState button = this.inputMap[inXboxButton.toString()] as XboxBoolState;
             if (button.previousState == ButtonState.Pressed && button.state == ButtonState.Released)
             {
                 return true;
@@ -561,7 +576,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 18.07.2018
 
-            if (this.LT.previousState == 0f && this.LT.state >= 0.1f)
+            if (this.lT.previousState == 0f && this.lT.state >= 0.1f)
                 return true;
             return false;
         }
@@ -572,7 +587,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 18.07.2018
 
-            if (this.RT.previousState == 0f && this.RT.state >= 0.1f)
+            if (this.rT.previousState == 0f && this.rT.state >= 0.1f)
                 return true;
             return false;
         }
@@ -609,27 +624,35 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// </summary>
         private void updateInputMap()
         {
-            // Written, 16.07.2018
+            // Written, 16.07.2018 | Modified, 09.10.2020
 
-            this.inputMap[A.name] = A;
-            this.inputMap[B.name] = B;
-            this.inputMap[X.name] = X;
-            this.inputMap[Y.name] = Y;
-            this.inputMap[DPadUp.name] = DPadUp;
-            this.inputMap[DPadDown.name] = DPadDown;
-            this.inputMap[DPadLeft.name] = DPadLeft;
-            this.inputMap[DPadRight.name] = DPadRight;
-            this.inputMap[Back.name] = Back;
-            this.inputMap[Start.name] = Start;
-            this.inputMap[LS.name] = LS;
-            this.inputMap[RS.name] = RS;
-            this.inputMap[LB.name] = LB;
-            this.inputMap[RB.name] = RB;
+            this.inputMap[a.name] = a;
+            this.inputMap[b.name] = b;
+            this.inputMap[x.name] = x;
+            this.inputMap[y.name] = y;
+            this.inputMap[dPadUp.name] = dPadUp;
+            this.inputMap[dPadDown.name] = dPadDown;
+            this.inputMap[dPadLeft.name] = dPadLeft;
+            this.inputMap[dPadRight.name] = dPadRight;
+            this.inputMap[back.name] = back;
+            this.inputMap[start.name] = start;
+            this.inputMap[lS.name] = lS;
+            this.inputMap[rS.name] = rS;
+            this.inputMap[lB.name] = lB;
+            this.inputMap[rB.name] = rB;
+            this.inputMap[leftThumbstick.up.name] = this.leftThumbstick.up;
+            this.inputMap[leftThumbstick.down.name] = this.leftThumbstick.down;
+            this.inputMap[leftThumbstick.left.name] = this.leftThumbstick.left;
+            this.inputMap[leftThumbstick.right.name] = this.leftThumbstick.right;
+            this.inputMap[rightThumbstick.up.name] = this.rightThumbstick.up;
+            this.inputMap[rightThumbstick.down.name] = this.rightThumbstick.down;
+            this.inputMap[rightThumbstick.left.name] = this.rightThumbstick.left;
+            this.inputMap[rightThumbstick.right.name] = this.rightThumbstick.right;
         }
         /// <summary>
         /// Handles all current rumbles.
         /// </summary>
-        private void handleRumble()
+        internal IEnumerator handleRumbleCoroutine()
         {
             // Written, 16.07.2018
 
@@ -638,18 +661,21 @@ namespace TommoJProductions.MoControls.XInputInterpreter
                 Vector2 currentPower = new Vector2(0.0f, 0.0f);
                 for (int i = 0; i < this.xboxRumbleEvents.Count; i++)
                 {
+                    if (this.xboxRumbleEvents.Count >= MAX_RUMBLE_EVENTS_PER_FRAME)
+                        if (i == MAX_RUMBLE_EVENTS_PER_FRAME)
+                            yield return new WaitForEndOfFrame();
                     XboxRumble currentXboxRumble = this.xboxRumbleEvents[i];
                     float timeLeft = Mathf.Clamp(currentXboxRumble.timer / currentXboxRumble.duration, 0f, 1f);
-                    if (timeLeft > 0.0f)
+                    if (timeLeft > 0)
                     {
                         currentPower = new Vector2(Mathf.Max(currentXboxRumble.power.x * timeLeft, currentPower.x), Mathf.Max(currentXboxRumble.power.y * timeLeft, currentPower.y));
-                        GamePad.SetVibration(this.playerIndex, currentPower.x, currentPower.y);
                         currentXboxRumble.update();
                     }
                     else
                     {
                         this.xboxRumbleEvents.Remove(currentXboxRumble);
                     }
+                    GamePad.SetVibration(this.playerIndex, currentPower.x, currentPower.y);
                 }
             }
         }
@@ -664,26 +690,26 @@ namespace TommoJProductions.MoControls.XInputInterpreter
             {
                 if (MoControlsMod.assetsLoaded)
                 {
-                    this.A.texture = MoControlsMod.assets.a;
-                    this.B.texture = MoControlsMod.assets.b;
-                    this.X.texture = MoControlsMod.assets.x;
-                    this.Y.texture = MoControlsMod.assets.y;
-                    this.Start.texture = MoControlsMod.assets.start;
-                    this.Back.texture = MoControlsMod.assets.back;
+                    this.a.texture = MoControlsMod.assets.a;
+                    this.b.texture = MoControlsMod.assets.b;
+                    this.x.texture = MoControlsMod.assets.x;
+                    this.y.texture = MoControlsMod.assets.y;
+                    this.start.texture = MoControlsMod.assets.start;
+                    this.back.texture = MoControlsMod.assets.back;
 
-                    this.LS.texture = MoControlsMod.assets.ls;
-                    this.RS.texture = MoControlsMod.assets.rs;
+                    this.lS.texture = MoControlsMod.assets.ls;
+                    this.rS.texture = MoControlsMod.assets.rs;
 
-                    this.LT.texture = MoControlsMod.assets.lt;
-                    this.RT.texture = MoControlsMod.assets.rt;
+                    this.lT.texture = MoControlsMod.assets.lt;
+                    this.rT.texture = MoControlsMod.assets.rt;
 
-                    this.RB.texture = MoControlsMod.assets.rb;
-                    this.LB.texture = MoControlsMod.assets.lb;
+                    this.rB.texture = MoControlsMod.assets.rb;
+                    this.lB.texture = MoControlsMod.assets.lb;
 
-                    this.DPadUp.texture = MoControlsMod.assets.dpup;
-                    this.DPadDown.texture = MoControlsMod.assets.dpdown;
-                    this.DPadLeft.texture = MoControlsMod.assets.dpleft;
-                    this.DPadRight.texture = MoControlsMod.assets.dpright;
+                    this.dPadUp.texture = MoControlsMod.assets.dpup;
+                    this.dPadDown.texture = MoControlsMod.assets.dpdown;
+                    this.dPadLeft.texture = MoControlsMod.assets.dpleft;
+                    this.dPadRight.texture = MoControlsMod.assets.dpright;
 
                     this.xboxControls[16].texture = MoControlsMod.assets.lsleft;
                     this.xboxControls[17].texture = MoControlsMod.assets.lsright;
@@ -712,20 +738,6 @@ namespace TommoJProductions.MoControls.XInputInterpreter
             if (inInputName != KeyCode.None.ToString()) // no point enumerating..
             {
                 foreach (XboxControl xboxControl in this.xboxControls)
-                {
-                    if (xboxControl.inputName == inInputName)
-                    {
-                        return xboxControl;
-                    }
-                }
-                foreach (XboxControl xboxControl in this.leftThumbstick.controls)
-                {
-                    if (xboxControl.inputName == inInputName)
-                    {
-                        return xboxControl;
-                    }
-                }
-                foreach (XboxControl xboxControl in this.rightThumbstick.controls)
                 {
                     if (xboxControl.inputName == inInputName)
                     {

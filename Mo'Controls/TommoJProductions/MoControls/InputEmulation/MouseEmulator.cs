@@ -1,12 +1,11 @@
-﻿using System;
+﻿using MSCLoader;
+using System;
+using System.Collections;
 using System.Drawing;
-using System.Runtime.InteropServices;
 using TommoJProductions.MoControls.XInputInterpreter;
 using UnityEngine;
 using XInputDotNetPure;
-using MSCLoader;
 using NM = TommoJProductions.MoControls.InputEmulation.NativeMethods;
-using System.Collections;
 
 namespace TommoJProductions.MoControls.InputEmulation
 {
@@ -33,7 +32,6 @@ namespace TommoJProductions.MoControls.InputEmulation
 
         #region Properties / Fields
 
-
         /// <summary>
         /// Returns the current position of the cursor.
         /// </summary>
@@ -41,8 +39,7 @@ namespace TommoJProductions.MoControls.InputEmulation
         {
             get
             {
-                Point point = new Point();
-                NM.GetCursorPos(out point);
+                NM.GetCursorPos(out Point point);
                 return point;
             }
         }
@@ -61,7 +58,7 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// <summary>
         /// Represents whether the current instance is emulating mouse movement.
         /// </summary>
-        public bool Emulating
+        public bool emulating
         {
             get
             {
@@ -87,7 +84,7 @@ namespace TommoJProductions.MoControls.InputEmulation
         {
             get;
             set;
-        }        
+        }
         /// <summary>
         /// Represents the deadzone for the mouse.
         /// </summary>
@@ -123,7 +120,7 @@ namespace TommoJProductions.MoControls.InputEmulation
             {
                 mouseSensitivity = value;
             }
-        }        
+        }
 
         // Mouse Constants
         /// <summary>
@@ -149,7 +146,7 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// <summary>
         /// Represents the max sensitivity.
         /// </summary>
-        public const float MAX_SENSITIVITY = 100f;        
+        public const float MAX_SENSITIVITY = 100f;
         /// <summary>
         /// Represents LMB input name.
         /// </summary>
@@ -158,6 +155,10 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// Represents RMB input name.
         /// </summary>
         public const string RMB_INPUT_NAME = "mocontrolsRMB";
+        /// <summary>
+        /// Represents a single mouse scroll value.
+        /// </summary>
+        public const int MOUSE_SCROLL_VALUE = 120;
 
         #endregion
 
@@ -183,23 +184,11 @@ namespace TommoJProductions.MoControls.InputEmulation
 
         #region Methods
 
-        /// <summary>
-        /// Occurs after game starts.
-        /// </summary>
-        private void Start()
+        private IEnumerator updateCoroutine()
         {
-            // Written, 08.10.2018
+            // Written, 16.10.2020
 
-            MoControlsMod.print(nameof(MouseEmulator) + ": Started", Debugging.DebugTypeEnum.full);
-        }
-        /// <summary>
-        /// Occurs every frame
-        /// </summary>
-        private void Update()
-        {
-            // Written, 01.08.2018
-
-            if (this.Emulating)
+            if (this.emulating)
             {
                 XboxController xboxController = MoControlsGO.xboxController;
 
@@ -221,19 +210,19 @@ namespace TommoJProductions.MoControls.InputEmulation
                             stickValue_temp = xboxController.getRightStick();
                             break;
                         case InputTypeEnum.DPad:
-                            if (xboxController.DPadLeft.state == ButtonState.Pressed)
+                            if (xboxController.dPadLeft.state == ButtonState.Pressed)
                             {
                                 stickValue.x = -1;
                             }
-                            if (xboxController.DPadRight.state == ButtonState.Pressed)
+                            if (xboxController.dPadRight.state == ButtonState.Pressed)
                             {
                                 stickValue.x = 1;
                             }
-                            if (xboxController.DPadUp.state == ButtonState.Pressed)
+                            if (xboxController.dPadUp.state == ButtonState.Pressed)
                             {
                                 stickValue.y = 1;
                             }
-                            if (xboxController.DPadDown.state == ButtonState.Pressed)
+                            if (xboxController.dPadDown.state == ButtonState.Pressed)
                             {
                                 stickValue.y = -1;
                             }
@@ -254,9 +243,28 @@ namespace TommoJProductions.MoControls.InputEmulation
                         moveX = (int)stickValue.x;
                         moveY = (int)stickValue.y * -1; // '* -1' xbox controller y axis is naturally inverted. so changing the that..;
                         simulateMouseMove(moveX, moveY);
+                        yield return new WaitForEndOfFrame();
                     }
                 }
             }
+        }
+        /// <summary>
+        /// Occurs after game starts.
+        /// </summary>
+        private void Start()
+        {
+            // Written, 08.10.2018
+
+            MoControlsMod.print(nameof(MouseEmulator) + ": Started", Debugging.DebugTypeEnum.full);
+        }
+        /// <summary>
+        /// Occurs every frame
+        /// </summary>
+        private void Update()
+        {
+            // Written, 01.08.2018
+
+            StartCoroutine(this.updateCoroutine());
         }
         /// <summary>
         /// Creates required stuff to simulate mouse movement.
@@ -304,15 +312,6 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// </summary>
         private void simulateLeftClick()
         {
-            // Written, 04.08.2018
-
-            /*Point tempCursPos = getCursorPosition;
-            Input[] inputs = new Input[1];
-            inputs[0].type = 0;
-            inputs[0].U = createMouseInput(tempCursPos.X, tempCursPos.Y, MouseEventDataXButtons.XBUTTON1, 0, MouseEventF.LEFTDOWN);
-            NM.SendInput((uint)inputs.Length, inputs, Input.Size);
-            NM.mouse_event(MouseEventF.LEFTDOWN | MouseEventF.LEFTUP, X, Y, 0, 0);*/
-
             // Written, 08.10.2020
 
             if (this.lmbPrimaryInput.GetKeybindDown() || this.lmbSecondaryInput.GetKeybindDown())
@@ -331,13 +330,6 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// </summary>
         private void simulateRightClick()
         {
-            // Written, 04.08.2018
-
-            /*Point tempCursPos = getCursorPosition;
-            int X = tempCursPos.X;
-            int Y = tempCursPos.Y;
-            NM.mouse_event(MouseEventF.RIGHTDOWN | MouseEventF.RIGHTUP, X, Y, 0, 0);*/
-
             // Written, 08.10.2020
 
             if (this.rmbPrimaryInput.GetKeybindDown() || this.rmbSecondaryInput.GetKeybindDown())
@@ -357,15 +349,9 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// <param name="inScrollAmount">The amount to scroll. default 120.</param>
         internal static void simulateScroll(int inScrollAmount)
         {
-            // Written, 28.12.2018
-
-            /*Point tempCursPos = getCursorPosition;
-            int X = tempCursPos.X;
-            int Y = tempCursPos.Y;
-            NM.mouse_event(MouseEventF.WHEEL, X, Y, (uint)inScrollAmount, 0);*/
-
             // Written, 08.10.2020
 
+            MoControlsMod.print(String.Format("Scroll {0} ({1})", inScrollAmount > 0 ? "Up" : "Down", inScrollAmount), Debugging.DebugTypeEnum.full);
             send(getCursorPosition, (uint)inScrollAmount, MouseEventF.WHEEL);
         }
         /// <summary>
@@ -374,7 +360,7 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// <param name="point">The position of the mouse.</param>
         /// <param name="wData">mouse data</param>
         /// <param name="eventF">mouse event flags.</param>
-        private static void send(Point point, uint wData, MouseEventF eventF) 
+        private static void send(Point point, uint wData, MouseEventF eventF)
         {
             // Written, 08.10.2020
 

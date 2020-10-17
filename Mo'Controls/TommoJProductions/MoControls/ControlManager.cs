@@ -1,16 +1,17 @@
-﻿using System;
-using System.Linq;
-using HutongGames.PlayMaker;
+﻿using HutongGames.PlayMaker;
 using MSCLoader;
+using System;
+using System.Linq;
 using TommoJProductions.Debugging;
 using TommoJProductions.MoControls.GUI;
 using TommoJProductions.MoControls.InputEmulation;
+using TommoJProductions.MoControls.XInputInterpreter;
 using UnityEngine;
 
 namespace TommoJProductions.MoControls
 {
     /// <summary>
-    /// re
+    /// Represents the control manager for mo Controls.
     /// </summary>
     public class ControlManager : MonoBehaviour
     {
@@ -19,61 +20,13 @@ namespace TommoJProductions.MoControls
         #region Fields
 
         /// <summary>
-        /// Represents all functional inputs for the game.
-        /// </summary>
-        public static string[] inputNames = new string[]
-        {
-            "Left",
-            "Right",
-            "Throttle",
-            "Brake",
-            "Clutch",
-            "ShiftUp",
-            "ShiftDown",
-            "IndicatorLeft",
-            "IndicatorRight",
-            "Range",
-            "HighBeam",
-            "Wipers",
-            "Boost",
-            "Handbrake",
-            "DrivingMode",
-            "PlayerLeft",
-            "PlayerRight",
-            "PlayerUp",
-            "PlayerDown",
-            "Jump",
-            "Run",
-            "Zoom",
-            "Use",
-            "Crouch",
-            "Watch",
-            "ReachLeft",
-            "ReachRight",
-            "Hitchhike",
-            "Swear",
-            "Hit",
-            "Push",
-            "Finger",
-            "Urinate",
-            "Drunk",
-            "Smoking",
-            "reverse",
-            "first",
-            "second",
-            "third",
-            "fourth",
-            "fifth",
-            "sixth",
-        };
-        /// <summary>
         /// Represents the handmode gameobject 
         /// </summary>
-        public const string handModeLocation = "PLAYER/Pivot/AnimPivot/Camera/FPSCamera/1Hand_Assemble";
+        private const string handModeLocation = "PLAYER/Pivot/AnimPivot/Camera/FPSCamera/1Hand_Assemble";
         /// <summary>
         /// Represents the tool mode gameobject
         /// </summary>
-        public const string toolModeLocation = "PLAYER/Pivot/AnimPivot/Camera/FPSCamera/2Spanner";
+        private const string toolModeLocation = "PLAYER/Pivot/AnimPivot/Camera/FPSCamera/2Spanner";
         /// <summary>
         /// Represents if the user has request toolmode change via, <see cref="HoldInputMono"/>. see:<see cref="toggleToolMode"/>.
         /// </summary>
@@ -82,14 +35,31 @@ namespace TommoJProductions.MoControls
         /// Represents logic to enable scroll to a connected xbox controllers' triggers. enabled when player is in tool mode.
         /// </summary>
         private GuiNav toolModeScroll;
+        /// <summary>
+        /// Represents the current car dynamics. used for forcefeedback.
+        /// </summary>
+        internal CarDynamics carDynamics;
+        /// <summary>
+        /// Represents the forcefeedback.
+        /// </summary>
+        internal ForceFeedback forceFeedback;
+        /// <summary>
+        /// Represents the satsuma gameobject. used for forcefeedback.
+        /// </summary>
+        private GameObject satsuma;
+        /// <summary>
+        /// Reprsents the current player mode.
+        /// </summary>
+        private PlayerModeEnum? currentPlayerMode;
+
         #endregion
 
         #region Properties
 
         /// <summary>
-        /// Returns the currently selected controls
+        /// gets or sets the currently selected controls
         /// </summary>
-        public string[,] currentControls
+        private string[,] currentControls
         {
             get
             {
@@ -103,14 +73,64 @@ namespace TommoJProductions.MoControls
                     this.footControls = value;
             }
         }
-        /// <summary>
-        /// Reprsents the current player mode.
+        /// <summary>        
+        /// Gets all functional game-inputs for the game (MSC).        
         /// </summary>
-        private PlayerModeEnum? currentPlayerMode;
+        private static string[] inputNames
+        {
+            get
+            {
+                return new string[]
+                {
+                    "Left",
+                    "Right",
+                    "Throttle",
+                    "Brake",
+                    "Clutch",
+                    "ShiftUp",
+                    "ShiftDown",
+                    "IndicatorLeft",
+                    "IndicatorRight",
+                    "Range",
+                    "HighBeam",
+                    "Wipers",
+                    "Boost",
+                    "Handbrake",
+                    "DrivingMode",
+                    "PlayerLeft",
+                    "PlayerRight",
+                    "PlayerUp",
+                    "PlayerDown",
+                    "Jump",
+                    "Run",
+                    "Zoom",
+                    "Use",
+                    "Crouch",
+                    "Watch",
+                    "ReachLeft",
+                    "ReachRight",
+                    "Hitchhike",
+                    "Swear",
+                    "Hit",
+                    "Push",
+                    "Finger",
+                    "Urinate",
+                    "Drunk",
+                    "Smoking",
+                    "reverse",
+                    "first",
+                    "second",
+                    "third",
+                    "fourth",
+                    "fifth",
+                    "sixth",
+                };
+            }
+        }
         /// <summary>
         /// Represents the current player mode. either in menu, on foot, or driving.
         /// </summary>
-        public static PlayerModeEnum playerMode
+        internal static PlayerModeEnum getCurrentPlayerMode
         {
             get
             {
@@ -133,15 +153,15 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents the change input result for the mod.
         /// </summary>
-        public ChangeInput changeInputResult
+        internal ChangeInput changeInputResult
         {
             get;
-            set;
+            private set;
         }
         /// <summary>
         /// Represents the current foot controls.
         /// </summary>
-        public string[,] footControls
+        internal string[,] footControls
         {
             get;
             private set;
@@ -149,7 +169,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents the current driving controls.
         /// </summary>
-        public string[,] drivingControls
+        internal string[,] drivingControls
         {
             get;
             private set;
@@ -157,12 +177,12 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents blank controls.
         /// </summary>
-        internal string[,] blankControls
+        private string[,] blankControls
         {
             get
             {
                 return new string[,]
-                {                   
+                {
                        { "Left", "None", "None", },
                        { "Right", "None", "None", },
                        { "Throttle", "None", "None", },
@@ -204,36 +224,44 @@ namespace TommoJProductions.MoControls
                        { "third", "None", "None", },
                        { "fourth", "None", "None", },
                        { "fifth", "None", "None", },
-                       { "sixth", "None", "None", },                   
+                       { "sixth", "None", "None", },
                 };
             }
         }
         /// <summary>
         /// Represents the hand mode gameobject.
         /// </summary>
-        internal static GameObject handModeGameObject 
+        private static GameObject handModeGameObject
         {
             get;
-            private set;
+            set;
         }
         /// <summary>
         /// Represents the tool mode gameobject.
         /// </summary>
-        internal static GameObject toolModeGameObject 
+        private static GameObject toolModeGameObject
         {
             get;
-            private set;
+            set;
         }
         /// <summary>
         /// Returns true if player is in tool mode.
         /// </summary>
-        internal static bool isInToolMode 
+        internal static bool isInToolMode
         {
-            get 
+            get
             {
                 return toolModeGameObject.activeSelf && !handModeGameObject.activeSelf;
             }
         }
+        /// <summary>
+        /// Represents if ffb is calulated on the xbox controller.
+        /// </summary>
+        internal bool ffbOnXboxController { get; set; }
+        /// <summary>
+        /// Represents the current ffb handling scheme.
+        /// </summary>
+        internal UnityRuntimeUpdateSchemesEnum ffbHandledOnUpdateScheme { get; set; }
 
         #endregion
 
@@ -245,11 +273,11 @@ namespace TommoJProductions.MoControls
         public ControlManager()
         {
             // Written, 22.08.2018
-            
+
             this.currentPlayerMode = null;
-            this.changeInputResult = new ChangeInput();
-            cInput.OnKeyChanged -= this.CInput_OnKeyChanged;
-            cInput.OnKeyChanged += this.CInput_OnKeyChanged;
+            this.setChangeInput();
+            cInput.OnKeyChanged -= this.cInput_OnKeyChanged;
+            cInput.OnKeyChanged += this.cInput_OnKeyChanged;
         }
 
         #endregion
@@ -263,14 +291,22 @@ namespace TommoJProductions.MoControls
         {
             // Written, 08.10.2018
 
+            // Setting up toolmode stuff
             toolModeGameObject = GameObject.Find(toolModeLocation);
             handModeGameObject = GameObject.Find(handModeLocation);
             // Tool mode hold button set up
             HoldInputMono him = this.gameObject.AddComponent<HoldInputMono>();
-            him.setData("Toggle Tool Mode", XInputInterpreter.XboxButtonEnum.Start, 0.3f, this.requestedModeChange);
-            // Setting up guiNav "toolMode Scroll".
+            him.setData("Toggle Tool Mode", XboxButtonEnum.Start, 0.3f, this.requestedModeChange);
+            // Setting up guiNav "toolMode MouseScroll".
             this.toolModeScroll = this.gameObject.AddComponent<GuiNav>();
-
+            this.toolModeScroll.setControls(XboxAxisEnum.rightTrigger, XboxButtonEnum.NULL,
+                XboxAxisEnum.leftTrigger, XboxButtonEnum.NULL,
+                XboxAxisEnum.NULL, XboxButtonEnum.RB,
+                XboxAxisEnum.NULL, XboxButtonEnum.LB);
+            // Setting up xbox controller forcefeedback
+            this.satsuma = GameObject.Find("SATSUMA(557kg, 248)");
+            this.carDynamics = this.satsuma.GetComponent<CarDynamics>();
+            this.forceFeedback = this.satsuma.GetComponent<ForceFeedback>();
             MoControlsMod.print(nameof(ControlManager) + ": Started", DebugTypeEnum.full);
         }
         /// <summary>
@@ -280,9 +316,9 @@ namespace TommoJProductions.MoControls
         {
             // Written, 31.08.2018
 
-            if (this.currentPlayerMode != playerMode)
+            if (this.currentPlayerMode != getCurrentPlayerMode)
             {
-                this.currentPlayerMode = playerMode;
+                this.currentPlayerMode = getCurrentPlayerMode;
                 this.loadControlModeToCInput(this.currentPlayerMode, this.currentControls);
                 MoControlsMod.print("Control Mode changed: " + this.currentPlayerMode, DebugTypeEnum.full);
             }
@@ -292,13 +328,29 @@ namespace TommoJProductions.MoControls
                 toggleToolMode();
                 this._requestedModeChange = false;
             }
-            this.toolModeScroll.enabled = (isInToolMode || (!isInToolMode && !isPlayerHandEmpty()) && this.currentPlayerMode != PlayerModeEnum.Driving);
+            // Enable scroll only if player is on foot and in tool mode (2) OR when player is holding an item while on foot and in hand mode.
+            this.toolModeScroll.enabled = this.currentPlayerMode == PlayerModeEnum.OnFoot && (isInToolMode || (!isInToolMode && !isPlayerHandEmpty()));
+            // Handling xbox controller force feedback rumble events.
+            if (this.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.update)
+                this.handleFfbOnXboxController();
+        }
+        private void LateUpdate()
+        {
+            // Written, 17.10.2020
+
+            if (this.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.lateUpdate)
+                this.handleFfbOnXboxController();
+        }
+        private void FixedUpdate()
+        {
+            if (this.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.fixedUpdate)
+                this.handleFfbOnXboxController();
         }
         /// <summary>
         /// Loads provided control list to cInput.
         /// </summary>
         /// <param name="inControlMode">The control mode.</param>
-        internal void loadControlModeToCInput(PlayerModeEnum? inPlayerMode, string[,] inControlMode)
+        private void loadControlModeToCInput(PlayerModeEnum? inPlayerMode, string[,] inControlMode)
         {
             // Written, 31.08.2018
 
@@ -324,12 +376,12 @@ namespace TommoJProductions.MoControls
             {
                 MoControlsMod.print(String.Format("<b><color=red>Unsuccessfully</color></b> loaded {0} inputs to cInput.", controlListName), DebugTypeEnum.full);
                 throw;
-            }            
+            }
         }
         /// <summary>
         /// Occurs when cinput keys are changed externally, (the game gui controls).
         /// </summary>
-        private void CInput_OnKeyChanged()
+        private void cInput_OnKeyChanged()
         {
             // Written, 09.07.2018
 
@@ -352,7 +404,7 @@ namespace TommoJProductions.MoControls
                     controls[i, 1] = cInput.GetText(inputNames[i], 1);
                     controls[i, 2] = cInput.GetText(inputNames[i], 2);
                 }
-                    MoControlsMod.print("<b><color=green>Successfully</color></b> loaded game control inputs from cInput.", DebugTypeEnum.full);
+                MoControlsMod.print("<b><color=green>Successfully</color></b> loaded game control inputs from cInput.", DebugTypeEnum.full);
                 return controls;
             }
             catch (Exception ex)
@@ -378,7 +430,7 @@ namespace TommoJProductions.MoControls
         /// Sets the provided game control in provided mode.
         /// </summary>
         /// <param name="inMode"></param>
-        internal void setGameControl(PlayerModeEnum inMode, string inControlName, int inIndex, string inInput)
+        private void setGameControl(PlayerModeEnum inMode, string inControlName, int inIndex, string inInput)
         {
             // Written, 02.09.2018
 
@@ -471,7 +523,7 @@ namespace TommoJProductions.MoControls
                 ModSettings_menu.SaveModBinds(this.changeInputResult.mod);
                 MoControlsMod.print("saved <i>" + modKeybind.Mod.Name + "</i> mod keybinds.", DebugTypeEnum.full);
             }
-            this.changeInputResult = new ChangeInput();
+            this.setChangeInput();
         }
         /// <summary>
         /// Toggles toolmode eg. tool=>hand | hand=>tool
@@ -486,8 +538,11 @@ namespace TommoJProductions.MoControls
                 wVk = VirtualKeyShort.KEY_1;
             else if (isPlayerHandEmpty())
                 wVk = VirtualKeyShort.KEY_2;
-            StartCoroutine(KeyboardEmulator.simulateKeyPress((VirtualKeyShort)wVk));
+            StartCoroutine(KeyboardEmulator.simulateKeyPressCoroutine((VirtualKeyShort)wVk));
         }
+        /// <summary>
+        /// changes to request mode.
+        /// </summary>
         private void requestedModeChange()
         {
             // Written, 07.10.2020
@@ -498,13 +553,75 @@ namespace TommoJProductions.MoControls
         /// Returns whether the players hand is empty (not holding anything).
         /// </summary>
         /// <returns></returns>
-        internal static bool isPlayerHandEmpty() 
+        private static bool isPlayerHandEmpty()
         {
             // Written, 06.10.2020
 
             GameObject gm = GameObject.Find(handModeLocation + "/Hand");
             PlayMakerFSM pm = gm.GetComponents<PlayMakerFSM>().First(_pm => _pm.FsmName == "PickUp");
             return pm.FsmVariables.FindFsmBool("HandEmpty").Value;
+        }
+        /// <summary>
+        /// Handles ffb on the xbox controller.
+        /// </summary>
+        private void handleFfbOnXboxController()
+        {
+            // Written, 16.10.2020
+
+            if (MoControlsGO.xboxController.isConnected && this.ffbOnXboxController)
+                if (FsmVariables.GlobalVariables.FindFsmString("PlayerCurrentVehicle").Value == "Satsuma")
+                {
+                    float rumbleFloat = this.scaleForceFeedbackRange();
+                    XboxRumble rumble = new XboxRumble()
+                    {
+                        timer = 0.01f,
+                        duration = 0,
+                        power = this.floatToVector(rumbleFloat)
+                    };
+                    if (rumble.power.x > 0.000f || rumble.power.y > 0.000f)
+                        MoControlsGO.xboxController.addRumble(rumble);
+                }
+        }
+        /// <summary>
+        /// Scales the ffb float value from it's clamped value (<see cref="ForceFeedback.clampValue"/> to xbox's -1f - 1f value range 
+        /// </summary>
+        internal float scaleForceFeedbackRange()
+        {
+            // Written, 16.10.2020
+
+            float ffb = this.carDynamics.forceFeedback;
+            int raw = this.forceFeedback.clampValue;
+            int clamped = 1;
+
+            float m = (-raw - raw) / (-clamped - clamped);
+            float c = -clamped * m;
+            float scaled = m * ffb + c;
+            return scaled;
+        }
+        /// <summary>
+        /// Converts ffb float value to a vector 2 for xbox rumble events.
+        /// </summary>
+        /// <param name="inValue">The force feed back value.</param>
+        private Vector2 floatToVector(float inValue)
+        {
+            // Written, 16.10.2020
+
+            if (inValue > 0)
+                return new Vector2(Mathf.Abs(inValue), 0);
+            else if (inValue < 0)
+                return new Vector2(0, Mathf.Abs(inValue));
+            else
+                return Vector2.zero;
+        }
+        /// <summary>
+        /// Sets the change input result to the provided parameter. if <paramref name="inChangeInput"/> is null (no parameter), sets changeInputResult to a new instance.
+        /// </summary>
+        /// <param name="inChangeInput">The change input instance to set.</param>
+        internal void setChangeInput(ChangeInput inChangeInput = null)
+        {
+            // Written, 17.10.2020
+
+            this.changeInputResult = inChangeInput ?? new ChangeInput();
         }
 
         #endregion

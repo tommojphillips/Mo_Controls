@@ -1,8 +1,8 @@
 ﻿using System;
-using UnityEngine;
-using uInput = UnityEngine.Input;
-using XInputDotNetPure;
 using TommoJProductions.MoControls.XInputInterpreter;
+using UnityEngine;
+using XInputDotNetPure;
+using uInput = UnityEngine.Input;
 
 namespace TommoJProductions.MoControls
 {
@@ -46,42 +46,42 @@ namespace TommoJProductions.MoControls
                 if (xboxController.getRightTrigger() > 0.5f)
                 {
                     monitorInputData.foundInput = true;
-                    monitorInputData.input = xboxController.RT.inputName;
+                    monitorInputData.input = xboxController.rT.inputName;
                 }
                 else
                 {
                     if (xboxController.getLeftTrigger() > 0.5f)
                     {
                         monitorInputData.foundInput = true;
-                        monitorInputData.input = xboxController.LT.inputName;
+                        monitorInputData.input = xboxController.lT.inputName;
                     }
                     else
                     {
-                        if (xboxController.DPadUp.state == ButtonState.Pressed)
+                        if (xboxController.dPadUp.state == ButtonState.Pressed)
                         {
                             monitorInputData.foundInput = true;
-                            monitorInputData.input = xboxController.DPadUp.inputName;
+                            monitorInputData.input = xboxController.dPadUp.inputName;
                         }
                         else
                         {
-                            if (xboxController.DPadDown.state == ButtonState.Pressed)
+                            if (xboxController.dPadDown.state == ButtonState.Pressed)
                             {
                                 monitorInputData.foundInput = true;
-                                monitorInputData.input = xboxController.DPadDown.inputName;
+                                monitorInputData.input = xboxController.dPadDown.inputName;
                             }
                             else
                             {
-                                if (xboxController.DPadLeft.state == ButtonState.Pressed)
+                                if (xboxController.dPadLeft.state == ButtonState.Pressed)
                                 {
                                     monitorInputData.foundInput = true;
-                                    monitorInputData.input = xboxController.DPadLeft.inputName;
+                                    monitorInputData.input = xboxController.dPadLeft.inputName;
                                 }
                                 else
                                 {
-                                    if (xboxController.DPadRight.state == ButtonState.Pressed)
+                                    if (xboxController.dPadRight.state == ButtonState.Pressed)
                                     {
                                         monitorInputData.foundInput = true;
-                                        monitorInputData.input = xboxController.DPadRight.inputName;
+                                        monitorInputData.input = xboxController.dPadRight.inputName;
                                     }
                                     else
                                     {
@@ -183,7 +183,7 @@ namespace TommoJProductions.MoControls
                                     }
                                     else
                                     {
-                                        MoControlsGO.controlManager.changeInputResult = new ChangeInput();
+                                        MoControlsGO.controlManager.setChangeInput();
                                     }
                                 }
                                 break;
