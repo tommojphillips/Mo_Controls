@@ -332,17 +332,21 @@ namespace TommoJProductions.MoControls.GUI
 
             try
             {
-                if (this.controlsGuiOpened)
+                if (MoControlsMod.instance.loaded)
                 {
-                    this.drawMainMenuGUI();
-                    this.drawMainGUI();
-                }
-                else
-                {
-                    if (MoControlsSaveData.loadedSaveData.displayCurrentPlayerModeOverlay)
-                        this.drawPlayerModeOverlayGUI();
-                    if (MoControlsSaveData.loadedSaveData.displayFfbOverlay)
-                        this.drawForceFeedBackOverlayGUI();
+                    if (this.controlsGuiOpened)
+                    {
+                        this.drawMainMenuGUI();
+                        this.drawMainGUI();
+                    }
+                    else
+                    {
+
+                        if (MoControlsSaveData.loadedSaveData.displayCurrentPlayerModeOverlay)
+                            this.drawPlayerModeOverlayGUI();
+                        if (MoControlsSaveData.loadedSaveData.displayFfbOverlay)
+                            this.drawForceFeedBackOverlayGUI();
+                    }
                 }
             }
             catch (Exception ex)

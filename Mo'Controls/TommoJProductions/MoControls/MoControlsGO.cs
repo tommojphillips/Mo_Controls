@@ -93,10 +93,10 @@ namespace TommoJProductions.MoControls
         {
             // Written, 08.10.2018
 
-            controlManager = this.gameObject.AddComponent<ControlManager>();
-            moControlsGui = this.gameObject.AddComponent<MoControlsGUI>();
             xboxControllerManager = this.gameObject.AddComponent<XboxControllerManager>();
+            controlManager = this.gameObject.AddComponent<ControlManager>();
             mouseEmulator = this.gameObject.AddComponent<MouseEmulator>();
+            moControlsGui = this.gameObject.AddComponent<MoControlsGUI>();
             XboxControllerManager.ControllerConnected += this.xboxControllerManager_ControllerConnected;
             XboxControllerManager.ControllerDisconnected += this.xboxControllerManager_ControllerDisconnected;
             MoControlsMod.print(nameof(MoControlsGO) + ": Started", Debugging.DebugTypeEnum.full);

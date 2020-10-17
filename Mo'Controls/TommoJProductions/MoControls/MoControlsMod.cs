@@ -47,6 +47,7 @@ namespace TommoJProductions.MoControls
 
         #region Properties
 
+        internal bool loaded { get; private set; } = false;
         /// <summary>
         /// Represents the release version name.
         /// </summary>
@@ -189,8 +190,11 @@ namespace TommoJProductions.MoControls
             else
             {
                 print("<color=grey>Running supported modloader version, <color=green>" + SUPPORTED_MODLOADER_VERSION + "</color></color>", DebugTypeEnum.full);
-                MoControlsSaveData.loadedSaveData.playerSeenMscLoaderVersionError = false;
-                MoControlsSaveData.loadedSaveData.saveSettings();
+                if (MoControlsSaveData.loadedSaveData.playerSeenMscLoaderVersionError)
+                {
+                    MoControlsSaveData.loadedSaveData.playerSeenMscLoaderVersionError = false;
+                    MoControlsSaveData.loadedSaveData.saveSettings();
+                }
             }
         }
         /// <summary>
@@ -241,32 +245,21 @@ namespace TommoJProductions.MoControls
         {
             // Written, 06.07.2018    
 
+            MoControlsSaveData.loadSettings();
             moControlsGameObject = new GameObject(gameObjectName);
             moControlsGO = moControlsGameObject.AddComponent<MoControlsGO>();
-            MoControlsSaveData.loadSettings();
             this.initialize();
             this.performModLoaderVersionCheck();
-            print("Assets returned: " + assets.result, DebugTypeEnum.full);
             print(this.Name + " v" + this.Version + ": Loaded.", DebugTypeEnum.none);
         }
         public override void SecondPassOnLoad()
         {
             // Written, 17.10.2020
 
-            if (moControlsGO.modulesStarted)
-            {
-                if (GameObject.Find(this.gameObjectName) != null)
-                {
-                    MoControlsGO.controlManager.setControls(MoControlsSaveData.loadedSaveData.footControls, MoControlsSaveData.loadedSaveData.drivingControls);
-                    MoControlsGO.xboxController.loadControllerAssets();
-                    print("All Modules have <b><color=green>successfully</color></b> been initilized.", DebugTypeEnum.partial);
-                }
-            }
-            else
-            {
-                moControlsGO.moduleError = true;
-                print("Some modules have <b>not</b> been initilized.", DebugTypeEnum.partial);
-            }
+            MoControlsGO.controlManager.setControls(MoControlsSaveData.loadedSaveData.footControls, MoControlsSaveData.loadedSaveData.drivingControls);
+            MoControlsGO.xboxController.loadControllerAssets();
+            print("Assets returned: " + assets.result, DebugTypeEnum.full);
+            this.loaded = true;
         }
 
         #endregion
