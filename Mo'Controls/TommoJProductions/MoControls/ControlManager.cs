@@ -254,14 +254,6 @@ namespace TommoJProductions.MoControls
                 return toolModeGameObject.activeSelf && !handModeGameObject.activeSelf;
             }
         }
-        /// <summary>
-        /// Represents if ffb is calulated on the xbox controller.
-        /// </summary>
-        internal bool ffbOnXboxController { get; set; }
-        /// <summary>
-        /// Represents the current ffb handling scheme.
-        /// </summary>
-        internal UnityRuntimeUpdateSchemesEnum ffbHandledOnUpdateScheme { get; set; }
 
         #endregion
 
@@ -331,19 +323,19 @@ namespace TommoJProductions.MoControls
             // Enable scroll only if player is on foot and in tool mode (2) OR when player is holding an item while on foot and in hand mode.
             this.toolModeScroll.enabled = this.currentPlayerMode == PlayerModeEnum.OnFoot && (isInToolMode || (!isInToolMode && !isPlayerHandEmpty()));
             // Handling xbox controller force feedback rumble events.
-            if (this.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.update)
+            if (MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.update)
                 this.handleFfbOnXboxController();
         }
         private void LateUpdate()
         {
             // Written, 17.10.2020
 
-            if (this.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.lateUpdate)
+            if (MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.lateUpdate)
                 this.handleFfbOnXboxController();
         }
         private void FixedUpdate()
         {
-            if (this.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.fixedUpdate)
+            if (MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.fixedUpdate)
                 this.handleFfbOnXboxController();
         }
         /// <summary>
@@ -504,7 +496,7 @@ namespace TommoJProductions.MoControls
                 {
                     this.setGameControl((PlayerModeEnum)playerMode, this.changeInputResult.controlName, this.changeInputResult.index, inInput);
                     MoControlsMod.print("Player mode was equal to <b>" + this.changeInputResult.mode + "</b> whiling setting '" + this.changeInputResult.controlName + "' to '" + inInput + "'.", DebugTypeEnum.full);
-                    MoControlsSaveData.saveSettings();
+                    MoControlsSaveData.loadedSaveData.saveSettings();
                 }
             }
             else
@@ -568,7 +560,7 @@ namespace TommoJProductions.MoControls
         {
             // Written, 16.10.2020
 
-            if (MoControlsGO.xboxController.isConnected && this.ffbOnXboxController)
+            if (MoControlsGO.xboxController.isConnected && MoControlsSaveData.loadedSaveData.ffbOnXboxController)
                 if (FsmVariables.GlobalVariables.FindFsmString("PlayerCurrentVehicle").Value == "Satsuma")
                 {
                     float rumbleFloat = this.scaleForceFeedbackRange();

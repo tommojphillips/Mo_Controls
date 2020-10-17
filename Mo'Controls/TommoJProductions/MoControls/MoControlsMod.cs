@@ -42,10 +42,6 @@ namespace TommoJProductions.MoControls
         /// Represents the supported/compatible version of mod loader.
         /// </summary>
         public const string SUPPORTED_MODLOADER_VERSION = "1.1.7";
-        /// <summary>
-        /// Represents whether or not to display debug data.
-        /// </summary>
-        internal static DebugTypeEnum debug;
 
         #endregion
 
@@ -60,14 +56,6 @@ namespace TommoJProductions.MoControls
             {
                 return "<color=" + (isReleaseVersion ? "blue>Release" : "red>Pre-Release") + "</color>";
             }
-        }
-        /// <summary>
-        /// Player seen error message?
-        /// </summary>
-        internal bool playerSeenMscLoaderVersionError
-        {
-            get;
-            set;
         }
         /// <summary>
         /// Represents whether or not the assets are loaded.
@@ -131,12 +119,12 @@ namespace TommoJProductions.MoControls
         {
             // Written, 15.10.2018
 
-            if (debug == DebugTypeEnum.full)
+            if (MoControlsSaveData.loadedSaveData.debugMode == DebugTypeEnum.full)
                 return true;
-            if (debug == DebugTypeEnum.partial)
+            if (MoControlsSaveData.loadedSaveData.debugMode == DebugTypeEnum.partial)
                 if (inDebugType == DebugTypeEnum.none)
                     return true;
-            if (debug == inDebugType)
+            if (MoControlsSaveData.loadedSaveData.debugMode == inDebugType)
                 return true;
             return false;
         }
@@ -187,22 +175,22 @@ namespace TommoJProductions.MoControls
             // Modloader supported version check.
             if (SUPPORTED_MODLOADER_VERSION != ModLoader.MSCLoader_Ver)
             {
-                if (!this.playerSeenMscLoaderVersionError)
+                if (!MoControlsSaveData.loadedSaveData.playerSeenMscLoaderVersionError)
                 {
                     ModUI.ShowMessage(
                         String.Format("<b>[{0} <color=orange>v{1}]</color></b> - NOTE: modloader v{2} may not be <color=orange>compatible</color>.\r\nSupported " +
                         "modloader version is <color=orange>v{3}</color>.",
                         this.Name, this.Version, ModLoader.MSCLoader_Ver, SUPPORTED_MODLOADER_VERSION), "ModLoader Version not supported.");
-                    this.playerSeenMscLoaderVersionError = true;
-                    MoControlsSaveData.saveSettings();
+                    MoControlsSaveData.loadedSaveData.playerSeenMscLoaderVersionError = true;
+                    MoControlsSaveData.loadedSaveData.saveSettings();
                 }
                 print("<color=orange>Warning</color> <color=grey>Supported modloader version is <b>v" + SUPPORTED_MODLOADER_VERSION + "</b>; you're running version <b>" + ModLoader.MSCLoader_Ver + "</b>. May not be compatible with current version.</color>.", DebugTypeEnum.partial);
             }
             else
             {
                 print("<color=grey>Running supported modloader version, <color=green>" + SUPPORTED_MODLOADER_VERSION + "</color></color>", DebugTypeEnum.full);
-                this.playerSeenMscLoaderVersionError = false;
-                MoControlsSaveData.saveSettings();
+                MoControlsSaveData.loadedSaveData.playerSeenMscLoaderVersionError = false;
+                MoControlsSaveData.loadedSaveData.saveSettings();
             }
         }
         /// <summary>
@@ -255,7 +243,7 @@ namespace TommoJProductions.MoControls
 
             moControlsGameObject = new GameObject(gameObjectName);
             moControlsGO = moControlsGameObject.AddComponent<MoControlsGO>();
-            moControlsGO.setLoadedSettings(MoControlsSaveData.loadSettings(), inPreload: true);
+            MoControlsSaveData.loadSettings();
             this.initialize();
             this.performModLoaderVersionCheck();
             print("Assets returned: " + assets.result, DebugTypeEnum.full);
@@ -267,9 +255,9 @@ namespace TommoJProductions.MoControls
 
             if (moControlsGO.modulesStarted)
             {
-                if (!moControlsGO.settingsLoaded && GameObject.Find(this.gameObjectName) != null)
+                if (GameObject.Find(this.gameObjectName) != null)
                 {
-                    moControlsGO.setLoadedSettings(MoControlsSaveData.loadedSaveData, inStartUp: true);
+                    MoControlsGO.controlManager.setControls(MoControlsSaveData.loadedSaveData.footControls, MoControlsSaveData.loadedSaveData.drivingControls);
                     MoControlsGO.xboxController.loadControllerAssets();
                     print("All Modules have <b><color=green>successfully</color></b> been initilized.", DebugTypeEnum.partial);
                 }

@@ -43,84 +43,6 @@ namespace TommoJProductions.MoControls.InputEmulation
                 return point;
             }
         }
-        /// <summary>
-        /// Represents whether the mod should emulate the mouse.
-        /// </summary>
-        public static bool emulateMouse;
-        /// <summary>
-        /// Represents the current sensitivity for the mouse.
-        /// </summary>
-        public static float mouseSensitivity;
-        /// <summary>
-        /// Represents the current deadzone for the mouse.
-        /// </summary>
-        public static float mouseDeadzone;
-        /// <summary>
-        /// Represents whether the current instance is emulating mouse movement.
-        /// </summary>
-        public bool emulating
-        {
-            get
-            {
-                return emulateMouse;
-            }
-            set
-            {
-                if (value)
-                {
-                    MoControlsMod.print(String.Format("Started Emulating mouse as {0}.", this.inputType), Debugging.DebugTypeEnum.full);
-                }
-                else
-                {
-                    MoControlsMod.print("Stopped Emulating mouse..", Debugging.DebugTypeEnum.full);
-                }
-                emulateMouse = value;
-            }
-        }
-        /// <summary>
-        /// Represents the input that will control the mouse.
-        /// </summary>
-        public InputTypeEnum inputType
-        {
-            get;
-            set;
-        }
-        /// <summary>
-        /// Represents the deadzone for the mouse.
-        /// </summary>
-        public float deadzone
-        {
-            get
-            {
-                return mouseDeadzone;
-            }
-            set
-            {
-                mouseDeadzone = value;
-            }
-        }
-        /// <summary>
-        /// Represents the type of deadzone algorithm to use.
-        /// </summary>
-        public DeadzoneTypeEnum deadzoneType
-        {
-            get;
-            set;
-        }
-        /// <summary>
-        /// Represents the sensitivity fpr the mouse.
-        /// </summary>
-        public float sensitivity
-        {
-            get
-            {
-                return mouseSensitivity;
-            }
-            set
-            {
-                mouseSensitivity = value;
-            }
-        }
 
         // Mouse Constants
         /// <summary>
@@ -172,8 +94,6 @@ namespace TommoJProductions.MoControls.InputEmulation
         {
             // Written, 01.08.2018
 
-            this.deadzoneType = DeadzoneTypeEnum.ScaledRadial;
-
             Keybind.Add(MoControlsMod.instance, this.lmbPrimaryInput);
             Keybind.Add(MoControlsMod.instance, this.lmbSecondaryInput);
             Keybind.Add(MoControlsMod.instance, this.rmbPrimaryInput);
@@ -188,7 +108,7 @@ namespace TommoJProductions.MoControls.InputEmulation
         {
             // Written, 16.10.2020
 
-            if (this.emulating)
+            if (MoControlsSaveData.loadedSaveData.emulateMouse)
             {
                 XboxController xboxController = MoControlsGO.xboxController;
 
@@ -201,7 +121,7 @@ namespace TommoJProductions.MoControls.InputEmulation
                     int moveX;
                     int moveY;
 
-                    switch (this.inputType)
+                    switch (MoControlsSaveData.loadedSaveData.mouseInputType)
                     {
                         case InputTypeEnum.LS:
                             stickValue_temp = xboxController.getLeftStick();
@@ -228,7 +148,7 @@ namespace TommoJProductions.MoControls.InputEmulation
                             }
                             break;
                     }
-                    if (this.inputType != InputTypeEnum.DPad)
+                    if (MoControlsSaveData.loadedSaveData.mouseInputType != InputTypeEnum.DPad)
                     {
                         stickValue.x = stickValue_temp.X;
                         stickValue.y = stickValue_temp.Y;
@@ -236,9 +156,9 @@ namespace TommoJProductions.MoControls.InputEmulation
                     if (stickValue != Vector2.zero)
                     {
                         // Deadzone
-                        stickValue = stickValue.doDeadzoneCheck(this.deadzone, this.deadzoneType);
+                        stickValue = stickValue.doDeadzoneCheck(MoControlsSaveData.loadedSaveData.mouseDeadzone, DeadzoneTypeEnum.ScaledRadial);
                         // Sensitivity
-                        stickValue = stickValue.doSensitivityOperation(this.sensitivity);
+                        stickValue = stickValue.doSensitivityOperation(MoControlsSaveData.loadedSaveData.mouseSensitivity);
 
                         moveX = (int)stickValue.x;
                         moveY = (int)stickValue.y * -1; // '* -1' xbox controller y axis is naturally inverted. so changing the that..;

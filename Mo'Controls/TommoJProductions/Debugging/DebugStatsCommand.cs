@@ -30,7 +30,7 @@ namespace TommoJProductions.Debugging
                 "\r\nmc_DebugMode=<b>{1}</b>" +
                 "\r\nDEBUG Config=<b>{2}</b>",
                 MoControlsMod.isReleaseVersion,
-                MoControlsMod.debug,
+                MoControlsSaveData.loadedSaveData.debugMode,
                 debugConStr), DebugTypeEnum.none);
         }
     }

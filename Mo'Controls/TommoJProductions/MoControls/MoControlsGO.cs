@@ -101,58 +101,6 @@ namespace TommoJProductions.MoControls
             XboxControllerManager.ControllerDisconnected += this.xboxControllerManager_ControllerDisconnected;
             MoControlsMod.print(nameof(MoControlsGO) + ": Started", Debugging.DebugTypeEnum.full);
         }
-        /// <summary>
-        /// Occurs every frame.
-        /// </summary>
-        private void Update()
-        {
-            // Written, 08.10.2018
-
-
-        }
-        /// <summary>
-        /// sets the settings.
-        /// </summary>
-        /// <param name="inSaveData">The save data to set as loaded.</param>
-        /// <param name="inStartUp">the</param>
-        internal void setLoadedSettings(MoControlsSaveData inSaveData, bool inStartUp = false, bool inPreload = false)
-        {
-            // Written, 22.08.2018
-
-            if (inPreload)
-            {
-                MoControlsMod.debug = inSaveData.debugMode;
-                MoControlsMod.instance.playerSeenMscLoaderVersionError = inSaveData.playerSeenMscLoaderVersionError;
-                MoControlsMod.print("Pre-Settings loaded", Debugging.DebugTypeEnum.full);
-            }
-            else
-            {
-                try
-                {
-                    xboxControllerManager.monitorControllerConnections.monitor = inSaveData.monitiorXboxControllerConnectionStatus;
-                    mouseEmulator.deadzone = inSaveData.mouseDeadzone;
-                    mouseEmulator.sensitivity = inSaveData.mouseSensitivity;
-                    mouseEmulator.inputType = inSaveData.mouseInputType;
-                    mouseEmulator.emulating = inSaveData.emulateMouse;
-                    MoControlsGUI.displayCurrentPlayerModeOverlay = inSaveData.displayCurrentPlayerModeOverlay;
-                    moControlsGui.displayForceFeedbackOverlay = inSaveData.displayFfbOverlay;
-                    controlManager.ffbOnXboxController = inSaveData.ffbOnXboxController;
-                    controlManager.ffbHandledOnUpdateScheme = inSaveData.ffbHandledOnUpdateScheme;
-                    controlManager.setControls(inSaveData.footControls, inSaveData.drivingControls);
-                    settingsLoaded = true;
-
-                    if (inStartUp)
-                    {
-                        MoControlsMod.print("Start-Up settings loaded", Debugging.DebugTypeEnum.partial);
-                    }
-
-                }
-                catch (NullReferenceException ex)
-                {
-                    MoControlsMod.print("[MoControlsGO.setLoadedSettings] - " + ex.StackTrace, Debugging.DebugTypeEnum.full);
-                }
-            }
-        }
 
         #endregion
 

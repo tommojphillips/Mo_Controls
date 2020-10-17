@@ -1,6 +1,7 @@
 ﻿using MSCLoader;
 using System;
 using TommoJProductions.MoControls.InputEmulation;
+using TommoJProductions.MoControls.XInputInterpreter;
 
 namespace TommoJProductions.MoControls
 {
@@ -129,6 +130,9 @@ namespace TommoJProductions.MoControls
                     ffbOnXboxController = false,
                     ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.update,
                     moControlsVersion = MoControlsMod.instance.Version,
+                    ffbOption_default = true,
+                    ffbOption_rpm = false,
+                    ffbOption_wheelSlip = false,
                 };
             }
         }
@@ -137,183 +141,72 @@ namespace TommoJProductions.MoControls
 
         #region Properties
 
-        public string moControlsVersion
-        {
-            get;
-            set;
-        }
-        public static MoControlsSaveData loadedSaveData
-        {
-            get;
-            set;
-        }
-        public bool playerSeenMscLoaderVersionError
-        {
-            get;
-            set;
-        }
-        public Debugging.DebugTypeEnum debugMode
-        {
-            get;
-            set;
-        }
-        public bool monitiorXboxControllerConnectionStatus
-        {
-            get;
-            set;
-        }
-        public bool emulateMouse
-        {
-            get;
-            set;
-        }
-        public InputTypeEnum mouseInputType
-        {
-            get;
-            set;
-        }
-        public float mouseDeadzone
-        {
-            get;
-            set;
-        }
-        public float mouseSensitivity
-        {
-            get;
-            set;
-        }
-        public bool displayCurrentPlayerModeOverlay
-        {
-            get;
-            set;
-        }
-        public string[,] footControls
-        {
-            get;
-            set;
-        }
-        public string[,] drivingControls
-        {
-            get;
-            set;
-        }
-        public bool ffbOnXboxController
-        {
-            get;
-            set;
-        }
-        public bool displayFfbOverlay
-        {
-            get;
-            set;
-        }
-        public UnityRuntimeUpdateSchemesEnum ffbHandledOnUpdateScheme
-        {
-            get;
-            set;
-        }
+        public string moControlsVersion;
+        public static MoControlsSaveData loadedSaveData;
+        public bool playerSeenMscLoaderVersionError;
+        public Debugging.DebugTypeEnum debugMode;
+        public bool monitiorXboxControllerConnectionStatus;
+        public bool emulateMouse;
+        public InputTypeEnum mouseInputType;
+        public DeadzoneTypeEnum mouseDeadzoneType;
+        public float mouseDeadzone;
+        public float mouseSensitivity;
+        public bool displayCurrentPlayerModeOverlay;
+        public string[,] footControls;
+        public string[,] drivingControls;
+        public bool ffbOnXboxController;
+        public bool displayFfbOverlay;
+        public UnityRuntimeUpdateSchemesEnum ffbHandledOnUpdateScheme;
+        public bool ffbOption_default;
+        public bool ffbOption_rpm;
+        public bool ffbOption_wheelSlip;
+        public bool displayVehicalInfoOverlay;
 
         #endregion
 
         #region Methods
 
-        /// <summary>
-        /// Gathers data and saves the settings.
-        /// </summary>
-        public static void saveSettings()
+        internal void saveSettings() 
         {
-            // Written, 20.08.2018  | 16.08.2020
+            // Written, 17.10.2020
 
-            bool _error = false;
-
-            MoControlsSaveData mcsd = new MoControlsSaveData();
-
-            if (MoControlsGO.xboxControllerManager != null)
-                mcsd.monitiorXboxControllerConnectionStatus = MoControlsGO.xboxControllerManager.monitorControllerConnections.monitor;
-            else
-                _error = true;
-            if (MoControlsGO.mouseEmulator != null)
-            {
-                mcsd.emulateMouse = MoControlsGO.mouseEmulator.emulating;
-                mcsd.mouseDeadzone = MoControlsGO.mouseEmulator.deadzone;
-                mcsd.mouseSensitivity = MoControlsGO.mouseEmulator.sensitivity;
-                mcsd.mouseInputType = MoControlsGO.mouseEmulator.inputType;
-            }
-            else
-                _error = true;
-            if (MoControlsGO.controlManager != null)
-            {
-                mcsd.footControls = MoControlsGO.controlManager.footControls;
-                mcsd.drivingControls = MoControlsGO.controlManager.drivingControls;
-                mcsd.ffbOnXboxController = MoControlsGO.controlManager.ffbOnXboxController;
-                mcsd.ffbHandledOnUpdateScheme = MoControlsGO.controlManager.ffbHandledOnUpdateScheme;
-            }
-            else
-                _error = true;
-            if (MoControlsGO.moControlsGui != null)
-            {
-                mcsd.displayCurrentPlayerModeOverlay = GUI.MoControlsGUI.displayCurrentPlayerModeOverlay;
-                mcsd.displayFfbOverlay = MoControlsGO.moControlsGui.displayForceFeedbackOverlay;
-            }
-            else
-                _error = true;
-            mcsd.debugMode = MoControlsMod.debug;
-            mcsd.playerSeenMscLoaderVersionError = MoControlsMod.instance.playerSeenMscLoaderVersionError;
-            mcsd.moControlsVersion = MoControlsMod.instance.Version;
-
-            if (!_error)
-                saveSettings(MoControlsMod.instance, mcsd);
-        }
-        /// <summary>
-        /// Saves the settings.
-        /// </summary>
-        private static void saveSettings(MoControlsMod inMo_Controls, MoControlsSaveData inMcsd)
-        {
-            // Written, 22.08.2018
-
-            SaveLoad.SerializeSaveFile(inMo_Controls, inMcsd, fileName + fileExtention);
+            SaveLoad.SerializeSaveFile(MoControlsMod.instance, this, fileName + fileExtention);
             MoControlsMod.print("saved mo'controls data.", Debugging.DebugTypeEnum.full);
         }
-        /// <summary>
-        /// Loads the settings.
-        /// </summary>
-        public static MoControlsSaveData loadSettings()
+        internal static MoControlsSaveData loadSettings() 
         {
-            // Written, 20.08.2018
+            // Written, 17.10.2020
 
-            float time = UnityEngine.Time.time;
-
-            if (loadedSaveData == null)
+            bool createNewSaveFile = false;
+            MoControlsSaveData mcsd = null;
+            try
             {
-                bool createNewSaveFile = false;
-                MoControlsSaveData mcsd = null;
-                try
-                {
-                    mcsd = SaveLoad.DeserializeSaveFile<MoControlsSaveData>(MoControlsMod.instance, fileName + fileExtention);
-                    if (mcsd == null)
-                        throw new NullReferenceException();
-                    if (mcsd.moControlsVersion != MoControlsMod.instance.Version)
-                        throw new Exception("Old mocontrols save file.");
-                }
-                catch (NullReferenceException)
-                {
-                    createNewSaveFile = true;
-                    MoControlsMod.print("Save file does not exist, creating save file.", Debugging.DebugTypeEnum.none);
-                }
-                catch (Exception e)
-                {
-                    createNewSaveFile = true;
-                    MoControlsMod.print("An error occured while loading the save file.. overriding with new save file. Maybe mod updated?\nERROR: " + e.Message, Debugging.DebugTypeEnum.none);
-                }
+                mcsd = SaveLoad.DeserializeSaveFile<MoControlsSaveData>(MoControlsMod.instance, fileName + fileExtention);
+                if (mcsd == null)
+                    throw new NullReferenceException();
+                if (mcsd.moControlsVersion != MoControlsMod.instance.Version)
+                    throw new Exception("Old mocontrols save file.");
+            }
+            catch (NullReferenceException)
+            {
+                createNewSaveFile = true;
+                MoControlsMod.print("Save file does not exist, creating save file.", Debugging.DebugTypeEnum.none);
+            }
+            catch (Exception e)
+            {
+                createNewSaveFile = true;
+                MoControlsMod.print("An error occured while loading the save file.. overriding with new save file. Maybe mod updated?\nERROR: " + e.Message, Debugging.DebugTypeEnum.none);
+            }
+            finally
+            {
                 if (createNewSaveFile)
                 {
-                    mcsd = defaultSave;
-                    saveSettings(MoControlsMod.instance, mcsd);
+                    defaultSave.saveSettings();
                 }
-                MoControlsMod.print("loaded mo'controls data in <b>" + (time - UnityEngine.Time.time) + "s</b>.", Debugging.DebugTypeEnum.none);
-                loadedSaveData = mcsd;
             }
-            return loadedSaveData;
+            loadedSaveData = mcsd;
+            MoControlsMod.print("loaded mo'controls data.", Debugging.DebugTypeEnum.full);
+            return mcsd;
         }
 
         #endregion

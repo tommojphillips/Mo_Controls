@@ -230,14 +230,6 @@ namespace TommoJProductions.MoControls.GUI
             set;
         }
         /// <summary>
-        /// Represents whether this should display the overlay.
-        /// </summary>
-        internal static bool displayCurrentPlayerModeOverlay
-        {
-            get;
-            set;
-        }
-        /// <summary>
         /// Represents whether the gui should be opened or closed.
         /// </summary>
         internal bool controlsGuiOpened
@@ -253,10 +245,6 @@ namespace TommoJProductions.MoControls.GUI
             get;
             private set;
         }
-        /// <summary>
-        /// Represents if forcefeed back overlay should be rendered.
-        /// </summary>
-        internal bool displayForceFeedbackOverlay { get; set; }
 
         #endregion
 
@@ -351,9 +339,9 @@ namespace TommoJProductions.MoControls.GUI
                 }
                 else
                 {
-                    if (displayCurrentPlayerModeOverlay)
+                    if (MoControlsSaveData.loadedSaveData.displayCurrentPlayerModeOverlay)
                         this.drawPlayerModeOverlayGUI();
-                    if (displayForceFeedbackOverlay)
+                    if (MoControlsSaveData.loadedSaveData.displayFfbOverlay)
                         this.drawForceFeedBackOverlayGUI();
                 }
             }
@@ -526,47 +514,47 @@ namespace TommoJProductions.MoControls.GUI
             // Written, 09.10.2018
 
             bool _asInput;
-            UnityRuntimeUpdateSchemesEnum scheme = this.controlManager.ffbHandledOnUpdateScheme;
+            UnityRuntimeUpdateSchemesEnum scheme = MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme;
             bool _saveSettings = false;
             gui.Label(string.Format("<b>Xbox Controller</b>: {0}", this.xboxController.isConnected ? "<color=green>connected</color>" : "<color=red>disconnected</color>"));
             gui.Space(5f);
             using (new gui.VerticalScope())
             {
                 ueGUI.backgroundColor = this.moduleBackgroundColor;
-                bool ffbOn = this.controlManager.ffbOnXboxController;
+                bool ffbOn = MoControlsSaveData.loadedSaveData.ffbOnXboxController;
                 string toggleString = ffbOn ? "<color=green>On</color>" : "<color=red>Off</color>";
                 if (gui.Toggle(ffbOn, String.Format("FFB: {0}", toggleString)) != ffbOn)
                 {
-                    this.controlManager.ffbOnXboxController = !ffbOn;
+                    MoControlsSaveData.loadedSaveData.ffbOnXboxController = !ffbOn;
                     _saveSettings = true;
                 }
                 using (new gui.HorizontalScope("box"))
                 {
                     gui.Label("<i><b>FFB on update scheme:</b></i>");
-                    _asInput = this.controlManager.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.update;
+                    _asInput = MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.update;
                     if (gui.Toggle(_asInput, String.Format("<b>Update:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
                         if (scheme != UnityRuntimeUpdateSchemesEnum.update)
                         {
-                            this.controlManager.ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.update;
+                            MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.update;
                             _saveSettings = true;
                         }
                     }
-                    _asInput = this.controlManager.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.lateUpdate;
+                    _asInput = MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.lateUpdate;
                     if (gui.Toggle(_asInput, String.Format("<b>Late Update:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
                         if (scheme != UnityRuntimeUpdateSchemesEnum.lateUpdate)
                         {
-                            this.controlManager.ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.lateUpdate;
+                            MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.lateUpdate;
                             _saveSettings = true;
                         }
                     }
-                    _asInput = this.controlManager.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.fixedUpdate;
+                    _asInput = MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.fixedUpdate;
                     if (gui.Toggle(_asInput, String.Format("<b>Fixed Update:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
                         if (scheme != UnityRuntimeUpdateSchemesEnum.fixedUpdate)
                         {
-                            this.controlManager.ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.fixedUpdate;
+                            MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.fixedUpdate;
                             _saveSettings = true;
                         }
                     }
@@ -575,7 +563,7 @@ namespace TommoJProductions.MoControls.GUI
                 ueGUI.backgroundColor = this.backgroundColor;
             }
             if (_saveSettings)
-                MoControlsSaveData.saveSettings();
+                MoControlsSaveData.loadedSaveData.saveSettings();
         }
         /// <summary>
         /// Draws controller input content.
@@ -662,10 +650,10 @@ namespace TommoJProductions.MoControls.GUI
 
             using (new gui.HorizontalScope("box"))
             {
-                gui.Label(this.mouseEmulator.emulating ? "<color=green><b>ON</b></color>" : "<color=red><b>OFF</b></color>");
-                if (gui.Toggle(this.mouseEmulator.emulating, String.Format("<b>Emulate mouse for controller:</b> Using {0}", this.mouseEmulator.inputType)) != this.mouseEmulator.emulating)
+                gui.Label(MoControlsSaveData.loadedSaveData.emulateMouse ? "<color=green><b>ON</b></color>" : "<color=red><b>OFF</b></color>");
+                if (gui.Toggle(MoControlsSaveData.loadedSaveData.emulateMouse, String.Format("<b>Emulate mouse for controller:</b> Using {0}", MoControlsSaveData.loadedSaveData.mouseInputType)) != MoControlsSaveData.loadedSaveData.emulateMouse)
                 {
-                    this.mouseEmulator.emulating = !this.mouseEmulator.emulating;
+                    MoControlsSaveData.loadedSaveData.emulateMouse = !MoControlsSaveData.loadedSaveData.emulateMouse;
                     saveSettings = true;
                 }
             }
@@ -676,30 +664,30 @@ namespace TommoJProductions.MoControls.GUI
                 {
                     gui.Label("<i><b>Emulate mouse on joystick:</b></i>");
                     // As left + right thumb stick settings are grouped; need to manually change other value..
-                    _asInput = this.mouseEmulator.inputType == InputTypeEnum.LS;
+                    _asInput = MoControlsSaveData.loadedSaveData.mouseInputType == InputTypeEnum.LS;
                     if (gui.Toggle(_asInput, String.Format("<b>Left Stick:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
-                        if (this.mouseEmulator.inputType != InputTypeEnum.LS)
+                        if (MoControlsSaveData.loadedSaveData.mouseInputType != InputTypeEnum.LS)
                         {
-                            this.mouseEmulator.inputType = InputTypeEnum.LS;
+                            MoControlsSaveData.loadedSaveData.mouseInputType = InputTypeEnum.LS;
                             saveSettings = true;
                         }
                     }
-                    _asInput = this.mouseEmulator.inputType == InputTypeEnum.RS;
+                    _asInput = MoControlsSaveData.loadedSaveData.mouseInputType == InputTypeEnum.RS;
                     if (gui.Toggle(_asInput, String.Format("<b>Right Stick:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
-                        if (this.mouseEmulator.inputType != InputTypeEnum.RS)
+                        if (MoControlsSaveData.loadedSaveData.mouseInputType != InputTypeEnum.RS)
                         {
-                            this.mouseEmulator.inputType = InputTypeEnum.RS;
+                            MoControlsSaveData.loadedSaveData.mouseInputType = InputTypeEnum.RS;
                             saveSettings = true;
                         }
                     }
-                    _asInput = this.mouseEmulator.inputType == InputTypeEnum.DPad;
+                    _asInput = MoControlsSaveData.loadedSaveData.mouseInputType == InputTypeEnum.DPad;
                     if (gui.Toggle(_asInput, String.Format("<b>Directional Pad:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
-                        if (this.mouseEmulator.inputType != InputTypeEnum.DPad)
+                        if (MoControlsSaveData.loadedSaveData.mouseInputType != InputTypeEnum.DPad)
                         {
-                            this.mouseEmulator.inputType = InputTypeEnum.DPad;
+                            MoControlsSaveData.loadedSaveData.mouseInputType = InputTypeEnum.DPad;
                             saveSettings = true;
                         }
                     }
@@ -707,21 +695,21 @@ namespace TommoJProductions.MoControls.GUI
                 using (new gui.HorizontalScope("box"))
                 {
                     gui.Label("<i><b>Deadzone type:</b></i>");
-                    _asInput = this.mouseEmulator.deadzoneType == DeadzoneTypeEnum.Radial;
+                    _asInput = MoControlsSaveData.loadedSaveData.mouseDeadzoneType == DeadzoneTypeEnum.Radial;
                     if (gui.Toggle(_asInput, String.Format("<b>Radial:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
-                        if (this.mouseEmulator.deadzoneType != DeadzoneTypeEnum.Radial)
+                        if (MoControlsSaveData.loadedSaveData.mouseDeadzoneType != DeadzoneTypeEnum.Radial)
                         {
-                            this.mouseEmulator.deadzoneType = DeadzoneTypeEnum.Radial;
+                            MoControlsSaveData.loadedSaveData.mouseDeadzoneType = DeadzoneTypeEnum.Radial;
                             saveSettings = true;
                         }
                     }
-                    _asInput = this.mouseEmulator.deadzoneType == DeadzoneTypeEnum.ScaledRadial;
+                    _asInput = MoControlsSaveData.loadedSaveData.mouseDeadzoneType == DeadzoneTypeEnum.ScaledRadial;
                     if (gui.Toggle(_asInput, String.Format("<b>Scaled Radial:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
-                        if (this.mouseEmulator.deadzoneType != DeadzoneTypeEnum.ScaledRadial)
+                        if (MoControlsSaveData.loadedSaveData.mouseDeadzoneType != DeadzoneTypeEnum.ScaledRadial)
                         {
-                            this.mouseEmulator.deadzoneType = DeadzoneTypeEnum.ScaledRadial;
+                            MoControlsSaveData.loadedSaveData.mouseDeadzoneType = DeadzoneTypeEnum.ScaledRadial;
                             saveSettings = true;
                         }
                     }
@@ -731,31 +719,31 @@ namespace TommoJProductions.MoControls.GUI
             {
                 using (new gui.VerticalScope("box"))
                 {
-                    gui.Label(String.Format("<b>Mouse Deadzone:</b> {0}", this.mouseEmulator.deadzone));
-                    tempValue = gui.HorizontalSlider(this.mouseEmulator.deadzone, MouseEmulator.MIN_DEADZONE, MouseEmulator.MAX_DEADZONE);
-                    if (tempValue != this.mouseEmulator.deadzone) // Value Changed.
+                    gui.Label(String.Format("<b>Mouse Deadzone:</b> {0}", MoControlsSaveData.loadedSaveData.mouseDeadzone));
+                    tempValue = gui.HorizontalSlider(MoControlsSaveData.loadedSaveData.mouseDeadzone, MouseEmulator.MIN_DEADZONE, MouseEmulator.MAX_DEADZONE);
+                    if (tempValue != MoControlsSaveData.loadedSaveData.mouseDeadzone) // Value Changed.
                     {
-                        this.mouseEmulator.deadzone = tempValue;
+                        MoControlsSaveData.loadedSaveData.mouseDeadzone = tempValue;
                         saveSettings = true;
                     }
                 }
                 using (new gui.VerticalScope("box"))
                 {
-                    gui.Label(String.Format("<b>Mouse Sensitivity:</b> {0}", this.mouseEmulator.sensitivity));
-                    tempValue = gui.HorizontalSlider(this.mouseEmulator.sensitivity, MouseEmulator.MIN_SENSITIVITY, MouseEmulator.MAX_SENSITIVITY);
-                    if (tempValue != this.mouseEmulator.sensitivity) // Value Changed.
+                    gui.Label(String.Format("<b>Mouse Sensitivity:</b> {0}", MoControlsSaveData.loadedSaveData.mouseSensitivity));
+                    tempValue = gui.HorizontalSlider(MoControlsSaveData.loadedSaveData.mouseSensitivity, MouseEmulator.MIN_SENSITIVITY, MouseEmulator.MAX_SENSITIVITY);
+                    if (tempValue != MoControlsSaveData.loadedSaveData.mouseSensitivity) // Value Changed.
                     {
-                        this.mouseEmulator.sensitivity = tempValue;
+                        MoControlsSaveData.loadedSaveData.mouseSensitivity = tempValue;
                         saveSettings = true;
                     }
                 }
                 using (new gui.VerticalScope("box"))
                 {
-                    gui.Label(String.Format("<b>GUI Sensitivity:</b> {0}", this.mouseEmulator.sensitivity));
-                    tempValue = gui.HorizontalSlider(this.mouseEmulator.sensitivity, MouseEmulator.MIN_SENSITIVITY, MouseEmulator.MAX_SENSITIVITY);
-                    if (tempValue != this.mouseEmulator.sensitivity) // Value Changed.
+                    gui.Label(String.Format("<b>GUI Sensitivity:</b> {0}", MoControlsSaveData.loadedSaveData.mouseSensitivity));
+                    tempValue = gui.HorizontalSlider(MoControlsSaveData.loadedSaveData.mouseSensitivity, MouseEmulator.MIN_SENSITIVITY, MouseEmulator.MAX_SENSITIVITY);
+                    if (tempValue != MoControlsSaveData.loadedSaveData.mouseSensitivity) // Value Changed.
                     {
-                        this.mouseEmulator.sensitivity = tempValue;
+                        MoControlsSaveData.loadedSaveData.mouseSensitivity = tempValue;
                         saveSettings = true;
                     }
                 }
@@ -816,7 +804,7 @@ namespace TommoJProductions.MoControls.GUI
             gui.Space(5f);
             if (saveSettings)
             {
-                MoControlsSaveData.saveSettings();
+                MoControlsSaveData.loadedSaveData.saveSettings();
             }
         }
         /// <summary>
@@ -831,14 +819,14 @@ namespace TommoJProductions.MoControls.GUI
 
             using (new gui.HorizontalScope("box"))
             {
-                if (gui.Toggle(displayCurrentPlayerModeOverlay, "Display current player mode overlay") != displayCurrentPlayerModeOverlay)
+                if (gui.Toggle(MoControlsSaveData.loadedSaveData.displayCurrentPlayerModeOverlay, "Display current player mode overlay") != MoControlsSaveData.loadedSaveData.displayCurrentPlayerModeOverlay)
                 {
-                    displayCurrentPlayerModeOverlay = !displayCurrentPlayerModeOverlay;
+                    MoControlsSaveData.loadedSaveData.displayCurrentPlayerModeOverlay = !MoControlsSaveData.loadedSaveData.displayCurrentPlayerModeOverlay;
                     _saveSettings = true;
                 }
-                if (gui.Toggle(this.displayForceFeedbackOverlay, "Display force feedback overlay") != this.displayForceFeedbackOverlay)
+                if (gui.Toggle(MoControlsSaveData.loadedSaveData.displayFfbOverlay, "Display force feedback overlay") != MoControlsSaveData.loadedSaveData.displayFfbOverlay)
                 {
-                    this.displayForceFeedbackOverlay = !this.displayForceFeedbackOverlay;
+                    MoControlsSaveData.loadedSaveData.displayFfbOverlay = !MoControlsSaveData.loadedSaveData.displayFfbOverlay;
                     _saveSettings = true;
                 }
             }
@@ -896,7 +884,7 @@ namespace TommoJProductions.MoControls.GUI
             ueGUI.backgroundColor = this.backgroundColor;
             if (_saveSettings)
             {
-                MoControlsSaveData.saveSettings();
+                MoControlsSaveData.loadedSaveData.saveSettings();
             }
         }
         /// <summary>

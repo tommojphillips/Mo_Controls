@@ -14,14 +14,6 @@ namespace TommoJProductions.MoControls.XInputInterpreter.Monitoring
 
         private XboxControllerManager xboxControllerManager;
         /// <summary>
-        /// Represents whether the current instance is monitoring for controller connections changing.
-        /// </summary>
-        public bool monitor
-        {
-            get;
-            set;
-        }
-        /// <summary>
         /// Represents a List of xbox controllers to monitor.
         /// </summary>
         private XboxController[] xboxControllers
@@ -56,7 +48,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter.Monitoring
         {
             // Written, 16.07.2018
 
-            if (this.monitor)
+            if (MoControlsSaveData.loadedSaveData.monitiorXboxControllerConnectionStatus)
             {
                 for (int i = 0; i < this.xboxControllers.Length; i++)
                 {

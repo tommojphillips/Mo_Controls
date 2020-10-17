@@ -23,29 +23,29 @@ namespace TommoJProductions.Debugging
                 switch (inArgs[0])
                 {
                     case "0":
-                        MoControlsMod.debug = DebugTypeEnum.none;
+                        MoControlsSaveData.loadedSaveData.debugMode = DebugTypeEnum.none;
                         break;
                     case "1":
-                        MoControlsMod.debug = DebugTypeEnum.partial;
+                        MoControlsSaveData.loadedSaveData.debugMode = DebugTypeEnum.partial;
                         break;
                     case "2":
-                        MoControlsMod.debug = DebugTypeEnum.full;
+                        MoControlsSaveData.loadedSaveData.debugMode = DebugTypeEnum.full;
                         break;
                     case "none":
-                        MoControlsMod.debug = DebugTypeEnum.none;
+                        MoControlsSaveData.loadedSaveData.debugMode = DebugTypeEnum.none;
                         break;
                     case "partial":
-                        MoControlsMod.debug = DebugTypeEnum.partial;
+                        MoControlsSaveData.loadedSaveData.debugMode = DebugTypeEnum.partial;
                         break;
                     case "full":
-                        MoControlsMod.debug = DebugTypeEnum.full;
+                        MoControlsSaveData.loadedSaveData.debugMode = DebugTypeEnum.full;
                         break;
                     default:
                         MoControlsMod.print("debug mode does not exist.. Use:\r\n1.) none or '0'\r\n2.) partial or '1'\r\n3.) full or '2'", DebugTypeEnum.none);
                         break;
                 }
-                MoControlsSaveData.saveSettings();
-                MoControlsMod.print("Debug Mode set to <b>" + MoControlsMod.debug + "</b>.", DebugTypeEnum.none);
+                MoControlsSaveData.loadedSaveData.saveSettings();
+                MoControlsMod.print("Debug Mode set to <b>" + MoControlsSaveData.loadedSaveData.debugMode + "</b>.", DebugTypeEnum.none);
             }
         }
     }
