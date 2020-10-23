@@ -135,6 +135,11 @@ namespace TommoJProductions.MoControls
                     ffbOption_wheelSlip = true,
                     displayVehicleInfoOverlay = false,
                     ffbOption_gearChange = true,
+                    playerHorz = 0.05f,
+                    playerVert = 0.05f,
+                    horz = 0.05f,
+                    vert = 0.05f,
+                    combinedTriggerAxis = false,
                 };
             }
         }
@@ -163,6 +168,11 @@ namespace TommoJProductions.MoControls
         public bool ffbOption_wheelSlip;
         public bool displayVehicleInfoOverlay;
         public bool ffbOption_gearChange;
+        public float playerHorz;
+        public float playerVert;
+        public float horz;
+        public float vert;
+        public bool combinedTriggerAxis;
 
         #endregion
 
@@ -178,7 +188,7 @@ namespace TommoJProductions.MoControls
         internal static MoControlsSaveData loadSettings()
         {
             // Written, 17.10.2020
-
+                        
             bool createNewSaveFile = false;
             MoControlsSaveData mcsd = null;
             try
@@ -203,7 +213,6 @@ namespace TommoJProductions.MoControls
             {
                 mcsd = defaultSave;
             }
-
             loadedSaveData = mcsd;
             MoControlsMod.print("loaded mo'controls data.", Debugging.DebugTypeEnum.full);
             return mcsd;

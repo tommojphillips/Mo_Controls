@@ -1,5 +1,4 @@
-﻿using MSCLoader;
-using System.Collections;
+﻿using System.Collections;
 using System.Drawing;
 using TommoJProductions.MoControls.XInputInterpreter;
 using UnityEngine;
@@ -11,23 +10,6 @@ namespace TommoJProductions.MoControls.InputEmulation
     public class MouseEmulator : MonoBehaviour
     {
         // Written, 01.08.2018
-
-        /// <summary>
-        /// Represents the primary input for LMB
-        /// </summary>
-        public Keybind lmbPrimaryInput = new Keybind(LMB_INPUT_NAME + "1", "LMB Primary Input", KeyCode.JoystickButton0);
-        /// <summary>
-        /// Represents the secondary input for LMB
-        /// </summary>
-        public Keybind lmbSecondaryInput = new Keybind(LMB_INPUT_NAME + "2", "LMB Secondary", KeyCode.Keypad1);
-        /// <summary>
-        /// Represents the primary input for RMB
-        /// </summary>
-        public Keybind rmbPrimaryInput = new Keybind(RMB_INPUT_NAME + "1", "RMB Primary Input", KeyCode.JoystickButton1);
-        /// <summary>
-        /// Represents the secondary input for RMB
-        /// </summary>
-        public Keybind rmbSecondaryInput = new Keybind(RMB_INPUT_NAME + "2", "RMB Secondary", KeyCode.Keypad2);
 
         #region Properties / Fields
 
@@ -80,24 +62,6 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// Represents a single mouse scroll value.
         /// </summary>
         public const int MOUSE_SCROLL_VALUE = 120;
-
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="MouseEmulator"/>.
-        /// </summary>
-        /// <param name="inputType">The input type to control the mouse.</param>
-        public MouseEmulator()
-        {
-            // Written, 01.08.2018
-
-            Keybind.Add(MoControlsMod.instance, this.lmbPrimaryInput);
-            Keybind.Add(MoControlsMod.instance, this.lmbSecondaryInput);
-            Keybind.Add(MoControlsMod.instance, this.rmbPrimaryInput);
-            Keybind.Add(MoControlsMod.instance, this.rmbSecondaryInput);
-        }
 
         #endregion
 
@@ -228,11 +192,11 @@ namespace TommoJProductions.MoControls.InputEmulation
         {
             // Written, 08.10.2020
 
-            if (this.lmbPrimaryInput.GetKeybindDown() || this.lmbSecondaryInput.GetKeybindDown())
+            if (MoControlsMod.instance.lmbPrimaryInput.GetKeybindDown() || MoControlsMod.instance.lmbSecondaryInput.GetKeybindDown())
             {
                 send(getCursorPosition, (uint)MouseEventButtons.XBUTTON1, MouseEventF.LEFTDOWN);
             }
-            if (this.lmbPrimaryInput.GetKeybindUp() || this.lmbSecondaryInput.GetKeybindUp())
+            if (MoControlsMod.instance.lmbPrimaryInput.GetKeybindUp() || MoControlsMod.instance.lmbSecondaryInput.GetKeybindUp())
             {
                 send(getCursorPosition, (uint)MouseEventButtons.XBUTTON1, MouseEventF.LEFTUP);
             }
@@ -244,11 +208,11 @@ namespace TommoJProductions.MoControls.InputEmulation
         {
             // Written, 08.10.2020
 
-            if (this.rmbPrimaryInput.GetKeybindDown() || this.rmbSecondaryInput.GetKeybindDown())
+            if (MoControlsMod.instance.rmbPrimaryInput.GetKeybindDown() || MoControlsMod.instance.rmbSecondaryInput.GetKeybindDown())
             {
                 send(getCursorPosition, (uint)MouseEventButtons.XBUTTON2, MouseEventF.RIGHTDOWN);
             }
-            if (this.rmbPrimaryInput.GetKeybindUp() || this.rmbSecondaryInput.GetKeybindUp())
+            if (MoControlsMod.instance.rmbPrimaryInput.GetKeybindUp() || MoControlsMod.instance.rmbSecondaryInput.GetKeybindUp())
             {
                 send(getCursorPosition, (uint)MouseEventButtons.XBUTTON2, MouseEventF.RIGHTUP);
             }

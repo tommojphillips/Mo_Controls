@@ -28,10 +28,6 @@ namespace TommoJProductions.MoControls
         /// </summary>
         private const string toolModeLocation = "PLAYER/Pivot/AnimPivot/Camera/FPSCamera/2Spanner";
         /// <summary>
-        /// 
-        /// </summary>
-        private Vector2 prevRumblePow;
-        /// <summary>
         /// Represents logic to enable scroll to a connected xbox controllers' triggers. enabled when player is in tool mode.
         /// </summary>
         private GuiNav toolModeScroll;

@@ -1,6 +1,7 @@
 ﻿using MSCLoader;
 using System;
 using TommoJProductions.Debugging;
+using TommoJProductions.MoControls.InputEmulation;
 using UnityEngine;
 
 namespace TommoJProductions.MoControls
@@ -30,17 +31,31 @@ namespace TommoJProductions.MoControls
         /// </summary>
         internal const string LATEST_RELEASE_DATE = "23.10.2020";
 
-#if DEBUG
-        private const bool IS_DEBUG_CONFIG = true;
-#else
-        private const bool IS_DEBUG_CONFIG = false;
-#endif
 
-#if x64
-        private const bool IS_X64 = true;
-#else
-        private const bool IS_x64 = false;
-#endif
+        #region Mod Keybinds
+
+        /// <summary>
+        /// Represents a keybind to open/close the gui for the mod.
+        /// </summary>
+        public Keybind openControlsGui = new Keybind("OpenControls", "Open Controls GUI", KeyCode.Home);
+        /// <summary>
+        /// Represents the primary input for LMB
+        /// </summary>
+        public Keybind lmbPrimaryInput = new Keybind(MouseEmulator.LMB_INPUT_NAME + "1", "LMB Primary Input", KeyCode.JoystickButton0);
+        /// <summary>
+        /// Represents the secondary input for LMB
+        /// </summary>
+        public Keybind lmbSecondaryInput = new Keybind(MouseEmulator.LMB_INPUT_NAME + "2", "LMB Secondary", KeyCode.Keypad1);
+        /// <summary>
+        /// Represents the primary input for RMB
+        /// </summary>
+        public Keybind rmbPrimaryInput = new Keybind(MouseEmulator.RMB_INPUT_NAME + "1", "RMB Primary Input", KeyCode.JoystickButton1);
+        /// <summary>
+        /// Represents the secondary input for RMB
+        /// </summary>
+        public Keybind rmbSecondaryInput = new Keybind(MouseEmulator.RMB_INPUT_NAME + "2", "RMB Secondary", KeyCode.Keypad2);
+
+        #endregion
 
         #region Mod Fields
 
@@ -62,6 +77,18 @@ namespace TommoJProductions.MoControls
         /// Represents the supported/compatible version of mod loader.
         /// </summary>
         public const string SUPPORTED_MODLOADER_VERSION = "1.1.7";
+
+#if DEBUG
+        private const bool IS_DEBUG_CONFIG = true;
+#else
+        private const bool IS_DEBUG_CONFIG = false;
+#endif
+
+#if x64
+        private const bool IS_X64 = true;
+#else
+        private const bool IS_x64 = false;
+#endif
 
         #endregion
 
@@ -234,6 +261,11 @@ namespace TommoJProductions.MoControls
             ConsoleCommand.Add(new ListLoadedAssembliesConsoleCommand());
             ConsoleCommand.Add(new WriteCinputExternInputsCommand());
             ConsoleCommand.Add(new ChangeToolModeCommand());
+            Keybind.Add(this, this.openControlsGui);
+            Keybind.Add(this, this.lmbPrimaryInput);
+            Keybind.Add(this, this.lmbSecondaryInput);
+            Keybind.Add(this, this.rmbPrimaryInput);
+            Keybind.Add(this, this.rmbSecondaryInput);
 
             this.loadControllerAssets();
         }
@@ -262,6 +294,19 @@ namespace TommoJProductions.MoControls
 #endif
         }
 
+        private void loadCInputAxisDeadzones()
+        {
+            // Written, 23.10.2020
+
+            // setting cInput axis deadzones//
+            /*external cinput control names = PlayerVertical*PlayerHorizontal*Horizontal*Vertical*/
+            cInput.SetAxisDeadzone("PlayerHorizontal", MoControlsSaveData.loadedSaveData.playerHorz);
+            cInput.SetAxisDeadzone("PlayerVertical", MoControlsSaveData.loadedSaveData.playerVert);
+            cInput.SetAxisDeadzone("Horizontal", MoControlsSaveData.loadedSaveData.horz);
+            cInput.SetAxisDeadzone("Vertical", MoControlsSaveData.loadedSaveData.vert);
+            MoControlsMod.print("loaded cinput deadzones", DebugTypeEnum.none);//.full);
+        }
+
         #endregion
 
         #region Override Methods
@@ -276,6 +321,8 @@ namespace TommoJProductions.MoControls
         public override void SecondPassOnLoad()
         {
             // Written, 18.10.2020
+
+            this.loadCInputAxisDeadzones();
             moControlsGameObject = new GameObject(gameObjectName);
             moControlsGO = moControlsGameObject.AddComponent<MoControlsGO>();
             print(this.Name + " v" + this.Version + ": Loaded.", DebugTypeEnum.none);

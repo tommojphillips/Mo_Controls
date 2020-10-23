@@ -20,11 +20,6 @@ namespace TommoJProductions.MoControls.GUI
     {
         // Written, 22.08.2018
 
-        private float playerV_axisDeadzone;
-        private float playerH_axisDeadzone;
-        private float vert_axisDeadzone;
-        private float hoz_axisDeadzone;
-
         #region Fields
 
         #region GUI
@@ -83,10 +78,6 @@ namespace TommoJProductions.MoControls.GUI
         /// Represents the amount of keybinds that have been loaded via the mods.
         /// </summary>
         private int modKeybindCount = 0;
-        /// <summary>
-        /// Represents a keybind to open/close the gui for the mod.
-        /// </summary>
-        public readonly Keybind openControlsGui = new Keybind("OpenControls", "Open Controls GUI", KeyCode.Home);
 
         #endregion
 
@@ -249,21 +240,6 @@ namespace TommoJProductions.MoControls.GUI
 
         #endregion
 
-        #region Constructors
-
-        /// <summary>
-        /// Initliazes a new instance of <see cref="MoControlsGUI"/>.
-        /// </summary>
-        /// <param name="inMod">The mod.</param>
-        public MoControlsGUI()
-        {
-            // Written, 22.08.2018
-
-            Keybind.Add(this.mod, this.openControlsGui);
-        }
-
-        #endregion
-
         #region Methods
 
         /// <summary>
@@ -308,7 +284,7 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 22.08.2018
 
-            if (this.openControlsGui.GetKeybindDown())
+            if (MoControlsMod.instance.openControlsGui.GetKeybindDown())
                 this.toggleGui();
             if (this.controlsGuiOpened)
             {
@@ -394,7 +370,7 @@ namespace TommoJProductions.MoControls.GUI
                         "\r\n<b>{1}</b> Sets as None." +
                         "\r\n<b>LMB</b> Selects." +
                         "\r\n<b>RMB</b> Cancels.",
-                        this.openControlsGui.Key,
+                        MoControlsMod.instance.openControlsGui.Key,
                         Input.noneKey));
                 gui.Space(3.0f);
                 switch (this.mainGUIMenu)
@@ -427,7 +403,7 @@ namespace TommoJProductions.MoControls.GUI
             string aboutMessage = "<b>Mo'Controls</b> allows the player to have a primary and secondary input for each in-game control," +
                 " the player could set all primary inputs to the keyboard and all secondary inputs to an Xbox Controller to have a seamless" +
                 " swap of the keyboard to Xbox Controller. Mo'Controls also allows the player to have different control profiles for when " +
-                "on foot and when in driving mode! So you can get more out of your controller! Key to toggle the GUI is " + this.openControlsGui.Key +
+                "on foot and when in driving mode! So you can get more out of your controller! Key to toggle the GUI is " + MoControlsMod.instance.openControlsGui.Key +
                 " or <b>hold down the back button on a connected xbox controller for (> 0.3sec)</b>";
             string[] features = new string[]
             {
@@ -788,21 +764,21 @@ namespace TommoJProductions.MoControls.GUI
                 {
                     using (new gui.VerticalScope("box"))
                     {
-                        gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.lmbPrimaryInput.Name));
+                        gui.Label(String.Format("<b>{0}:</b>", MoControlsMod.instance.lmbPrimaryInput.Name));
                         using (new gui.HorizontalScope())
                         {
-                            this.drawCommonControl("Modifier", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Modifier.ToString(), 1, inMod: this.mod);
-                            this.drawCommonControl("Input", this.mouseEmulator.lmbPrimaryInput.ID, this.mouseEmulator.lmbPrimaryInput.Key.ToString(), 2, inMod: this.mod);
+                            this.drawCommonControl("Modifier", MoControlsMod.instance.lmbPrimaryInput.ID, MoControlsMod.instance.lmbPrimaryInput.Modifier.ToString(), 1, inMod: this.mod);
+                            this.drawCommonControl("Input", MoControlsMod.instance.lmbPrimaryInput.ID, MoControlsMod.instance.lmbPrimaryInput.Key.ToString(), 2, inMod: this.mod);
                         }
                     }
                     ueGUI.backgroundColor = this.secondaryItemColor;
                     using (new gui.VerticalScope("box"))
                     {
-                        gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.lmbSecondaryInput.Name));
+                        gui.Label(String.Format("<b>{0}:</b>", MoControlsMod.instance.lmbSecondaryInput.Name));
                         using (new gui.HorizontalScope())
                         {
-                            this.drawCommonControl("Modifier", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Modifier.ToString(), 1, inMod: this.mod);
-                            this.drawCommonControl("Input", this.mouseEmulator.lmbSecondaryInput.ID, this.mouseEmulator.lmbSecondaryInput.Key.ToString(), 2, inMod: this.mod);
+                            this.drawCommonControl("Modifier", MoControlsMod.instance.lmbSecondaryInput.ID, MoControlsMod.instance.lmbSecondaryInput.Modifier.ToString(), 1, inMod: this.mod);
+                            this.drawCommonControl("Input", MoControlsMod.instance.lmbSecondaryInput.ID, MoControlsMod.instance.lmbSecondaryInput.Key.ToString(), 2, inMod: this.mod);
                         }
                     }
                 }
@@ -811,21 +787,21 @@ namespace TommoJProductions.MoControls.GUI
                 {
                     using (new gui.VerticalScope("box"))
                     {
-                        gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.rmbPrimaryInput.Name));
+                        gui.Label(String.Format("<b>{0}:</b>", MoControlsMod.instance.rmbPrimaryInput.Name));
                         using (new gui.HorizontalScope())
                         {
-                            this.drawCommonControl("Modifier", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Modifier.ToString(), 1, inMod: this.mod);
-                            this.drawCommonControl("Input", this.mouseEmulator.rmbPrimaryInput.ID, this.mouseEmulator.rmbPrimaryInput.Key.ToString(), 2, inMod: this.mod);
+                            this.drawCommonControl("Modifier", MoControlsMod.instance.rmbPrimaryInput.ID, MoControlsMod.instance.rmbPrimaryInput.Modifier.ToString(), 1, inMod: this.mod);
+                            this.drawCommonControl("Input", MoControlsMod.instance.rmbPrimaryInput.ID, MoControlsMod.instance.rmbPrimaryInput.Key.ToString(), 2, inMod: this.mod);
                         }
                     }
                     ueGUI.backgroundColor = this.secondaryItemColor;
                     using (new gui.VerticalScope("box"))
                     {
-                        gui.Label(String.Format("<b>{0}:</b>", this.mouseEmulator.rmbSecondaryInput.Name));
+                        gui.Label(String.Format("<b>{0}:</b>", MoControlsMod.instance.rmbSecondaryInput.Name));
                         using (new gui.HorizontalScope())
                         {
-                            this.drawCommonControl("Modifier", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Modifier.ToString(), 1, inMod: this.mod);
-                            this.drawCommonControl("Input", this.mouseEmulator.rmbSecondaryInput.ID, this.mouseEmulator.rmbSecondaryInput.Key.ToString(), 2, inMod: this.mod);
+                            this.drawCommonControl("Modifier", MoControlsMod.instance.rmbSecondaryInput.ID, MoControlsMod.instance.rmbSecondaryInput.Modifier.ToString(), 1, inMod: this.mod);
+                            this.drawCommonControl("Input", MoControlsMod.instance.rmbSecondaryInput.ID, MoControlsMod.instance.rmbSecondaryInput.Key.ToString(), 2, inMod: this.mod);
                         }
                     }
                 }
@@ -874,41 +850,57 @@ namespace TommoJProductions.MoControls.GUI
                 string axisName = "PlayerVertical";
                 using (new gui.VerticalScope("box"))
                 {
-                    this.playerV_axisDeadzone = cInput.GetAxisDeadzone(axisName);
-                    gui.Label(axisName + " Deadzone: " + this.playerV_axisDeadzone);
-                    temp = gui.HorizontalSlider(this.playerV_axisDeadzone, 0.0f, 100.0f);
-                    if (temp != this.playerV_axisDeadzone)
+                    MoControlsSaveData.loadedSaveData.playerVert = cInput.GetAxisDeadzone(axisName);
+                    gui.Label(axisName + " Deadzone: " + MoControlsSaveData.loadedSaveData.playerVert);
+                    temp = gui.HorizontalSlider(MoControlsSaveData.loadedSaveData.playerVert, 0.0f, 100.0f);
+                    if (temp != MoControlsSaveData.loadedSaveData.playerVert)
+                    {
                         cInput.SetAxisDeadzone(axisName, temp);
+                        MoControlsSaveData.loadedSaveData.playerVert = temp;
+                        _saveSettings = true;
+                    }
                 }
                 temp = 0;
                 axisName = "PlayerHorizontal";
                 using (new gui.VerticalScope("box"))
                 {
-                    this.playerH_axisDeadzone = cInput.GetAxisDeadzone(axisName);
-                    gui.Label(axisName + " Deadzone: " + this.playerH_axisDeadzone);
-                    temp = gui.HorizontalSlider(this.playerH_axisDeadzone, 0.0f, 100.0f);
-                    if (temp != this.playerH_axisDeadzone)
+                    MoControlsSaveData.loadedSaveData.playerHorz = cInput.GetAxisDeadzone(axisName);
+                    gui.Label(axisName + " Deadzone: " + MoControlsSaveData.loadedSaveData.playerHorz);
+                    temp = gui.HorizontalSlider(MoControlsSaveData.loadedSaveData.playerHorz, 0.0f, 100.0f);
+                    if (temp != MoControlsSaveData.loadedSaveData.playerHorz)
+                    {
                         cInput.SetAxisDeadzone(axisName, temp);
+                        MoControlsSaveData.loadedSaveData.playerHorz = temp;
+                        _saveSettings = true;
+                    }
                 }
                 temp = 0;
                 axisName = "Vertical";
                 using (new gui.VerticalScope("box"))
                 {
-                    this.vert_axisDeadzone = cInput.GetAxisDeadzone(axisName);
-                    gui.Label(axisName + " Deadzone: " + this.vert_axisDeadzone);
-                    temp = gui.HorizontalSlider(this.vert_axisDeadzone, 0.0f, 100.0f);
-                    if (temp != this.vert_axisDeadzone)
+                    MoControlsSaveData.loadedSaveData.vert = cInput.GetAxisDeadzone(axisName);
+                    gui.Label(axisName + " Deadzone: " + MoControlsSaveData.loadedSaveData.vert);
+                    temp = gui.HorizontalSlider(MoControlsSaveData.loadedSaveData.vert, 0.0f, 100.0f);
+                    if (temp != MoControlsSaveData.loadedSaveData.vert)
+                    {
                         cInput.SetAxisDeadzone(axisName, temp);
+                        MoControlsSaveData.loadedSaveData.vert = temp;
+                        _saveSettings = true;
+
+                    }
                 }
                 temp = 0;
                 axisName = "Horizontal";
                 using (new gui.VerticalScope("box"))
                 {
-                    this.hoz_axisDeadzone = cInput.GetAxisDeadzone(axisName);
-                    gui.Label(axisName + " Deadzone: " + this.hoz_axisDeadzone);
-                    temp = gui.HorizontalSlider(this.hoz_axisDeadzone, 0.0f, 100.0f);
-                    if (temp != this.hoz_axisDeadzone)
+                    MoControlsSaveData.loadedSaveData.horz = cInput.GetAxisDeadzone(axisName);
+                    gui.Label(axisName + " Deadzone: " + MoControlsSaveData.loadedSaveData.horz);
+                    temp = gui.HorizontalSlider(MoControlsSaveData.loadedSaveData.horz, 0.0f, 100.0f);
+                    if (temp != MoControlsSaveData.loadedSaveData.horz)
+                    {
                         cInput.SetAxisDeadzone(axisName, temp);
+                        _saveSettings = true;
+                    }
                 }
             }
             using (new gui.HorizontalScope("box"))
@@ -1081,7 +1073,7 @@ namespace TommoJProductions.MoControls.GUI
 
                                 if (_mod is MoControlsMod)
                                 {
-                                    if (modKeybinds[i].ID != this.openControlsGui.ID)
+                                    if (modKeybinds[i].ID != MoControlsMod.instance.openControlsGui.ID)
                                         ignoreKeybind = true;
                                 }
                                 if (!ignoreKeybind)

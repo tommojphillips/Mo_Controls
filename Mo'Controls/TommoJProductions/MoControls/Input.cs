@@ -173,7 +173,7 @@ namespace TommoJProductions.MoControls
                                 }
                                 else
                                 {
-                                    if (kcode != MoControlsGO.moControlsGui.openControlsGui.Key && kcode != cancelKey) // not allowed
+                                    if (kcode != MoControlsMod.instance.openControlsGui.Key && kcode != cancelKey) // not allowed
                                     {
                                         monitorInputData = new MonitorInputData()
                                         {
