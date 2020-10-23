@@ -156,14 +156,14 @@ namespace TommoJProductions.MoControls.InputEmulation
                     if (stickValue != Vector2.zero)
                     {
                         // Deadzone
-                        stickValue = stickValue.doDeadzoneCheck(MoControlsSaveData.loadedSaveData.mouseDeadzone, DeadzoneTypeEnum.ScaledRadial);
+                        stickValue = stickValue.doDeadzoneCheck(MoControlsSaveData.loadedSaveData.mouseDeadzone, MoControlsSaveData.loadedSaveData.mouseDeadzoneType);
                         // Sensitivity
                         stickValue = stickValue.doSensitivityOperation(MoControlsSaveData.loadedSaveData.mouseSensitivity);
 
                         moveX = (int)stickValue.x;
                         moveY = (int)stickValue.y * -1; // '* -1' xbox controller y axis is naturally inverted. so changing the that..;
                         simulateMouseMove(moveX, moveY);
-                        yield return new WaitForEndOfFrame();
+                        yield return null;//new WaitForEndOfFrame();
                     }
                 }
             }
@@ -218,11 +218,6 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// <param name="y">The Y.</param>
         private static void simulateMouseMove(int x, int y)
         {
-            /*Input[] MouseEvent = new Input[1];
-            MouseEvent[0].type = 0;
-            MouseEvent[0].U = createMouseInput(x, y, 0, 0, MouseEventF.MOVE);
-            NM.SendInput((uint)MouseEvent.Length, MouseEvent, Input.Size);*/
-
             // Written, 08.10.2020
 
             send(new Point(x, y), (uint)MouseEventDataXButtons.Nothing, MouseEventF.MOVE);
@@ -236,12 +231,10 @@ namespace TommoJProductions.MoControls.InputEmulation
 
             if (this.lmbPrimaryInput.GetKeybindDown() || this.lmbSecondaryInput.GetKeybindDown())
             {
-                MoControlsMod.print("LMB Down", Debugging.DebugTypeEnum.full);
                 send(getCursorPosition, (uint)MouseEventDataXButtons.XBUTTON1, MouseEventF.LEFTDOWN);
             }
             if (this.lmbPrimaryInput.GetKeybindUp() || this.lmbSecondaryInput.GetKeybindUp())
             {
-                MoControlsMod.print("LMB Up", Debugging.DebugTypeEnum.full);
                 send(getCursorPosition, (uint)MouseEventDataXButtons.XBUTTON1, MouseEventF.LEFTUP);
             }
         }
@@ -254,12 +247,10 @@ namespace TommoJProductions.MoControls.InputEmulation
 
             if (this.rmbPrimaryInput.GetKeybindDown() || this.rmbSecondaryInput.GetKeybindDown())
             {
-                MoControlsMod.print("RMB Down", Debugging.DebugTypeEnum.full);
                 send(getCursorPosition, (uint)MouseEventDataXButtons.XBUTTON2, MouseEventF.RIGHTDOWN);
             }
             if (this.rmbPrimaryInput.GetKeybindUp() || this.rmbSecondaryInput.GetKeybindUp())
             {
-                MoControlsMod.print("RMB Up", Debugging.DebugTypeEnum.full);
                 send(getCursorPosition, (uint)MouseEventDataXButtons.XBUTTON2, MouseEventF.RIGHTUP);
             }
         }
@@ -271,7 +262,6 @@ namespace TommoJProductions.MoControls.InputEmulation
         {
             // Written, 08.10.2020
 
-            MoControlsMod.print(String.Format("Scroll {0} ({1})", inScrollAmount > 0 ? "Up" : "Down", inScrollAmount), Debugging.DebugTypeEnum.full);
             send(getCursorPosition, (uint)inScrollAmount, MouseEventF.WHEEL);
         }
         /// <summary>

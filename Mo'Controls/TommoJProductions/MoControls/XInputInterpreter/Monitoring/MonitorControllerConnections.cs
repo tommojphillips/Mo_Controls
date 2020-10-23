@@ -75,7 +75,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter.Monitoring
                         }
                     }
                 }
-                yield return new WaitForEndOfFrame();
+                yield return null;
             }
         }
         private void Update()

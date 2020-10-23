@@ -14,22 +14,42 @@ namespace TommoJProductions.MoControls
     /// </summary>
     public class MoControlsMod : Mod
     {
-        // Written, 06.07.2018        
+        // Written, 06.07.2018  (Project start date)     
 
         /// <summary>
         /// Represents whether this is a release version
         /// </summary>
         internal static bool isReleaseVersion => false;
+        /// <summary>
+        /// Represents the current version.
+        /// </summary>
+        /// 
+        internal const string VERSION = "1.1.2";
+        /// <summary>
+        /// Represents the latest release version.
+        /// </summary>
+        internal const string LATEST_RELEASE_DATE = "18.10.2020";
+
+#if DEBUG
+        private const bool IS_DEBUG_CONFIG = true;
+#else
+        private const bool IS_DEBUG_CONFIG = false;
+#endif
+
+#if x64
+        private const bool IS_X64 = true;
+#else
+        private const bool IS_x64 = false;
+#endif
 
         #region Mod Fields
 
         public override string ID => "Mo_Controls";
         public override string Name => "Mo'Controls";
         public override string Author => "tommojphillips";
-        public override string Version => "1.1.2";
+        public override string Version => VERSION;
         public override bool UseAssetsFolder => true;
         public override bool SecondPass => true;
-
         #endregion
 
         #region Fields
@@ -47,7 +67,6 @@ namespace TommoJProductions.MoControls
 
         #region Properties
 
-        internal bool loaded { get; private set; } = false;
         /// <summary>
         /// Represents the release version name.
         /// </summary>
@@ -55,7 +74,7 @@ namespace TommoJProductions.MoControls
         {
             get
             {
-                return "<color=" + (isReleaseVersion ? "blue>Release" : "red>Pre-Release") + "</color>";
+                return String.Format("(<color={0}-{2}</color>) {1}", isReleaseVersion ? "blue>Release" : "red>Pre-Release", IS_X64 ? "x64" : "x86", IS_DEBUG_CONFIG ? "DEBUG" : "R");
             }
         }
         /// <summary>
@@ -105,7 +124,8 @@ namespace TommoJProductions.MoControls
 
             instance = this;
             this.performDebugCheck();
-            ModConsole.Print(String.Format("<color=green>{0} <b>v{1}</b> ({2}) ready</color>", this.Name, this.Version, this.releaseVersionName));
+            MoControlsSaveData.loadSettings();
+            ModConsole.Print(String.Format("<color=green>{0} <b>v{1}</b> {2} ready</color>", this.Name, this.Version, this.releaseVersionName));
         }
 
         #endregion
@@ -120,12 +140,17 @@ namespace TommoJProductions.MoControls
         {
             // Written, 15.10.2018
 
-            if (MoControlsSaveData.loadedSaveData.debugMode == DebugTypeEnum.full)
-                return true;
-            if (MoControlsSaveData.loadedSaveData.debugMode == DebugTypeEnum.partial)
-                if (inDebugType == DebugTypeEnum.none)
+            if (MoControlsSaveData.loadedSaveData != null)
+            {
+                if (MoControlsSaveData.loadedSaveData.debugMode == DebugTypeEnum.full)
                     return true;
-            if (MoControlsSaveData.loadedSaveData.debugMode == inDebugType)
+                if (MoControlsSaveData.loadedSaveData.debugMode == DebugTypeEnum.partial)
+                    if (inDebugType == DebugTypeEnum.none)
+                        return true;
+                if (MoControlsSaveData.loadedSaveData.debugMode == inDebugType)
+                    return true;
+            }
+            else
                 return true;
             return false;
         }
@@ -226,7 +251,7 @@ namespace TommoJProductions.MoControls
                     "\r\nRelease version: " + isReleaseVersion +
                     "\r\nDebug Config: True",
                     "<color=orange>Warning</color>: <b>Incorrect Debug/Releaase Configuration</b>");
-#else 
+#else
             if (!isReleaseVersion)
                 ModUI.ShowMessage("<color=orange>Warning</color>: Release Configuration invaild" +
                     "\r\nWas this intentional Tommo? (dev message)" +
@@ -243,25 +268,18 @@ namespace TommoJProductions.MoControls
 
         public override void OnLoad()
         {
-            // Written, 06.07.2018    
+            // Project start date, 06.07.2018 | Modified 28.10.2020   
 
-            MoControlsSaveData.loadSettings();
-            moControlsGameObject = new GameObject(gameObjectName);
-            moControlsGO = moControlsGameObject.AddComponent<MoControlsGO>();
             this.initialize();
             this.performModLoaderVersionCheck();
-            print(this.Name + " v" + this.Version + ": Loaded.", DebugTypeEnum.none);
         }
         public override void SecondPassOnLoad()
         {
-            // Written, 17.10.2020
-
-            MoControlsGO.controlManager.setControls(MoControlsSaveData.loadedSaveData.footControls, MoControlsSaveData.loadedSaveData.drivingControls);
-            MoControlsGO.xboxController.loadControllerAssets();
-            print("Assets returned: " + assets.result, DebugTypeEnum.full);
-            this.loaded = true;
+            // Written, 18.10.2020
+            moControlsGameObject = new GameObject(gameObjectName);
+            moControlsGO = moControlsGameObject.AddComponent<MoControlsGO>();
+            print(this.Name + " v" + this.Version + ": Loaded.", DebugTypeEnum.none);
         }
-
         #endregion
 
     }

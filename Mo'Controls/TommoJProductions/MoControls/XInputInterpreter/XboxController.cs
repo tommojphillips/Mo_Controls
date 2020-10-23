@@ -403,7 +403,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
 
                 this.updateInputMap();
             }
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         /// <summary>
         /// Refreshes the controllers previous state as with the input map.
@@ -663,7 +663,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
                 {
                     if (this.xboxRumbleEvents.Count >= MAX_RUMBLE_EVENTS_PER_FRAME)
                         if (i == MAX_RUMBLE_EVENTS_PER_FRAME)
-                            yield return new WaitForEndOfFrame();
+                            yield return null;
                     XboxRumble currentXboxRumble = this.xboxRumbleEvents[i];
                     float timeLeft = Mathf.Clamp(currentXboxRumble.timer / currentXboxRumble.duration, 0f, 1f);
                     if (timeLeft > 0)

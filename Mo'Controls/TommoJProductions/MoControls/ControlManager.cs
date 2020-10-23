@@ -2,6 +2,7 @@
 using MSCLoader;
 using System;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using TommoJProductions.Debugging;
 using TommoJProductions.MoControls.GUI;
 using TommoJProductions.MoControls.InputEmulation;
@@ -51,6 +52,10 @@ namespace TommoJProductions.MoControls
         /// Reprsents the current player mode.
         /// </summary>
         private PlayerModeEnum? currentPlayerMode;
+        /// <summary>
+        /// Represents the drivetrain gamobject. used for ffb.
+        /// </summary>
+        internal Drivetrain drivetrain;
 
         #endregion
 
@@ -254,6 +259,22 @@ namespace TommoJProductions.MoControls
                 return toolModeGameObject.activeSelf && !handModeGameObject.activeSelf;
             }
         }
+        /// <summary>
+        /// Represents the last rumble pow.
+        /// </summary>
+        internal Vector2 lastRumblePow 
+        {
+            get;
+            private set;
+        }
+        /// <summary>
+        /// Represents the last rumble pow sent to the controller.
+        /// </summary>
+        internal Vector2 lastRumbePowSent 
+        {
+            get;
+            private set;
+        }
 
         #endregion
 
@@ -283,6 +304,7 @@ namespace TommoJProductions.MoControls
         {
             // Written, 08.10.2018
 
+            MoControlsGO.controlManager.setControls(MoControlsSaveData.loadedSaveData.footControls, MoControlsSaveData.loadedSaveData.drivingControls);
             // Setting up toolmode stuff
             toolModeGameObject = GameObject.Find(toolModeLocation);
             handModeGameObject = GameObject.Find(handModeLocation);
@@ -299,6 +321,7 @@ namespace TommoJProductions.MoControls
             this.satsuma = GameObject.Find("SATSUMA(557kg, 248)");
             this.carDynamics = this.satsuma.GetComponent<CarDynamics>();
             this.forceFeedback = this.satsuma.GetComponent<ForceFeedback>();
+            this.drivetrain = this.satsuma.GetComponent<Drivetrain>();
             MoControlsMod.print(nameof(ControlManager) + ": Started", DebugTypeEnum.full);
         }
         /// <summary>
@@ -359,10 +382,10 @@ namespace TommoJProductions.MoControls
             catch (NullReferenceException)
             {
                 MoControlsMod.print(String.Format("control inputs was null; setting {0} inputs to current control settings.", controlListName), DebugTypeEnum.full);
-                if (inPlayerMode == PlayerModeEnum.OnFoot)
-                    this.footControls = loadControlInputsFromCInput();
-                else
+                if (inPlayerMode == PlayerModeEnum.Driving)
                     this.drivingControls = loadControlInputsFromCInput();
+                else
+                    this.footControls = loadControlInputsFromCInput();
             }
             catch
             {
@@ -560,34 +583,79 @@ namespace TommoJProductions.MoControls
         {
             // Written, 16.10.2020
 
-            if (MoControlsGO.xboxController.isConnected && MoControlsSaveData.loadedSaveData.ffbOnXboxController)
-                if (FsmVariables.GlobalVariables.FindFsmString("PlayerCurrentVehicle").Value == "Satsuma")
-                {
-                    float rumbleFloat = this.scaleForceFeedbackRange();
-                    XboxRumble rumble = new XboxRumble()
+            Vector2 rumblePow = this.floatToVector(this.getFfbSetOpt(true));
+
+            if (rumblePow.x > 0 || rumblePow.y > 0)
+            {
+                if (!MoControlsGO.moControlsGui.controlsGuiOpened && MoControlsGO.xboxController.isConnected && MoControlsSaveData.loadedSaveData.ffbOnXboxController)
+
+                    if (FsmVariables.GlobalVariables.FindFsmString("PlayerCurrentVehicle").Value == "Satsuma")
                     {
-                        timer = 0.01f,
-                        duration = 0,
-                        power = this.floatToVector(rumbleFloat)
-                    };
-                    if (rumble.power.x > 0.000f || rumble.power.y > 0.000f)
+                        XboxRumble rumble = new XboxRumble()
+                        {
+                            timer = 0.05f,
+                            duration = 0.025f,
+                            power = rumblePow
+                        };
                         MoControlsGO.xboxController.addRumble(rumble);
+                    }
+                this.lastRumbePowSent = rumblePow;
+            }
+            this.lastRumblePow = rumblePow;
+        }
+        internal float getFfbSetOpt(bool scale = false) 
+        {
+            // Written, 18.10.2020
+
+            float rumbleFloat = 0;
+            if (MoControlsSaveData.loadedSaveData.ffbOption_default)
+            {
+                float _def = this.defaultFfb(); 
+                rumbleFloat = scale && _def != 0 ? this.scaleForceFeedbackRange(_def, 0, this.forceFeedback.clampValue) :_def;
+            }
+            else
+            {
+                if (MoControlsSaveData.loadedSaveData.ffbOption_wheelSlip)
+                    rumbleFloat = Mathf.Clamp(this.wheelSlipBasedFfb(), -1, 1);
+                if (MoControlsSaveData.loadedSaveData.ffbOption_rpmLimiter)
+                {
+                    float _rpm = this.rpmLimiterBasedFfb();
+                    rumbleFloat += scale && _rpm > 0 ? this.scaleForceFeedbackRange(_rpm, this.drivetrain.minRPM, this.drivetrain.maxRPM) : _rpm;
                 }
+            }
+            return rumbleFloat;
+        }
+        private float rpmLimiterBasedFfb()
+        {
+            // Written, 18.10.2020
+
+            if (this.drivetrain.revLimiterTriggered)
+                return this.drivetrain.rpm;
+            return 0;
+
+        }
+        private float wheelSlipBasedFfb() 
+        {
+            // Written, 18.10.2020
+
+            return this.drivetrain.poweredWheels[0].lateralSlip;
+        }
+        private float defaultFfb() 
+        {
+            // Written, 18.10.2020
+
+            return this.carDynamics.forceFeedback;
         }
         /// <summary>
         /// Scales the ffb float value from it's clamped value (<see cref="ForceFeedback.clampValue"/> to xbox's -1f - 1f value range 
         /// </summary>
-        internal float scaleForceFeedbackRange()
+        private float scaleForceFeedbackRange(float value, float min, float max, float clamped = 1)
         {
-            // Written, 16.10.2020
-
-            float ffb = this.carDynamics.forceFeedback;
-            int raw = this.forceFeedback.clampValue;
-            int clamped = 1;
-
-            float m = (-raw - raw) / (-clamped - clamped);
+            // Written, 18.10.2020
+            
+            float m = (max - min) / (clamped - -clamped);
             float c = -clamped * m;
-            float scaled = m * ffb + c;
+            float scaled = m * value + c;
             return scaled;
         }
         /// <summary>

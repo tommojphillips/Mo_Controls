@@ -21,15 +21,10 @@ namespace TommoJProductions.MoControls.InputEmulation
         {
             // Written, 06.10.2020
 
-            MoControlsMod.print("User32.dll=>SendInput started:", Debugging.DebugTypeEnum.full);
             Input[] inputs = new Input[1];
             inputs[0].type = 1; // 1 = Keyboard Input
             inputs[0].U = createKeyEvent(wVk, eventF, 0, UIntPtr.Zero);
-            MoControlsMod.print(string.Format("Sending scs:{0} with flag:{1}", wVk, eventF), Debugging.DebugTypeEnum.full);
-            if (NativeMethods.SendInput((uint)inputs.Length, inputs, Input.Size) == 0)
-                MoControlsMod.print(string.Format("Error: {0}", new Win32Exception(Marshal.GetLastWin32Error()).Message), Debugging.DebugTypeEnum.full);
-            else
-                MoControlsMod.print("SendInput finished without any errors.", Debugging.DebugTypeEnum.full);
+            NativeMethods.SendInput((uint)inputs.Length, inputs, Input.Size);
         }
         /// <summary>
         /// Simulates a key press via User32.dll=>SendInput

@@ -89,9 +89,9 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Occurs when game starts.
         /// </summary>
-        private void Start()
+        private void Awake() 
         {
-            // Written, 08.10.2018
+            // Written, 18.10.2020
 
             xboxControllerManager = this.gameObject.AddComponent<XboxControllerManager>();
             controlManager = this.gameObject.AddComponent<ControlManager>();

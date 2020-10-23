@@ -115,11 +115,17 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 16.07.2018
 
-            foreach (XboxController controller in this.controllers)
+            /*foreach (XboxController controller in this.controllers)
             {
                 StartCoroutine(controller.updateStateCoroutine());
+                if (MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.update)
                 StartCoroutine(controller.handleRumbleCoroutine());
             }
+*/
+            StartCoroutine(this.controllers[0].updateStateCoroutine());
+            if (MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.update)
+                StartCoroutine(this.controllers[0].handleRumbleCoroutine());
+
         }
         /// <summary>
         /// Performs refreshes for every controller within the manager.
@@ -128,10 +134,24 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 16.07.2018
 
-            foreach (XboxController controller in this.controllers)
+            /*foreach (XboxController controller in this.controllers)
             {
+                if (MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.lateUpdate)
+                    StartCoroutine(controller.handleRumbleCoroutine());
                 controller.refresh();
-            }
+            }*/
+
+            if (MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.lateUpdate)
+                StartCoroutine(this.controllers[0].handleRumbleCoroutine());
+            this.controllers[0].refresh();
+        }
+        private void FixedUpdate() 
+        {
+            // Written, 23.10.2020
+
+            if (MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.fixedUpdate)
+                StartCoroutine(this.controllers[0].handleRumbleCoroutine());
+
         }
         /// <summary>
         /// Adds the specified xbox controller to the manager.
@@ -147,6 +167,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
                 if (this.controllers[i] == null)
                 {
                     this.controllers[i] = inXboxController;
+                    this.controllers[i].loadControllerAssets();
                     isControllerAssigned = true;
                     break;
                 }

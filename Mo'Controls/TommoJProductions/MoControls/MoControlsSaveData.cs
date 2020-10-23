@@ -32,6 +32,7 @@ namespace TommoJProductions.MoControls
                     emulateMouse = false,
                     mouseDeadzone = MouseEmulator.DEFAULT_DEADZONE,
                     mouseSensitivity = MouseEmulator.DEFAULT_SENSITIVITY,
+                    mouseDeadzoneType = DeadzoneTypeEnum.ScaledRadial,
                     mouseInputType = InputTypeEnum.RS,
                     displayCurrentPlayerModeOverlay = true,
                     footControls = new string[,]
@@ -129,10 +130,11 @@ namespace TommoJProductions.MoControls
                     displayFfbOverlay = false,
                     ffbOnXboxController = false,
                     ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.update,
-                    moControlsVersion = MoControlsMod.instance.Version,
+                    moControlsVersion = MoControlsMod.VERSION,
                     ffbOption_default = true,
-                    ffbOption_rpm = false,
+                    ffbOption_rpmLimiter = false,
                     ffbOption_wheelSlip = false,
+                    displayVehicleInfoOverlay = false,
                 };
             }
         }
@@ -158,9 +160,9 @@ namespace TommoJProductions.MoControls
         public bool displayFfbOverlay;
         public UnityRuntimeUpdateSchemesEnum ffbHandledOnUpdateScheme;
         public bool ffbOption_default;
-        public bool ffbOption_rpm;
+        public bool ffbOption_rpmLimiter;
         public bool ffbOption_wheelSlip;
-        public bool displayVehicalInfoOverlay;
+        public bool displayVehicleInfoOverlay;
 
         #endregion
 
@@ -173,7 +175,7 @@ namespace TommoJProductions.MoControls
             SaveLoad.SerializeSaveFile(MoControlsMod.instance, this, fileName + fileExtention);
             MoControlsMod.print("saved mo'controls data.", Debugging.DebugTypeEnum.full);
         }
-        internal static MoControlsSaveData loadSettings() 
+        internal static MoControlsSaveData loadSettings()
         {
             // Written, 17.10.2020
 
@@ -197,13 +199,11 @@ namespace TommoJProductions.MoControls
                 createNewSaveFile = true;
                 MoControlsMod.print("An error occured while loading the save file.. overriding with new save file. Maybe mod updated?\nERROR: " + e.Message, Debugging.DebugTypeEnum.none);
             }
-            finally
+            if (createNewSaveFile)
             {
-                if (createNewSaveFile)
-                {
-                    defaultSave.saveSettings();
-                }
+                mcsd = defaultSave;
             }
+
             loadedSaveData = mcsd;
             MoControlsMod.print("loaded mo'controls data.", Debugging.DebugTypeEnum.full);
             return mcsd;

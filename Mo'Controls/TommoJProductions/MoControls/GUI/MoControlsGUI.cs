@@ -3,6 +3,7 @@ using MSCLoader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using TommoJProductions.MoControls.InputEmulation;
 using TommoJProductions.MoControls.XInputInterpreter;
 using UnityEngine;
@@ -332,21 +333,20 @@ namespace TommoJProductions.MoControls.GUI
 
             try
             {
-                if (MoControlsMod.instance.loaded)
+                if (this.controlsGuiOpened)
                 {
-                    if (this.controlsGuiOpened)
-                    {
-                        this.drawMainMenuGUI();
-                        this.drawMainGUI();
-                    }
-                    else
-                    {
+                    this.drawMainMenuGUI();
+                    this.drawMainGUI();
+                }
+                else
+                {
 
-                        if (MoControlsSaveData.loadedSaveData.displayCurrentPlayerModeOverlay)
-                            this.drawPlayerModeOverlayGUI();
-                        if (MoControlsSaveData.loadedSaveData.displayFfbOverlay)
-                            this.drawForceFeedBackOverlayGUI();
-                    }
+                    if (MoControlsSaveData.loadedSaveData.displayCurrentPlayerModeOverlay)
+                        this.drawPlayerModeOverlayGUI();
+                    if (MoControlsSaveData.loadedSaveData.displayFfbOverlay)
+                        this.drawForceFeedBackOverlayGUI();
+                    if (MoControlsSaveData.loadedSaveData.displayVehicleInfoOverlay)
+                        this.drawDrivetrainOverlay();
                 }
             }
             catch (Exception ex)
@@ -385,11 +385,10 @@ namespace TommoJProductions.MoControls.GUI
             using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width(this.mainGuiWidth - SCROLL_BAR_OFFSET), gui.MaxWidth(this.mainGuiWidth - SCROLL_BAR_OFFSET) }))
             {
                 this.mainGUIScrollPosition = scrollViewScope.scrollPosition;
-                gui.Label(String.Format("<b>{0} v{1} ({3}) by {2}</b>",
+                gui.Label(String.Format("<b>{0} v{1} by {2}</b>",
                     this.mod.Name,
                     this.mod.Version,
-                    this.mod.Author,
-                    MoControlsMod.instance.releaseVersionName));
+                    this.mod.Author));
                 if (this.mainGUIMenu != MainGUIMenuEnum.About)
                     gui.Label(String.Format("<b>{0}</b> GUI key bind." +
                         "\r\n<b>{1}</b> Sets as None." +
@@ -428,18 +427,19 @@ namespace TommoJProductions.MoControls.GUI
             string aboutMessage = "<b>Mo'Controls</b> allows the player to have a primary and secondary input for each in-game control," +
                 " the player could set all primary inputs to the keyboard and all secondary inputs to an Xbox Controller to have a seamless" +
                 " swap of the keyboard to Xbox Controller. Mo'Controls also allows the player to have different control profiles for when " +
-                "on foot and when in driving mode! So you can get more out of your controller! Default key to toggle the GUI is " + this.openControlsGui.Key +
-                " or <b>hold down the back button on a connected xbox controller. (> 0.5sec)</b>";
+                "on foot and when in driving mode! So you can get more out of your controller! Key to toggle the GUI is " + this.openControlsGui.Key +
+                " or <b>hold down the back button on a connected xbox controller for (> 0.3sec)</b>";
             string[] features = new string[]
             {
-                "Xbox Controller Support",
+                "Xbox controller support",
                 "Assign two inputs to each game control",
-                "Mouse Emulation; Use your Xbox Controller to control the mouse",
+                "Mouse emulation; use your Xbox controller to control the mouse",
                 "Split control modes for driving & walking",
-                "Hold down the back button on an xbox controller to open the gui.",
-                "Controller GUI Navigation"
+                "Toggle tool/hand mode by holding down the <i>Start</i> button on a connected xbox controller for > 0.3sec",
+                "Controller gui navigation",
+                "Controller vibration/rumble effects; rumble options based on default (toplessgun), rpm, wheel-slip, etc."
             };
-            string footerMessage = "Developed by <b>Tommo J. Armytage. | Latest release: 05.10.2020</b>";
+            string footerMessage = "Developed by <b>Tommo J. Armytage. | Latest release: "+ MoControlsMod.LATEST_RELEASE_DATE +"</b>";
             string joinPrefix = "\r\n# ";
 
             gui.Space(5f);
@@ -517,57 +517,15 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 09.10.2018
 
-            bool _asInput;
-            UnityRuntimeUpdateSchemesEnum scheme = MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme;
-            bool _saveSettings = false;
             gui.Label(string.Format("<b>Xbox Controller</b>: {0}", this.xboxController.isConnected ? "<color=green>connected</color>" : "<color=red>disconnected</color>"));
             gui.Space(5f);
             using (new gui.VerticalScope())
             {
                 ueGUI.backgroundColor = this.moduleBackgroundColor;
-                bool ffbOn = MoControlsSaveData.loadedSaveData.ffbOnXboxController;
-                string toggleString = ffbOn ? "<color=green>On</color>" : "<color=red>Off</color>";
-                if (gui.Toggle(ffbOn, String.Format("FFB: {0}", toggleString)) != ffbOn)
-                {
-                    MoControlsSaveData.loadedSaveData.ffbOnXboxController = !ffbOn;
-                    _saveSettings = true;
-                }
-                using (new gui.HorizontalScope("box"))
-                {
-                    gui.Label("<i><b>FFB on update scheme:</b></i>");
-                    _asInput = MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.update;
-                    if (gui.Toggle(_asInput, String.Format("<b>Update:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
-                    {
-                        if (scheme != UnityRuntimeUpdateSchemesEnum.update)
-                        {
-                            MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.update;
-                            _saveSettings = true;
-                        }
-                    }
-                    _asInput = MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.lateUpdate;
-                    if (gui.Toggle(_asInput, String.Format("<b>Late Update:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
-                    {
-                        if (scheme != UnityRuntimeUpdateSchemesEnum.lateUpdate)
-                        {
-                            MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.lateUpdate;
-                            _saveSettings = true;
-                        }
-                    }
-                    _asInput = MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.fixedUpdate;
-                    if (gui.Toggle(_asInput, String.Format("<b>Fixed Update:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
-                    {
-                        if (scheme != UnityRuntimeUpdateSchemesEnum.fixedUpdate)
-                        {
-                            MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.fixedUpdate;
-                            _saveSettings = true;
-                        }
-                    }
-                }
+                this.drawControllerFFBContent();
                 this.drawControllerInputContent();
                 ueGUI.backgroundColor = this.backgroundColor;
             }
-            if (_saveSettings)
-                MoControlsSaveData.loadedSaveData.saveSettings();
         }
         /// <summary>
         /// Draws controller input content.
@@ -639,6 +597,94 @@ namespace TommoJProductions.MoControls.GUI
             }
         }
         /// <summary>
+        /// Draws controller force feedback content.
+        /// </summary>
+        private void drawControllerFFBContent()
+        {
+            // Written, 18.10.2020
+
+            bool _saveSettings = false;
+            bool _asInput;
+            bool ffbOn = MoControlsSaveData.loadedSaveData.ffbOnXboxController;
+            bool ffbOptDefault = MoControlsSaveData.loadedSaveData.ffbOption_default;
+            bool ffbOptRpm = MoControlsSaveData.loadedSaveData.ffbOption_rpmLimiter;
+            bool ffbOptWheelSlip = MoControlsSaveData.loadedSaveData.ffbOption_wheelSlip;
+            if (gui.Toggle(ffbOn, String.Format("FFB: {0}", ffbOn ? "<color=green>On</color>" : "<color=red>Off</color>")) != ffbOn)
+            {
+                MoControlsSaveData.loadedSaveData.ffbOnXboxController = !ffbOn;
+                _saveSettings = true;
+            }
+            using (new gui.HorizontalScope("box"))
+            {
+                gui.Label("<i><b>FFB Options</b></i>");
+                if (gui.Toggle(ffbOptDefault, String.Format("Default ffb: {0}", ffbOptDefault ? "<color=green>On</color>" : "<color=red>Off</color>"))
+                    != ffbOptDefault)
+                {
+                    // only default opt allowed if enabled
+                    MoControlsSaveData.loadedSaveData.ffbOption_default = !ffbOptDefault;
+                    if (MoControlsSaveData.loadedSaveData.ffbOption_default)
+                    {
+                        if (ffbOptRpm)
+                            MoControlsSaveData.loadedSaveData.ffbOption_rpmLimiter = false;
+                        if (ffbOptWheelSlip)
+                            MoControlsSaveData.loadedSaveData.ffbOption_wheelSlip = false;
+                    }
+                    _saveSettings = true;
+                }
+                if (gui.Toggle(ffbOptRpm, String.Format("RPM Limiter ffb: {0}", ffbOptRpm ? "<color=green>On</color>" : "<color=red>Off</color>"))
+                   != ffbOptRpm)
+                {
+                    MoControlsSaveData.loadedSaveData.ffbOption_rpmLimiter = !ffbOptRpm;
+                    if (MoControlsSaveData.loadedSaveData.ffbOption_rpmLimiter)
+                        if (MoControlsSaveData.loadedSaveData.ffbOption_default)
+                            MoControlsSaveData.loadedSaveData.ffbOption_default = false;
+                    _saveSettings = true;
+                }
+                if (gui.Toggle(ffbOptWheelSlip, String.Format("WheelSlip ffb: {0}", ffbOptWheelSlip ? "<color=green>On</color>" : "<color=red>Off</color>"))
+                   != ffbOptWheelSlip)
+                {
+                    MoControlsSaveData.loadedSaveData.ffbOption_wheelSlip = !ffbOptWheelSlip;
+                    if (MoControlsSaveData.loadedSaveData.ffbOption_wheelSlip)
+                        if (MoControlsSaveData.loadedSaveData.ffbOption_default)
+                            MoControlsSaveData.loadedSaveData.ffbOption_default = false;
+                    _saveSettings = true;
+                }
+            }
+            using (new gui.HorizontalScope("box"))
+            {
+                gui.Label("<i><b>FFB on update scheme:</b></i>");
+                _asInput = MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.update;
+                if (gui.Toggle(_asInput, String.Format("<b>Update:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
+                {
+                    if (!_asInput)
+                    {
+                        MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.update;
+                        _saveSettings = true;
+                    }
+                }
+                _asInput = MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.lateUpdate;
+                if (gui.Toggle(_asInput, String.Format("<b>Late Update:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
+                {
+                    if (!_asInput)
+                    {
+                        MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.lateUpdate;
+                        _saveSettings = true;
+                    }
+                }
+                _asInput = MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.fixedUpdate;
+                if (gui.Toggle(_asInput, String.Format("<b>Fixed Update:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
+                {
+                    if (!_asInput)
+                    {
+                        MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.fixedUpdate;
+                        _saveSettings = true;
+                    }
+                }
+            }
+            if (_saveSettings)
+                MoControlsSaveData.loadedSaveData.saveSettings();
+        }
+        /// <summary>
         /// Draws mouse emulation content to the main gui.
         /// </summary>
         private void drawMouseEmulationContent()
@@ -671,7 +717,7 @@ namespace TommoJProductions.MoControls.GUI
                     _asInput = MoControlsSaveData.loadedSaveData.mouseInputType == InputTypeEnum.LS;
                     if (gui.Toggle(_asInput, String.Format("<b>Left Stick:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
-                        if (MoControlsSaveData.loadedSaveData.mouseInputType != InputTypeEnum.LS)
+                        if (!_asInput)
                         {
                             MoControlsSaveData.loadedSaveData.mouseInputType = InputTypeEnum.LS;
                             saveSettings = true;
@@ -680,7 +726,7 @@ namespace TommoJProductions.MoControls.GUI
                     _asInput = MoControlsSaveData.loadedSaveData.mouseInputType == InputTypeEnum.RS;
                     if (gui.Toggle(_asInput, String.Format("<b>Right Stick:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
-                        if (MoControlsSaveData.loadedSaveData.mouseInputType != InputTypeEnum.RS)
+                        if (_asInput)
                         {
                             MoControlsSaveData.loadedSaveData.mouseInputType = InputTypeEnum.RS;
                             saveSettings = true;
@@ -689,7 +735,7 @@ namespace TommoJProductions.MoControls.GUI
                     _asInput = MoControlsSaveData.loadedSaveData.mouseInputType == InputTypeEnum.DPad;
                     if (gui.Toggle(_asInput, String.Format("<b>Directional Pad:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
-                        if (MoControlsSaveData.loadedSaveData.mouseInputType != InputTypeEnum.DPad)
+                        if (!_asInput)
                         {
                             MoControlsSaveData.loadedSaveData.mouseInputType = InputTypeEnum.DPad;
                             saveSettings = true;
@@ -702,7 +748,7 @@ namespace TommoJProductions.MoControls.GUI
                     _asInput = MoControlsSaveData.loadedSaveData.mouseDeadzoneType == DeadzoneTypeEnum.Radial;
                     if (gui.Toggle(_asInput, String.Format("<b>Radial:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
-                        if (MoControlsSaveData.loadedSaveData.mouseDeadzoneType != DeadzoneTypeEnum.Radial)
+                        if (!_asInput)
                         {
                             MoControlsSaveData.loadedSaveData.mouseDeadzoneType = DeadzoneTypeEnum.Radial;
                             saveSettings = true;
@@ -711,7 +757,7 @@ namespace TommoJProductions.MoControls.GUI
                     _asInput = MoControlsSaveData.loadedSaveData.mouseDeadzoneType == DeadzoneTypeEnum.ScaledRadial;
                     if (gui.Toggle(_asInput, String.Format("<b>Scaled Radial:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
-                        if (MoControlsSaveData.loadedSaveData.mouseDeadzoneType != DeadzoneTypeEnum.ScaledRadial)
+                        if (!_asInput)
                         {
                             MoControlsSaveData.loadedSaveData.mouseDeadzoneType = DeadzoneTypeEnum.ScaledRadial;
                             saveSettings = true;
@@ -831,6 +877,11 @@ namespace TommoJProductions.MoControls.GUI
                 if (gui.Toggle(MoControlsSaveData.loadedSaveData.displayFfbOverlay, "Display force feedback overlay") != MoControlsSaveData.loadedSaveData.displayFfbOverlay)
                 {
                     MoControlsSaveData.loadedSaveData.displayFfbOverlay = !MoControlsSaveData.loadedSaveData.displayFfbOverlay;
+                    _saveSettings = true;
+                }
+                if (gui.Toggle(MoControlsSaveData.loadedSaveData.displayVehicleInfoOverlay, "Display vehicle info overlay") != MoControlsSaveData.loadedSaveData.displayVehicleInfoOverlay)
+                {
+                    MoControlsSaveData.loadedSaveData.displayVehicleInfoOverlay = !MoControlsSaveData.loadedSaveData.displayVehicleInfoOverlay;
                     _saveSettings = true;
                 }
             }
@@ -1126,14 +1177,33 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 16.10.2020
 
-            using (new gui.AreaScope(new Rect(Screen.width / 2, 22, 180, 200)))
+            using (new gui.AreaScope(new Rect(Screen.width / 2, 20, 180, 200)))
             {
-                gui.Label(String.Format("FFB: {4}\nClamp: {0}\nFactor: {1}\nForce: {2}\nMultiplier: {3}",
+                gui.Label(String.Format("FFB: {3}, Scaled:({4})\nClamp: {0}\nForce: {1}\nMultiplier: {2}",
                     this.controlManager.forceFeedback.clampValue,
-                    this.controlManager.forceFeedback.factor,
                     this.controlManager.forceFeedback.force,
                     this.controlManager.forceFeedback.multiplier,
-                    this.controlManager.carDynamics.forceFeedback));
+                    this.controlManager.getFfbSetOpt(),
+                    this.controlManager.getFfbSetOpt(true)));
+            }
+        }
+        /// <summary>
+        /// Draws drivetrain related info as a overlay.
+        /// </summary>
+        private void drawDrivetrainOverlay()
+        {
+            // Written, 18.10.2020
+
+            using (new gui.AreaScope(new Rect(180 + Screen.width / 2, 22, 180, 300)))
+            {
+                Drivetrain dt = this.controlManager.drivetrain;
+                CarDynamics cd = this.controlManager.carDynamics;
+                gui.Label(new StringBuilder().AppendFormat("Drivetrain: rpm: {2}\nrange: {0}-{1}\nRev Limiter: {3} | {6} ({7})\nVelo: {4}\nWheelVelo: {5}\nShift Triggered: {8} ({9})\nLateralSlip velo rear wheels: {10}\nSlip Velo: {11}",
+                    dt.minRPM.ToString("0"), dt.maxRPM, dt.rpm.ToString("0"), dt.revLimiter, dt.velo, dt.wheelTireVelo, dt.revLimiterTriggered, dt.revLimiterTime, dt.shiftTriggered, dt.shiftTime, cd.LateralSlipVeloRearWheels(), cd.SlipVelo()).ToString());
+                /*gui.Label(String.Format("Drivetrain: rpm: {2}\nrange: {0}-{1}\nRev Limiter: {3} | {6} ({7})\nVelo: {4}\nWheelVelo: " +
+                    "{5}\nShift Triggered: {8} ({9})\nLateralSlip velo rear wheels: {10}\nSlip Velo: {11}",
+                    dt.minRPM, dt.maxRPM, dt.rpm, dt.revLimiter, dt.velo, dt.wheelTireVelo, dt.revLimiterTriggered, dt.revLimiterTime,
+                    dt.shiftTriggered, dt.shiftTime, cd.LateralSlipVeloRearWheels(), cd.SlipVelo()));*/
             }
         }
 
