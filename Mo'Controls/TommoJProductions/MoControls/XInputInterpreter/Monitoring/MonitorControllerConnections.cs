@@ -16,17 +16,17 @@ namespace TommoJProductions.MoControls.XInputInterpreter.Monitoring
         /// <summary>
         /// Represents a List of xbox controllers to monitor.
         /// </summary>
-        private XboxController[] xboxControllers
+        private XboxController xboxController
         {
             get
             {
-                return this.xboxControllerManager.controllers;
+                return this.xboxControllerManager.controller;
             }
         }
         /// <summary>
         /// Represents an array of connections.
         /// </summary>
-        private ControllerConnection[] controllerConnections
+        private ControllerConnection controllerConnection
         {
             get;
             set;
@@ -36,13 +36,12 @@ namespace TommoJProductions.MoControls.XInputInterpreter.Monitoring
 
         #region Methods
 
-        private void Start() 
+        private void Start()
         {
             // Written, 17.10.2020
 
-            this.xboxControllerManager = GetComponent<XboxControllerManager>(); 
-            this.controllerConnections = new ControllerConnection[] { new ControllerConnection() /*{ currentConnectionStatus = xboxControllers[0].isConnected, previousConnectionStatus = null }*/ };
-            //Only supports 1 controller currently.. no point enumating.
+            this.xboxControllerManager = GetComponent<XboxControllerManager>();
+            this.controllerConnection = new ControllerConnection();
         }
         private IEnumerator updateCoroutine()
         {
@@ -50,27 +49,22 @@ namespace TommoJProductions.MoControls.XInputInterpreter.Monitoring
 
             if (MoControlsSaveData.loadedSaveData.monitiorXboxControllerConnectionStatus)
             {
-                for (int i = 0; i < this.xboxControllers.Length; i++)
+                if (xboxController != null)
                 {
-                    ControllerConnection controllerConnection = this.controllerConnections[i];
-                    XboxController xboxController = xboxControllers[i];
-                    if (xboxController != null)
+                    if (xboxController.isConnected != controllerConnection.currentConnectionStatus)
                     {
-                        if (xboxController.isConnected != controllerConnection.currentConnectionStatus)
-                        {
-                            controllerConnection.previousConnectionStatus = controllerConnection.currentConnectionStatus;
-                            controllerConnection.currentConnectionStatus = xboxController.isConnected;
+                        controllerConnection.previousConnectionStatus = controllerConnection.currentConnectionStatus;
+                        controllerConnection.currentConnectionStatus = xboxController.isConnected;
 
-                            if (controllerConnection.currentConnectionStatus == true)
+                        if (controllerConnection.currentConnectionStatus == true)
+                        {
+                            XboxControllerManager.onControllerConnected(new ControllerConnectionEventArgs(xboxController));
+                        }
+                        else
+                        {
+                            if (controllerConnection.currentConnectionStatus == false)
                             {
-                                XboxControllerManager.onControllerConnected(new ControllerConnectionEventArgs(xboxController));
-                            }
-                            else
-                            {
-                                if (controllerConnection.currentConnectionStatus == false)
-                                {
-                                    XboxControllerManager.onControllerDisconnected(new ControllerConnectionEventArgs(xboxController));
-                                }
+                                XboxControllerManager.onControllerDisconnected(new ControllerConnectionEventArgs(xboxController));
                             }
                         }
                     }

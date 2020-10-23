@@ -24,7 +24,8 @@ namespace TommoJProductions.MoControls.InputEmulation
             Input[] inputs = new Input[1];
             inputs[0].type = 1; // 1 = Keyboard Input
             inputs[0].U = createKeyEvent(wVk, eventF, 0, UIntPtr.Zero);
-            NativeMethods.SendInput((uint)inputs.Length, inputs, Input.Size);
+            if (NativeMethods.SendInput((uint)inputs.Length, inputs, Input.Size) == 0)
+                MoControlsMod.print(string.Format("Error: {0}", new Win32Exception(Marshal.GetLastWin32Error()).Message), Debugging.DebugTypeEnum.full);
         }
         /// <summary>
         /// Simulates a key press via User32.dll=>SendInput
@@ -52,7 +53,7 @@ namespace TommoJProductions.MoControls.InputEmulation
 
             InputUnion result = new InputUnion
             {
-                ki = new KEYBDINPUT()
+                ki = new KeyboardInput()
                 {
                     dwExtraInfo = dwExtraInfo,
                     dwFlags = dwFlags,

@@ -1,5 +1,4 @@
 ﻿using MSCLoader;
-using System;
 using System.Collections;
 using System.Drawing;
 using TommoJProductions.MoControls.XInputInterpreter;
@@ -220,7 +219,7 @@ namespace TommoJProductions.MoControls.InputEmulation
         {
             // Written, 08.10.2020
 
-            send(new Point(x, y), (uint)MouseEventDataXButtons.Nothing, MouseEventF.MOVE);
+            send(new Point(x, y), (uint)MouseEventButtons.Nothing, MouseEventF.MOVE);
         }
         /// <summary>
         /// Simulates a left mouse button click.
@@ -231,11 +230,11 @@ namespace TommoJProductions.MoControls.InputEmulation
 
             if (this.lmbPrimaryInput.GetKeybindDown() || this.lmbSecondaryInput.GetKeybindDown())
             {
-                send(getCursorPosition, (uint)MouseEventDataXButtons.XBUTTON1, MouseEventF.LEFTDOWN);
+                send(getCursorPosition, (uint)MouseEventButtons.XBUTTON1, MouseEventF.LEFTDOWN);
             }
             if (this.lmbPrimaryInput.GetKeybindUp() || this.lmbSecondaryInput.GetKeybindUp())
             {
-                send(getCursorPosition, (uint)MouseEventDataXButtons.XBUTTON1, MouseEventF.LEFTUP);
+                send(getCursorPosition, (uint)MouseEventButtons.XBUTTON1, MouseEventF.LEFTUP);
             }
         }
         /// <summary>
@@ -247,11 +246,11 @@ namespace TommoJProductions.MoControls.InputEmulation
 
             if (this.rmbPrimaryInput.GetKeybindDown() || this.rmbSecondaryInput.GetKeybindDown())
             {
-                send(getCursorPosition, (uint)MouseEventDataXButtons.XBUTTON2, MouseEventF.RIGHTDOWN);
+                send(getCursorPosition, (uint)MouseEventButtons.XBUTTON2, MouseEventF.RIGHTDOWN);
             }
             if (this.rmbPrimaryInput.GetKeybindUp() || this.rmbSecondaryInput.GetKeybindUp())
             {
-                send(getCursorPosition, (uint)MouseEventDataXButtons.XBUTTON2, MouseEventF.RIGHTUP);
+                send(getCursorPosition, (uint)MouseEventButtons.XBUTTON2, MouseEventF.RIGHTUP);
             }
         }
         /// <summary>

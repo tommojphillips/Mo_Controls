@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Mo_Controls")]
-[assembly: AssemblyDescription("A mod for my summer car that implements full xbox controller support")]
+[assembly: AssemblyDescription("A mod for my summer car that implements full xbox controller support eg rumble support")]
 [assembly: AssemblyConfiguration("x64")]
 [assembly: AssemblyCompany("Tommo J. Productions")]
 [assembly: AssemblyProduct("Mo'Controls v1.1.2")]

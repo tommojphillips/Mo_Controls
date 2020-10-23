@@ -19,7 +19,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents whether this is a release version
         /// </summary>
-        internal static bool isReleaseVersion => false;
+        internal static bool isReleaseVersion => true;
         /// <summary>
         /// Represents the current version.
         /// </summary>
@@ -28,7 +28,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents the latest release version.
         /// </summary>
-        internal const string LATEST_RELEASE_DATE = "18.10.2020";
+        internal const string LATEST_RELEASE_DATE = "23.10.2020";
 
 #if DEBUG
         private const bool IS_DEBUG_CONFIG = true;

@@ -1,5 +1,4 @@
-﻿using System;
-using TommoJProductions.MoControls.GUI;
+﻿using TommoJProductions.MoControls.GUI;
 using TommoJProductions.MoControls.InputEmulation;
 using TommoJProductions.MoControls.XInputInterpreter;
 using UnityEngine;
@@ -78,7 +77,7 @@ namespace TommoJProductions.MoControls
         {
             get
             {
-                return xboxControllerManager.controllers[0];
+                return xboxControllerManager.controller;
             }
         }
 
@@ -89,7 +88,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Occurs when game starts.
         /// </summary>
-        private void Awake() 
+        private void Awake()
         {
             // Written, 18.10.2020
 

@@ -7,7 +7,7 @@ namespace TommoJProductions.MoControls.InputEmulation
     /// Represents keyboard input
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct KEYBDINPUT
+    public struct KeyboardInput
     {
         internal VirtualKeyShort wVk;
         internal ScanCodeShort wScan;

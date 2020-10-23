@@ -439,7 +439,7 @@ namespace TommoJProductions.MoControls.GUI
                 "Controller gui navigation",
                 "Controller vibration/rumble effects; rumble options based on default (toplessgun), rpm, wheel-slip, etc."
             };
-            string footerMessage = "Developed by <b>Tommo J. Armytage. | Latest release: "+ MoControlsMod.LATEST_RELEASE_DATE +"</b>";
+            string footerMessage = "Developed by <b>Tommo J. Armytage. | Latest release: " + MoControlsMod.LATEST_RELEASE_DATE + "</b>";
             string joinPrefix = "\r\n# ";
 
             gui.Space(5f);
@@ -604,11 +604,11 @@ namespace TommoJProductions.MoControls.GUI
             // Written, 18.10.2020
 
             bool _saveSettings = false;
-            bool _asInput;
             bool ffbOn = MoControlsSaveData.loadedSaveData.ffbOnXboxController;
             bool ffbOptDefault = MoControlsSaveData.loadedSaveData.ffbOption_default;
             bool ffbOptRpm = MoControlsSaveData.loadedSaveData.ffbOption_rpmLimiter;
             bool ffbOptWheelSlip = MoControlsSaveData.loadedSaveData.ffbOption_wheelSlip;
+            bool ffbOptGearChange = MoControlsSaveData.loadedSaveData.ffbOption_gearChange;
             if (gui.Toggle(ffbOn, String.Format("FFB: {0}", ffbOn ? "<color=green>On</color>" : "<color=red>Off</color>")) != ffbOn)
             {
                 MoControlsSaveData.loadedSaveData.ffbOnXboxController = !ffbOn;
@@ -628,10 +628,12 @@ namespace TommoJProductions.MoControls.GUI
                             MoControlsSaveData.loadedSaveData.ffbOption_rpmLimiter = false;
                         if (ffbOptWheelSlip)
                             MoControlsSaveData.loadedSaveData.ffbOption_wheelSlip = false;
+                        if (ffbOptGearChange)
+                            MoControlsSaveData.loadedSaveData.ffbOption_gearChange = false;
                     }
                     _saveSettings = true;
                 }
-                if (gui.Toggle(ffbOptRpm, String.Format("RPM Limiter ffb: {0}", ffbOptRpm ? "<color=green>On</color>" : "<color=red>Off</color>"))
+                if (gui.Toggle(ffbOptRpm, String.Format("RPM limiter ffb: {0}", ffbOptRpm ? "<color=green>On</color>" : "<color=red>Off</color>"))
                    != ffbOptRpm)
                 {
                     MoControlsSaveData.loadedSaveData.ffbOption_rpmLimiter = !ffbOptRpm;
@@ -640,7 +642,7 @@ namespace TommoJProductions.MoControls.GUI
                             MoControlsSaveData.loadedSaveData.ffbOption_default = false;
                     _saveSettings = true;
                 }
-                if (gui.Toggle(ffbOptWheelSlip, String.Format("WheelSlip ffb: {0}", ffbOptWheelSlip ? "<color=green>On</color>" : "<color=red>Off</color>"))
+                if (gui.Toggle(ffbOptWheelSlip, String.Format("Wheel slip ffb: {0}", ffbOptWheelSlip ? "<color=green>On</color>" : "<color=red>Off</color>"))
                    != ffbOptWheelSlip)
                 {
                     MoControlsSaveData.loadedSaveData.ffbOption_wheelSlip = !ffbOptWheelSlip;
@@ -649,36 +651,14 @@ namespace TommoJProductions.MoControls.GUI
                             MoControlsSaveData.loadedSaveData.ffbOption_default = false;
                     _saveSettings = true;
                 }
-            }
-            using (new gui.HorizontalScope("box"))
-            {
-                gui.Label("<i><b>FFB on update scheme:</b></i>");
-                _asInput = MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.update;
-                if (gui.Toggle(_asInput, String.Format("<b>Update:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
+                if (gui.Toggle(ffbOptGearChange, String.Format("Gear change ffb: {0}", ffbOptGearChange ? "<color=green>On</color>" : "<color=red>Off</color>"))
+                  != ffbOptGearChange)
                 {
-                    if (!_asInput)
-                    {
-                        MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.update;
-                        _saveSettings = true;
-                    }
-                }
-                _asInput = MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.lateUpdate;
-                if (gui.Toggle(_asInput, String.Format("<b>Late Update:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
-                {
-                    if (!_asInput)
-                    {
-                        MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.lateUpdate;
-                        _saveSettings = true;
-                    }
-                }
-                _asInput = MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.fixedUpdate;
-                if (gui.Toggle(_asInput, String.Format("<b>Fixed Update:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
-                {
-                    if (!_asInput)
-                    {
-                        MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.fixedUpdate;
-                        _saveSettings = true;
-                    }
+                    MoControlsSaveData.loadedSaveData.ffbOption_gearChange = !ffbOptGearChange;
+                    if (MoControlsSaveData.loadedSaveData.ffbOption_gearChange)
+                        if (MoControlsSaveData.loadedSaveData.ffbOption_default)
+                            MoControlsSaveData.loadedSaveData.ffbOption_default = false;
+                    _saveSettings = true;
                 }
             }
             if (_saveSettings)
@@ -1177,14 +1157,18 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 16.10.2020
 
-            using (new gui.AreaScope(new Rect(Screen.width / 2, 20, 180, 200)))
+            using (new gui.AreaScope(new Rect(Screen.width / 2, 20, 200, 200)))
             {
-                gui.Label(String.Format("FFB: {3}, Scaled:({4})\nClamp: {0}\nForce: {1}\nMultiplier: {2}",
-                    this.controlManager.forceFeedback.clampValue,
-                    this.controlManager.forceFeedback.force,
-                    this.controlManager.forceFeedback.multiplier,
-                    this.controlManager.getFfbSetOpt(),
-                    this.controlManager.getFfbSetOpt(true)));
+                if (this.controlManager.vehicle != null)
+                {
+                    gui.Label(String.Format("FFB: {0}\nLast Rumble Sent: {1}",
+                        this.controlManager.getFfbSetOpt().ToString("0.###"),
+                        this.xboxController.prevRumblePow.magnitude.ToString("0.###")));
+                }
+                else
+                {
+                    gui.Label("No supported vehicle found.\nCurrent vehicle: " + ControlManager.getCurrentVehicle);
+                }
             }
         }
         /// <summary>
@@ -1194,16 +1178,29 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 18.10.2020
 
-            using (new gui.AreaScope(new Rect(180 + Screen.width / 2, 22, 180, 300)))
+            using (new gui.AreaScope(new Rect(200 + Screen.width / 2, 22, 200, 300)))
             {
-                Drivetrain dt = this.controlManager.drivetrain;
-                CarDynamics cd = this.controlManager.carDynamics;
-                gui.Label(new StringBuilder().AppendFormat("Drivetrain: rpm: {2}\nrange: {0}-{1}\nRev Limiter: {3} | {6} ({7})\nVelo: {4}\nWheelVelo: {5}\nShift Triggered: {8} ({9})\nLateralSlip velo rear wheels: {10}\nSlip Velo: {11}",
-                    dt.minRPM.ToString("0"), dt.maxRPM, dt.rpm.ToString("0"), dt.revLimiter, dt.velo, dt.wheelTireVelo, dt.revLimiterTriggered, dt.revLimiterTime, dt.shiftTriggered, dt.shiftTime, cd.LateralSlipVeloRearWheels(), cd.SlipVelo()).ToString());
-                /*gui.Label(String.Format("Drivetrain: rpm: {2}\nrange: {0}-{1}\nRev Limiter: {3} | {6} ({7})\nVelo: {4}\nWheelVelo: " +
-                    "{5}\nShift Triggered: {8} ({9})\nLateralSlip velo rear wheels: {10}\nSlip Velo: {11}",
-                    dt.minRPM, dt.maxRPM, dt.rpm, dt.revLimiter, dt.velo, dt.wheelTireVelo, dt.revLimiterTriggered, dt.revLimiterTime,
-                    dt.shiftTriggered, dt.shiftTime, cd.LateralSlipVeloRearWheels(), cd.SlipVelo()));*/
+                if (this.controlManager.vehicle != null)
+                {
+                    Drivetrain dt = this.controlManager.drivetrain;
+                    CarDynamics cd = this.controlManager.carDynamics;
+                    gui.Label(new StringBuilder().AppendFormat("{9} drivetrain:\nRpm: {2}\nRange: {0}-{1}\nRev Limiter: {3} ({4})\nShift Triggered: {5} ({6})\nLongitudeSlip: {7}\nLateralSlip: {8}",
+                        dt.minRPM.ToString("0"),
+                        dt.maxRPM,
+                        dt.rpm.ToString("0"),
+                        dt.revLimiterTriggered,
+                        dt.revLimiterTime,
+                        dt.shiftTriggered,
+                        dt.shiftTime,
+                        dt.poweredWheels.Max(_wheel => _wheel.longitunalSlipVelo).ToString("0.###"),
+                        dt.poweredWheels.Max(_wheel => _wheel.lateralSlipVelo).ToString("0.###"),
+                        String.IsNullOrEmpty(ControlManager.currentVehicleName) ? "NaN" : ControlManager.currentVehicleName).ToString());;
+
+                }
+                else
+                {
+                    gui.Label("No supported vehicle found.\nCurrent vehicle: " + ControlManager.getCurrentVehicle);
+                }
             }
         }
 

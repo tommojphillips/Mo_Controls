@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using UnityEngine;
 using XInputDotNetPure;
 
@@ -9,12 +10,17 @@ namespace TommoJProductions.MoControls.XInputInterpreter
     /// <summary>
     /// Represents an xbox controller.
     /// </summary>
-    public class XboxController
+    public class XboxController : MonoBehaviour
     {
         // Written, 16.07.2018
 
         #region Fields
 
+        internal Vector2 prevRumblePow;
+        /// <summary>
+        /// Represents if the user has request toolmode change via, <see cref="HoldInputMono"/>. see:<see cref="toggleToolMode"/>.
+        /// </summary>
+        internal bool _requestedModeChange;
         /// <summary>
         /// Represents the button prefix.
         /// </summary>
@@ -58,10 +64,6 @@ namespace TommoJProductions.MoControls.XInputInterpreter
                 new XboxFloatState(String.Format("{0}5-", axisPrefix), "RS-Up"),
                 new XboxFloatState(String.Format("{0}5+", axisPrefix), "RS-Down")
         };
-        /// <summary>
-        /// Represents the max number of events that can be processed per frame.
-        /// </summary>
-        private const int MAX_RUMBLE_EVENTS_PER_FRAME = 5;
 
         #endregion
 
@@ -78,7 +80,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents whether the controller is connect or not.
         /// </summary>
-        public bool isConnected
+        internal bool isConnected
         {
             get
             {
@@ -88,7 +90,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the index of the controller (1 - 4).
         /// </summary>
-        public int index
+        internal int index
         {
             get
             {
@@ -328,11 +330,11 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// Initializes a new instance of <see cref="XboxController"/> and sets the index of the controller (1 - 4).
         /// </summary>
         /// <param name="inIndex">The controller index to set, 1 - 4.</param>
-        public XboxController(int inIndex)
+        public XboxController()
         {
             // Written, 16.07.2018
 
-            this.gamePadIndex = inIndex - 1;
+            this.gamePadIndex = 0;
             this.playerIndex = (PlayerIndex)this.gamePadIndex;
             this.xboxRumbleEvents = new List<XboxRumble>();
             this.inputMap = new Dictionary<string, XboxControl>();
@@ -352,17 +354,38 @@ namespace TommoJProductions.MoControls.XInputInterpreter
                 this.xboxControls[22] as XboxFloatState,
                 this.xboxControls[23] as XboxFloatState);
 
-            #endregion            
+            #endregion
+
+            this.loadControllerAssets();
         }
 
         #endregion
 
         #region Methods
 
+        private void Update()
+        {
+            // Written, 23.10.2020
+
+
+            if (this._requestedModeChange)
+            {
+                MoControlsMod.print("Identified changemode request.", Debugging.DebugTypeEnum.full);
+                MoControlsGO.controlManager.toggleToolMode();
+                this._requestedModeChange = false;
+            }
+            this.update();
+        }
+        private void LateUpdate()
+        {
+            // Written, 23.10.2020
+
+            this.refresh();
+        }
         /// <summary>
         /// Updates the controllers state as with the input map, and handles current rumbles.
         /// </summary>
-        internal IEnumerator updateStateCoroutine()
+        private void update()
         {
             // Written, 16.10.2020
 
@@ -403,12 +426,11 @@ namespace TommoJProductions.MoControls.XInputInterpreter
 
                 this.updateInputMap();
             }
-            yield return null;
         }
         /// <summary>
         /// Refreshes the controllers previous state as with the input map.
         /// </summary>
-        public void refresh()
+        private void refresh()
         {
             // Written, 16.07.2018 | Modified, 09.10.2020
 
@@ -455,7 +477,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// </summary>
         /// <param name="inXboxButton">The button to check</param>
         /// <returns></returns>
-        public bool getButtonPressed(XboxButtonEnum inXboxButton)
+        internal bool getButtonPressed(XboxButtonEnum inXboxButton)
         {
             // Written, 16.07.2018
 
@@ -469,7 +491,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// Returns true if the provided <see cref="XboxButtonEnum"/> has been pressed and held down.
         /// </summary>
         /// <param name="inXboxButton">The button to check.</param>
-        public bool getButtonDown(XboxButtonEnum inXboxButton)
+        internal bool getButtonDown(XboxButtonEnum inXboxButton)
         {
             // Written, 16.07.2018
 
@@ -484,7 +506,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// Returns true if the provided <see cref="XboxButtonEnum"/> has been pressed and released.
         /// </summary>
         /// <param name="inXboxButton">The button to check.</param>
-        public bool getButtonUp(XboxButtonEnum inXboxButton)
+        internal bool getButtonUp(XboxButtonEnum inXboxButton)
         {
             // Written, 20.12.2018
 
@@ -498,7 +520,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// If xbox button has been pressed; returns that xbox button, else returns <see cref="XboxButtonEnum.NULL"/>.
         /// </summary>
-        public XboxButtonEnum getAnyButtonPressed()
+        internal XboxButtonEnum getAnyButtonPressed()
         {
             // Written, 18.07.2018
 
@@ -517,7 +539,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// If xbox button has been pressed down; returns that xbox button, else returns <see cref="XboxButtonEnum.NULL"/>.
         /// </summary>
-        public XboxButtonEnum getAnyButtonDown()
+        internal XboxButtonEnum getAnyButtonDown()
         {
             // Written, 18.07.2018
 
@@ -536,7 +558,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Gets the left thumb sticks values.
         /// </summary>
-        public GamePadThumbSticks.StickValue getLeftStick()
+        internal GamePadThumbSticks.StickValue getLeftStick()
         {
             // Written, 18.07.2018
 
@@ -545,7 +567,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Gets the right thumb sticks values.
         /// </summary>
-        public GamePadThumbSticks.StickValue getRightStick()
+        internal GamePadThumbSticks.StickValue getRightStick()
         {
             // Written, 18.07.2018
 
@@ -563,7 +585,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Gets the right trigger. Ranges from 0.0f (not pressed) to 1.0f (fully pressed).
         /// </summary>
-        public float getRightTrigger()
+        internal float getRightTrigger()
         {
             // Written, 18.07.2018
 
@@ -572,7 +594,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Returns true if the left trigger was tapped.
         /// </summary>
-        public bool getLeftTriggerTap()
+        internal bool getLeftTriggerTap()
         {
             // Written, 18.07.2018
 
@@ -583,7 +605,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Returns true of the right trigger was tapped.
         /// </summary>
-        public bool getRightTriggerTap()
+        internal bool getRightTriggerTap()
         {
             // Written, 18.07.2018
 
@@ -597,7 +619,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <param name="inTimer">The time in seconds to rumble for.</param>
         /// <param name="inPower">The power of the rumble.</param>
         /// <param name="inDuration">The duration until the fade-time comes.</param>
-        public void addRumble(float inTimer, Vector2 inPower, float inDuration)
+        internal void addRumble(float inTimer, Vector2 inPower, float inDuration)
         {
             // Written, 16.07.2018
 
@@ -613,7 +635,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// Adds the provided rumble to the xbox controller.
         /// </summary>
         /// <param name="inXboxRumble">The rumble to add.</param>
-        public void addRumble(XboxRumble inXboxRumble)
+        internal void addRumble(XboxRumble inXboxRumble)
         {
             // Written, 16.07.2018
 
@@ -652,37 +674,20 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Handles all current rumbles.
         /// </summary>
-        internal IEnumerator handleRumbleCoroutine()
+        internal void setRumble(Vector2 rumblePow)
         {
-            // Written, 16.07.2018
+            // Written, 23.10.2020
 
-            if (this.xboxRumbleEvents.Count > 0)
+            if (rumblePow != this.prevRumblePow)
             {
-                Vector2 currentPower = new Vector2(0.0f, 0.0f);
-                for (int i = 0; i < this.xboxRumbleEvents.Count; i++)
-                {
-                    if (this.xboxRumbleEvents.Count >= MAX_RUMBLE_EVENTS_PER_FRAME)
-                        if (i == MAX_RUMBLE_EVENTS_PER_FRAME)
-                            yield return null;
-                    XboxRumble currentXboxRumble = this.xboxRumbleEvents[i];
-                    float timeLeft = Mathf.Clamp(currentXboxRumble.timer / currentXboxRumble.duration, 0f, 1f);
-                    if (timeLeft > 0)
-                    {
-                        currentPower = new Vector2(Mathf.Max(currentXboxRumble.power.x * timeLeft, currentPower.x), Mathf.Max(currentXboxRumble.power.y * timeLeft, currentPower.y));
-                        currentXboxRumble.update();
-                    }
-                    else
-                    {
-                        this.xboxRumbleEvents.Remove(currentXboxRumble);
-                    }
-                    GamePad.SetVibration(this.playerIndex, currentPower.x, currentPower.y);
-                }
+                GamePad.SetVibration(PlayerIndex.One, rumblePow.x, rumblePow.y);
+                this.prevRumblePow = rumblePow;
             }
         }
         /// <summary>
         /// Loads control asset textures.
         /// </summary>
-        public void loadControllerAssets()
+        private void loadControllerAssets()
         {
             // Written, 20.07.2018
 
@@ -732,7 +737,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Gets an xbox control by input name.
         /// </summary>
-        public XboxControl getXboxControlByInputName(string inInputName)
+        internal XboxControl getXboxControlByInputName(string inInputName)
         {
             // Written, 20.07.2018
             if (inInputName != KeyCode.None.ToString()) // no point enumerating..
@@ -750,7 +755,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Returns all the xbox controls.
         /// </summary>
-        public XboxControl[] getXboxControls()
+        internal XboxControl[] getXboxControls()
         {
             // Written, 22.07.2018
 

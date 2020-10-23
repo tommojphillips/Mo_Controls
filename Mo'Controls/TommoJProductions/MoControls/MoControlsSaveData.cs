@@ -129,12 +129,12 @@ namespace TommoJProductions.MoControls
                     playerSeenMscLoaderVersionError = false,
                     displayFfbOverlay = false,
                     ffbOnXboxController = false,
-                    ffbHandledOnUpdateScheme = UnityRuntimeUpdateSchemesEnum.update,
                     moControlsVersion = MoControlsMod.VERSION,
-                    ffbOption_default = true,
-                    ffbOption_rpmLimiter = false,
-                    ffbOption_wheelSlip = false,
+                    ffbOption_default = false,
+                    ffbOption_rpmLimiter = true,
+                    ffbOption_wheelSlip = true,
                     displayVehicleInfoOverlay = false,
+                    ffbOption_gearChange = true,
                 };
             }
         }
@@ -158,17 +158,17 @@ namespace TommoJProductions.MoControls
         public string[,] drivingControls;
         public bool ffbOnXboxController;
         public bool displayFfbOverlay;
-        public UnityRuntimeUpdateSchemesEnum ffbHandledOnUpdateScheme;
         public bool ffbOption_default;
         public bool ffbOption_rpmLimiter;
         public bool ffbOption_wheelSlip;
         public bool displayVehicleInfoOverlay;
+        public bool ffbOption_gearChange;
 
         #endregion
 
         #region Methods
 
-        internal void saveSettings() 
+        internal void saveSettings()
         {
             // Written, 17.10.2020
 

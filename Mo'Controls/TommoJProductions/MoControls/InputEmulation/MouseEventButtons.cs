@@ -3,7 +3,7 @@
 namespace TommoJProductions.MoControls.InputEmulation
 {
     [Flags]
-    public enum MouseEventDataXButtons : uint
+    public enum MouseEventButtons : uint
     {
         // Written, 06.10.2020
 

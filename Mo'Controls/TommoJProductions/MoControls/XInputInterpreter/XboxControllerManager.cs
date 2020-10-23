@@ -57,10 +57,9 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents the controllers.
         /// </summary>
-        public XboxController[] controllers
+        internal XboxController controller
         {
-            get;
-            private set;
+            get { return this.gameObject.GetComponent<XboxController>(); }
         }
         /// <summary>
         /// Represents the monitoring controller connections system.
@@ -95,88 +94,13 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             try
             {
-                this.controllers = new XboxController[numOfControllersSupported];
-                for (int i = 1; i <= numOfControllersSupported; i++)
-                {
-                    this.addController(new XboxController(i));
-                }
+                this.gameObject.AddComponent<XboxController>();
                 this.monitorControllerConnections = this.gameObject.AddComponent<MonitorControllerConnections>();
                 MoControlsMod.print(nameof(XboxControllerManager) + ": Started", Debugging.DebugTypeEnum.full);
             }
             catch (Exception ex)
             {
                 MSCLoader.ModConsole.Error(ex.StackTrace);
-            }
-        }
-        /// <summary>
-        /// Performs updates for every controller within the manager. Updates <see cref="monitorControllerConnections"/>.
-        /// </summary>
-        private void Update()
-        {
-            // Written, 16.07.2018
-
-            /*foreach (XboxController controller in this.controllers)
-            {
-                StartCoroutine(controller.updateStateCoroutine());
-                if (MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.update)
-                StartCoroutine(controller.handleRumbleCoroutine());
-            }
-*/
-            StartCoroutine(this.controllers[0].updateStateCoroutine());
-            if (MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.update)
-                StartCoroutine(this.controllers[0].handleRumbleCoroutine());
-
-        }
-        /// <summary>
-        /// Performs refreshes for every controller within the manager.
-        /// </summary>
-        private void LateUpdate()
-        {
-            // Written, 16.07.2018
-
-            /*foreach (XboxController controller in this.controllers)
-            {
-                if (MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.lateUpdate)
-                    StartCoroutine(controller.handleRumbleCoroutine());
-                controller.refresh();
-            }*/
-
-            if (MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.lateUpdate)
-                StartCoroutine(this.controllers[0].handleRumbleCoroutine());
-            this.controllers[0].refresh();
-        }
-        private void FixedUpdate() 
-        {
-            // Written, 23.10.2020
-
-            if (MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.fixedUpdate)
-                StartCoroutine(this.controllers[0].handleRumbleCoroutine());
-
-        }
-        /// <summary>
-        /// Adds the specified xbox controller to the manager.
-        /// </summary>
-        /// <param name="inXboxController">The controller to add.</param>
-        public void addController(XboxController inXboxController)
-        {
-            // Written, 16.07.2018
-
-            bool isControllerAssigned = false;
-            for (int i = 0; i < numOfControllersSupported; i++)
-            {
-                if (this.controllers[i] == null)
-                {
-                    this.controllers[i] = inXboxController;
-                    this.controllers[i].loadControllerAssets();
-                    isControllerAssigned = true;
-                    break;
-                }
-            }
-            if (!isControllerAssigned)
-            {
-                string errorMessage = String.Format("This instance of {2} only supports {0} controller{1}. You have attempted to add another controller which cannot be executed.", numOfControllersSupported, numOfControllersSupported > 1 ? "s" : "", nameof(XboxControllerManager));
-                MSCLoader.ModConsole.Error(errorMessage);
-                throw new Exception(errorMessage);
             }
         }
 

@@ -2,7 +2,6 @@
 using MSCLoader;
 using System;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using TommoJProductions.Debugging;
 using TommoJProductions.MoControls.GUI;
 using TommoJProductions.MoControls.InputEmulation;
@@ -29,9 +28,9 @@ namespace TommoJProductions.MoControls
         /// </summary>
         private const string toolModeLocation = "PLAYER/Pivot/AnimPivot/Camera/FPSCamera/2Spanner";
         /// <summary>
-        /// Represents if the user has request toolmode change via, <see cref="HoldInputMono"/>. see:<see cref="toggleToolMode"/>.
+        /// 
         /// </summary>
-        private bool _requestedModeChange;
+        private Vector2 prevRumblePow;
         /// <summary>
         /// Represents logic to enable scroll to a connected xbox controllers' triggers. enabled when player is in tool mode.
         /// </summary>
@@ -40,14 +39,6 @@ namespace TommoJProductions.MoControls
         /// Represents the current car dynamics. used for forcefeedback.
         /// </summary>
         internal CarDynamics carDynamics;
-        /// <summary>
-        /// Represents the forcefeedback.
-        /// </summary>
-        internal ForceFeedback forceFeedback;
-        /// <summary>
-        /// Represents the satsuma gameobject. used for forcefeedback.
-        /// </summary>
-        private GameObject satsuma;
         /// <summary>
         /// Reprsents the current player mode.
         /// </summary>
@@ -61,6 +52,10 @@ namespace TommoJProductions.MoControls
 
         #region Properties
 
+        /// <summary>
+        /// Represents the satsuma gameobject. used for forcefeedback.
+        /// </summary>
+        internal GameObject vehicle { get; private set; }
         /// <summary>
         /// gets or sets the currently selected controls
         /// </summary>
@@ -142,8 +137,7 @@ namespace TommoJProductions.MoControls
                 if (MoControlsGO.moControlsGui.controlsGuiOpened)
                     return PlayerModeEnum.InMenu;
                 PlayerModeEnum pme;
-                string currentVehicle = FsmVariables.GlobalVariables.FindFsmString("PlayerCurrentVehicle").Value;
-                switch (currentVehicle)
+                switch (getCurrentVehicle)
                 {
                     case "":
                         pme = PlayerModeEnum.OnFoot;
@@ -154,6 +148,21 @@ namespace TommoJProductions.MoControls
                 }
                 return pme;
             }
+        }
+        /// <summary>
+        /// Represents the current vehicle name (global playmakerFSM)
+        /// </summary>
+        internal static string currentVehicleName 
+        {
+            get;
+            private set;
+        }
+        /// <summary>
+        /// Gets the current vehicle the player is in.
+        /// </summary>
+        internal static string getCurrentVehicle
+        {
+            get { return FsmVariables.GlobalVariables.FindFsmString("PlayerCurrentVehicle").Value; }
         }
         /// <summary>
         /// Represents the change input result for the mod.
@@ -262,7 +271,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents the last rumble pow.
         /// </summary>
-        internal Vector2 lastRumblePow 
+        internal Vector2 lastRumblePow
         {
             get;
             private set;
@@ -270,7 +279,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents the last rumble pow sent to the controller.
         /// </summary>
-        internal Vector2 lastRumbePowSent 
+        internal Vector2 lastRumbePowSent
         {
             get;
             private set;
@@ -317,11 +326,6 @@ namespace TommoJProductions.MoControls
                 XboxAxisEnum.leftTrigger, XboxButtonEnum.NULL,
                 XboxAxisEnum.NULL, XboxButtonEnum.RB,
                 XboxAxisEnum.NULL, XboxButtonEnum.LB);
-            // Setting up xbox controller forcefeedback
-            this.satsuma = GameObject.Find("SATSUMA(557kg, 248)");
-            this.carDynamics = this.satsuma.GetComponent<CarDynamics>();
-            this.forceFeedback = this.satsuma.GetComponent<ForceFeedback>();
-            this.drivetrain = this.satsuma.GetComponent<Drivetrain>();
             MoControlsMod.print(nameof(ControlManager) + ": Started", DebugTypeEnum.full);
         }
         /// <summary>
@@ -337,28 +341,10 @@ namespace TommoJProductions.MoControls
                 this.loadControlModeToCInput(this.currentPlayerMode, this.currentControls);
                 MoControlsMod.print("Control Mode changed: " + this.currentPlayerMode, DebugTypeEnum.full);
             }
-            if (this._requestedModeChange)
-            {
-                MoControlsMod.print("Identified changemode request.", DebugTypeEnum.full);
-                toggleToolMode();
-                this._requestedModeChange = false;
-            }
             // Enable scroll only if player is on foot and in tool mode (2) OR when player is holding an item while on foot and in hand mode.
             this.toolModeScroll.enabled = this.currentPlayerMode == PlayerModeEnum.OnFoot && (isInToolMode || (!isInToolMode && !isPlayerHandEmpty()));
             // Handling xbox controller force feedback rumble events.
-            if (MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.update)
-                this.handleFfbOnXboxController();
-        }
-        private void LateUpdate()
-        {
-            // Written, 17.10.2020
-
-            if (MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.lateUpdate)
-                this.handleFfbOnXboxController();
-        }
-        private void FixedUpdate()
-        {
-            if (MoControlsSaveData.loadedSaveData.ffbHandledOnUpdateScheme == UnityRuntimeUpdateSchemesEnum.fixedUpdate)
+            if (this.setFfbForVehicle())
                 this.handleFfbOnXboxController();
         }
         /// <summary>
@@ -562,7 +548,7 @@ namespace TommoJProductions.MoControls
         {
             // Written, 07.10.2020
 
-            this._requestedModeChange = true;
+           MoControlsGO.xboxController._requestedModeChange = true;
         }
         /// <summary>
         /// Returns whether the players hand is empty (not holding anything).
@@ -583,80 +569,73 @@ namespace TommoJProductions.MoControls
         {
             // Written, 16.10.2020
 
-            Vector2 rumblePow = this.floatToVector(this.getFfbSetOpt(true));
-
-            if (rumblePow.x > 0 || rumblePow.y > 0)
+            if (MoControlsSaveData.loadedSaveData.ffbOnXboxController && this.vehicle != null)
             {
-                if (!MoControlsGO.moControlsGui.controlsGuiOpened && MoControlsGO.xboxController.isConnected && MoControlsSaveData.loadedSaveData.ffbOnXboxController)
-
-                    if (FsmVariables.GlobalVariables.FindFsmString("PlayerCurrentVehicle").Value == "Satsuma")
-                    {
-                        XboxRumble rumble = new XboxRumble()
-                        {
-                            timer = 0.05f,
-                            duration = 0.025f,
-                            power = rumblePow
-                        };
-                        MoControlsGO.xboxController.addRumble(rumble);
-                    }
-                this.lastRumbePowSent = rumblePow;
+                Vector2 rumblePow = this.getFfbSetOpt();
+                MoControlsGO.xboxController.setRumble(rumblePow);
             }
-            this.lastRumblePow = rumblePow;
         }
-        internal float getFfbSetOpt(bool scale = false) 
+        /// <summary>
+        /// Gets set options for ffb and returns the result as a vector2.
+        /// </summary>
+        internal Vector2 getFfbSetOpt()
         {
             // Written, 18.10.2020
 
-            float rumbleFloat = 0;
+            float xMotor = 0;
+            float yMotor = 0;
             if (MoControlsSaveData.loadedSaveData.ffbOption_default)
             {
-                float _def = this.defaultFfb(); 
-                rumbleFloat = scale && _def != 0 ? this.scaleForceFeedbackRange(_def, 0, this.forceFeedback.clampValue) :_def;
+                return this.floatToVector(this.defaultFfb());
             }
             else
             {
                 if (MoControlsSaveData.loadedSaveData.ffbOption_wheelSlip)
-                    rumbleFloat = Mathf.Clamp(this.wheelSlipBasedFfb(), -1, 1);
-                if (MoControlsSaveData.loadedSaveData.ffbOption_rpmLimiter)
                 {
-                    float _rpm = this.rpmLimiterBasedFfb();
-                    rumbleFloat += scale && _rpm > 0 ? this.scaleForceFeedbackRange(_rpm, this.drivetrain.minRPM, this.drivetrain.maxRPM) : _rpm;
-                }
+                    float wheelSlip = Mathf.Clamp(this.wheelSlipBasedFfb(), -1, 1);
+                    if (wheelSlip > 0)
+                        xMotor = wheelSlip;
+                    else
+                        yMotor = Mathf.Abs(wheelSlip);
+                } if (MoControlsSaveData.loadedSaveData.ffbOption_rpmLimiter)
+                    xMotor += this.rpmLimiterBasedFfb();
+                if (MoControlsSaveData.loadedSaveData.ffbOption_gearChange)
+                    yMotor += this.gearChangeBasedFfb();
             }
-            return rumbleFloat;
+            return new Vector2(Mathf.Clamp(xMotor, 0, 1), Mathf.Clamp(yMotor, 0, 1));
+        }
+        private float gearChangeBasedFfb()
+        {
+            // Written, 23.10.2020
+
+            if (this.drivetrain.changingGear)
+                return this.drivetrain.rpm / this.drivetrain.maxRPM;
+            return 0;
         }
         private float rpmLimiterBasedFfb()
         {
             // Written, 18.10.2020
 
-            if (this.drivetrain.revLimiterTriggered)
-                return this.drivetrain.rpm;
+            int engageAt = 1500;
+            float _rpm = this.drivetrain.rpm;
+            if (this.drivetrain.revLimiterTriggered || _rpm > (int)this.drivetrain.maxRPM - engageAt) // > 6500 RPM => ffb)
+                return _rpm / this.drivetrain.maxRPM;
             return 0;
-
         }
-        private float wheelSlipBasedFfb() 
+        private float wheelSlipBasedFfb()
         {
             // Written, 18.10.2020
 
-            return this.drivetrain.poweredWheels[0].lateralSlip;
+            return this.drivetrain.poweredWheels.Max(_wheel => _wheel.longitudinalSlip); // based on car roll, facing forward
         }
-        private float defaultFfb() 
+        /// <summary>
+        /// Represents the default ffb (designed for a wheel) doesnt work properly
+        /// </summary>
+        private float defaultFfb()
         {
             // Written, 18.10.2020
 
             return this.carDynamics.forceFeedback;
-        }
-        /// <summary>
-        /// Scales the ffb float value from it's clamped value (<see cref="ForceFeedback.clampValue"/> to xbox's -1f - 1f value range 
-        /// </summary>
-        private float scaleForceFeedbackRange(float value, float min, float max, float clamped = 1)
-        {
-            // Written, 18.10.2020
-            
-            float m = (max - min) / (clamped - -clamped);
-            float c = -clamped * m;
-            float scaled = m * value + c;
-            return scaled;
         }
         /// <summary>
         /// Converts ffb float value to a vector 2 for xbox rumble events.
@@ -682,6 +661,52 @@ namespace TommoJProductions.MoControls
             // Written, 17.10.2020
 
             this.changeInputResult = inChangeInput ?? new ChangeInput();
+        }
+        /// <summary>
+        /// Sets all ffb to the current vehicle.
+        /// </summary>
+        private bool setFfbForVehicle() 
+        {
+            // Written, 23.10.2020
+
+            string _currentVehicleName = getCurrentVehicle;
+            bool isSet = (_currentVehicleName ?? "") == currentVehicleName;
+            if (!isSet)
+            {
+                switch (_currentVehicleName)
+                {
+                    case "Satsuma":
+                        this.vehicle = GameObject.Find("SATSUMA(557kg, 248)");
+                        this.carDynamics = this.vehicle.GetComponent<CarDynamics>();
+                        this.drivetrain = this.vehicle.GetComponent<Drivetrain>();
+                        break;
+                    case "Jonnez":
+                        this.vehicle = GameObject.Find("JONNEZ ES(Clone)");
+                        this.carDynamics = this.vehicle.GetComponent<CarDynamics>();
+                        this.drivetrain = this.vehicle.GetComponent<Drivetrain>();
+                        break;
+                    case "Kekmet":
+                        this.vehicle = GameObject.Find("KEKMET(350-400psi)");
+                        this.carDynamics = this.vehicle.GetComponent<CarDynamics>();
+                        this.drivetrain = this.vehicle.GetComponent<Drivetrain>();
+                        break;
+                    case "Hayosiko":
+                        this.vehicle = GameObject.Find("HAYOSIKO(1500kg, 250)");
+                        this.carDynamics = this.vehicle.GetComponent<CarDynamics>();
+                        this.drivetrain = this.vehicle.GetComponent<Drivetrain>();
+                        break;
+                    case "Gifu":
+                        this.vehicle = GameObject.Find("GIFU(750/450psi)");
+                        this.carDynamics = this.vehicle.GetComponent<CarDynamics>();
+                        this.drivetrain = this.vehicle.GetComponent<Drivetrain>();
+                        break;
+                    default:
+                        this.vehicle = null;
+                        break;
+                }
+                currentVehicleName = _currentVehicleName;
+            }
+            return this.vehicle != null;
         }
 
         #endregion
