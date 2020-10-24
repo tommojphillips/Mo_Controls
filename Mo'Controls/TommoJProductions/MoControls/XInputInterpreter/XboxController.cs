@@ -357,12 +357,31 @@ namespace TommoJProductions.MoControls.XInputInterpreter
             #endregion
 
             this.loadControllerAssets();
+            this.updateTriggerAxis();
         }
 
         #endregion
 
         #region Methods
 
+        /// <summary>
+        /// Updates and sets the inputName (combined: 3-/3+ | not: 9+/10+) for the triggers.
+        /// </summary>
+        internal void updateTriggerAxis()
+        {
+            // Written, 24.10.2020
+
+            if (MoControlsSaveData.loadedSaveData.combinedTriggerAxis)
+            {
+                this.xboxControls[14].setInputName(String.Format("{0}3+", axisPrefix));
+                this.xboxControls[15].setInputName(String.Format("{0}3-", axisPrefix));
+            }
+            else
+            {
+                this.xboxControls[14].setInputName(String.Format("{0}9+", axisPrefix));
+                this.xboxControls[15].setInputName(String.Format("{0}10+", axisPrefix));
+            }
+        }
         private void Update()
         {
             // Written, 23.10.2020
@@ -612,34 +631,6 @@ namespace TommoJProductions.MoControls.XInputInterpreter
             if (this.rT.previousState == 0f && this.rT.state >= 0.1f)
                 return true;
             return false;
-        }
-        /// <summary>
-        /// Adds a rumble to the xbox controller.
-        /// </summary>
-        /// <param name="inTimer">The time in seconds to rumble for.</param>
-        /// <param name="inPower">The power of the rumble.</param>
-        /// <param name="inDuration">The duration until the fade-time comes.</param>
-        internal void addRumble(float inTimer, Vector2 inPower, float inDuration)
-        {
-            // Written, 16.07.2018
-
-            XboxRumble xboxRumble = new XboxRumble()
-            {
-                timer = inTimer,
-                power = inPower,
-                duration = inDuration,
-            };
-            this.addRumble(xboxRumble);
-        }
-        /// <summary>
-        /// Adds the provided rumble to the xbox controller.
-        /// </summary>
-        /// <param name="inXboxRumble">The rumble to add.</param>
-        internal void addRumble(XboxRumble inXboxRumble)
-        {
-            // Written, 16.07.2018
-
-            this.xboxRumbleEvents.Add(inXboxRumble);
         }
         /// <summary>
         /// Updates the input map.

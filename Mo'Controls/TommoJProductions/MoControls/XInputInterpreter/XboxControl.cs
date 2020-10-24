@@ -59,5 +59,16 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         }
 
         #endregion
+
+        #region Methods
+
+        internal void setInputName(string inInputName) 
+        {
+            // Written, 24.10.2020
+
+            this.inputName = inInputName;
+        }
+
+        #endregion
     }
 }

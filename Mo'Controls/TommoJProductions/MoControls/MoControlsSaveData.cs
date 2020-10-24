@@ -65,7 +65,7 @@ namespace TommoJProductions.MoControls
                         { "ReachLeft", "Q", "JoystickButton4" },
                         { "ReachRight", "E", "None" },
                         { "Hitchhike", "O", "None" },
-                        { "Swear", "N", "JoystickButton7" },
+                        { "Swear", "N", "None" },
                         { "Hit", "H", "JoystickButton5" },
                         { "Push", "J", "Joy Axis 7-" },
                         { "Finger", "M", "Joy Axis 6-" },
@@ -135,10 +135,10 @@ namespace TommoJProductions.MoControls
                     ffbOption_wheelSlip = true,
                     displayVehicleInfoOverlay = false,
                     ffbOption_gearChange = true,
-                    playerHorz = 0.05f,
-                    playerVert = 0.05f,
-                    horz = 0.05f,
-                    vert = 0.05f,
+                    playerHorz = 0.005f,
+                    playerVert = 0.005f,
+                    horz = 0.005f,
+                    vert = 0.005f,
                     combinedTriggerAxis = false,
                 };
             }

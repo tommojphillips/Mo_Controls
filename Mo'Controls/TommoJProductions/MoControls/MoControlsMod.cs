@@ -29,7 +29,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents the latest release version.
         /// </summary>
-        internal const string LATEST_RELEASE_DATE = "23.10.2020";
+        internal const string LATEST_RELEASE_DATE = "24.10.2020";
 
 
         #region Mod Keybinds

@@ -500,7 +500,27 @@ namespace TommoJProductions.MoControls.GUI
                 ueGUI.backgroundColor = this.moduleBackgroundColor;
                 this.drawControllerFFBContent();
                 this.drawControllerInputContent();
+                this.drawCombinedTriggerAxisContent();
                 ueGUI.backgroundColor = this.backgroundColor;
+            }
+        }
+        /// <summary>
+        /// Draws combined trigger axis setting content.
+        /// </summary>
+        private void drawCombinedTriggerAxisContent()
+        {
+            // Written, 24.10.2020
+
+            using (new gui.HorizontalScope("box"))
+            {
+                bool combineTriggerAxis = MoControlsSaveData.loadedSaveData.combinedTriggerAxis;
+                if (gui.Toggle(combineTriggerAxis, String.Format("Combine trigger axis: {0}", combineTriggerAxis ? "<color=green>On</color>" : "<color=red>Off</color>")) != combineTriggerAxis)
+                {
+                    MoControlsSaveData.loadedSaveData.combinedTriggerAxis = !combineTriggerAxis;
+                    this.xboxController.updateTriggerAxis();
+                    MoControlsSaveData.loadedSaveData.saveSettings();
+                }
+                gui.Label("NOTE: after changing this value you will need to reassign desired gameContol inputs to triggers.");
             }
         }
         /// <summary>
@@ -525,6 +545,8 @@ namespace TommoJProductions.MoControls.GUI
                     {
                         for (int n = 0; n < maxItemsPerRow; n++)
                         {
+                            if (i > xboxControls.Length)
+                                break;
                             j++;
                             if (j == 2)
                             {
