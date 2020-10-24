@@ -202,12 +202,12 @@ namespace TommoJProductions.MoControls
             catch (NullReferenceException)
             {
                 createNewSaveFile = true;
-                MoControlsMod.print("Save file does not exist, creating save file.", Debugging.DebugTypeEnum.none);
+                MoControlsMod.print("Save file does not exist, make any change to a setting to save.", Debugging.DebugTypeEnum.none);
             }
             catch (Exception e)
             {
                 createNewSaveFile = true;
-                MoControlsMod.print("An error occured while loading the save file.. overriding with new save file. Maybe mod updated?\nERROR: " + e.Message, Debugging.DebugTypeEnum.none);
+                MoControlsMod.print("An error occured while loading the save file..make any change to a setting to save.\nERROR: " + e.Message, Debugging.DebugTypeEnum.none);
             }
             if (createNewSaveFile)
             {
