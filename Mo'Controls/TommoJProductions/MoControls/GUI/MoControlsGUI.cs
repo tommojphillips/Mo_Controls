@@ -545,7 +545,7 @@ namespace TommoJProductions.MoControls.GUI
                     {
                         for (int n = 0; n < maxItemsPerRow; n++)
                         {
-                            if (i > xboxControls.Length)
+                            if (i >= xboxControls.Length)
                                 break;
                             j++;
                             if (j == 2)

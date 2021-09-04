@@ -529,13 +529,16 @@ namespace TommoJProductions.MoControls
         {
             // Written, 08.10.2020
 
-            VirtualKeyShort? wVk = null;
+            if (isPlayerHandEmpty())
+            {
+                VirtualKeyShort? wVk = null;
 
-            if (isInToolMode)
-                wVk = VirtualKeyShort.KEY_1;
-            else if (isPlayerHandEmpty())
-                wVk = VirtualKeyShort.KEY_2;
-            StartCoroutine(KeyboardEmulator.simulateKeyPressCoroutine((VirtualKeyShort)wVk));
+                if (isInToolMode)
+                    wVk = VirtualKeyShort.KEY_1;
+                else if (isPlayerHandEmpty())
+                    wVk = VirtualKeyShort.KEY_2;
+                StartCoroutine(KeyboardEmulator.simulateKeyPressCoroutine((VirtualKeyShort)wVk));
+            }
         }
         /// <summary>
         /// changes to request mode.
