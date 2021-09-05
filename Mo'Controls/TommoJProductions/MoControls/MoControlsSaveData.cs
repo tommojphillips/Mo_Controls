@@ -58,7 +58,7 @@ namespace TommoJProductions.MoControls
                         { "PlayerDown", "S", "Joy Axis 2+" },
                         { "Jump", "Space", "JoystickButton3" },
                         { "Run", "LeftShift", "JoystickButton8" },
-                        { "Zoom", "None", "Joy Axis 7+" },
+                        { "Zoom", "LeftControl", "Joy Axis 7+" },
                         { "Use", "F", "JoystickButton2" },
                         { "Crouch", "C", "JoystickButton9" },
                         { "Watch", "U", "None" },
@@ -91,7 +91,7 @@ namespace TommoJProductions.MoControls
                         { "ShiftDown", "B", "JoystickButton4", },
                         { "IndicatorLeft", "Semicolon", "None", },
                         { "IndicatorRight", "Quote", "None", },
-                        { "Range", "R", "None", },
+                        { "Range", "R", "JoystickButton9", },
                         { "HighBeam", "L", "Joy Axis 7-", },
                         { "Wipers", "K", "None", },
                         { "Boost", "T", "None", },
@@ -103,13 +103,13 @@ namespace TommoJProductions.MoControls
                         { "PlayerDown", "None", "None", },
                         { "Jump", "None", "None", },
                         { "Run", "None", "None", },
-                        { "Zoom", "None", "Joy Axis 7+", },
+                        { "Zoom", "LeftControl", "Joy Axis 7+", },
                         { "Use", "F", "JoystickButton2", },
                         { "Crouch", "None", "None", },
                         { "Watch", "U", "None" },
                         { "ReachLeft", "Q", "Joy Axis 6-", },
                         { "ReachRight", "E", "Joy Axis 6+", },
-                        { "Hitchhike", "None", "None", },
+                        { "Hitchhike", "O", "None", },
                         { "Swear", "N", "None", },
                         { "Hit", "H", "None", },
                         { "Push", "None", "None", },
@@ -131,15 +131,24 @@ namespace TommoJProductions.MoControls
                     ffbOnXboxController = false,
                     moControlsVersion = MoControlsMod.VERSION,
                     ffbOption_default = false,
-                    ffbOption_rpmLimiter = true,
+                    ffbOption_rpmLimiter = false,
                     ffbOption_wheelSlip = true,
                     displayVehicleInfoOverlay = false,
                     ffbOption_gearChange = true,
-                    playerHorz = 0.005f,
-                    playerVert = 0.005f,
-                    horz = 0.005f,
-                    vert = 0.005f,
                     combinedTriggerAxis = false,
+                    horzDeadzone = 0.001f,
+                    horzGravity = 3,
+                    horzSensitivity = 3,
+                    vertDeadzone = 0.001f,
+                    vertGravity = 3,
+                    vertSensitivity = 3,
+                    playerHorzDeadzone = 0.05f,
+                    playerHorzGravity = 3,
+                    playerHorzSensitivity = 3,
+                    playerVertDeadzone = 0.05f,
+                    playerVertGravity = 3,
+                    playerVertSensitivity = 3,
+                    oldNewVersionAccepted = null,
                 };
             }
         }   
@@ -168,11 +177,26 @@ namespace TommoJProductions.MoControls
         public bool ffbOption_wheelSlip;
         public bool displayVehicleInfoOverlay;
         public bool ffbOption_gearChange;
-        public float playerHorz;
-        public float playerVert;
-        public float horz;
-        public float vert;
         public bool combinedTriggerAxis;
+        public float playerHorzDeadzone;
+        public float playerHorzGravity;
+        public float playerHorzSensitivity;
+        public float playerVertDeadzone;
+        public float playerVertGravity;
+        public float playerVertSensitivity;
+        public float horzDeadzone;
+        public float horzGravity;
+        public float horzSensitivity;
+        public float vertDeadzone;
+        public float vertGravity;
+        public float vertSensitivity;
+        public string oldNewVersionAccepted;
+
+        #endregion
+
+        #region Fields
+
+        private static OldSaveDataException oldSaveException;
 
         #endregion
 
@@ -196,13 +220,28 @@ namespace TommoJProductions.MoControls
                 mcsd = SaveLoad.DeserializeSaveFile<MoControlsSaveData>(MoControlsMod.instance, fileName + fileExtention);
                 if (mcsd == null)
                     throw new NullReferenceException();
+
                 if (mcsd.moControlsVersion != MoControlsMod.instance.Version)
-                    throw new Exception("Old mocontrols save file.");
+                {
+                    if (mcsd.oldNewVersionAccepted != mcsd.moControlsVersion)
+                    {
+                        oldSaveException = new OldSaveDataException(mcsd);
+                        throw oldSaveException;
+                    }
+                }
             }
             catch (NullReferenceException)
             {
                 createNewSaveFile = true;
                 MoControlsMod.print("Save file does not exist, make any change to a setting to save.", Debugging.DebugTypeEnum.none);
+            }
+            catch (OldSaveDataException e)
+            {
+                    createNewSaveFile = true;
+                    ModUI.ShowYesNoMessage(string.Format("A{1} save detected (v{0}).. Would you like to still load this save file? NOTE: you may need to change various settings",
+                        e.oldSaveData.moControlsVersion,
+                        MoControlsMod.determineIsVersionOldCurrentOrNew(mcsd.moControlsVersion) < 0 ? "n Older" : " Newer"),
+                        "[Mo'Controls] - Different save version detected", keepSaveFile);
             }
             catch (Exception e)
             {
@@ -212,10 +251,18 @@ namespace TommoJProductions.MoControls
             if (createNewSaveFile)
             {
                 mcsd = defaultSave;
+                mcsd.saveSettings();
             }
             loadedSaveData = mcsd;
             MoControlsMod.print("loaded mo'controls data.", Debugging.DebugTypeEnum.full);
             return mcsd;
+        }
+
+        private static void keepSaveFile()
+        {
+            loadedSaveData = oldSaveException.oldSaveData;
+            loadedSaveData.oldNewVersionAccepted = loadedSaveData.moControlsVersion;
+            loadedSaveData.saveSettings();
         }
 
         #endregion

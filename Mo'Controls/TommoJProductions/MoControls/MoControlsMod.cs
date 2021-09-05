@@ -25,11 +25,11 @@ namespace TommoJProductions.MoControls
         /// Represents the current version.
         /// </summary>
         /// 
-        internal const string VERSION = "1.1.2";
+        internal const string VERSION = "1.1.3";
         /// <summary>
         /// Represents the latest release version.
         /// </summary>
-        internal const string LATEST_RELEASE_DATE = "24.10.2020";
+        internal const string LATEST_RELEASE_DATE = "05.09.2021";
 
 
         #region Mod Keybinds
@@ -76,7 +76,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents the supported/compatible version of mod loader.
         /// </summary>
-        public const string SUPPORTED_MODLOADER_VERSION = "1.1.7";
+        public const string SUPPORTED_MODLOADER_VERSION = "1.1.16";
 
 #if DEBUG
         private const bool IS_DEBUG_CONFIG = true;
@@ -294,17 +294,25 @@ namespace TommoJProductions.MoControls
 #endif
         }
 
-        private void loadCInputAxisDeadzones()
+        private void loadCInputAxisSettings()
         {
             // Written, 23.10.2020
 
             // setting cInput axis deadzones//
             /*external cinput control names = PlayerVertical*PlayerHorizontal*Horizontal*Vertical*/
-            cInput.SetAxisDeadzone("PlayerHorizontal", MoControlsSaveData.loadedSaveData.playerHorz);
-            cInput.SetAxisDeadzone("PlayerVertical", MoControlsSaveData.loadedSaveData.playerVert);
-            cInput.SetAxisDeadzone("Horizontal", MoControlsSaveData.loadedSaveData.horz);
-            cInput.SetAxisDeadzone("Vertical", MoControlsSaveData.loadedSaveData.vert);
-            MoControlsMod.print("loaded cinput deadzones", DebugTypeEnum.none);//.full);
+            cInput.SetAxisDeadzone("PlayerHorizontal", MoControlsSaveData.loadedSaveData.playerHorzDeadzone);
+            cInput.SetAxisSensitivity("PlayerHorizontal", MoControlsSaveData.loadedSaveData.playerHorzSensitivity);
+            cInput.SetAxisGravity("PlayerHorizontal", MoControlsSaveData.loadedSaveData.playerHorzGravity);
+            cInput.SetAxisDeadzone("PlayerVertical", MoControlsSaveData.loadedSaveData.playerVertDeadzone);
+            cInput.SetAxisSensitivity("PlayerVertical", MoControlsSaveData.loadedSaveData.playerVertSensitivity);
+            cInput.SetAxisGravity("PlayerVertical", MoControlsSaveData.loadedSaveData.playerVertGravity);
+            cInput.SetAxisDeadzone("Horizontal", MoControlsSaveData.loadedSaveData.horzDeadzone);
+            cInput.SetAxisSensitivity("Horizontal", MoControlsSaveData.loadedSaveData.horzSensitivity);
+            cInput.SetAxisGravity("Horizontal", MoControlsSaveData.loadedSaveData.horzGravity);
+            cInput.SetAxisDeadzone("Vertical", MoControlsSaveData.loadedSaveData.vertDeadzone);
+            cInput.SetAxisSensitivity("Vertical", MoControlsSaveData.loadedSaveData.vertSensitivity);
+            cInput.SetAxisGravity("Vertical", MoControlsSaveData.loadedSaveData.vertGravity);
+            MoControlsMod.print("loaded cinput axis settings (grav, dead, sens).. hold <i>Left-Ctrl</i> through Mo'Controls' second pass loading sequ to disable", DebugTypeEnum.none);//.full);
         }
 
         #endregion
@@ -318,11 +326,34 @@ namespace TommoJProductions.MoControls
             this.initialize();
             this.performModLoaderVersionCheck();
         }
+        public static int determineIsVersionOldCurrentOrNew(string inVersion)
+        {
+            string[] versionNumbers = inVersion.Split('.');
+            string[] currentVersionNumbers = VERSION.Split('.');
+            int result;
+            int value;
+            if (versionNumbers.Length == currentVersionNumbers.Length)
+            {
+                for (int i = 0; i < versionNumbers.Length; i++)
+                {
+                    if (int.TryParse(versionNumbers[i], out result))
+                        if (int.TryParse(currentVersionNumbers[i], out value))
+                            if (result > value)
+                                return 1;
+                            else if (result < value)
+                                return -1;
+                }
+            }
+            return 0;
+        }
         public override void SecondPassOnLoad()
         {
             // Written, 18.10.2020
 
-            this.loadCInputAxisDeadzones();
+            if (!UnityEngine.Input.GetKey(KeyCode.LeftControl))
+                this.loadCInputAxisSettings();
+            else
+                print("skipped loading cinput axis settings (grav, dead, sens).. Cause: <i>Left-Ctrl held down through Mo'Controls' second pass loading sequ</i>", DebugTypeEnum.none);
             moControlsGameObject = new GameObject(gameObjectName);
             moControlsGO = moControlsGameObject.AddComponent<MoControlsGO>();
             print(this.Name + " v" + this.Version + ": Loaded.", DebugTypeEnum.none);
