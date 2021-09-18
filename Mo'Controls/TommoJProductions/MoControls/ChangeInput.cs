@@ -79,11 +79,11 @@ namespace TommoJProductions.MoControls
         {
             // Written, 16.07.2018
 
-            this.reassignKey = false;
-            this.controlName = null;
-            this.index = 0;
-            this.mod = null;
-            this.mode = null;
+            reassignKey = false;
+            controlName = null;
+            index = 0;
+            mod = null;
+            mode = null;
         }
         /// <summary>
         /// Initializes a new instance of <see cref="ChangeInput"/> and assigns the classes properties to the parameters.
@@ -96,11 +96,11 @@ namespace TommoJProductions.MoControls
         {
             // Written, 11.07.2018
 
-            this.reassignKey = inReassignKey;
-            this.controlName = inInputName;
-            this.index = inIndex;
-            this.mod = inMod;
-            this.mode = inMode;
+            reassignKey = inReassignKey;
+            controlName = inInputName;
+            index = inIndex;
+            mod = inMod;
+            mode = inMode;
         }
 
         #endregion
@@ -117,13 +117,13 @@ namespace TommoJProductions.MoControls
         {
             // Written, 20.07.2018
 
-            if (!this.reassignKey)
+            if (!reassignKey)
             {
-                this.reassignKey = true;
-                this.controlName = inControlName;
-                this.index = inIndex;
-                this.mod = inMod;
-                this.mode = inMode;
+                reassignKey = true;
+                controlName = inControlName;
+                index = inIndex;
+                mod = inMod;
+                mode = inMode;
             }
         }
 

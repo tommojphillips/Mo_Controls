@@ -55,9 +55,9 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 04.01.2019
 
-            if (this.moControlsGUI.controlsGuiOpened)
-                this.controllerMenuChange();
-            this.controllerScroll();
+            if (moControlsGUI.controlsGuiOpened)
+                controllerMenuChange();
+            controllerScroll();
         }
         /// <summary>
         /// Allows the xbox controller to scroll up/down in the User Interface.
@@ -66,12 +66,12 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 09.10.2020
 
-            if (this.xboxController.isConnected)
+            if (xboxController.isConnected)
             {
-                float input = this.hasInputFromAxisOrButton(this.scrollDownA, this.scrollDownB);
+                float input = hasInputFromAxisOrButton(scrollDownA, scrollDownB);
                 if (input > 0)
                     MouseEmulator.simulateScroll((int)(-input * MouseEmulator.MOUSE_SCROLL_VALUE));
-                input = this.hasInputFromAxisOrButton(this.scrollUpA, this.scrollUpB);
+                input = hasInputFromAxisOrButton(scrollUpA, scrollUpB);
                 if (input > 0)
                     MouseEmulator.simulateScroll((int)(input * MouseEmulator.MOUSE_SCROLL_VALUE));
             }
@@ -86,16 +86,16 @@ namespace TommoJProductions.MoControls.GUI
                 switch (xboxAxis)
                 {
                     case XboxAxisEnum.leftTrigger:
-                        valueF = this.xboxController.getLeftTrigger();
+                        valueF = xboxController.getLeftTrigger();
                         break;
                     case XboxAxisEnum.rightTrigger:
-                        valueF = this.xboxController.getRightTrigger();
+                        valueF = xboxController.getRightTrigger();
                         break;
                 }
             }
             else if (xboxButton != XboxButtonEnum.NULL) // is a button.
             {
-                valueF = this.xboxController.getButtonDown(xboxButton) ? 1f : 0.0f;
+                valueF = xboxController.getButtonDown(xboxButton) ? 1f : 0.0f;
             }
             return valueF;
         }
@@ -106,47 +106,47 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 04.01.2019
 
-            if (this.xboxController.isConnected)
+            if (xboxController.isConnected)
             {
                 int mainMenuItemCount = Enum.GetNames(typeof(MainGUIMenuEnum)).Length - 1;
                 int settingsMenuItemCount = Enum.GetNames(typeof(SettingsMenuEnum)).Length - 1;
 
 
-                if (this.hasInputFromAxisOrButton(menuDownA, menuDownB) > 0)
+                if (hasInputFromAxisOrButton(menuDownA, menuDownB) > 0)
                 {
-                    if (this.moControlsGUI.mainGUIMenu == 0)
+                    if (moControlsGUI.mainGUIMenu == 0)
                     {
-                        this.moControlsGUI.mainGUIMenu = (MainGUIMenuEnum)mainMenuItemCount;
+                        moControlsGUI.mainGUIMenu = (MainGUIMenuEnum)mainMenuItemCount;
                     }
                     else
                     {
-                        if (this.moControlsGUI.mainGUIMenu == MainGUIMenuEnum.Settings)
+                        if (moControlsGUI.mainGUIMenu == MainGUIMenuEnum.Settings)
                         {
-                            if (this.moControlsGUI.settingsMenu > 0)
+                            if (moControlsGUI.settingsMenu > 0)
                             {
-                                this.moControlsGUI.settingsMenu--;
+                                moControlsGUI.settingsMenu--;
                                 return;
                             }
                         }
-                        this.moControlsGUI.mainGUIMenu--;
+                        moControlsGUI.mainGUIMenu--;
                     }
                 }
-                else if (this.hasInputFromAxisOrButton(menuUpA, menuUpB) > 0)
+                else if (hasInputFromAxisOrButton(menuUpA, menuUpB) > 0)
                 {
-                    if (this.moControlsGUI.mainGUIMenu == (MainGUIMenuEnum)mainMenuItemCount)
+                    if (moControlsGUI.mainGUIMenu == (MainGUIMenuEnum)mainMenuItemCount)
                     {
-                        if (this.moControlsGUI.settingsMenu < (SettingsMenuEnum)settingsMenuItemCount)
+                        if (moControlsGUI.settingsMenu < (SettingsMenuEnum)settingsMenuItemCount)
                         {
-                            this.moControlsGUI.settingsMenu++;
+                            moControlsGUI.settingsMenu++;
                         }
                         else
                         {
-                            this.moControlsGUI.mainGUIMenu = 0;
+                            moControlsGUI.mainGUIMenu = 0;
                         }
                     }
                     else
                     {
-                        this.moControlsGUI.mainGUIMenu++;
+                        moControlsGUI.mainGUIMenu++;
                     }
                 }
             }

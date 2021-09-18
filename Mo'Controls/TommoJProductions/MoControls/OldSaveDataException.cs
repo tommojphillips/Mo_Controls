@@ -8,7 +8,7 @@ namespace TommoJProductions.MoControls
 
         public OldSaveDataException(MoControlsSaveData inOldSaveData) 
         {
-            this.oldSaveData = inOldSaveData;
+            oldSaveData = inOldSaveData;
         }
     }
 }

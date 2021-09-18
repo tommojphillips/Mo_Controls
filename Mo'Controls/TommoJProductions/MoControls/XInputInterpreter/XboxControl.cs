@@ -53,9 +53,9 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 20.07.2018
 
-            this.inputName = inInputName;
-            this.name = inName;
-            this.controlType = inType;
+            inputName = inInputName;
+            name = inName;
+            controlType = inType;
         }
 
         #endregion
@@ -66,7 +66,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 24.10.2020
 
-            this.inputName = inInputName;
+            inputName = inInputName;
         }
 
         #endregion

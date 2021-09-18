@@ -59,14 +59,14 @@ namespace TommoJProductions.MoControls
         {
             get
             {
-                return currentPlayerMode == PlayerModeEnum.Driving ? this.drivingControls : currentPlayerMode == PlayerModeEnum.OnFoot ? this.footControls : this.blankControls;
+                return currentPlayerMode == PlayerModeEnum.Driving ? drivingControls : currentPlayerMode == PlayerModeEnum.OnFoot ? footControls : blankControls;
             }
             set
             {
-                if (this.currentPlayerMode == PlayerModeEnum.Driving)
-                    this.drivingControls = value;
-                else if (this.currentPlayerMode == PlayerModeEnum.OnFoot)
-                    this.footControls = value;
+                if (currentPlayerMode == PlayerModeEnum.Driving)
+                    drivingControls = value;
+                else if (currentPlayerMode == PlayerModeEnum.OnFoot)
+                    footControls = value;
             }
         }
         /// <summary>        
@@ -292,10 +292,10 @@ namespace TommoJProductions.MoControls
         {
             // Written, 22.08.2018
 
-            this.currentPlayerMode = null;
-            this.setChangeInput();
-            cInput.OnKeyChanged -= this.cInput_OnKeyChanged;
-            cInput.OnKeyChanged += this.cInput_OnKeyChanged;
+            currentPlayerMode = null;
+            setChangeInput();
+            cInput.OnKeyChanged -= cInput_OnKeyChanged;
+            cInput.OnKeyChanged += cInput_OnKeyChanged;
         }
 
         #endregion
@@ -314,11 +314,11 @@ namespace TommoJProductions.MoControls
             toolModeGameObject = GameObject.Find(toolModeLocation);
             handModeGameObject = GameObject.Find(handModeLocation);
             // Tool mode hold button set up
-            HoldInputMono him = this.gameObject.AddComponent<HoldInputMono>();
-            him.setData("Toggle Tool Mode", XboxButtonEnum.Start, 0.3f, this.requestedModeChange);
+            HoldInputMono him = gameObject.AddComponent<HoldInputMono>();
+            him.setData("Toggle Tool Mode", XboxButtonEnum.Start, 0.3f, requestedModeChange);
             // Setting up guiNav "toolMode MouseScroll".
-            this.toolModeScroll = this.gameObject.AddComponent<GuiNav>();
-            this.toolModeScroll.setControls(XboxAxisEnum.rightTrigger, XboxButtonEnum.NULL,
+            toolModeScroll = gameObject.AddComponent<GuiNav>();
+            toolModeScroll.setControls(XboxAxisEnum.rightTrigger, XboxButtonEnum.NULL,
                 XboxAxisEnum.leftTrigger, XboxButtonEnum.NULL,
                 XboxAxisEnum.NULL, XboxButtonEnum.RB,
                 XboxAxisEnum.NULL, XboxButtonEnum.LB);
@@ -331,17 +331,17 @@ namespace TommoJProductions.MoControls
         {
             // Written, 31.08.2018
 
-            if (this.currentPlayerMode != getCurrentPlayerMode)
+            if (currentPlayerMode != getCurrentPlayerMode)
             {
-                this.currentPlayerMode = getCurrentPlayerMode;
-                this.loadControlModeToCInput(this.currentPlayerMode, this.currentControls);
-                MoControlsMod.print("Control Mode changed: " + this.currentPlayerMode, DebugTypeEnum.full);
+                currentPlayerMode = getCurrentPlayerMode;
+                loadControlModeToCInput(currentPlayerMode, currentControls);
+                MoControlsMod.print("Control Mode changed: " + currentPlayerMode, DebugTypeEnum.full);
             }
             // Enable scroll only if player is on foot and in tool mode (2) OR when player is holding an item while on foot and in hand mode.
-            this.toolModeScroll.enabled = this.currentPlayerMode == PlayerModeEnum.OnFoot && (isInToolMode || (!isInToolMode && !isPlayerHandEmpty()));
+            toolModeScroll.enabled = currentPlayerMode == PlayerModeEnum.OnFoot && (isInToolMode || (!isInToolMode && !isPlayerHandEmpty()));
             // Handling xbox controller force feedback rumble events.
-            if (this.setFfbForVehicle())
-                this.handleFfbOnXboxController();
+            if (setFfbForVehicle())
+                handleFfbOnXboxController();
         }
         /// <summary>
         /// Loads provided control list to cInput.
@@ -365,9 +365,9 @@ namespace TommoJProductions.MoControls
             {
                 MoControlsMod.print(String.Format("control inputs was null; setting {0} inputs to current control settings.", controlListName), DebugTypeEnum.full);
                 if (inPlayerMode == PlayerModeEnum.Driving)
-                    this.drivingControls = loadControlInputsFromCInput();
+                    drivingControls = loadControlInputsFromCInput();
                 else
-                    this.footControls = loadControlInputsFromCInput();
+                    footControls = loadControlInputsFromCInput();
             }
             catch
             {
@@ -382,7 +382,7 @@ namespace TommoJProductions.MoControls
         {
             // Written, 09.07.2018
 
-            this.currentControls = loadControlInputsFromCInput();
+            currentControls = loadControlInputsFromCInput();
         }
         /// <summary>
         /// Loads control inputs (defined in <see cref="inputNames"/>) from the class, <see cref="cInput"/> and adds each one to <see cref="controlInputs"/> with it's primary
@@ -420,8 +420,8 @@ namespace TommoJProductions.MoControls
         {
             // Written, 22.08.2018
 
-            this.footControls = inFootControls;
-            this.drivingControls = inDrivingControls;
+            footControls = inFootControls;
+            drivingControls = inDrivingControls;
         }
         /// <summary>
         /// Sets the provided game control in provided mode.
@@ -439,30 +439,30 @@ namespace TommoJProductions.MoControls
             switch (inMode)
             {
                 case PlayerModeEnum.Driving:
-                    for (int i = 0; i < this.drivingControls.GetLength(0); i++)
+                    for (int i = 0; i < drivingControls.GetLength(0); i++)
                     {
-                        string _controlName = this.drivingControls[i, 0];
+                        string _controlName = drivingControls[i, 0];
                         if (inControlName == _controlName)
                         {
-                            this.drivingControls[i, inIndex] = inInput;
+                            drivingControls[i, inIndex] = inInput;
                             break;
                         }
                     }
-                    if (this.currentPlayerMode == inMode)
-                        this.loadControlModeToCInput(inMode, this.drivingControls);
+                    if (currentPlayerMode == inMode)
+                        loadControlModeToCInput(inMode, drivingControls);
                     break;
                 case PlayerModeEnum.OnFoot:
-                    for (int i = 0; i < this.footControls.GetLength(0); i++)
+                    for (int i = 0; i < footControls.GetLength(0); i++)
                     {
-                        string _controlName = this.footControls[i, 0];
+                        string _controlName = footControls[i, 0];
                         if (inControlName == _controlName)
                         {
-                            this.footControls[i, inIndex] = inInput;
+                            footControls[i, inIndex] = inInput;
                             break;
                         }
                     }
-                    if (this.currentPlayerMode == inMode)
-                        this.loadControlModeToCInput(inMode, this.footControls);
+                    if (currentPlayerMode == inMode)
+                        loadControlModeToCInput(inMode, footControls);
                     break;
             }
         }
@@ -474,11 +474,11 @@ namespace TommoJProductions.MoControls
         {
             // Written, 09.07.2018
 
-            if (!this.changeInputResult.isModKeybind)
+            if (!changeInputResult.isModKeybind)
             {
                 // Treat as a game control.
 
-                PlayerModeEnum? playerMode = this.changeInputResult?.mode;
+                PlayerModeEnum? playerMode = changeInputResult?.mode;
 
                 if (playerMode == null)
                 {
@@ -489,18 +489,18 @@ namespace TommoJProductions.MoControls
                     });
                     if (!mistake)
                     {
-                        if (this.changeInputResult.index == 1)
-                            cInput.ChangeKey(this.changeInputResult.controlName, inInput, cInput.GetText(this.changeInputResult.controlName, 2));
+                        if (changeInputResult.index == 1)
+                            cInput.ChangeKey(changeInputResult.controlName, inInput, cInput.GetText(changeInputResult.controlName, 2));
                         else
-                            cInput.ChangeKey(this.changeInputResult.controlName, cInput.GetText(this.changeInputResult.controlName, 1), inInput);
-                        this.currentControls = loadControlInputsFromCInput();
+                            cInput.ChangeKey(changeInputResult.controlName, cInput.GetText(changeInputResult.controlName, 1), inInput);
+                        currentControls = loadControlInputsFromCInput();
                     }
                     MoControlsMod.print("Player mode wasa null while attempting to change input..", DebugTypeEnum.full);
                 }
                 else
                 {
-                    this.setGameControl((PlayerModeEnum)playerMode, this.changeInputResult.controlName, this.changeInputResult.index, inInput);
-                    MoControlsMod.print("Player mode was equal to <b>" + this.changeInputResult.mode + "</b> whiling setting '" + this.changeInputResult.controlName + "' to '" + inInput + "'.", DebugTypeEnum.full);
+                    setGameControl((PlayerModeEnum)playerMode, changeInputResult.controlName, changeInputResult.index, inInput);
+                    MoControlsMod.print("Player mode was equal to <b>" + changeInputResult.mode + "</b> whiling setting '" + changeInputResult.controlName + "' to '" + inInput + "'.", DebugTypeEnum.full);
                     MoControlsSaveData.loadedSaveData.saveSettings();
                 }
             }
@@ -508,8 +508,8 @@ namespace TommoJProductions.MoControls
             {
                 // Treat as a mod keybind.
 
-                Keybind modKeybind = Keybind.Get(this.changeInputResult.mod).Where(kb => kb.ID == this.changeInputResult.controlName).First();
-                if (this.changeInputResult.index == 1)
+                Keybind modKeybind = Keybind.Get(changeInputResult.mod).Where(kb => kb.ID == changeInputResult.controlName).First();
+                if (changeInputResult.index == 1)
                 {
                     modKeybind.Modifier = (KeyCode)Enum.Parse(typeof(KeyCode), inInput);
                 }
@@ -517,10 +517,10 @@ namespace TommoJProductions.MoControls
                 {
                     modKeybind.Key = (KeyCode)Enum.Parse(typeof(KeyCode), inInput);
                 }
-                ModSettings_menu.SaveModBinds(this.changeInputResult.mod);
+                ModSettings_menu.SaveModBinds(changeInputResult.mod);
                 MoControlsMod.print("saved <i>" + modKeybind.Mod.Name + "</i> mod keybinds.", DebugTypeEnum.full);
             }
-            this.setChangeInput();
+            setChangeInput();
         }
         /// <summary>
         /// Toggles toolmode eg. tool=>hand | hand=>tool
@@ -568,9 +568,9 @@ namespace TommoJProductions.MoControls
         {
             // Written, 16.10.2020
 
-            if (MoControlsSaveData.loadedSaveData.ffbOnXboxController && this.vehicle != null)
+            if (MoControlsSaveData.loadedSaveData.ffbOnXboxController && vehicle != null)
             {
-                Vector2 rumblePow = this.getFfbSetOpt();
+                Vector2 rumblePow = getFfbSetOpt();
                 MoControlsGO.xboxController.setRumble(rumblePow);
             }
         }
@@ -585,21 +585,21 @@ namespace TommoJProductions.MoControls
             float yMotor = 0;
             if (MoControlsSaveData.loadedSaveData.ffbOption_default)
             {
-                return this.floatToVector(this.defaultFfb());
+                return floatToVector(defaultFfb());
             }
             else
             {
                 if (MoControlsSaveData.loadedSaveData.ffbOption_wheelSlip)
                 {
-                    float wheelSlip = Mathf.Clamp(this.wheelSlipBasedFfb(), -1, 1);
+                    float wheelSlip = Mathf.Clamp(wheelSlipBasedFfb(), -1, 1);
                     if (wheelSlip > 0)
                         xMotor = wheelSlip;
                     else
                         yMotor = Mathf.Abs(wheelSlip);
                 } if (MoControlsSaveData.loadedSaveData.ffbOption_rpmLimiter)
-                    xMotor += this.rpmLimiterBasedFfb();
+                    xMotor += rpmLimiterBasedFfb();
                 if (MoControlsSaveData.loadedSaveData.ffbOption_gearChange)
-                    yMotor += this.gearChangeBasedFfb();
+                    yMotor += gearChangeBasedFfb();
             }
             return new Vector2(Mathf.Clamp(xMotor, 0, 1), Mathf.Clamp(yMotor, 0, 1));
         }
@@ -607,8 +607,8 @@ namespace TommoJProductions.MoControls
         {
             // Written, 23.10.2020
 
-            if (this.drivetrain.changingGear)
-                return this.drivetrain.rpm / this.drivetrain.maxRPM;
+            if (drivetrain.changingGear)
+                return drivetrain.rpm / drivetrain.maxRPM;
             return 0;
         }
         private float rpmLimiterBasedFfb()
@@ -616,16 +616,16 @@ namespace TommoJProductions.MoControls
             // Written, 18.10.2020
 
             int engageAt = 1500;
-            float _rpm = this.drivetrain.rpm;
-            if (this.drivetrain.revLimiterTriggered || _rpm > (int)this.drivetrain.maxRPM - engageAt) // > 6500 RPM => ffb)
-                return _rpm / this.drivetrain.maxRPM;
+            float _rpm = drivetrain.rpm;
+            if (drivetrain.revLimiterTriggered || _rpm > (int)drivetrain.maxRPM - engageAt) // > 6500 RPM => ffb)
+                return _rpm / drivetrain.maxRPM;
             return 0;
         }
         private float wheelSlipBasedFfb()
         {
             // Written, 18.10.2020
 
-            return this.drivetrain.poweredWheels.Max(_wheel => _wheel.longitudinalSlip); // based on car roll, facing forward
+            return drivetrain.poweredWheels.Max(_wheel => _wheel.longitudinalSlip); // based on car roll, facing forward
         }
         /// <summary>
         /// Represents the default ffb (designed for a wheel) doesnt work properly
@@ -634,7 +634,7 @@ namespace TommoJProductions.MoControls
         {
             // Written, 18.10.2020
 
-            return this.carDynamics.forceFeedback;
+            return carDynamics.forceFeedback;
         }
         /// <summary>
         /// Converts ffb float value to a vector 2 for xbox rumble events.
@@ -659,7 +659,7 @@ namespace TommoJProductions.MoControls
         {
             // Written, 17.10.2020
 
-            this.changeInputResult = inChangeInput ?? new ChangeInput();
+            changeInputResult = inChangeInput ?? new ChangeInput();
         }
         /// <summary>
         /// Sets all ffb to the current vehicle.
@@ -675,37 +675,37 @@ namespace TommoJProductions.MoControls
                 switch (_currentVehicleName)
                 {
                     case "Satsuma":
-                        this.vehicle = GameObject.Find("SATSUMA(557kg, 248)");
-                        this.carDynamics = this.vehicle.GetComponent<CarDynamics>();
-                        this.drivetrain = this.vehicle.GetComponent<Drivetrain>();
+                        vehicle = GameObject.Find("SATSUMA(557kg, 248)");
+                        carDynamics = vehicle.GetComponent<CarDynamics>();
+                        drivetrain = vehicle.GetComponent<Drivetrain>();
                         break;
                     case "Jonnez":
-                        this.vehicle = GameObject.Find("JONNEZ ES(Clone)");
-                        this.carDynamics = this.vehicle.GetComponent<CarDynamics>();
-                        this.drivetrain = this.vehicle.GetComponent<Drivetrain>();
+                        vehicle = GameObject.Find("JONNEZ ES(Clone)");
+                        carDynamics = vehicle.GetComponent<CarDynamics>();
+                        drivetrain = vehicle.GetComponent<Drivetrain>();
                         break;
                     case "Kekmet":
-                        this.vehicle = GameObject.Find("KEKMET(350-400psi)");
-                        this.carDynamics = this.vehicle.GetComponent<CarDynamics>();
-                        this.drivetrain = this.vehicle.GetComponent<Drivetrain>();
+                        vehicle = GameObject.Find("KEKMET(350-400psi)");
+                        carDynamics = vehicle.GetComponent<CarDynamics>();
+                        drivetrain = vehicle.GetComponent<Drivetrain>();
                         break;
                     case "Hayosiko":
-                        this.vehicle = GameObject.Find("HAYOSIKO(1500kg, 250)");
-                        this.carDynamics = this.vehicle.GetComponent<CarDynamics>();
-                        this.drivetrain = this.vehicle.GetComponent<Drivetrain>();
+                        vehicle = GameObject.Find("HAYOSIKO(1500kg, 250)");
+                        carDynamics = vehicle.GetComponent<CarDynamics>();
+                        drivetrain = vehicle.GetComponent<Drivetrain>();
                         break;
                     case "Gifu":
-                        this.vehicle = GameObject.Find("GIFU(750/450psi)");
-                        this.carDynamics = this.vehicle.GetComponent<CarDynamics>();
-                        this.drivetrain = this.vehicle.GetComponent<Drivetrain>();
+                        vehicle = GameObject.Find("GIFU(750/450psi)");
+                        carDynamics = vehicle.GetComponent<CarDynamics>();
+                        drivetrain = vehicle.GetComponent<Drivetrain>();
                         break;
                     default:
-                        this.vehicle = null;
+                        vehicle = null;
                         break;
                 }
                 currentVehicleName = _currentVehicleName;
             }
-            return this.vehicle != null;
+            return vehicle != null;
         }
 
         #endregion

@@ -212,7 +212,7 @@ namespace TommoJProductions.MoControls
         internal static MoControlsSaveData loadSettings()
         {
             // Written, 17.10.2020
-                        
+
             bool createNewSaveFile = false;
             MoControlsSaveData mcsd = null;
             try

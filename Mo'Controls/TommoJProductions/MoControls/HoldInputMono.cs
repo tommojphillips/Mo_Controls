@@ -72,7 +72,7 @@ namespace TommoJProductions.MoControls
                     if (timer > (startTime + holdTime))
                     {
                         held = true;
-                        this.action?.Invoke();
+                        action?.Invoke();
                     }
                 }
                 if (xc.getButtonUp(keyName))
@@ -92,13 +92,13 @@ namespace TommoJProductions.MoControls
         {
             // Written, 19.12.2018
 
-            this.holdTime = inHoldTime;
-            this.keyName = inKeyName;
-            this.action = inAction;
-            this.hiName = inName;
-            this.id = ("hld_inpt_" + this.hiName.ToLower().Replace(" ", "") + "_K" + inKeyName).ToLower().Trim();
+            holdTime = inHoldTime;
+            keyName = inKeyName;
+            action = inAction;
+            hiName = inName;
+            id = ("hld_inpt_" + hiName.ToLower().Replace(" ", "") + "_K" + inKeyName).ToLower().Trim();
 
-            MoControlsMod.print("hld_inpt: " + this.hiName + " initiliazed as '" + this.id + "'.", Debugging.DebugTypeEnum.full);
+            MoControlsMod.print("hld_inpt: " + hiName + " initiliazed as '" + id + "'.", Debugging.DebugTypeEnum.full);
         }
 
         #endregion

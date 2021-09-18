@@ -21,7 +21,7 @@
         {
             get
             {
-                return this.controls[0];
+                return controls[0];
             }
         }
         /// <summary>
@@ -31,7 +31,7 @@
         {
             get
             {
-                return this.controls[1];
+                return controls[1];
             }
         }
         /// <summary>
@@ -41,7 +41,7 @@
         {
             get
             {
-                return this.controls[2];
+                return controls[2];
             }
         }
         /// <summary>
@@ -51,7 +51,7 @@
         {
             get
             {
-                return this.controls[3];
+                return controls[3];
             }
         }
 
@@ -70,7 +70,7 @@
         {
             // Written, 21.07.2018
 
-            this.controls = new XboxFloatState[]
+            controls = new XboxFloatState[]
             {
                 inLeft,
                 inRight,

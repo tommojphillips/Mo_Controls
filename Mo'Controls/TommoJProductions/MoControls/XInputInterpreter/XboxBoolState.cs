@@ -45,7 +45,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// </summary>
         public override string ToString()
         {
-            return string.Format("<color={0}><b>{1}</b></color>", this.state == ButtonState.Pressed ? "yellow" : "white", this.state);
+            return string.Format("<color={0}><b>{1}</b></color>", state == ButtonState.Pressed ? "yellow" : "white", state);
         }
     }
 }

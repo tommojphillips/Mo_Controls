@@ -20,7 +20,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter.Monitoring
         {
             get
             {
-                return this.xboxControllerManager.controller;
+                return xboxControllerManager.controller;
             }
         }
         /// <summary>
@@ -40,8 +40,8 @@ namespace TommoJProductions.MoControls.XInputInterpreter.Monitoring
         {
             // Written, 17.10.2020
 
-            this.xboxControllerManager = GetComponent<XboxControllerManager>();
-            this.controllerConnection = new ControllerConnection();
+            xboxControllerManager = GetComponent<XboxControllerManager>();
+            controllerConnection = new ControllerConnection();
         }
         private IEnumerator updateCoroutine()
         {

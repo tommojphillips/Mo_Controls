@@ -208,17 +208,17 @@ namespace TommoJProductions.MoControls
                 }
                 catch (NullReferenceException ex)
                 {
-                    this.result = false;
+                    result = false;
                     MoControlsMod.print("<color=red>Error occured when setting asset textures...</color>.\r\n<b>Message:</b>" + ex.Message + "\r\nStacktrace:\r\n" + ex.StackTrace, DebugTypeEnum.full);
                     throw;
                 }
             }
             else
             {
-                this.result = false;
+                result = false;
                 MoControlsMod.print("<color=red>Error not all assets could be found..</color>.", DebugTypeEnum.full);
             }
-            this.result = true;
+            result = true;
         }
     }
 }

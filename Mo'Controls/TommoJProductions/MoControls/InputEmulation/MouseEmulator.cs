@@ -147,7 +147,7 @@ namespace TommoJProductions.MoControls.InputEmulation
         {
             // Written, 01.08.2018
 
-            StartCoroutine(this.updateCoroutine());
+            StartCoroutine(updateCoroutine());
         }
         /// <summary>
         /// Creates required stuff to simulate mouse movement.

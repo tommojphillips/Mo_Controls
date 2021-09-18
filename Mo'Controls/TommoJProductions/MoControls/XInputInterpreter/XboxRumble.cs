@@ -47,7 +47,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 16.07.2018
 
-            this.timer -= Time.deltaTime;
+            timer -= Time.deltaTime;
         }
 
         #endregion

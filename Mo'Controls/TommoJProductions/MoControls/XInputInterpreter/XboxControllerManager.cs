@@ -59,7 +59,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// </summary>
         internal XboxController controller
         {
-            get { return this.gameObject.GetComponent<XboxController>(); }
+            get { return gameObject.GetComponent<XboxController>(); }
         }
         /// <summary>
         /// Represents the monitoring controller connections system.
@@ -94,8 +94,8 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             try
             {
-                this.gameObject.AddComponent<XboxController>();
-                this.monitorControllerConnections = this.gameObject.AddComponent<MonitorControllerConnections>();
+                gameObject.AddComponent<XboxController>();
+                monitorControllerConnections = gameObject.AddComponent<MonitorControllerConnections>();
                 MoControlsMod.print(nameof(XboxControllerManager) + ": Started", Debugging.DebugTypeEnum.full);
             }
             catch (Exception ex)

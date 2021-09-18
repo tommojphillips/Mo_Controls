@@ -123,7 +123,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents the <see cref="moControlsGO"/> name.
         /// </summary>
-        internal string gameObjectName => String.Format("{0} v{1}", this.ID, this.Version);
+        internal string gameObjectName => String.Format("{0} v{1}", ID, Version);
         /// <summary>
         /// Represents the current instance of <see cref="MoControlsMod"/>.
         /// </summary>
@@ -150,9 +150,8 @@ namespace TommoJProductions.MoControls
             // Written, 20.08.2018
 
             instance = this;
-            this.performDebugCheck();
-            MoControlsSaveData.loadSettings();
-            ModConsole.Print(String.Format("<color=green>{0} <b>v{1}</b> {2} ready</color>", this.Name, this.Version, this.releaseVersionName));
+            performDebugCheck();
+            ModConsole.Print(String.Format("<color=green>{0} <b>v{1}</b> {2} ready</color>", Name, Version, releaseVersionName));
         }
 
         #endregion
@@ -233,7 +232,7 @@ namespace TommoJProductions.MoControls
                     ModUI.ShowMessage(
                         String.Format("<b>[{0} <color=orange>v{1}]</color></b> - NOTE: modloader v{2} may not be <color=orange>compatible</color>.\r\nSupported " +
                         "modloader version is <color=orange>v{3}</color>.",
-                        this.Name, this.Version, ModLoader.MSCLoader_Ver, SUPPORTED_MODLOADER_VERSION), "ModLoader Version not supported.");
+                        Name, Version, ModLoader.MSCLoader_Ver, SUPPORTED_MODLOADER_VERSION), "ModLoader Version not supported.");
                     MoControlsSaveData.loadedSaveData.playerSeenMscLoaderVersionError = true;
                     MoControlsSaveData.loadedSaveData.saveSettings();
                 }
@@ -261,13 +260,13 @@ namespace TommoJProductions.MoControls
             ConsoleCommand.Add(new ListLoadedAssembliesConsoleCommand());
             ConsoleCommand.Add(new WriteCinputExternInputsCommand());
             ConsoleCommand.Add(new ChangeToolModeCommand());
-            Keybind.Add(this, this.openControlsGui);
-            Keybind.Add(this, this.lmbPrimaryInput);
-            Keybind.Add(this, this.lmbSecondaryInput);
-            Keybind.Add(this, this.rmbPrimaryInput);
-            Keybind.Add(this, this.rmbSecondaryInput);
+            Keybind.Add(this, openControlsGui);
+            Keybind.Add(this, lmbPrimaryInput);
+            Keybind.Add(this, lmbSecondaryInput);
+            Keybind.Add(this, rmbPrimaryInput);
+            Keybind.Add(this, rmbSecondaryInput);
 
-            this.loadControllerAssets();
+            loadControllerAssets();
         }
         /// <summary>
         /// Represents a debug/release mode check.
@@ -323,8 +322,9 @@ namespace TommoJProductions.MoControls
         {
             // Project start date, 06.07.2018 | Modified 28.10.2020   
 
-            this.initialize();
-            this.performModLoaderVersionCheck();
+            MoControlsSaveData.loadSettings();
+            initialize();
+            performModLoaderVersionCheck();
         }
         public static int determineIsVersionOldCurrentOrNew(string inVersion)
         {
@@ -351,12 +351,12 @@ namespace TommoJProductions.MoControls
             // Written, 18.10.2020
 
             if (!UnityEngine.Input.GetKey(KeyCode.LeftControl))
-                this.loadCInputAxisSettings();
+                loadCInputAxisSettings();
             else
                 print("skipped loading cinput axis settings (grav, dead, sens).. Cause: <i>Left-Ctrl held down through Mo'Controls' second pass loading sequ</i>", DebugTypeEnum.none);
             moControlsGameObject = new GameObject(gameObjectName);
             moControlsGO = moControlsGameObject.AddComponent<MoControlsGO>();
-            print(this.Name + " v" + this.Version + ": Loaded.", DebugTypeEnum.none);
+            print(Name + " v" + Version + ": Loaded.", DebugTypeEnum.none);
         }
         #endregion
 

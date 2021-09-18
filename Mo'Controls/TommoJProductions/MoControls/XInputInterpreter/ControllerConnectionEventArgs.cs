@@ -26,7 +26,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 16.07.2018
 
-            this.xboxController = inXboxController;
+            xboxController = inXboxController;
         }
     }
 }

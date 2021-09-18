@@ -49,7 +49,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// </summary>
         public override string ToString()
         {
-            return string.Format("<color={0}><b>{1}</b></color>", Mathf.Abs(this.state) > 0 ? "yellow" : "white", this.state.ToString("0.00"));
+            return string.Format("<color={0}><b>{1}</b></color>", Mathf.Abs(state) > 0 ? "yellow" : "white", state.ToString("0.00"));
         }
     }
 }
