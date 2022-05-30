@@ -33,7 +33,7 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// <summary>
         /// Represents the default sensitivity for the emulated mouse.
         /// </summary>
-        public const float DEFAULT_SENSITIVITY = 30.0f;
+        public const float DEFAULT_SENSITIVITY = 15.0f;
         /// <summary>
         /// Represents the min deadzone.
         /// </summary>
@@ -126,7 +126,7 @@ namespace TommoJProductions.MoControls.InputEmulation
                         moveX = (int)stickValue.x;
                         moveY = (int)stickValue.y * -1; // '* -1' xbox controller y axis is naturally inverted. so changing the that..;
                         simulateMouseMove(moveX, moveY);
-                        yield return null;//new WaitForEndOfFrame();
+                        yield return null;
                     }
                 }
             }

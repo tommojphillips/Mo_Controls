@@ -12,16 +12,6 @@ namespace TommoJProductions.MoControls
         #region Properties
 
         /// <summary>
-        /// Returns whether the input to change is a mod keybind.
-        /// </summary>
-        public bool isModKeybind
-        {
-            get
-            {
-                return mod != null;
-            }
-        }
-        /// <summary>
         /// Represents whether to reassign a key or not.
         /// </summary>
         public bool reassignKey
@@ -91,15 +81,13 @@ namespace TommoJProductions.MoControls
         /// <param name="inReassignKey">Indicates if the program should begin ressign key function.</param>
         /// <param name="inInputName">The name of the input to change. If <paramref name="inReassignKey"/> is equal to false, this should be null.</param>
         /// <param name="inIndex">The input to change, either 1 or 2; 1 for primary input, 2 for secondary input. if <paramref name="inReassignKey"/> is equal to <see langword="false"/>, this should be equal to 0</param>
-        /// <param name="mod">The mod to change keybind.</param>
-        public ChangeInput(bool inReassignKey, string inInputName, int inIndex, PlayerModeEnum? inMode = null, Mod inMod = null)
+        public ChangeInput(bool inReassignKey, string inInputName, int inIndex, PlayerModeEnum? inMode = null)
         {
             // Written, 11.07.2018
 
             reassignKey = inReassignKey;
             controlName = inInputName;
             index = inIndex;
-            mod = inMod;
             mode = inMode;
         }
 

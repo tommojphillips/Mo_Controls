@@ -1,6 +1,7 @@
 ﻿using HutongGames.PlayMaker;
 using MSCLoader;
 using System;
+using System.Collections;
 using System.Linq;
 using TommoJProductions.Debugging;
 using TommoJProductions.MoControls.GUI;
@@ -36,18 +37,38 @@ namespace TommoJProductions.MoControls
         /// </summary>
         internal CarDynamics carDynamics;
         /// <summary>
-        /// Reprsents the current player mode.
-        /// </summary>
-        private PlayerModeEnum? currentPlayerMode;
-        /// <summary>
         /// Represents the drivetrain gamobject. used for ffb.
         /// </summary>
         internal Drivetrain drivetrain;
-
+        /// <summary>
+        /// Reprsents the current player mode.
+        /// </summary>
+        private PlayerModeEnum _cpm;
         #endregion
 
         #region Properties
 
+        /// <summary>
+        /// Reprsents the current player mode.
+        /// </summary>
+        private PlayerModeEnum currentPlayerMode 
+        {
+            get
+            {
+                if (_cpm != getCurrentPlayerMode)
+                {
+                    currentPlayerMode = getCurrentPlayerMode;
+                }
+                return _cpm;
+            }
+
+            set
+            {
+                _cpm = value;
+                loadControlModeToCInput(_cpm, currentControls);
+                MoControlsMod.print("Control Mode changed: " + _cpm, DebugTypeEnum.full);
+            }
+        }
         /// <summary>
         /// Represents the satsuma gameobject. used for forcefeedback.
         /// </summary>
@@ -272,14 +293,8 @@ namespace TommoJProductions.MoControls
             get;
             private set;
         }
-        /// <summary>
-        /// Represents the last rumble pow sent to the controller.
-        /// </summary>
-        internal Vector2 lastRumbePowSent
-        {
-            get;
-            private set;
-        }
+
+        private FsmBool handEmpty;
 
         #endregion
 
@@ -292,7 +307,6 @@ namespace TommoJProductions.MoControls
         {
             // Written, 22.08.2018
 
-            currentPlayerMode = null;
             setChangeInput();
             cInput.OnKeyChanged -= cInput_OnKeyChanged;
             cInput.OnKeyChanged += cInput_OnKeyChanged;
@@ -308,6 +322,10 @@ namespace TommoJProductions.MoControls
         private void Start()
         {
             // Written, 08.10.2018
+
+
+            GameObject gm = GameObject.Find(handModeLocation + "/Hand");
+            handEmpty = gm.GetPlayMaker("PickUp").FsmVariables.FindFsmBool("HandEmpty").Value;
 
             MoControlsGO.controlManager.setControls(MoControlsSaveData.loadedSaveData.footControls, MoControlsSaveData.loadedSaveData.drivingControls);
             // Setting up toolmode stuff
@@ -329,19 +347,28 @@ namespace TommoJProductions.MoControls
         /// </summary>
         private void Update()
         {
-            // Written, 31.08.2018
+            // Written, 31.08.2018 | Updated, 30.05.2022
+                       
 
-            if (currentPlayerMode != getCurrentPlayerMode)
-            {
-                currentPlayerMode = getCurrentPlayerMode;
-                loadControlModeToCInput(currentPlayerMode, currentControls);
-                MoControlsMod.print("Control Mode changed: " + currentPlayerMode, DebugTypeEnum.full);
-            }
             // Enable scroll only if player is on foot and in tool mode (2) OR when player is holding an item while on foot and in hand mode.
-            toolModeScroll.enabled = currentPlayerMode == PlayerModeEnum.OnFoot && (isInToolMode || (!isInToolMode && !isPlayerHandEmpty()));
+            switch (currentPlayerMode)
+            {
+                case PlayerModeEnum.OnFoot:
+                    toolModeScroll.enabled = isInToolMode ? true : !isPlayerHandEmpty();
+                    break;
+                default:
+                    toolModeScroll.enabled = false;
+                    break;
+            }
+
             // Handling xbox controller force feedback rumble events.
             if (setFfbForVehicle())
                 handleFfbOnXboxController();
+            else if (MoControlsGO.xboxController.prevRumblePow.magnitude > 0)
+            {
+                lastRumblePow = Vector2.zero;
+                MoControlsGO.xboxController.setRumble(Vector2.zero);
+            }
         }
         /// <summary>
         /// Loads provided control list to cInput.
@@ -472,54 +499,13 @@ namespace TommoJProductions.MoControls
         /// <param name="inInput">The input to assign.</param>
         internal void changeInput(string inInput)
         {
-            // Written, 09.07.2018
+            // Written, 09.07.2018 | Updated, 30.05.2022
 
-            if (!changeInputResult.isModKeybind)
-            {
-                // Treat as a game control.
+            // Treat as a game control.            
+            setGameControl((PlayerModeEnum)changeInputResult.mode, changeInputResult.controlName, changeInputResult.index, inInput);
+            MoControlsMod.print("Player mode was equal to <b>" + changeInputResult.mode + "</b> whiling setting '" + changeInputResult.controlName + "' to '" + inInput + "'.", DebugTypeEnum.full);
+            MoControlsSaveData.loadedSaveData.saveSettings();
 
-                PlayerModeEnum? playerMode = changeInputResult?.mode;
-
-                if (playerMode == null)
-                {
-                    bool mistake = true;
-                    ModUI.ShowYesNoMessage("Player Mode was null, is that right?", "Mistake?", delegate ()
-                    {
-                        mistake = false;
-                    });
-                    if (!mistake)
-                    {
-                        if (changeInputResult.index == 1)
-                            cInput.ChangeKey(changeInputResult.controlName, inInput, cInput.GetText(changeInputResult.controlName, 2));
-                        else
-                            cInput.ChangeKey(changeInputResult.controlName, cInput.GetText(changeInputResult.controlName, 1), inInput);
-                        currentControls = loadControlInputsFromCInput();
-                    }
-                    MoControlsMod.print("Player mode wasa null while attempting to change input..", DebugTypeEnum.full);
-                }
-                else
-                {
-                    setGameControl((PlayerModeEnum)playerMode, changeInputResult.controlName, changeInputResult.index, inInput);
-                    MoControlsMod.print("Player mode was equal to <b>" + changeInputResult.mode + "</b> whiling setting '" + changeInputResult.controlName + "' to '" + inInput + "'.", DebugTypeEnum.full);
-                    MoControlsSaveData.loadedSaveData.saveSettings();
-                }
-            }
-            else
-            {
-                // Treat as a mod keybind.
-
-                Keybind modKeybind = Keybind.Get(changeInputResult.mod).Where(kb => kb.ID == changeInputResult.controlName).First();
-                if (changeInputResult.index == 1)
-                {
-                    modKeybind.Modifier = (KeyCode)Enum.Parse(typeof(KeyCode), inInput);
-                }
-                else
-                {
-                    modKeybind.Key = (KeyCode)Enum.Parse(typeof(KeyCode), inInput);
-                }
-                ModSettings_menu.SaveModBinds(changeInputResult.mod);
-                MoControlsMod.print("saved <i>" + modKeybind.Mod.Name + "</i> mod keybinds.", DebugTypeEnum.full);
-            }
             setChangeInput();
         }
         /// <summary>
@@ -553,13 +539,11 @@ namespace TommoJProductions.MoControls
         /// Returns whether the players hand is empty (not holding anything).
         /// </summary>
         /// <returns></returns>
-        private static bool isPlayerHandEmpty()
+        private bool isPlayerHandEmpty()
         {
-            // Written, 06.10.2020
+            // Written, 27.02.2022
 
-            GameObject gm = GameObject.Find(handModeLocation + "/Hand");
-            PlayMakerFSM pm = gm.GetComponents<PlayMakerFSM>().First(_pm => _pm.FsmName == "PickUp");
-            return pm.FsmVariables.FindFsmBool("HandEmpty").Value;
+            return handEmpty.Value;
         }
         /// <summary>
         /// Handles ffb on the xbox controller.
@@ -570,8 +554,13 @@ namespace TommoJProductions.MoControls
 
             if (MoControlsSaveData.loadedSaveData.ffbOnXboxController && vehicle != null)
             {
-                Vector2 rumblePow = getFfbSetOpt();
-                MoControlsGO.xboxController.setRumble(rumblePow);
+                lastRumblePow = getFfbSetOpt();
+                MoControlsGO.xboxController.setRumble(lastRumblePow);
+            }
+            else if (lastRumblePow.magnitude != 0)
+            {
+                lastRumblePow = Vector2.zero;
+                MoControlsGO.xboxController.setRumble(lastRumblePow);
             }
         }
         /// <summary>
@@ -613,19 +602,17 @@ namespace TommoJProductions.MoControls
         }
         private float rpmLimiterBasedFfb()
         {
-            // Written, 18.10.2020
-
-            int engageAt = 1500;
-            float _rpm = drivetrain.rpm;
-            if (drivetrain.revLimiterTriggered || _rpm > (int)drivetrain.maxRPM - engageAt) // > 6500 RPM => ffb)
-                return _rpm / drivetrain.maxRPM;
+            // Written, 18.10.2020 || updated, 28.09.2021
+            
+            if (drivetrain.revLimiterTriggered)
+                return drivetrain.rpm / drivetrain.maxRPM;
             return 0;
         }
         private float wheelSlipBasedFfb()
         {
             // Written, 18.10.2020
 
-            return drivetrain.poweredWheels.Max(_wheel => _wheel.longitudinalSlip); // based on car roll, facing forward
+            return drivetrain.poweredWheels.Max(_wheel => Mathf.Abs(_wheel.longitudinalSlip)); // based on car roll, facing forward
         }
         /// <summary>
         /// Represents the default ffb (designed for a wheel) doesnt work properly
@@ -634,7 +621,7 @@ namespace TommoJProductions.MoControls
         {
             // Written, 18.10.2020
 
-            return carDynamics.forceFeedback;
+            return carDynamics.forceFeedback / 100;
         }
         /// <summary>
         /// Converts ffb float value to a vector 2 for xbox rumble events.

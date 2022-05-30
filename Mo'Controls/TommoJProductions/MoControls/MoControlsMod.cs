@@ -25,11 +25,11 @@ namespace TommoJProductions.MoControls
         /// Represents the current version.
         /// </summary>
         /// 
-        internal const string VERSION = "1.1.4";
+        internal const string VERSION = "1.1.6";
         /// <summary>
         /// Represents the latest release version.
         /// </summary>
-        internal const string LATEST_RELEASE_DATE = "19.09.2021";
+        internal const string LATEST_RELEASE_DATE = "30.05.2022";
 
 
         #region Mod Keybinds

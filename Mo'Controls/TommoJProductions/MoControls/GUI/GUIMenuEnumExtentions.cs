@@ -16,8 +16,6 @@ namespace TommoJProductions.MoControls.GUI
                     return "Driving Controls";
                 case MainGUIMenuEnum.FootControls:
                     return "Foot Controls";
-                case MainGUIMenuEnum.ModControls:
-                    return "Mod Controls";
                 default:
                     return inMainGUIMenu.ToString();
             }

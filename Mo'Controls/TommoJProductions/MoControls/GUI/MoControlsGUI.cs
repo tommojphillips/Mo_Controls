@@ -407,9 +407,6 @@ namespace TommoJProductions.MoControls.GUI
                     case MainGUIMenuEnum.Settings:
                         drawSettingsContent();
                         break;
-                    case MainGUIMenuEnum.ModControls:
-                        drawModContent();
-                        break;
                 }
             }
         }
@@ -1026,72 +1023,7 @@ namespace TommoJProductions.MoControls.GUI
                 }
             }
         }
-        /// <summary>
-        /// Draws all mod keybinds.
-        /// </summary>
-        private void drawModContent()
-        {
-            // Written, 09.09.2018
-
-            int j = 0;
-            if (!hasCountedModKeybinds)
-            {
-                hasCountedModKeybinds = true;
-                foreach (Mod _mod in ModLoader.LoadedMods)
-                    modKeybindCount += Keybind.Get(_mod).Count;
-            }
-            gui.Space(3f);
-            gui.Label(String.Format("<b>Total Mod Keybinds: {0}</b>", modKeybindCount - 4 /* There are 4 hidden kb's for mouse buttons as of 13.12.2018, correcting stats with constant value. */));
-            foreach (Mod _mod in ModLoader.LoadedMods)
-            {
-                Keybind[] modKeybinds = Keybind.Get(_mod).ToArray();
-
-                if (modKeybinds.Count() > 0)
-                {
-                    gui.Space(3f);
-                    ueGUI.backgroundColor = moduleBackgroundColor;
-                    using (new gui.HorizontalScope("box"))
-                    {
-                        gui.Label(String.Format("<b>{0}</b>, by <b>{1}</b>:", _mod.Name, _mod.Author));
-                        using (new gui.VerticalScope())
-                        {
-                            bool ignoreKeybind = false;
-                            for (int i = 0; i < modKeybinds.Length; i++)
-                            {
-
-                                if (_mod is MoControlsMod)
-                                {
-                                    if (modKeybinds[i].ID != MoControlsMod.instance.openControlsGui.ID)
-                                        ignoreKeybind = true;
-                                }
-                                if (!ignoreKeybind)
-                                {
-                                    j++;
-                                    if (j == 2)
-                                    {
-                                        j = 0;
-                                        ueGUI.backgroundColor = primaryItemColor;
-                                    }
-                                    else
-                                        ueGUI.backgroundColor = secondaryItemColor;
-                                    using (new gui.VerticalScope("box"))
-                                    {
-                                        gui.Label(String.Format("<b>{0}:</b>", modKeybinds[i].Name));
-                                        using (new gui.HorizontalScope())
-                                        {
-                                            drawCommonControl("Modifier", modKeybinds[i].ID, modKeybinds[i].Modifier.ToString(), 1, inMod: _mod);
-                                            drawCommonControl("Input", modKeybinds[i].ID, modKeybinds[i].Key.ToString(), 2, inMod: _mod);
-                                        }
-                                    }
-                                    gui.Space(3f);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            ueGUI.backgroundColor = backgroundColor;
-        }
+       
         /// <summary>
         /// Draws a menu with the provided Enum, <typeparamref name="T"/>.
         /// </summary>
@@ -1188,73 +1120,15 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Player movement: gravity, sensitivity and deadzone settings 
             bool saveSettings = false;
-            float _value;
 
             #region player horz
 
             gui.Label("<b>PlayerHorizontal</b>");
             using (new gui.HorizontalScope())
             {
-                // Gravity:
-                using (new gui.HorizontalScope("box"))
-                {
-                    gui.Label(String.Format("<b>Gravity</b> {0}", MoControlsSaveData.loadedSaveData.playerHorzGravity));
-                    using (new gui.VerticalScope("box"))
-                    {                        
-                        if (string.IsNullOrEmpty(pHorzGrav))
-                            pHorzGrav = MoControlsSaveData.loadedSaveData.playerHorzGravity.ToString();;
-                        pHorzGrav = gui.TextField(pHorzGrav);
-                        if (gui.Button("Set Gravity"))
-                        {
-                            if (float.TryParse(pHorzGrav, out _value))
-                            {
-                                cInput.SetAxisGravity("PlayerHorizontal", _value);
-                                MoControlsSaveData.loadedSaveData.playerHorzGravity = _value;
-                                saveSettings = true;
-                            }
-                        }
-                    }
-                }
-                // Sensitivity:
-                using (new gui.HorizontalScope("box"))
-                {
-                    gui.Label(String.Format("<b>Sensitivity</b> {0}", MoControlsSaveData.loadedSaveData.playerHorzSensitivity));
-                    using (new gui.VerticalScope("box"))
-                    {
-                        if (string.IsNullOrEmpty(pHorzSens))
-                            pHorzSens = MoControlsSaveData.loadedSaveData.playerHorzSensitivity.ToString();
-                        pHorzSens = gui.TextField(pHorzSens);
-                        if (gui.Button("Set Sensitivity"))
-                        {
-                            if (float.TryParse(pHorzSens, out _value))
-                            {
-                                cInput.SetAxisSensitivity("PlayerHorizontal", _value);
-                                MoControlsSaveData.loadedSaveData.playerHorzSensitivity = _value;
-                                saveSettings = true;
-                            }
-                        }
-                    }
-                }
-                // Deadzone:
-                using (new gui.HorizontalScope("box"))
-                {
-                    gui.Label(String.Format("<b>Deadzone</b> {0}", MoControlsSaveData.loadedSaveData.playerHorzDeadzone));
-                    using (new gui.VerticalScope("box"))
-                    {
-                        if (string.IsNullOrEmpty(pHorzDead))
-                            pHorzDead = MoControlsSaveData.loadedSaveData.playerHorzDeadzone.ToString();
-                        pHorzDead = gui.TextField(pHorzDead);
-                        if (gui.Button("Set Deadzone"))
-                        {
-                            if (float.TryParse(pHorzDead, out _value))
-                            {
-                                cInput.SetAxisDeadzone("PlayerHorizontal", _value);
-                                MoControlsSaveData.loadedSaveData.playerHorzDeadzone = _value;
-                                saveSettings = true;
-                            }
-                        }
-                    }
-                }
+                drawCInputAxisEdit("Gravity", ref pHorzGrav, ref MoControlsSaveData.loadedSaveData.playerHorzGravity, ref saveSettings, cInputAxisEditType.gravity, cInputAxisEditMember.PlayerHorizontal);
+                drawCInputAxisEdit("Sensitivity", ref pHorzSens, ref MoControlsSaveData.loadedSaveData.playerHorzSensitivity, ref saveSettings, cInputAxisEditType.sensitivity, cInputAxisEditMember.PlayerHorizontal);
+                drawCInputAxisEdit("Deadzone", ref pHorzDead, ref MoControlsSaveData.loadedSaveData.playerHorzDeadzone, ref saveSettings, cInputAxisEditType.deadzone, cInputAxisEditMember.PlayerHorizontal);
             }
 
             #endregion
@@ -1264,66 +1138,9 @@ namespace TommoJProductions.MoControls.GUI
             gui.Label("<b>PlayerVertical</b>");
             using (new gui.HorizontalScope())
             {
-                // Gravity:
-                using (new gui.HorizontalScope("box"))
-                {
-                    gui.Label(String.Format("<b>Gravity</b> {0}", MoControlsSaveData.loadedSaveData.playerVertGravity));
-                    using (new gui.VerticalScope("box"))
-                    {
-                        if (string.IsNullOrEmpty(pVertGrav))
-                            pVertGrav = MoControlsSaveData.loadedSaveData.playerVertGravity.ToString();
-                        pVertGrav = gui.TextField(pVertGrav);
-                        if (gui.Button("Set Gravity"))
-                        {
-                            if (float.TryParse(pVertGrav, out _value))
-                            {
-                                cInput.SetAxisGravity("PlayerVertical", _value);
-                                MoControlsSaveData.loadedSaveData.playerVertGravity = _value;
-                                saveSettings = true;
-                            }
-                        }
-                    }
-                }
-                // Sensitivity:
-                using (new gui.HorizontalScope("box"))
-                {
-                    gui.Label(String.Format("<b>Sensitivity</b> {0}", MoControlsSaveData.loadedSaveData.playerVertSensitivity));
-                    using (new gui.VerticalScope("box"))
-                    {
-                        if (string.IsNullOrEmpty(pVertSens))
-                            pVertSens = MoControlsSaveData.loadedSaveData.playerVertSensitivity.ToString();
-                        pVertSens = gui.TextField(pVertSens);
-                        if (gui.Button("Set Sensitivity"))
-                        {
-                            if (float.TryParse(pVertSens, out _value))
-                            {
-                                cInput.SetAxisSensitivity("PlayerVertical", _value);
-                                MoControlsSaveData.loadedSaveData.playerVertSensitivity = _value;
-                                saveSettings = true;
-                            }
-                        }
-                    }
-                }
-                // Deadzone:
-                using (new gui.HorizontalScope("box"))
-                {
-                    gui.Label(String.Format("<b>Deadzone</b> {0}", MoControlsSaveData.loadedSaveData.playerVertDeadzone));
-                    using (new gui.VerticalScope("box"))
-                    {
-                        if (string.IsNullOrEmpty(pVertDead))
-                            pVertDead = MoControlsSaveData.loadedSaveData.playerVertDeadzone.ToString();
-                        pVertDead = gui.TextField(pVertDead);
-                        if (gui.Button("Set Deadzone"))
-                        {
-                            if (float.TryParse(pVertDead, out _value))
-                            {
-                                cInput.SetAxisDeadzone("PlayerVertical", _value);
-                                MoControlsSaveData.loadedSaveData.playerVertDeadzone = _value;
-                                saveSettings = true;
-                            }
-                        }
-                    }
-                }
+                drawCInputAxisEdit("Gravity", ref pVertGrav, ref MoControlsSaveData.loadedSaveData.playerVertGravity, ref saveSettings, cInputAxisEditType.gravity, cInputAxisEditMember.PlayerVertical);
+                drawCInputAxisEdit("Sensitivity", ref pVertSens, ref MoControlsSaveData.loadedSaveData.playerVertSensitivity, ref saveSettings, cInputAxisEditType.sensitivity, cInputAxisEditMember.PlayerVertical);
+                drawCInputAxisEdit("Deadzone", ref pVertDead, ref MoControlsSaveData.loadedSaveData.playerVertDeadzone, ref saveSettings, cInputAxisEditType.deadzone, cInputAxisEditMember.PlayerVertical);
             }
 
             #endregion
@@ -1333,138 +1150,20 @@ namespace TommoJProductions.MoControls.GUI
             gui.Label("<b>Horizontal</b>");
             using (new gui.HorizontalScope())
             {
-                // Gravity:
-                using (new gui.HorizontalScope("box"))
-                {
-                    gui.Label(String.Format("<b>Gravity</b> {0}", MoControlsSaveData.loadedSaveData.horzGravity));
-                    using (new gui.VerticalScope("box"))
-                    {
-                        if (string.IsNullOrEmpty(horzGrav))
-                            horzGrav = MoControlsSaveData.loadedSaveData.horzGravity.ToString();
-                            horzGrav = gui.TextField(horzGrav);
-                        if (gui.Button("Set Gravity"))
-                        {
-                            if (float.TryParse(horzGrav, out _value))
-                            {
-                                cInput.SetAxisGravity("Horizontal", _value);
-                                MoControlsSaveData.loadedSaveData.horzGravity = _value;
-                                saveSettings = true;
-                            }
-                        }
-                    }
-                }
-                // Sensitivity:
-                using (new gui.HorizontalScope("box"))
-                {
-                    gui.Label(String.Format("<b>Sensitivity</b> {0}", MoControlsSaveData.loadedSaveData.horzSensitivity));
-                    using (new gui.VerticalScope("box"))
-                    {
-                        if (string.IsNullOrEmpty(horzSens))
-                            horzSens = MoControlsSaveData.loadedSaveData.horzSensitivity.ToString();
-                        horzSens = gui.TextField(horzSens);
-                        if (gui.Button("Set Sensitivity"))
-                        {
-                            if (float.TryParse(horzSens, out _value))
-                            {
-                                cInput.SetAxisSensitivity("Horizontal", _value);
-                                MoControlsSaveData.loadedSaveData.horzSensitivity = _value;
-                                saveSettings = true;
-                            }
-                        }
-                    }
-                }
-                // Deadzone:
-                using (new gui.HorizontalScope("box"))
-                {
-                    gui.Label(String.Format("<b>Deadzone</b> {0}", MoControlsSaveData.loadedSaveData.horzDeadzone));
-                    using (new gui.VerticalScope("box"))
-                    {
-                        if (string.IsNullOrEmpty(horzDead))
-                            horzDead = MoControlsSaveData.loadedSaveData.horzDeadzone.ToString();
-                        horzDead = gui.TextField(horzDead);
-                        if (gui.Button("Set Deadzone"))
-                        {
-                            if (float.TryParse(horzDead, out _value))
-                            {
-                                cInput.SetAxisDeadzone("Horizontal", _value);
-                                MoControlsSaveData.loadedSaveData.horzDeadzone = _value;
-                                saveSettings = true;
-                            }
-                        }
-                    }
-                }
+                drawCInputAxisEdit("Gravity", ref horzGrav, ref MoControlsSaveData.loadedSaveData.horzGravity, ref saveSettings, cInputAxisEditType.gravity, cInputAxisEditMember.Horizontal);
+                drawCInputAxisEdit("Sensitivity", ref horzSens, ref MoControlsSaveData.loadedSaveData.horzSensitivity, ref saveSettings, cInputAxisEditType.sensitivity, cInputAxisEditMember.Horizontal);
+                drawCInputAxisEdit("Deadzone", ref horzDead, ref MoControlsSaveData.loadedSaveData.horzDeadzone, ref saveSettings, cInputAxisEditType.deadzone, cInputAxisEditMember.Horizontal);
             }
 
             #endregion
-
-            #region vert
 
             gui.Label("<b>Vertical</b>");
             using (new gui.HorizontalScope())
-            {
-                // Gravity:
-                using (new gui.HorizontalScope("box"))
-                {
-                    gui.Label(String.Format("<b>Gravity</b> {0}", MoControlsSaveData.loadedSaveData.vertGravity));
-                    using (new gui.VerticalScope("box"))
-                    {
-                        if (string.IsNullOrEmpty(vertGrav))
-                            vertGrav = MoControlsSaveData.loadedSaveData.vertGravity.ToString();
-                        vertGrav = gui.TextField(vertGrav);
-                        if (gui.Button("Set Gravity"))
-                        {
-                            if (float.TryParse(vertGrav, out _value))
-                            {
-                                cInput.SetAxisGravity("Vertical", _value);
-                                MoControlsSaveData.loadedSaveData.vertGravity = _value;
-                                saveSettings = true;
-                            }
-                        }
-                    }
-                }
-                // Sensitivity:
-                using (new gui.HorizontalScope("box"))
-                {
-                    gui.Label(String.Format("<b>Sensitivity</b> {0}", MoControlsSaveData.loadedSaveData.vertSensitivity));
-                    using (new gui.VerticalScope("box"))
-                    {
-                        if (string.IsNullOrEmpty(vertSens))
-                            vertSens = MoControlsSaveData.loadedSaveData.vertSensitivity.ToString();
-                        vertSens = gui.TextField(vertSens);
-                        if (gui.Button("Set Sensitivity"))
-                        {
-                            if (float.TryParse(vertSens, out _value))
-                            {
-                                cInput.SetAxisSensitivity("Vertical", _value);
-                                MoControlsSaveData.loadedSaveData.vertSensitivity = _value;
-                                saveSettings = true;
-                            }
-                        }
-                    }
-                }
-                // Deadzone:
-                using (new gui.HorizontalScope("box"))
-                {
-                    gui.Label(String.Format("<b>Deadzone</b> {0}", MoControlsSaveData.loadedSaveData.vertDeadzone));
-                    using (new gui.VerticalScope("box"))
-                    {
-                        if (string.IsNullOrEmpty(vertDead))
-                            vertDead = MoControlsSaveData.loadedSaveData.vertDeadzone.ToString();
-                        vertDead = gui.TextField(vertDead);
-                        if (gui.Button("Set Deadzone"))
-                        {
-                            if (float.TryParse(vertDead, out _value))
-                            {
-                                cInput.SetAxisDeadzone("Vertical", _value);
-                                MoControlsSaveData.loadedSaveData.vertDeadzone = _value;
-                                saveSettings = true;
-                            }
-                        }
-                    }
-                }
+            {   
+                drawCInputAxisEdit("Gravity", ref vertGrav, ref MoControlsSaveData.loadedSaveData.vertGravity, ref saveSettings, cInputAxisEditType.gravity, cInputAxisEditMember.Vertical);
+                drawCInputAxisEdit("Sensitivity", ref vertSens, ref MoControlsSaveData.loadedSaveData.vertSensitivity, ref saveSettings, cInputAxisEditType.sensitivity, cInputAxisEditMember.Vertical);
+                drawCInputAxisEdit("Deadzone", ref vertDead, ref MoControlsSaveData.loadedSaveData.vertDeadzone, ref saveSettings, cInputAxisEditType.deadzone, cInputAxisEditMember.Vertical);
             }
-
-            #endregion
 
             // save settings
             if (saveSettings)
@@ -1474,5 +1173,55 @@ namespace TommoJProductions.MoControls.GUI
         }
 
         #endregion
+
+        private void drawCInputAxisEdit(string name, ref string value, ref float property, ref bool saveSettings, cInputAxisEditType editType, cInputAxisEditMember editMember) 
+        {
+            float _value;
+
+            using (new gui.HorizontalScope("box"))
+            {
+                gui.Label($"<b>{name}</b> {property}");
+                using (new gui.VerticalScope("box"))
+                {
+                    if (string.IsNullOrEmpty(value))
+                        value = property.ToString();
+                    value = gui.TextField(value);
+                    if (gui.Button($"Set {name}"))
+                    {
+                        if (float.TryParse(value, out _value))
+                        {
+                            switch (editType)
+                            {
+                                case cInputAxisEditType.deadzone:
+                                    cInput.SetAxisDeadzone(editMember.ToString(), _value);
+                                    break;
+                                case cInputAxisEditType.sensitivity:
+                                    cInput.SetAxisSensitivity(editMember.ToString(), _value);
+                                    break;
+                                case cInputAxisEditType.gravity:
+                                    cInput.SetAxisGravity(editMember.ToString(), _value);
+                                    break;
+                            }
+                            property = _value;
+                            saveSettings = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        enum cInputAxisEditType
+        {
+            deadzone,
+            sensitivity,
+            gravity
+        }
+        enum cInputAxisEditMember
+        {
+            Vertical,
+            Horizontal,
+            PlayerVertical,
+            PlayerHorizontal
+        }
     }
 }

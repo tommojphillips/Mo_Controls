@@ -8,8 +8,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("A mod for my summer car that implements full xbox controller support eg rumble support")]
 [assembly: AssemblyConfiguration("x64")]
 [assembly: AssemblyCompany("Tommo J. Productions")]
-[assembly: AssemblyProduct("Mo'Controls v1.1.4")]
-[assembly: AssemblyCopyright("Tommo J. Phillips Copyright ©  2021")]
+[assembly: AssemblyProduct("Mo'Controls v1.1.6")]
+[assembly: AssemblyCopyright("Tommo J. Phillips Copyright ©  2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -31,5 +31,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.4.0")]
-[assembly: AssemblyFileVersion("1.1.4.0")]
+[assembly: AssemblyVersion("1.1.6.0")]
+[assembly: AssemblyFileVersion("1.1.6.0")]
