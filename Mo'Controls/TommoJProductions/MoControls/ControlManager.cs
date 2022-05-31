@@ -188,13 +188,13 @@ namespace TommoJProductions.MoControls
             get
             {
                 if (_playerCurrentVehicle == null)
-                    _playerCurrentVehicle = PlayMakerGlobals.Instance.Variables.FindFsmString("PlayerCurrentVehicle").Value;
+                    _playerCurrentVehicle = PlayMakerGlobals.Instance.Variables.FindFsmString("PlayerCurrentVehicle");
                 return _playerCurrentVehicle.Value;
             }
             set
             {
                 if (_playerCurrentVehicle == null)
-                    _playerCurrentVehicle = PlayMakerGlobals.Instance.Variables.FindFsmString("PlayerCurrentVehicle").Value;
+                    _playerCurrentVehicle = PlayMakerGlobals.Instance.Variables.FindFsmString("PlayerCurrentVehicle");
                 _playerCurrentVehicle.Value = value;
             }
         }
@@ -391,7 +391,7 @@ namespace TommoJProductions.MoControls
         {
             // Written, 31.05.2022
 
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(UnityEngine.Input.mousePosition), out RaycastHit hit, 1, LayerMask.GetMask("Parts", "Dashboard")))
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(UnityEngine.Input.mousePosition), out RaycastHit hit, 1, LayerMask.GetMask("Parts", "Dashboard", "Bolts")))
             {
                 return hit.collider?.gameObject;
             }

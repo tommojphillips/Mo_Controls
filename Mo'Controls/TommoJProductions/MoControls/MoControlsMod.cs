@@ -25,7 +25,7 @@ namespace TommoJProductions.MoControls
         /// Represents the current version.
         /// </summary>
         /// 
-        internal const string VERSION = "1.1.7";
+        internal const string VERSION = "1.1.7.1";
         /// <summary>
         /// Represents the latest release version.
         /// </summary>
