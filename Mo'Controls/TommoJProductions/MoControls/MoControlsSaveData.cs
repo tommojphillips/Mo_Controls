@@ -136,8 +136,8 @@ namespace TommoJProductions.MoControls
                     displayVehicleInfoOverlay = false,
                     ffbOption_gearChange = true,
                     combinedTriggerAxis = false,
-                    horzDeadzone = 0.001f,
-                    horzGravity = 3,
+                    horzDeadzone = 0.1f,
+                    horzGravity = 100,
                     horzSensitivity = 3,
                     vertDeadzone = 0.1f,
                     vertGravity = 100,
@@ -240,7 +240,7 @@ namespace TommoJProductions.MoControls
                     createNewSaveFile = true;
                     ModUI.ShowYesNoMessage(string.Format("A{1} save detected (v{0}).. Would you like to still load this save file? NOTE: you may need to change various settings",
                         e.oldSaveData.moControlsVersion,
-                        MoControlsMod.determineIsVersionOldCurrentOrNew(mcsd.moControlsVersion) < 0 ? "n Older" : " Newer"),
+                        MoControlsMod.determineIsVersionOldCurrentOrNew(mcsd.moControlsVersion, MoControlsMod.VERSION) < 0 ? "n Older" : " Newer"),
                         "[Mo'Controls] - Different save version detected", keepSaveFile);
             }
             catch (Exception e)

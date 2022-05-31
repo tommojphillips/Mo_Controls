@@ -1,7 +1,6 @@
 ﻿using HutongGames.PlayMaker;
 using MSCLoader;
 using System;
-using System.Collections;
 using System.Linq;
 using TommoJProductions.Debugging;
 using TommoJProductions.MoControls.GUI;
@@ -44,6 +43,15 @@ namespace TommoJProductions.MoControls
         /// Reprsents the current player mode.
         /// </summary>
         private PlayerModeEnum _cpm;
+        private FsmBool handEmpty;
+        private PlayMakerFSM pickUp;
+        private static FsmString _playerCurrentVehicle;
+        private readonly string[] scrollables = new string[]
+        {
+            "Get scroll",
+            "Input"
+        };
+
         #endregion
 
         #region Properties
@@ -56,9 +64,7 @@ namespace TommoJProductions.MoControls
             get
             {
                 if (_cpm != getCurrentPlayerMode)
-                {
                     currentPlayerMode = getCurrentPlayerMode;
-                }
                 return _cpm;
             }
 
@@ -154,7 +160,7 @@ namespace TommoJProductions.MoControls
                 if (MoControlsGO.moControlsGui.controlsGuiOpened)
                     return PlayerModeEnum.InMenu;
                 PlayerModeEnum pme;
-                switch (getCurrentVehicle)
+                switch (playerCurrentVehicle)
                 {
                     case "":
                         pme = PlayerModeEnum.OnFoot;
@@ -175,11 +181,22 @@ namespace TommoJProductions.MoControls
             private set;
         }
         /// <summary>
-        /// Gets the current vehicle the player is in.
+        /// Represents the player current vehicle state.
         /// </summary>
-        internal static string getCurrentVehicle
+        internal static string playerCurrentVehicle
         {
-            get { return FsmVariables.GlobalVariables.FindFsmString("PlayerCurrentVehicle").Value; }
+            get
+            {
+                if (_playerCurrentVehicle == null)
+                    _playerCurrentVehicle = PlayMakerGlobals.Instance.Variables.FindFsmString("PlayerCurrentVehicle").Value;
+                return _playerCurrentVehicle.Value;
+            }
+            set
+            {
+                if (_playerCurrentVehicle == null)
+                    _playerCurrentVehicle = PlayMakerGlobals.Instance.Variables.FindFsmString("PlayerCurrentVehicle").Value;
+                _playerCurrentVehicle.Value = value;
+            }
         }
         /// <summary>
         /// Represents the change input result for the mod.
@@ -259,32 +276,7 @@ namespace TommoJProductions.MoControls
                 };
             }
         }
-        /// <summary>
-        /// Represents the hand mode gameobject.
-        /// </summary>
-        private static GameObject handModeGameObject
-        {
-            get;
-            set;
-        }
-        /// <summary>
-        /// Represents the tool mode gameobject.
-        /// </summary>
-        private static GameObject toolModeGameObject
-        {
-            get;
-            set;
-        }
-        /// <summary>
-        /// Returns true if player is in tool mode.
-        /// </summary>
-        internal static bool isInToolMode
-        {
-            get
-            {
-                return toolModeGameObject.activeSelf && !handModeGameObject.activeSelf;
-            }
-        }
+
         /// <summary>
         /// Represents the last rumble pow.
         /// </summary>
@@ -294,7 +286,23 @@ namespace TommoJProductions.MoControls
             private set;
         }
 
-        private FsmBool handEmpty;
+
+        /// <summary>
+        /// Gets the pickup playmakerfsm from the hand gameobject.
+        /// </summary>
+        public PlayMakerFSM getHandPickUpFsm
+        {
+            get
+            {
+                if (pickUp == null)
+                    pickUp = GameObject.Find("PLAYER/Pivot/AnimPivot/Camera/FPSCamera/1Hand_Assemble/Hand").GetPlayMaker("PickUp");
+                return pickUp;
+            }
+        }
+        /// <summary>
+        /// Returns true if in hand mode. determines state by <see cref="getHandPickUpFsm"/>.Active.
+        /// </summary>
+        public bool isInHandMode => getHandPickUpFsm.Active;
 
         #endregion
 
@@ -323,14 +331,9 @@ namespace TommoJProductions.MoControls
         {
             // Written, 08.10.2018
 
-
-            GameObject gm = GameObject.Find(handModeLocation + "/Hand");
-            handEmpty = gm.GetPlayMaker("PickUp").FsmVariables.FindFsmBool("HandEmpty").Value;
+            handEmpty = getHandPickUpFsm.FsmVariables.FindFsmBool("HandEmpty");
 
             MoControlsGO.controlManager.setControls(MoControlsSaveData.loadedSaveData.footControls, MoControlsSaveData.loadedSaveData.drivingControls);
-            // Setting up toolmode stuff
-            toolModeGameObject = GameObject.Find(toolModeLocation);
-            handModeGameObject = GameObject.Find(handModeLocation);
             // Tool mode hold button set up
             HoldInputMono him = gameObject.AddComponent<HoldInputMono>();
             him.setData("Toggle Tool Mode", XboxButtonEnum.Start, 0.3f, requestedModeChange);
@@ -354,13 +357,12 @@ namespace TommoJProductions.MoControls
             switch (currentPlayerMode)
             {
                 case PlayerModeEnum.OnFoot:
-                    toolModeScroll.enabled = isInToolMode ? true : !isPlayerHandEmpty();
+                    toolModeScroll.enabled = detectScrollable();
                     break;
                 default:
                     toolModeScroll.enabled = false;
                     break;
             }
-
             // Handling xbox controller force feedback rumble events.
             if (setFfbForVehicle())
                 handleFfbOnXboxController();
@@ -369,6 +371,31 @@ namespace TommoJProductions.MoControls
                 lastRumblePow = Vector2.zero;
                 MoControlsGO.xboxController.setRumble(Vector2.zero);
             }
+        }
+        /// <summary>
+        /// Checks if the raycasted gameobject has a playmakerfsm component and if the fsm has a state by the name of any <see cref="scrollables"/>
+        /// </summary>
+        private bool detectScrollable() 
+        {
+            // Written, 31.05.2022
+
+            if (isInHandMode)
+                if (handEmpty.Value)
+                    return raycastForScrollable()?.GetComponents<PlayMakerFSM>().Any(fsm => fsm.FsmStates.Any(state => scrollables.Any(ssn => ssn == state.Name && state.Active))) ?? false;
+            return true;
+        }
+        /// <summary>
+        /// Raycast for gameobjects on the included layers.
+        /// </summary>
+        private GameObject raycastForScrollable() 
+        {
+            // Written, 31.05.2022
+
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(UnityEngine.Input.mousePosition), out RaycastHit hit, 1, LayerMask.GetMask("Parts", "Dashboard")))
+            {
+                return hit.collider?.gameObject;
+            }
+            return null;
         }
         /// <summary>
         /// Loads provided control list to cInput.
@@ -515,15 +542,15 @@ namespace TommoJProductions.MoControls
         {
             // Written, 08.10.2020
 
-            if (isPlayerHandEmpty())
+            if (handEmpty.Value)
             {
-                VirtualKeyShort? wVk = null;
+                VirtualKeyShort wVk;
 
-                if (isInToolMode)
+                if (!isInHandMode)
                     wVk = VirtualKeyShort.KEY_1;
-                else if (isPlayerHandEmpty())
+                else
                     wVk = VirtualKeyShort.KEY_2;
-                StartCoroutine(KeyboardEmulator.simulateKeyPressCoroutine((VirtualKeyShort)wVk));
+                StartCoroutine(KeyboardEmulator.simulateKeyPressCoroutine(wVk));
             }
         }
         /// <summary>
@@ -534,16 +561,6 @@ namespace TommoJProductions.MoControls
             // Written, 07.10.2020
 
            MoControlsGO.xboxController._requestedModeChange = true;
-        }
-        /// <summary>
-        /// Returns whether the players hand is empty (not holding anything).
-        /// </summary>
-        /// <returns></returns>
-        private bool isPlayerHandEmpty()
-        {
-            // Written, 27.02.2022
-
-            return handEmpty.Value;
         }
         /// <summary>
         /// Handles ffb on the xbox controller.
@@ -592,6 +609,9 @@ namespace TommoJProductions.MoControls
             }
             return new Vector2(Mathf.Clamp(xMotor, 0, 1), Mathf.Clamp(yMotor, 0, 1));
         }
+        /// <summary>
+        /// Calulates force feed back based on gear change
+        /// </summary>
         private float gearChangeBasedFfb()
         {
             // Written, 23.10.2020
@@ -600,6 +620,9 @@ namespace TommoJProductions.MoControls
                 return drivetrain.rpm / drivetrain.maxRPM;
             return 0;
         }
+        /// <summary>
+        /// Calulates force feed back based on rpm limiter
+        /// </summary>
         private float rpmLimiterBasedFfb()
         {
             // Written, 18.10.2020 || updated, 28.09.2021
@@ -608,6 +631,9 @@ namespace TommoJProductions.MoControls
                 return drivetrain.rpm / drivetrain.maxRPM;
             return 0;
         }
+        /// <summary>
+        /// Calulates force feed back based on wheel slip.
+        /// </summary>
         private float wheelSlipBasedFfb()
         {
             // Written, 18.10.2020
@@ -653,44 +679,34 @@ namespace TommoJProductions.MoControls
         /// </summary>
         private bool setFfbForVehicle() 
         {
-            // Written, 23.10.2020
+            // Written, 23.10.2020, Updated, 31.05.2022
 
-            string _currentVehicleName = getCurrentVehicle;
-            bool isSet = (_currentVehicleName ?? "") == currentVehicleName;
-            if (!isSet)
+            if (playerCurrentVehicle != currentVehicleName)
             {
-                switch (_currentVehicleName)
+                switch (playerCurrentVehicle)
                 {
                     case "Satsuma":
                         vehicle = GameObject.Find("SATSUMA(557kg, 248)");
-                        carDynamics = vehicle.GetComponent<CarDynamics>();
-                        drivetrain = vehicle.GetComponent<Drivetrain>();
                         break;
                     case "Jonnez":
                         vehicle = GameObject.Find("JONNEZ ES(Clone)");
-                        carDynamics = vehicle.GetComponent<CarDynamics>();
-                        drivetrain = vehicle.GetComponent<Drivetrain>();
                         break;
                     case "Kekmet":
                         vehicle = GameObject.Find("KEKMET(350-400psi)");
-                        carDynamics = vehicle.GetComponent<CarDynamics>();
-                        drivetrain = vehicle.GetComponent<Drivetrain>();
                         break;
                     case "Hayosiko":
                         vehicle = GameObject.Find("HAYOSIKO(1500kg, 250)");
-                        carDynamics = vehicle.GetComponent<CarDynamics>();
-                        drivetrain = vehicle.GetComponent<Drivetrain>();
                         break;
                     case "Gifu":
                         vehicle = GameObject.Find("GIFU(750/450psi)");
-                        carDynamics = vehicle.GetComponent<CarDynamics>();
-                        drivetrain = vehicle.GetComponent<Drivetrain>();
                         break;
                     default:
                         vehicle = null;
                         break;
                 }
-                currentVehicleName = _currentVehicleName;
+                carDynamics = vehicle?.GetComponent<CarDynamics>();
+                drivetrain = vehicle?.GetComponent<Drivetrain>();
+                currentVehicleName = playerCurrentVehicle;
             }
             return vehicle != null;
         }

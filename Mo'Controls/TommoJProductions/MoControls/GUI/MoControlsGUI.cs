@@ -82,19 +82,6 @@ namespace TommoJProductions.MoControls.GUI
 
         #endregion
 
-        #region KeyBind fields
-
-        /// <summary>
-        /// Represents whether the instance has calculated the amount of keybinds yet.
-        /// </summary>
-        private bool hasCountedModKeybinds = false;
-        /// <summary>
-        /// Represents the amount of keybinds that have been loaded via the mods.
-        /// </summary>
-        private int modKeybindCount = 0;
-
-        #endregion
-
         #region Relevant controls 
 
         /// <summary>
@@ -430,7 +417,8 @@ namespace TommoJProductions.MoControls.GUI
                 "Split control modes for driving & walking",
                 "Toggle tool/hand mode by holding down the <i>Start</i> button on a connected xbox controller for > 0.3sec",
                 "Controller gui navigation",
-                "Controller vibration/rumble effects; rumble options based on default (toplessgun), rpm, wheel-slip, etc."
+                "Controller vibration/rumble effects; rumble options based on default (toplessgun), rpm, wheel-slip, gear change. See (Settings => Xbox Controller",
+                "\nAuto-Enables scroll on the controller triggers if player is looking at something that has a Scroll function."
             };
             string footerMessage = "Developed by <b>Tommo J. Armytage. | Latest release: " + MoControlsMod.LATEST_RELEASE_DATE + "</b>";
             string joinPrefix = "\r\n# ";
@@ -486,7 +474,7 @@ namespace TommoJProductions.MoControls.GUI
                 case SettingsMenuEnum.XboxController:
                     drawXboxControllerContent();
                     break;
-                case SettingsMenuEnum.Display:
+                case SettingsMenuEnum.Axis:
                     drawDisplayContent();
                     break;
             }
@@ -721,7 +709,7 @@ namespace TommoJProductions.MoControls.GUI
                     _asInput = MoControlsSaveData.loadedSaveData.mouseInputType == InputTypeEnum.RS;
                     if (gui.Toggle(_asInput, String.Format("<b>Right Stick:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
                     {
-                        if (_asInput)
+                        if (!_asInput)
                         {
                             MoControlsSaveData.loadedSaveData.mouseInputType = InputTypeEnum.RS;
                             saveSettings = true;
@@ -908,7 +896,7 @@ namespace TommoJProductions.MoControls.GUI
 
             using (new gui.AreaScope(new Rect(Screen.width / 2, 1, 180, 20)))
             {
-                gui.Label(String.Format("{0} ({1} mode)", ControlManager.getCurrentPlayerMode.ToString(), ControlManager.isInToolMode ? "Tool" : "Hand"));
+                gui.Label(String.Format("{0} ({1} mode)", ControlManager.getCurrentPlayerMode.ToString(), !controlManager.isInHandMode ? "Tool" : "Hand"));
             }
         }
         /// <summary>
@@ -1079,7 +1067,7 @@ namespace TommoJProductions.MoControls.GUI
                 }
                 else
                 {
-                    gui.Label("No supported vehicle found.\nCurrent vehicle: " + ControlManager.getCurrentVehicle);
+                    gui.Label("No supported vehicle found.\nCurrent vehicle: " + ControlManager.playerCurrentVehicle);
                 }
             }
         }
@@ -1111,7 +1099,7 @@ namespace TommoJProductions.MoControls.GUI
                 }
                 else
                 {
-                    gui.Label("No supported vehicle found.\nCurrent vehicle: " + ControlManager.getCurrentVehicle);
+                    gui.Label("No supported vehicle found.\nCurrent vehicle: " + ControlManager.playerCurrentVehicle);
                 }
             }
         }
@@ -1121,8 +1109,6 @@ namespace TommoJProductions.MoControls.GUI
             // Player movement: gravity, sensitivity and deadzone settings 
             bool saveSettings = false;
 
-            #region player horz
-
             gui.Label("<b>PlayerHorizontal</b>");
             using (new gui.HorizontalScope())
             {
@@ -1130,11 +1116,6 @@ namespace TommoJProductions.MoControls.GUI
                 drawCInputAxisEdit("Sensitivity", ref pHorzSens, ref MoControlsSaveData.loadedSaveData.playerHorzSensitivity, ref saveSettings, cInputAxisEditType.sensitivity, cInputAxisEditMember.PlayerHorizontal);
                 drawCInputAxisEdit("Deadzone", ref pHorzDead, ref MoControlsSaveData.loadedSaveData.playerHorzDeadzone, ref saveSettings, cInputAxisEditType.deadzone, cInputAxisEditMember.PlayerHorizontal);
             }
-
-            #endregion
-
-            #region player vert
-
             gui.Label("<b>PlayerVertical</b>");
             using (new gui.HorizontalScope())
             {
@@ -1142,11 +1123,6 @@ namespace TommoJProductions.MoControls.GUI
                 drawCInputAxisEdit("Sensitivity", ref pVertSens, ref MoControlsSaveData.loadedSaveData.playerVertSensitivity, ref saveSettings, cInputAxisEditType.sensitivity, cInputAxisEditMember.PlayerVertical);
                 drawCInputAxisEdit("Deadzone", ref pVertDead, ref MoControlsSaveData.loadedSaveData.playerVertDeadzone, ref saveSettings, cInputAxisEditType.deadzone, cInputAxisEditMember.PlayerVertical);
             }
-
-            #endregion
-
-            #region horz
-
             gui.Label("<b>Horizontal</b>");
             using (new gui.HorizontalScope())
             {
@@ -1154,9 +1130,6 @@ namespace TommoJProductions.MoControls.GUI
                 drawCInputAxisEdit("Sensitivity", ref horzSens, ref MoControlsSaveData.loadedSaveData.horzSensitivity, ref saveSettings, cInputAxisEditType.sensitivity, cInputAxisEditMember.Horizontal);
                 drawCInputAxisEdit("Deadzone", ref horzDead, ref MoControlsSaveData.loadedSaveData.horzDeadzone, ref saveSettings, cInputAxisEditType.deadzone, cInputAxisEditMember.Horizontal);
             }
-
-            #endregion
-
             gui.Label("<b>Vertical</b>");
             using (new gui.HorizontalScope())
             {   

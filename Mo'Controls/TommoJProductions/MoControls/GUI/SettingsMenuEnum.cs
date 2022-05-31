@@ -4,6 +4,6 @@
     {
         MouseEmulation,
         XboxController,
-        Display,
+        Axis,
     }
 }

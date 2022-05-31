@@ -25,11 +25,11 @@ namespace TommoJProductions.MoControls
         /// Represents the current version.
         /// </summary>
         /// 
-        internal const string VERSION = "1.1.6";
+        internal const string VERSION = "1.1.7";
         /// <summary>
         /// Represents the latest release version.
         /// </summary>
-        internal const string LATEST_RELEASE_DATE = "30.05.2022";
+        internal const string LATEST_RELEASE_DATE = "31.05.2022";
 
 
         #region Mod Keybinds
@@ -76,7 +76,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents the supported/compatible version of mod loader.
         /// </summary>
-        public const string SUPPORTED_MODLOADER_VERSION = "1.1.16";
+        public const string SUPPORTED_MODLOADER_VERSION = "1.2.6";
 
 #if DEBUG
         private const bool IS_DEBUG_CONFIG = true;
@@ -236,7 +236,7 @@ namespace TommoJProductions.MoControls
                     MoControlsSaveData.loadedSaveData.playerSeenMscLoaderVersionError = true;
                     MoControlsSaveData.loadedSaveData.saveSettings();
                 }
-                print("<color=orange>Warning</color> <color=grey>Supported modloader version is <b>v" + SUPPORTED_MODLOADER_VERSION + "</b>; you're running version <b>" + ModLoader.MSCLoader_Ver + "</b>. May not be compatible with current version.</color>.", DebugTypeEnum.partial);
+                print("<color=orange>Warning</color> <color=grey>Supported modloader version is <b>v" + SUPPORTED_MODLOADER_VERSION + "</b>; you're running version <b>" + ModLoader.MSCLoader_Ver + "</b>. May not be compatible with current version.</color>.", DebugTypeEnum.none);
             }
             else
             {
@@ -311,7 +311,7 @@ namespace TommoJProductions.MoControls
             cInput.SetAxisDeadzone("Vertical", MoControlsSaveData.loadedSaveData.vertDeadzone);
             cInput.SetAxisSensitivity("Vertical", MoControlsSaveData.loadedSaveData.vertSensitivity);
             cInput.SetAxisGravity("Vertical", MoControlsSaveData.loadedSaveData.vertGravity);
-            MoControlsMod.print("loaded cinput axis settings (grav, dead, sens).. hold <i>Left-Ctrl</i> through Mo'Controls' second pass loading sequ to disable", DebugTypeEnum.none);//.full);
+            print("loaded cinput axis settings (grav, dead, sens).. hold <i>Left-Ctrl</i> through Mo'Controls' second pass loading sequ to disable", DebugTypeEnum.full);
         }
 
         #endregion
@@ -326,10 +326,10 @@ namespace TommoJProductions.MoControls
             initialize();
             performModLoaderVersionCheck();
         }
-        public static int determineIsVersionOldCurrentOrNew(string inVersion)
+        public static int determineIsVersionOldCurrentOrNew(string v1, string v2)
         {
-            string[] versionNumbers = inVersion.Split('.');
-            string[] currentVersionNumbers = VERSION.Split('.');
+            string[] versionNumbers = v1.Split('.');
+            string[] currentVersionNumbers = v2.Split('.');
             int result;
             int value;
             if (versionNumbers.Length == currentVersionNumbers.Length)
@@ -346,6 +346,35 @@ namespace TommoJProductions.MoControls
             }
             return 0;
         }
+        public static string getVersionDifference(string v1, string v2)
+        {
+            string[] vN1 = v1.Split('.');
+            string[] vN2 = v2.Split('.');
+            string[] v;
+            string r = "";
+            int r1;
+            int r2;
+            if (vN1.Length != vN2.Length)
+                if (vN1.Length < vN2.Length)
+                    v = vN1;
+                else
+                    v = vN2;
+            else
+                v = vN1;
+
+            for (int i = 0; i < v.Length; i++)
+            {
+                if (int.TryParse(vN1[i], out r1))
+                    if (int.TryParse(vN2[i], out r2))
+                    {
+                        r += Mathf.Abs(r1 - r2) + ".";
+                        continue;
+                    }
+                r += "0.";
+            }
+            return r.Substring(0, r.Length - 1);
+        }
+
         public override void SecondPassOnLoad()
         {
             // Written, 18.10.2020
