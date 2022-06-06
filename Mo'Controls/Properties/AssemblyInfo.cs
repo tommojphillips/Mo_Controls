@@ -1,35 +1,37 @@
 ﻿using System.Reflection;
-using System.Runtime.InteropServices;
+using System.Resources;
 
-// General Information about an assembly is controlled through the following
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
+// General Information
 [assembly: AssemblyTitle("Mo_Controls")]
+[assembly: AssemblyProduct("Mo'Controls")]
 [assembly: AssemblyDescription("A mod for my summer car that implements full xbox controller support eg rumble support")]
-[assembly: AssemblyConfiguration("x64")]
 [assembly: AssemblyCompany("Tommo J. Productions")]
-[assembly: AssemblyProduct("Mo'Controls v1.1.7.1")]
-[assembly: AssemblyCopyright("Tommo J. Phillips Copyright ©  2022")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+[assembly: AssemblyCopyright("Copyright © Tommo J. Productions 2022")]
+[assembly: AssemblyTrademark("Azine")]
+[assembly: NeutralResourcesLanguage("en-AU")]
+[assembly: AssemblyConfiguration("")]
 
-// Setting ComVisible to false makes the types in this assembly not visible
-// to COM components.  If you need to access a type in this assembly from
-// COM, set the ComVisible attribute to true on that type.
-[assembly: ComVisible(false)]
+// Version information
+[assembly: AssemblyVersion("1.1.155.35")]
+//[assembly: AssemblyFileVersion("1.1.155.35")]
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("f5796575-6d5a-4b2f-a82e-534ae2c8ff13")]
+public class VersionInfo
+{
+	public const string lastestRelease = "05.06.2022 08:43 PM";
+	public const string version = "1.1.155.35";
 
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.7.1")]
-[assembly: AssemblyFileVersion("1.1.7.1")]
+    /// <summary>
+    /// Represents if the mod has been complied for x64
+    /// </summary>
+    #if x64
+        internal const bool IS_64_BIT = true;
+    #else
+        internal const bool IS_64_BIT = false;
+    #endif
+    #if DEBUG
+        internal const bool IS_DEBUG_CONFIG = true;
+    #else
+        internal const bool IS_DEBUG_CONFIG = false;
+    #endif
+}
+

@@ -21,16 +21,6 @@ namespace TommoJProductions.MoControls
         /// Represents whether this is a release version
         /// </summary>
         internal static bool isReleaseVersion => true;
-        /// <summary>
-        /// Represents the current version.
-        /// </summary>
-        /// 
-        internal const string VERSION = "1.1.7.1";
-        /// <summary>
-        /// Represents the latest release version.
-        /// </summary>
-        internal const string LATEST_RELEASE_DATE = "31.05.2022";
-
 
         #region Mod Keybinds
 
@@ -61,34 +51,20 @@ namespace TommoJProductions.MoControls
 
         public override string ID => "Mo_Controls";
         public override string Name => "Mo'Controls";
+        public override string Description => description;
         public override string Author => "tommojphillips";
-        public override string Version => VERSION;
+        public override string Version => VersionInfo.version;
         public override bool UseAssetsFolder => true;
-        public override bool SecondPass => true;
+
         #endregion
 
         #region Fields
 
+        private string description = $"Implements full xbox controller support eg rumble/ffb support, separate mode for controls (Foot, Driving), autodetect scrollable.\nLatest Release Date: {VersionInfo.lastestRelease}";
         /// <summary>
         /// Represents the moControls gameobject.
         /// </summary>
         private static GameObject moControlsGameObject;
-        /// <summary>
-        /// Represents the supported/compatible version of mod loader.
-        /// </summary>
-        public const string SUPPORTED_MODLOADER_VERSION = "1.2.6";
-
-#if DEBUG
-        private const bool IS_DEBUG_CONFIG = true;
-#else
-        private const bool IS_DEBUG_CONFIG = false;
-#endif
-
-#if x64
-        private const bool IS_X64 = true;
-#else
-        private const bool IS_x64 = false;
-#endif
 
         #endregion
 
@@ -101,7 +77,7 @@ namespace TommoJProductions.MoControls
         {
             get
             {
-                return String.Format("(<color={0}-{2}</color>) {1}", isReleaseVersion ? "blue>Release" : "red>Pre-Release", IS_X64 ? "x64" : "x86", IS_DEBUG_CONFIG ? "DEBUG" : "R");
+                return String.Format("(<color={0}-{2}</color>) {1}", isReleaseVersion ? "blue>Release" : "red>Pre-Release", VersionInfo.IS_64_BIT ? "x64" : "x86", VersionInfo.IS_DEBUG_CONFIG ? "DEBUG" : "R");
             }
         }
         /// <summary>
@@ -217,57 +193,7 @@ namespace TommoJProductions.MoControls
                 assetsLoaded = false;
             }
         }
-        /// <summary>
-        /// Performs a check to see if the mod loader version is the same as the currently supported version.
-        /// </summary>
-        private void performModLoaderVersionCheck()
-        {
-            // Written, 03.08.2018
 
-            // Modloader supported version check.
-            if (SUPPORTED_MODLOADER_VERSION != ModLoader.MSCLoader_Ver)
-            {
-                if (!MoControlsSaveData.loadedSaveData.playerSeenMscLoaderVersionError)
-                {
-                    ModUI.ShowMessage(
-                        String.Format("<b>[{0} <color=orange>v{1}]</color></b> - NOTE: modloader v{2} may not be <color=orange>compatible</color>.\r\nSupported " +
-                        "modloader version is <color=orange>v{3}</color>.",
-                        Name, Version, ModLoader.MSCLoader_Ver, SUPPORTED_MODLOADER_VERSION), "ModLoader Version not supported.");
-                    MoControlsSaveData.loadedSaveData.playerSeenMscLoaderVersionError = true;
-                    MoControlsSaveData.loadedSaveData.saveSettings();
-                }
-                print("<color=orange>Warning</color> <color=grey>Supported modloader version is <b>v" + SUPPORTED_MODLOADER_VERSION + "</b>; you're running version <b>" + ModLoader.MSCLoader_Ver + "</b>. May not be compatible with current version.</color>.", DebugTypeEnum.none);
-            }
-            else
-            {
-                print("<color=grey>Running supported modloader version, <color=green>" + SUPPORTED_MODLOADER_VERSION + "</color></color>", DebugTypeEnum.full);
-                if (MoControlsSaveData.loadedSaveData.playerSeenMscLoaderVersionError)
-                {
-                    MoControlsSaveData.loadedSaveData.playerSeenMscLoaderVersionError = false;
-                    MoControlsSaveData.loadedSaveData.saveSettings();
-                }
-            }
-        }
-        /// <summary>
-        /// Initializes all mscmodloader commands and loads controller assets. (textures)
-        /// </summary>
-        private void initialize()
-        {
-            // Written, 17.10.2018
-
-            ConsoleCommand.Add(new DebugConsoleCommand());
-            ConsoleCommand.Add(new DebugStatsCommand());
-            ConsoleCommand.Add(new ListLoadedAssembliesConsoleCommand());
-            ConsoleCommand.Add(new WriteCinputExternInputsCommand());
-            ConsoleCommand.Add(new ChangeToolModeCommand());
-            Keybind.Add(this, openControlsGui);
-            Keybind.Add(this, lmbPrimaryInput);
-            Keybind.Add(this, lmbSecondaryInput);
-            Keybind.Add(this, rmbPrimaryInput);
-            Keybind.Add(this, rmbSecondaryInput);
-
-            loadControllerAssets();
-        }
         /// <summary>
         /// Represents a debug/release mode check.
         /// </summary>
@@ -314,38 +240,49 @@ namespace TommoJProductions.MoControls
             print("loaded cinput axis settings (grav, dead, sens).. hold <i>Left-Ctrl</i> through Mo'Controls' second pass loading sequ to disable", DebugTypeEnum.full);
         }
 
-        #endregion
-
-        #region Override Methods
-
-        public override void OnLoad()
-        {
-            // Project start date, 06.07.2018 | Modified 28.10.2020   
-
-            MoControlsSaveData.loadSettings();
-            initialize();
-            performModLoaderVersionCheck();
-        }
         public static int determineIsVersionOldCurrentOrNew(string v1, string v2)
         {
-            string[] versionNumbers = v1.Split('.');
-            string[] currentVersionNumbers = v2.Split('.');
+            string[] vN1 = v1.Split('.');
+            string[] vN2 = v2.Split('.');
+            string[] v;
+            string[] V = null;
             int result;
             int value;
-            if (versionNumbers.Length == currentVersionNumbers.Length)
-            {
-                for (int i = 0; i < versionNumbers.Length; i++)
+            int returnValue = 0;
+            if (vN1.Length != vN2.Length)
+                if (vN1.Length < vN2.Length)
                 {
-                    if (int.TryParse(versionNumbers[i], out result))
-                        if (int.TryParse(currentVersionNumbers[i], out value))
-                            if (result > value)
-                                return 1;
-                            else if (result < value)
-                                return -1;
+                    v = vN1;
+                    V = vN2;
+                }
+                else
+                {
+                    v = vN2;
+                    V = vN1;
+                }
+            else
+                v = vN1;
+
+            for (int i = 0; i < v.Length; i++)
+            {
+                if (int.TryParse(vN1[i], out result))
+                    if (int.TryParse(vN2[i], out value))
+                        if (result > value)
+                            returnValue = 1;
+                        else if (result < value)
+                            return returnValue = -1;
+            }
+            if (V != null)
+            {
+                //for (int i = V.Length - (V.Length - v.Length); i < V.Length; i++)
+                {
+                    if (returnValue == 0)
+                        returnValue = 1;
                 }
             }
-            return 0;
+            return returnValue;
         }
+        
         public static string getVersionDifference(string v1, string v2)
         {
             string[] vN1 = v1.Split('.');
@@ -374,19 +311,34 @@ namespace TommoJProductions.MoControls
             }
             return r.Substring(0, r.Length - 1);
         }
+       
+        #endregion
 
-        public override void SecondPassOnLoad()
+        #region Override Methods
+
+        public override void OnLoad()
         {
-            // Written, 18.10.2020
+            // Project start date, 06.07.2018 | Modified 28.10.2020   
 
-            if (!UnityEngine.Input.GetKey(KeyCode.LeftControl))
-                loadCInputAxisSettings();
-            else
-                print("skipped loading cinput axis settings (grav, dead, sens).. Cause: <i>Left-Ctrl held down through Mo'Controls' second pass loading sequ</i>", DebugTypeEnum.none);
+            ConsoleCommand.Add(new DebugConsoleCommand());
+            ConsoleCommand.Add(new DebugStatsCommand());
+            ConsoleCommand.Add(new ListLoadedAssembliesConsoleCommand());
+            ConsoleCommand.Add(new WriteCinputExternInputsCommand());
+            ConsoleCommand.Add(new ChangeToolModeCommand());
+            Keybind.Add(this, openControlsGui);
+            Keybind.Add(this, lmbPrimaryInput);
+            Keybind.Add(this, lmbSecondaryInput);
+            Keybind.Add(this, rmbPrimaryInput);
+            Keybind.Add(this, rmbSecondaryInput);
+
+            MoControlsSaveData.loadSettings();
+            loadCInputAxisSettings();
+            loadControllerAssets();
             moControlsGameObject = new GameObject(gameObjectName);
             moControlsGO = moControlsGameObject.AddComponent<MoControlsGO>();
-            print(Name + " v" + Version + ": Loaded.", DebugTypeEnum.none);
+            print($"{Name} v{Version}: Loaded", DebugTypeEnum.none);
         }
+
         #endregion
 
     }

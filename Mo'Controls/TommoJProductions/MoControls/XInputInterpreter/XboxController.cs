@@ -16,6 +16,13 @@ namespace TommoJProductions.MoControls.XInputInterpreter
 
         #region Fields
 
+        /// <summary>
+        /// Represents all the controls of an xbox controller.
+        /// </summary>
+        private XboxControl[] xboxControls;
+        /// <summary>
+        /// the previous (last) rumble sent to xbox controller.
+        /// </summary>
         internal Vector2 prevRumblePow;
         /// <summary>
         /// Represents if the user has request toolmode change via, <see cref="HoldInputMono"/>. see:<see cref="toggleToolMode"/>.
@@ -29,6 +36,30 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// Represents the axis prefix.
         /// </summary>
         private static readonly string axisPrefix = "Joy Axis ";
+        /// <summary>
+        /// Represents the previous <see cref="GamePadState"/> of the controller.
+        /// </summary>
+        private GamePadState previousState;
+        /// <summary>
+        /// Represents the current <see cref="GamePadState"/> of the controller.
+        /// </summary>
+        private GamePadState state;
+        /// <summary>
+        /// Represents the gamepad index.
+        /// </summary>
+        private int gamePadIndex;
+        /// <summary>
+        /// Represents the index of the gamepad.
+        /// </summary>
+        private PlayerIndex playerIndex;
+        /// <summary>
+        /// Represents the rumble events for the xbox controller.
+        /// </summary>
+        private List<XboxRumble> xboxRumbleEvents;
+        /// <summary>
+        /// Represents the input map for the controller.
+        /// </summary>
+        private Dictionary<string, XboxControl> inputMap;
         /// <summary>
         /// Represents the normal (go) xbox controls.
         /// </summary>
@@ -70,14 +101,6 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         #region Properties
 
         /// <summary>
-        /// Represents all the controls of an xbox controller.
-        /// </summary>
-        private XboxControl[] xboxControls
-        {
-            get;
-            set;
-        }
-        /// <summary>
         /// Represents whether the controller is connect or not.
         /// </summary>
         internal bool isConnected
@@ -96,54 +119,6 @@ namespace TommoJProductions.MoControls.XInputInterpreter
             {
                 return gamePadIndex + 1;
             }
-        }
-        /// <summary>
-        /// Represents the previous <see cref="GamePadState"/> of the controller.
-        /// </summary>
-        private GamePadState previousState
-        {
-            get;
-            set;
-        }
-        /// <summary>
-        /// Represents the current <see cref="GamePadState"/> of the controller.
-        /// </summary>
-        private GamePadState state
-        {
-            get;
-            set;
-        }
-        /// <summary>
-        /// Represents the gamepad index. Allowed values; 1, 2, 3, 4.
-        /// </summary>
-        private int gamePadIndex
-        {
-            get;
-            set;
-        }
-        /// <summary>
-        /// Represents the index of the gamepad.
-        /// </summary>
-        private PlayerIndex playerIndex
-        {
-            get;
-            set;
-        }
-        /// <summary>
-        /// Represents the rumble events for the xbox controller.
-        /// </summary>
-        private List<XboxRumble> xboxRumbleEvents
-        {
-            get;
-            set;
-        }
-        /// <summary>
-        /// Represents the input map for the controller.
-        /// </summary>
-        private Dictionary<string, XboxControl> inputMap
-        {
-            get;
-            set;
         }
         /// <summary>
         /// Represents the A button on the xbox controller.
@@ -362,6 +337,27 @@ namespace TommoJProductions.MoControls.XInputInterpreter
 
         #endregion
 
+        #region Unity Methods
+
+        private void Update()
+        {
+            // Written, 23.10.2020
+
+            if (_requestedModeChange)
+            {
+                MoControlsMod.print("Identified changemode request.", Debugging.DebugTypeEnum.full);
+                MoControlsGO.controlManager.toggleToolMode();
+                _requestedModeChange = false;
+            }
+            update();
+        }
+        private void LateUpdate() 
+        {
+            refresh();
+        }
+
+        #endregion
+
         #region Methods
 
         /// <summary>
@@ -381,25 +377,6 @@ namespace TommoJProductions.MoControls.XInputInterpreter
                 xboxControls[14].setInputName(String.Format("{0}9+", axisPrefix));
                 xboxControls[15].setInputName(String.Format("{0}10+", axisPrefix));
             }
-        }
-        private void Update()
-        {
-            // Written, 23.10.2020
-
-
-            if (_requestedModeChange)
-            {
-                MoControlsMod.print("Identified changemode request.", Debugging.DebugTypeEnum.full);
-                MoControlsGO.controlManager.toggleToolMode();
-                _requestedModeChange = false;
-            }
-            update();
-        }
-        private void LateUpdate()
-        {
-            // Written, 23.10.2020
-
-            refresh();
         }
         /// <summary>
         /// Updates the controllers state as with the input map, and handles current rumbles.
@@ -599,7 +576,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 18.07.2018
 
-            return state.Triggers.Left;
+            return lT.state;
         }
         /// <summary>
         /// Gets the right trigger. Ranges from 0.0f (not pressed) to 1.0f (fully pressed).
@@ -608,7 +585,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 18.07.2018
 
-            return state.Triggers.Right;
+            return rT.state;
         }
         /// <summary>
         /// Returns true if the left trigger was tapped.
@@ -637,30 +614,12 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// </summary>
         private void updateInputMap()
         {
-            // Written, 16.07.2018 | Modified, 09.10.2020
+            // Written, 16.07.2018 | Modified, 09.10.2020 | Modified, 02.06.2022
 
-            inputMap[a.name] = a;
-            inputMap[b.name] = b;
-            inputMap[x.name] = x;
-            inputMap[y.name] = y;
-            inputMap[dPadUp.name] = dPadUp;
-            inputMap[dPadDown.name] = dPadDown;
-            inputMap[dPadLeft.name] = dPadLeft;
-            inputMap[dPadRight.name] = dPadRight;
-            inputMap[back.name] = back;
-            inputMap[start.name] = start;
-            inputMap[lS.name] = lS;
-            inputMap[rS.name] = rS;
-            inputMap[lB.name] = lB;
-            inputMap[rB.name] = rB;
-            inputMap[leftThumbstick.up.name] = leftThumbstick.up;
-            inputMap[leftThumbstick.down.name] = leftThumbstick.down;
-            inputMap[leftThumbstick.left.name] = leftThumbstick.left;
-            inputMap[leftThumbstick.right.name] = leftThumbstick.right;
-            inputMap[rightThumbstick.up.name] = rightThumbstick.up;
-            inputMap[rightThumbstick.down.name] = rightThumbstick.down;
-            inputMap[rightThumbstick.left.name] = rightThumbstick.left;
-            inputMap[rightThumbstick.right.name] = rightThumbstick.right;
+            for (int i = 0; i < xboxControls.Length; i++)
+            {
+                inputMap[xboxControls[i].name] = xboxControls[i];
+            }
         }
         /// <summary>
         /// Handles all current rumbles.
@@ -731,6 +690,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         internal XboxControl getXboxControlByInputName(string inInputName)
         {
             // Written, 20.07.2018
+
             if (inInputName != KeyCode.None.ToString()) // no point enumerating..
             {
                 foreach (XboxControl xboxControl in xboxControls)

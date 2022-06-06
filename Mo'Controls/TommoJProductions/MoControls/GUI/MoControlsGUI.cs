@@ -368,17 +368,9 @@ namespace TommoJProductions.MoControls.GUI
             using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width(mainGuiWidth - SCROLL_BAR_OFFSET), gui.MaxWidth(mainGuiWidth - SCROLL_BAR_OFFSET) }))
             {
                 mainGUIScrollPosition = scrollViewScope.scrollPosition;
-                gui.Label(String.Format("<b>{0} v{1} by {2}</b>",
-                    mod.Name,
-                    mod.Version,
-                    mod.Author));
+                gui.Label($"<b>{mod.Name} v{mod.Version} by {mod.Author}</b>");
                 if (mainGUIMenu != MainGUIMenuEnum.About)
-                    gui.Label(String.Format("<b>{0}</b> GUI key bind." +
-                        "\r\n<b>{1}</b> Sets as None." +
-                        "\r\n<b>LMB</b> Selects." +
-                        "\r\n<b>RMB</b> Cancels.",
-                        MoControlsMod.instance.openControlsGui.Key,
-                        Input.noneKey));
+                    gui.Label($"<b>{MoControlsMod.instance.openControlsGui.Key}</b> GUI key bind.\n<b>{Input.noneKey}</b> Sets as None.\n<b>LMB</b> Selects.\n<b>RMB</b> Cancels.");
                 gui.Space(3.0f);
                 switch (mainGUIMenu)
                 {
@@ -420,7 +412,7 @@ namespace TommoJProductions.MoControls.GUI
                 "Controller vibration/rumble effects; rumble options based on default (toplessgun), rpm, wheel-slip, gear change. See (Settings => Xbox Controller",
                 "\nAuto-Enables scroll on the controller triggers if player is looking at something that has a Scroll function."
             };
-            string footerMessage = "Developed by <b>Tommo J. Armytage. | Latest release: " + MoControlsMod.LATEST_RELEASE_DATE + "</b>";
+            string footerMessage = "Developed by <b>Tommo J. Armytage. | Latest release: " + VersionInfo.version + "</b>";
             string joinPrefix = "\r\n# ";
 
             gui.Space(5f);
@@ -683,7 +675,7 @@ namespace TommoJProductions.MoControls.GUI
 
             using (new gui.HorizontalScope("box"))
             {
-                gui.Label(MoControlsSaveData.loadedSaveData.emulateMouse ? "<color=green><b>ON</b></color>" : "<color=red><b>OFF</b></color>");
+                gui.Label("<b><color=" + (MoControlsSaveData.loadedSaveData.emulateMouse ? "green>ON" : "red>OFF") + "</color></b>");
                 if (gui.Toggle(MoControlsSaveData.loadedSaveData.emulateMouse, String.Format("<b>Emulate mouse for controller:</b> Using {0}", MoControlsSaveData.loadedSaveData.mouseInputType)) != MoControlsSaveData.loadedSaveData.emulateMouse)
                 {
                     MoControlsSaveData.loadedSaveData.emulateMouse = !MoControlsSaveData.loadedSaveData.emulateMouse;

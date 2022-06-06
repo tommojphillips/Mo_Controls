@@ -1,6 +1,6 @@
 ﻿namespace TommoJProductions.MoControls.XInputInterpreter
 {
-    internal enum XboxAxisEnum
+    public enum XboxAxisEnum
     {
         // Written, 09.10.2020
 

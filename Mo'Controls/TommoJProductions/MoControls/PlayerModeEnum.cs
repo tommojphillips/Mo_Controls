@@ -6,6 +6,10 @@
     public enum PlayerModeEnum
     {
         /// <summary>
+        /// Reps null.
+        /// </summary>
+        Null,
+        /// <summary>
         /// Represents the player is on foot.
         /// </summary>
         OnFoot,
