@@ -20,8 +20,9 @@ namespace TommoJProductions.MoControls.InputEmulation
         {
             get
             {
-                NM.GetCursorPos(out Point point);
-                return point;
+                if (NM.GetCursorPos(out Point point))
+                    return point;
+                return Point.Empty;
             }
         }
 
@@ -63,96 +64,52 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// </summary>
         public const int MOUSE_SCROLL_VALUE = 120;
 
+        Vector2 stickValue;
+        Point mouseMove;
+
+        #endregion
+
+        #region Unity runtime
+
+        private void Start()
+        {
+            // Written, 08.10.2018
+
+            mouseMove = new Point();
+        }
+        private void Update()
+        {
+            // Written, 01.08.2018
+
+            update();
+        }
+
         #endregion
 
         #region Methods
-
-        private IEnumerator updateCoroutine()
+         
+        private void update()
         {
             // Written, 16.10.2020
 
             if (MoControlsSaveData.loadedSaveData.emulateMouse)
             {
-                XboxController xboxController = MoControlsGO.xboxController;
-
-                simulateLeftClick();
-                simulateRightClick();
-                if (xboxController.isConnected)
+                if (MoControlsGO.controlManager.xboxController.isConnected)
                 {
-                    GamePadThumbSticks.StickValue stickValue_temp = default;
-                    Vector2 stickValue = Vector2.zero;
-                    int moveX;
-                    int moveY;
-
-                    switch (MoControlsSaveData.loadedSaveData.mouseInputType)
+                    stickValue = MoControlsGO.controlManager.xboxController.getInputFromTypeRaw(MoControlsSaveData.loadedSaveData.mouseInputType);
+                    if (stickValue.sqrMagnitude > 0)
                     {
-                        case InputTypeEnum.LS:
-                            stickValue_temp = xboxController.getLeftStick();
-                            break;
-                        case InputTypeEnum.RS:
-                            stickValue_temp = xboxController.getRightStick();
-                            break;
-                        case InputTypeEnum.DPad:
-                            if (xboxController.dPadLeft.state == ButtonState.Pressed)
-                            {
-                                stickValue.x = -1;
-                            }
-                            if (xboxController.dPadRight.state == ButtonState.Pressed)
-                            {
-                                stickValue.x = 1;
-                            }
-                            if (xboxController.dPadUp.state == ButtonState.Pressed)
-                            {
-                                stickValue.y = 1;
-                            }
-                            if (xboxController.dPadDown.state == ButtonState.Pressed)
-                            {
-                                stickValue.y = -1;
-                            }
-                            break;
-                    }
-                    if (MoControlsSaveData.loadedSaveData.mouseInputType != InputTypeEnum.DPad)
-                    {
-                        stickValue.x = stickValue_temp.X;
-                        stickValue.y = stickValue_temp.Y;
-                    }
-                    if (stickValue != Vector2.zero)
-                    {
-                        // Deadzone
-                        stickValue = stickValue.doDeadzoneCheck(MoControlsSaveData.loadedSaveData.mouseDeadzone, MoControlsSaveData.loadedSaveData.mouseDeadzoneType);
-                        // Sensitivity
-                        stickValue = stickValue.doSensitivityOperation(MoControlsSaveData.loadedSaveData.mouseSensitivity);
-
-                        moveX = (int)stickValue.x;
-                        moveY = (int)stickValue.y * -1; // '* -1' xbox controller y axis is naturally inverted. so changing the that..;
-                        simulateMouseMove(moveX, moveY);
-                        yield return null;
+                        mouseMove.X = (int)stickValue.x;
+                        mouseMove.Y = (int)stickValue.y * -1;
+                        simulateMouseMove(mouseMove);
                     }
                 }
             }
         }
         /// <summary>
-        /// Occurs after game starts.
-        /// </summary>
-        private void Start()
-        {
-            // Written, 08.10.2018
-
-            MoControlsMod.print(nameof(MouseEmulator) + ": Started", Debugging.DebugTypeEnum.full);
-        }
-        /// <summary>
-        /// Occurs every frame
-        /// </summary>
-        private void Update()
-        {
-            // Written, 01.08.2018
-
-            StartCoroutine(updateCoroutine());
-        }
-        /// <summary>
         /// Creates required stuff to simulate mouse movement.
         /// </summary>
-        /// <param name="x">The x.</param>
+        /// <param name="x">The MoControlsGO.controlManager.xboxController.</param>
         /// <param name="y">The y.</param>
         /// <param name="data">Data to pass.</param>
         /// <param name="time">The time of event.</param>
@@ -177,18 +134,18 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// <summary>
         /// Simulates mouse movement.
         /// </summary>
-        /// <param name="x">The X.</param>
+        /// <param name="x">The MoControlsGO.controlManager.xboxController.</param>
         /// <param name="y">The Y.</param>
-        private static void simulateMouseMove(int x, int y)
+        private static void simulateMouseMove(Point p)
         {
             // Written, 08.10.2020
 
-            send(new Point(x, y), (uint)MouseEventButtons.Nothing, MouseEventF.MOVE);
+            send(p, (uint)MouseEventButtons.Nothing, MouseEventF.MOVE);
         }
         /// <summary>
         /// Simulates a left mouse button click.
         /// </summary>
-        private void simulateLeftClick()
+        internal void simulateLeftClick()
         {
             // Written, 08.10.2020
 
@@ -204,7 +161,7 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// <summary>
         /// Simulates a right mouse button click
         /// </summary>
-        private void simulateRightClick()
+        internal void simulateRightClick()
         {
             // Written, 08.10.2020
 

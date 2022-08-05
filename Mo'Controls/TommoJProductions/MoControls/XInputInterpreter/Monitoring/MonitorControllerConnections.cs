@@ -10,73 +10,44 @@ namespace TommoJProductions.MoControls.XInputInterpreter.Monitoring
     {
         // Written, 16.07.2018
 
-        #region Properties / Fields
+        #region fields
 
-        private XboxControllerManager xboxControllerManager;
-        /// <summary>
-        /// Represents a List of xbox controllers to monitor.
-        /// </summary>
-        private XboxController xboxController
-        {
-            get
-            {
-                return xboxControllerManager.controller;
-            }
-        }
-        /// <summary>
-        /// Represents an array of connections.
-        /// </summary>
-        private ControllerConnection controllerConnection
-        {
-            get;
-            set;
-        }
+        private ControllerConnection controllerConnection = new ControllerConnection();
+        internal Coroutine routine;
 
         #endregion
 
         #region Methods
-
-        private void Start()
+                
+        private void OnEnable()
         {
-            // Written, 17.10.2020
+            // Written, 05.07.2022
 
-            xboxControllerManager = GetComponent<XboxControllerManager>();
-            controllerConnection = new ControllerConnection();
+            routine = StartCoroutine(updateCoroutine());
         }
         private IEnumerator updateCoroutine()
         {
             // Written, 16.07.2018
 
-            if (MoControlsSaveData.loadedSaveData.monitiorXboxControllerConnectionStatus)
+            while (isActiveAndEnabled)
             {
-                if (xboxController != null)
+                if (MoControlsGO.controlManager.xboxController.isConnected != controllerConnection.currentConnectionStatus)
                 {
-                    if (xboxController.isConnected != controllerConnection.currentConnectionStatus)
-                    {
-                        controllerConnection.previousConnectionStatus = controllerConnection.currentConnectionStatus;
-                        controllerConnection.currentConnectionStatus = xboxController.isConnected;
+                    controllerConnection.previousConnectionStatus = controllerConnection.currentConnectionStatus;
+                    controllerConnection.currentConnectionStatus = MoControlsGO.controlManager.xboxController.isConnected;
 
-                        if (controllerConnection.currentConnectionStatus == true)
-                        {
-                            XboxControllerManager.onControllerConnected(new ControllerConnectionEventArgs(xboxController));
-                        }
-                        else
-                        {
-                            if (controllerConnection.currentConnectionStatus == false)
-                            {
-                                XboxControllerManager.onControllerDisconnected(new ControllerConnectionEventArgs(xboxController));
-                            }
-                        }
+                    if (controllerConnection.currentConnectionStatus == true)
+                    {
+                        MoControlsGO.controlManager.xboxControllerManager.onControllerConnected(new ControllerConnectionEventArgs(MoControlsGO.controlManager.xboxController));
+                    }
+                    else if (controllerConnection.currentConnectionStatus == false)
+                    {
+                        MoControlsGO.controlManager.xboxControllerManager.onControllerDisconnected(new ControllerConnectionEventArgs(MoControlsGO.controlManager.xboxController));
                     }
                 }
                 yield return null;
             }
-        }
-        private void Update()
-        {
-            // Written, 16.10.2020
-
-            StartCoroutine(updateCoroutine());
+            routine = null;
         }
 
         #endregion

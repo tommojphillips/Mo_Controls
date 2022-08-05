@@ -39,120 +39,82 @@ namespace TommoJProductions.MoControls
                 foundInput = false,
                 input = null,
             };
-            XboxController xboxController = MoControlsGO.xboxController;
+            XboxController xc = MoControlsGO.controlManager.xboxController;
             // Check xbox controller for input.
-            if (xboxController.isConnected)
+            if (xc.isConnected)
             {
-                if (xboxController.getRightTrigger() > 0.5f)
+                if (xc.getRightTrigger() > 0.5f)
                 {
                     monitorInputData.foundInput = true;
-                    monitorInputData.input = xboxController.rT.inputName;
+                    monitorInputData.input = xc.rT.inputName;
                 }
-                else
+                if (xc.getLeftTrigger() > 0.5f)
                 {
-                    if (xboxController.getLeftTrigger() > 0.5f)
-                    {
-                        monitorInputData.foundInput = true;
-                        monitorInputData.input = xboxController.lT.inputName;
-                    }
-                    else
-                    {
-                        if (xboxController.dPadUp.state == ButtonState.Pressed)
-                        {
-                            monitorInputData.foundInput = true;
-                            monitorInputData.input = xboxController.dPadUp.inputName;
-                        }
-                        else
-                        {
-                            if (xboxController.dPadDown.state == ButtonState.Pressed)
-                            {
-                                monitorInputData.foundInput = true;
-                                monitorInputData.input = xboxController.dPadDown.inputName;
-                            }
-                            else
-                            {
-                                if (xboxController.dPadLeft.state == ButtonState.Pressed)
-                                {
-                                    monitorInputData.foundInput = true;
-                                    monitorInputData.input = xboxController.dPadLeft.inputName;
-                                }
-                                else
-                                {
-                                    if (xboxController.dPadRight.state == ButtonState.Pressed)
-                                    {
-                                        monitorInputData.foundInput = true;
-                                        monitorInputData.input = xboxController.dPadRight.inputName;
-                                    }
-                                    else
-                                    {
-                                        if (xboxController.getLeftStick().X > 0.0f)
-                                        {
-                                            monitorInputData.foundInput = true;
-                                            monitorInputData.input = xboxController.leftThumbstick.right.inputName;
-                                        }
-                                        else
-                                        {
-                                            if (xboxController.getLeftStick().X < 0.0f)
-                                            {
-                                                monitorInputData.foundInput = true;
-                                                monitorInputData.input = xboxController.leftThumbstick.left.inputName;
-                                            }
-                                            else
-                                            {
-                                                if (xboxController.getLeftStick().Y > 0.0f)
-                                                {
-                                                    monitorInputData.foundInput = true;
-                                                    monitorInputData.input = xboxController.leftThumbstick.up.inputName;
-                                                }
-                                                else
-                                                {
-                                                    if (xboxController.getLeftStick().Y < 0.0f)
-                                                    {
-                                                        monitorInputData.foundInput = true;
-                                                        monitorInputData.input = xboxController.leftThumbstick.down.inputName;
-                                                    }
-                                                    else
-                                                    {
-                                                        if (xboxController.getRightStick().X > 0.0f)
-                                                        {
-                                                            monitorInputData.foundInput = true;
-                                                            monitorInputData.input = xboxController.rightThumbstick.right.inputName;
-                                                        }
-                                                        else
-                                                        {
-                                                            if (xboxController.getRightStick().X < 0.0f)
-                                                            {
-                                                                monitorInputData.foundInput = true;
-                                                                monitorInputData.input = xboxController.rightThumbstick.left.inputName;
-                                                            }
-                                                            else
-                                                            {
-                                                                if (xboxController.getRightStick().Y > 0.0f)
-                                                                {
-                                                                    monitorInputData.foundInput = true;
-                                                                    monitorInputData.input = xboxController.rightThumbstick.up.inputName;
-                                                                }
-                                                                else
-                                                                {
-                                                                    if (xboxController.getRightStick().Y < 0.0f)
-                                                                    {
-                                                                        monitorInputData.foundInput = true;
-                                                                        monitorInputData.input = xboxController.rightThumbstick.down.inputName;
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    monitorInputData.foundInput = true;
+                    monitorInputData.input = xc.lT.inputName;
+                }
+                if (xc.dPadUp.state == ButtonState.Pressed)
+                {
+                    monitorInputData.foundInput = true;
+                    monitorInputData.input = xc.dPadUp.inputName;
+                }
+                if (xc.dPadDown.state == ButtonState.Pressed)
+                {
+                    monitorInputData.foundInput = true;
+                    monitorInputData.input = xc.dPadDown.inputName;
+                }
+                if (xc.dPadLeft.state == ButtonState.Pressed)
+                {
+                    monitorInputData.foundInput = true;
+                    monitorInputData.input = xc.dPadLeft.inputName;
+                }
+                if (xc.dPadRight.state == ButtonState.Pressed)
+                {
+                    monitorInputData.foundInput = true;
+                    monitorInputData.input = xc.dPadRight.inputName;
+                }
+                if (xc.getLeftStick().x > 0.0f)
+                {
+                    monitorInputData.foundInput = true;
+                    monitorInputData.input = xc.leftThumbstick.right.inputName;
+                }
+                if (xc.getLeftStick().x < 0.0f)
+                {
+                    monitorInputData.foundInput = true;
+                    monitorInputData.input = xc.leftThumbstick.left.inputName;
+                }
+                if (xc.getLeftStick().y > 0.0f)
+                {
+                    monitorInputData.foundInput = true;
+                    monitorInputData.input = xc.leftThumbstick.up.inputName;
+                }
+                if (xc.getLeftStick().y < 0.0f)
+                {
+                    monitorInputData.foundInput = true;
+                    monitorInputData.input = xc.leftThumbstick.down.inputName;
+                }
+                if (xc.getRightStick().x > 0.0f)
+                {
+                    monitorInputData.foundInput = true;
+                    monitorInputData.input = xc.rightThumbstick.right.inputName;
+                }
+                if (xc.getRightStick().x < 0.0f)
+                {
+                    monitorInputData.foundInput = true;
+                    monitorInputData.input = xc.rightThumbstick.left.inputName;
+                }
+                if (xc.getRightStick().y > 0.0f)
+                {
+                    monitorInputData.foundInput = true;
+                    monitorInputData.input = xc.rightThumbstick.up.inputName;
+                }
+                if (xc.getRightStick().y < 0.0f)
+                {
+                    monitorInputData.foundInput = true;
+                    monitorInputData.input = xc.rightThumbstick.down.inputName;
                 }
             }
+
             if (!monitorInputData.foundInput)
             {
                 if (uInput.anyKeyDown)
@@ -161,35 +123,34 @@ namespace TommoJProductions.MoControls
                     {
                         if (uInput.GetKeyDown(kcode))
                         {
-                            if (kcode != selectKey) //Select key
+                            if (kcode == selectKey) //Select key
+                                break;
+
+                            if (kcode == noneKey || kcode == KeyCode.Escape) // Set as none key
                             {
-                                if (kcode == noneKey) // Set as none key
+                                monitorInputData = new MonitorInputData()
+                                {
+                                    foundInput = true,
+                                    input = KeyCode.None.ToString(),
+                                };
+                            }
+                            else
+                            {
+                                if (kcode != MoControlsMod.instance.openControlsGui.Key && kcode != cancelKey) // not allowed
                                 {
                                     monitorInputData = new MonitorInputData()
                                     {
                                         foundInput = true,
-                                        input = KeyCode.None.ToString(),
+                                        input = kcode.ToString(),
                                     };
                                 }
                                 else
                                 {
-                                    if (kcode != MoControlsMod.instance.openControlsGui.Key && kcode != cancelKey) // not allowed
-                                    {
-                                        monitorInputData = new MonitorInputData()
-                                        {
-                                            foundInput = true,
-                                            input = kcode.ToString(),
-                                        };
-                                    }
-                                    else
-                                    {
-                                        MoControlsGO.controlManager.setChangeInput();
-                                    }
+                                    MoControlsGO.controlManager.changeInputResult.reset();
                                 }
-                                break;
                             }
-                            else
-                                break;
+
+                            break;
                         }
                     }
                 }

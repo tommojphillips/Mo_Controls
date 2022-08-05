@@ -12,7 +12,6 @@ namespace TommoJProductions.MoControls.GUI
     {
         // Written, 28.12.2018
 
-        #region Properties
 
         /// <summary>
         /// Represents the GUI for the mod.
@@ -25,21 +24,23 @@ namespace TommoJProductions.MoControls.GUI
             }
         }
 
-
-        #endregion
+        protected XboxAxisEnum menuDownA { get; private set; } = XboxAxisEnum.None;
+        protected XboxAxisEnum menuUpA { get; private set; } = XboxAxisEnum.None;
+        protected XboxButtonEnum menuDownB { get; private set; } = XboxButtonEnum.LB;
+        protected XboxButtonEnum menuUpB { get; private set; } = XboxButtonEnum.RB;
 
         #region Methods
 
         /// <summary>
         /// Occurs every frame (Unity Method)
         /// </summary>
-        private void Update()
+        private new void Update()
         {
             // Written, 04.01.2019
 
+            base.Update();
             if (moControlsGUI.controlsGuiOpened)
                 controllerMenuChange();
-            controllerScroll();
         }  
         /// <summary>
         /// Changes to the next/previous menu.
@@ -52,7 +53,6 @@ namespace TommoJProductions.MoControls.GUI
             {
                 int mainMenuItemCount = Enum.GetNames(typeof(MainGUIMenuEnum)).Length - 1;
                 int settingsMenuItemCount = Enum.GetNames(typeof(SettingsMenuEnum)).Length - 1;
-
 
                 if (hasInputFromAxisOrButton(menuDownA, menuDownB) > 0)
                 {
@@ -93,7 +93,31 @@ namespace TommoJProductions.MoControls.GUI
                 }
             }
         }
-       
+
+        /// <summary>
+        /// Sets all xbox controls. NOTE: only set either 'A' (axis) OR 'B' (button) variants of each control type, eg, scrollUpA & scrollUpB. otherwise will
+        /// only detect axis input variant.
+        /// </summary>
+        internal void setControls(XboxAxisEnum scrollUpA = XboxAxisEnum.None, XboxButtonEnum scrollUpB = XboxButtonEnum.None,
+            XboxAxisEnum scrollDownA = XboxAxisEnum.None, XboxButtonEnum scrollDownB = XboxButtonEnum.None,
+            XboxAxisEnum menuUpA = XboxAxisEnum.None, XboxButtonEnum menuUpB = XboxButtonEnum.None,
+            XboxAxisEnum menuDownA = XboxAxisEnum.None, XboxButtonEnum menuDownB = XboxButtonEnum.None)
+        {
+            // Written, 31.07.2022
+
+            base.setControls(scrollUpA, scrollUpB, scrollDownA, scrollDownB);
+
+            // Menu Down
+            if (menuDownA != XboxAxisEnum.None)
+                this.menuDownA = menuDownA;
+            if (menuDownB != XboxButtonEnum.None)
+                this.menuDownB = menuDownB;
+            // Menu Up
+            if (menuUpA != XboxAxisEnum.None)
+                this.menuUpA = menuUpA;
+            if (menuUpB != XboxButtonEnum.None)
+                this.menuUpB = menuUpB;
+        }
         #endregion
     }
 }

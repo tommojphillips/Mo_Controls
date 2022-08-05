@@ -1,5 +1,7 @@
 ﻿using MSCLoader;
 using System;
+using System.Collections.Generic;
+using System.Collections;
 using TommoJProductions.Debugging;
 using TommoJProductions.MoControls.InputEmulation;
 using UnityEngine;
@@ -16,11 +18,6 @@ namespace TommoJProductions.MoControls
     public class MoControlsMod : Mod
     {
         // Written, 06.07.2018  (Project start date)     
-
-        /// <summary>
-        /// Represents whether this is a release version
-        /// </summary>
-        internal static bool isReleaseVersion => true;
 
         #region Mod Keybinds
 
@@ -60,7 +57,9 @@ namespace TommoJProductions.MoControls
 
         #region Fields
 
-        private string description = $"Implements full xbox controller support eg rumble/ffb support, separate mode for controls (Foot, Driving), autodetect scrollable.\nLatest Release Date: {VersionInfo.lastestRelease}";
+        private readonly string versionInfo = String.Format("(<color={0}-{1}</color>)", VersionInfo.IS_DEBUG_CONFIG ? "red>Debug" : "blue>Release", VersionInfo.IS_64_BIT ? "x64" : "x86");
+        private readonly string description;
+
         /// <summary>
         /// Represents the moControls gameobject.
         /// </summary>
@@ -70,16 +69,6 @@ namespace TommoJProductions.MoControls
 
         #region Properties
 
-        /// <summary>
-        /// Represents the release version name.
-        /// </summary>
-        internal string releaseVersionName
-        {
-            get
-            {
-                return String.Format("(<color={0}-{2}</color>) {1}", isReleaseVersion ? "blue>Release" : "red>Pre-Release", VersionInfo.IS_64_BIT ? "x64" : "x86", VersionInfo.IS_DEBUG_CONFIG ? "DEBUG" : "R");
-            }
-        }
         /// <summary>
         /// Represents whether or not the assets are loaded.
         /// </summary>
@@ -126,8 +115,12 @@ namespace TommoJProductions.MoControls
             // Written, 20.08.2018
 
             instance = this;
-            performDebugCheck();
-            ModConsole.Print(String.Format("<color=green>{0} <b>v{1}</b> {2} ready</color>", Name, Version, releaseVersionName));
+            
+            description = "Implements full xbox controller support eg => rumble/ffb support, separate mode for controls (Foot, Driving), autodetect scrollable.\n" +
+            $"Latest Release Date: {VersionInfo.lastestRelease} | \n" +
+            $"Key to toggle the GUI is {openControlsGui.Key} or <b>hold down the back button on a connected xbox controller for (> 0.3sec)</b>";
+            
+            ModConsole.Print(String.Format("<color=green>{0} <b>v{1}</b> {2} ready</color>", Name, Version, versionInfo));
         }
 
         #endregion
@@ -181,7 +174,7 @@ namespace TommoJProductions.MoControls
             {
                 AssetBundle ab = LoadAssets.LoadBundle(this, "mo_controls.unity3d");
                 print("Asset bundle loaded successfully.", DebugTypeEnum.partial);
-                assets = new AssetHolder(ab.LoadAllAssets<Texture2D>()) ?? throw new Exception("asset holder return an error");
+                assets = new AssetHolder(ab.LoadAllAssets<Texture2D>()) ?? throw new Exception("asset holder returned null");
                 ab.Unload(false);
                 assetsLoaded = true;
 
@@ -193,125 +186,7 @@ namespace TommoJProductions.MoControls
                 assetsLoaded = false;
             }
         }
-
-        /// <summary>
-        /// Represents a debug/release mode check.
-        /// </summary>
-        private void performDebugCheck()
-        {
-            // Written, 28.12.2018
-
-#if DEBUG
-            if (isReleaseVersion)
-                ModUI.ShowMessage("<color=orange>Warning</color>: Debug Configuration invaild. Was this intentional Tommo? (dev message)" +
-                    "\r\n" +
-                    "\r\nRelease version: " + isReleaseVersion +
-                    "\r\nDebug Config: True",
-                    "<color=orange>Warning</color>: <b>Incorrect Debug/Releaase Configuration</b>");
-#else
-            if (!isReleaseVersion)
-                ModUI.ShowMessage("<color=orange>Warning</color>: Release Configuration invaild" +
-                    "\r\nWas this intentional Tommo? (dev message)" +
-                    "\r\n" +
-                    "\r\nRelease version: " + isReleaseVersion +
-                    "\r\nDebug Config: False",
-                    "<color=orange>Warning</color>: <b>Incorrect Release/Debug Configuration</b>");
-#endif
-        }
-
-        private void loadCInputAxisSettings()
-        {
-            // Written, 23.10.2020
-
-            // setting cInput axis deadzones//
-            /*external cinput control names = PlayerVertical*PlayerHorizontal*Horizontal*Vertical*/
-            cInput.SetAxisDeadzone("PlayerHorizontal", MoControlsSaveData.loadedSaveData.playerHorzDeadzone);
-            cInput.SetAxisSensitivity("PlayerHorizontal", MoControlsSaveData.loadedSaveData.playerHorzSensitivity);
-            cInput.SetAxisGravity("PlayerHorizontal", MoControlsSaveData.loadedSaveData.playerHorzGravity);
-            cInput.SetAxisDeadzone("PlayerVertical", MoControlsSaveData.loadedSaveData.playerVertDeadzone);
-            cInput.SetAxisSensitivity("PlayerVertical", MoControlsSaveData.loadedSaveData.playerVertSensitivity);
-            cInput.SetAxisGravity("PlayerVertical", MoControlsSaveData.loadedSaveData.playerVertGravity);
-            cInput.SetAxisDeadzone("Horizontal", MoControlsSaveData.loadedSaveData.horzDeadzone);
-            cInput.SetAxisSensitivity("Horizontal", MoControlsSaveData.loadedSaveData.horzSensitivity);
-            cInput.SetAxisGravity("Horizontal", MoControlsSaveData.loadedSaveData.horzGravity);
-            cInput.SetAxisDeadzone("Vertical", MoControlsSaveData.loadedSaveData.vertDeadzone);
-            cInput.SetAxisSensitivity("Vertical", MoControlsSaveData.loadedSaveData.vertSensitivity);
-            cInput.SetAxisGravity("Vertical", MoControlsSaveData.loadedSaveData.vertGravity);
-            print("loaded cinput axis settings (grav, dead, sens).. hold <i>Left-Ctrl</i> through Mo'Controls' second pass loading sequ to disable", DebugTypeEnum.full);
-        }
-
-        public static int determineIsVersionOldCurrentOrNew(string v1, string v2)
-        {
-            string[] vN1 = v1.Split('.');
-            string[] vN2 = v2.Split('.');
-            string[] v;
-            string[] V = null;
-            int result;
-            int value;
-            int returnValue = 0;
-            if (vN1.Length != vN2.Length)
-                if (vN1.Length < vN2.Length)
-                {
-                    v = vN1;
-                    V = vN2;
-                }
-                else
-                {
-                    v = vN2;
-                    V = vN1;
-                }
-            else
-                v = vN1;
-
-            for (int i = 0; i < v.Length; i++)
-            {
-                if (int.TryParse(vN1[i], out result))
-                    if (int.TryParse(vN2[i], out value))
-                        if (result > value)
-                            returnValue = 1;
-                        else if (result < value)
-                            return returnValue = -1;
-            }
-            if (V != null)
-            {
-                //for (int i = V.Length - (V.Length - v.Length); i < V.Length; i++)
-                {
-                    if (returnValue == 0)
-                        returnValue = 1;
-                }
-            }
-            return returnValue;
-        }
-        
-        public static string getVersionDifference(string v1, string v2)
-        {
-            string[] vN1 = v1.Split('.');
-            string[] vN2 = v2.Split('.');
-            string[] v;
-            string r = "";
-            int r1;
-            int r2;
-            if (vN1.Length != vN2.Length)
-                if (vN1.Length < vN2.Length)
-                    v = vN1;
-                else
-                    v = vN2;
-            else
-                v = vN1;
-
-            for (int i = 0; i < v.Length; i++)
-            {
-                if (int.TryParse(vN1[i], out r1))
-                    if (int.TryParse(vN2[i], out r2))
-                    {
-                        r += Mathf.Abs(r1 - r2) + ".";
-                        continue;
-                    }
-                r += "0.";
-            }
-            return r.Substring(0, r.Length - 1);
-        }
-       
+         
         #endregion
 
         #region Override Methods
@@ -325,6 +200,7 @@ namespace TommoJProductions.MoControls
             ConsoleCommand.Add(new ListLoadedAssembliesConsoleCommand());
             ConsoleCommand.Add(new WriteCinputExternInputsCommand());
             ConsoleCommand.Add(new ChangeToolModeCommand());
+
             Keybind.Add(this, openControlsGui);
             Keybind.Add(this, lmbPrimaryInput);
             Keybind.Add(this, lmbSecondaryInput);
@@ -332,11 +208,11 @@ namespace TommoJProductions.MoControls
             Keybind.Add(this, rmbSecondaryInput);
 
             MoControlsSaveData.loadSettings();
-            loadCInputAxisSettings();
             loadControllerAssets();
             moControlsGameObject = new GameObject(gameObjectName);
             moControlsGO = moControlsGameObject.AddComponent<MoControlsGO>();
-            print($"{Name} v{Version}: Loaded", DebugTypeEnum.none);
+
+            print($"{Name} v{Version}: Loaded", DebugTypeEnum.none);                        
         }
 
         #endregion

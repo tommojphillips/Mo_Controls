@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
+using TommoJProductions.MoControls.InputEmulation;
 using UnityEngine;
 using XInputDotNetPure;
 
@@ -19,23 +21,19 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Represents all the controls of an xbox controller.
         /// </summary>
-        private XboxControl[] xboxControls;
+        internal XboxControl[] xboxControls { get; private set; }
         /// <summary>
         /// the previous (last) rumble sent to xbox controller.
         /// </summary>
         internal Vector2 prevRumblePow;
         /// <summary>
-        /// Represents if the user has request toolmode change via, <see cref="HoldInputMono"/>. see:<see cref="toggleToolMode"/>.
-        /// </summary>
-        internal bool _requestedModeChange;
-        /// <summary>
         /// Represents the button prefix.
         /// </summary>
-        private static readonly string buttonPrefix = "JoystickButton";
+        private const string buttonPrefix = "JoystickButton";
         /// <summary>
         /// Represents the axis prefix.
         /// </summary>
-        private static readonly string axisPrefix = "Joy Axis ";
+        private const string axisPrefix = "Joy Axis ";
         /// <summary>
         /// Represents the previous <see cref="GamePadState"/> of the controller.
         /// </summary>
@@ -45,17 +43,9 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// </summary>
         private GamePadState state;
         /// <summary>
-        /// Represents the gamepad index.
-        /// </summary>
-        private int gamePadIndex;
-        /// <summary>
         /// Represents the index of the gamepad.
         /// </summary>
         private PlayerIndex playerIndex;
-        /// <summary>
-        /// Represents the rumble events for the xbox controller.
-        /// </summary>
-        private List<XboxRumble> xboxRumbleEvents;
         /// <summary>
         /// Represents the input map for the controller.
         /// </summary>
@@ -66,34 +56,34 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         internal static readonly XboxControl[] normalXboxControls = new XboxControl[]
         {
                 // Buttons
-                new XboxBoolState(String.Format("{0}0", buttonPrefix), "A", XboxControlTypeEnum.Button),
-                new XboxBoolState(String.Format("{0}1", buttonPrefix), "B", XboxControlTypeEnum.Button),
-                new XboxBoolState(String.Format("{0}2", buttonPrefix), "X", XboxControlTypeEnum.Button),
-                new XboxBoolState(String.Format("{0}3", buttonPrefix), "Y", XboxControlTypeEnum.Button),
-                new XboxBoolState(String.Format("{0}4", buttonPrefix), "LB", XboxControlTypeEnum.Button),
-                new XboxBoolState(String.Format("{0}5", buttonPrefix), "RB", XboxControlTypeEnum.Button),
-                new XboxBoolState(String.Format("{0}6", buttonPrefix), "Back", XboxControlTypeEnum.Button),
-                new XboxBoolState(String.Format("{0}7", buttonPrefix), "Start", XboxControlTypeEnum.Button),
-                new XboxBoolState(String.Format("{0}8", buttonPrefix), "LS", XboxControlTypeEnum.Button),
-                new XboxBoolState(String.Format("{0}9", buttonPrefix), "RS", XboxControlTypeEnum.Button),
+                new XboxBoolState(String.Format("{0}0", buttonPrefix), "A"),
+                new XboxBoolState(String.Format("{0}1", buttonPrefix), "B"),
+                new XboxBoolState(String.Format("{0}2", buttonPrefix), "X"),
+                new XboxBoolState(String.Format("{0}3", buttonPrefix), "Y"),
+                new XboxBoolState(String.Format("{0}4", buttonPrefix), "LB"),
+                new XboxBoolState(String.Format("{0}5", buttonPrefix), "RB"),
+                new XboxBoolState(String.Format("{0}6", buttonPrefix), "Back"),
+                new XboxBoolState(String.Format("{0}7", buttonPrefix), "Start"),
+                new XboxBoolState(String.Format("{0}8", buttonPrefix), "LS"),
+                new XboxBoolState(String.Format("{0}9", buttonPrefix), "RS"),
                 // D-Pad
-                new XboxBoolState(String.Format("{0}7+", axisPrefix), "D-Pad Up", XboxControlTypeEnum.Axis),
-                new XboxBoolState(String.Format("{0}7-", axisPrefix), "D-Pad Down", XboxControlTypeEnum.Axis),
-                new XboxBoolState(String.Format("{0}6-", axisPrefix), "D-Pad Left", XboxControlTypeEnum.Axis),
-                new XboxBoolState(String.Format("{0}6+", axisPrefix), "D-Pad Right", XboxControlTypeEnum.Axis),
+                new XboxBoolState(String.Format("{0}7+", axisPrefix), "D Pad Up", XboxControlTypeEnum.Axis),
+                new XboxBoolState(String.Format("{0}7-", axisPrefix), "D Pad Down", XboxControlTypeEnum.Axis),
+                new XboxBoolState(String.Format("{0}6-", axisPrefix), "D Pad Left", XboxControlTypeEnum.Axis),
+                new XboxBoolState(String.Format("{0}6+", axisPrefix), "D Pad Right", XboxControlTypeEnum.Axis),
                 // Triggers
                 new XboxFloatState(String.Format("{0}9+", axisPrefix), "LT"),
                 new XboxFloatState(String.Format("{0}10+", axisPrefix), "RT"),
                 // LS
-                new XboxFloatState(String.Format("{0}1-", axisPrefix), "LS-Left"),
-                new XboxFloatState(String.Format("{0}1+", axisPrefix), "LS-Right"),
-                new XboxFloatState(String.Format("{0}2-", axisPrefix), "LS-Up"),
-                new XboxFloatState(String.Format("{0}2+", axisPrefix), "LS-Down"),
+                new XboxFloatState(String.Format("{0}1-", axisPrefix), "LS Left"),
+                new XboxFloatState(String.Format("{0}1+", axisPrefix), "LS Right"),
+                new XboxFloatState(String.Format("{0}2-", axisPrefix), "LS Up"),
+                new XboxFloatState(String.Format("{0}2+", axisPrefix), "LS Down"),
                 // RS
-                new XboxFloatState(String.Format("{0}4-", axisPrefix), "RS-Left"),
-                new XboxFloatState(String.Format("{0}4+", axisPrefix), "RS-Right"),
-                new XboxFloatState(String.Format("{0}5-", axisPrefix), "RS-Up"),
-                new XboxFloatState(String.Format("{0}5+", axisPrefix), "RS-Down")
+                new XboxFloatState(String.Format("{0}4-", axisPrefix), "RS Left"),
+                new XboxFloatState(String.Format("{0}4+", axisPrefix), "RS Right"),
+                new XboxFloatState(String.Format("{0}5-", axisPrefix), "RS Up"),
+                new XboxFloatState(String.Format("{0}5+", axisPrefix), "RS Down")
         };
 
         #endregion
@@ -117,7 +107,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             get
             {
-                return gamePadIndex + 1;
+                return (int)playerIndex + 1;
             }
         }
         /// <summary>
@@ -296,22 +286,46 @@ namespace TommoJProductions.MoControls.XInputInterpreter
             get;
             private set;
         }
+        public bool anyInput { get; private set; }
+        public bool anyThumbstickInput { get; private set; }
+        public bool anyButtonPressed { get; private set; }
+        public bool anyButtonDown { get; private set; }
+        public XboxControl lastControlInput { get; private set; }
+
+        public XboxBoolState[] dPadControls { get; private set; }
 
         #endregion
 
+        private Vector2 leftThumbStickState;
+        private Vector2 rightThumbStickState;
+        private bool _anyInput;
+        private bool _anyThumbstickInput;
+        private bool _anyButtonPressed;
+        private bool _anyButtonDown;
+
+        private Vector2 inputFromType;
+
+        internal static Vector2 vector2Zero { get; private set; }
+
+        private static XboxBoolState emptyBoolState;
+        private static XboxFloatState emptyFloatState;
+
         #region Constructors
 
+        static XboxController() 
+        {
+            // Written, 05.08.2022
+
+            vector2Zero = Vector2.zero;
+        }
         /// <summary>
-        /// Initializes a new instance of <see cref="XboxController"/> and sets the index of the controller (1 - 4).
+        /// Initializes a new instance of <see cref="XboxController"/> and sets the index of the controller.
         /// </summary>
-        /// <param name="inIndex">The controller index to set, 1 - 4.</param>
         public XboxController()
         {
             // Written, 16.07.2018
 
-            gamePadIndex = 0;
-            playerIndex = (PlayerIndex)gamePadIndex;
-            xboxRumbleEvents = new List<XboxRumble>();
+            playerIndex = PlayerIndex.One;
             inputMap = new Dictionary<string, XboxControl>();
 
             #region Initilize Xbox Buttons
@@ -330,9 +344,48 @@ namespace TommoJProductions.MoControls.XInputInterpreter
                 xboxControls[23] as XboxFloatState);
 
             #endregion
+            
+            loadAssetsToController();
+            updateTriggerAxisInputName();
 
-            loadControllerAssets();
-            updateTriggerAxis();
+            leftThumbStickState = new Vector2();
+            rightThumbStickState = new Vector2();
+
+            dPadControls = new XboxBoolState[4]
+            {
+                dPadUp,
+                dPadDown,
+                dPadLeft,
+                dPadRight
+            };
+
+            emptyBoolState = new XboxBoolState(string.Empty, string.Empty);
+            emptyFloatState = new XboxFloatState(string.Empty, string.Empty);
+        }
+
+        [IndexerName("xboxControl")]
+        public XboxBoolState this[XboxButtonEnum xboxButton]
+        {
+            get
+            {
+                string key = xboxButton.toString();
+                if (inputMap.ContainsKey(key))
+                    return inputMap[key] as XboxBoolState;
+                return emptyBoolState;
+                //throw new Exception("[XboxController] error occured in indexer: xboxButton. button probably doesn't exist.");
+            }
+        }
+        [IndexerName("xboxControl")]
+        public XboxFloatState this[XboxAxisEnum xboxAxis]
+        {
+            get
+            {
+                string key = xboxAxis.toString();
+                if (inputMap.ContainsKey(key))
+                    return inputMap[key] as XboxFloatState;
+                return emptyFloatState;
+                //throw new Exception("[XboxController] error occured in indexer: xboxAxis. axis probably doesn't exist.");
+            }
         }
 
         #endregion
@@ -343,12 +396,6 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 23.10.2020
 
-            if (_requestedModeChange)
-            {
-                MoControlsMod.print("Identified changemode request.", Debugging.DebugTypeEnum.full);
-                MoControlsGO.controlManager.toggleToolMode();
-                _requestedModeChange = false;
-            }
             update();
         }
         private void LateUpdate() 
@@ -359,11 +406,49 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         #endregion
 
         #region Methods
-
+        
+        internal Vector2 getInputFromTypeRaw(InputTypeEnum inputType)
+        {
+            // Written, 24.07.2022
+                        
+            switch (inputType)
+            {
+                case InputTypeEnum.LS:
+                    inputFromType = getLeftStick();
+                    break;
+                case InputTypeEnum.RS:
+                    inputFromType = getRightStick();
+                    break;
+                case InputTypeEnum.DPad:
+                    inputFromType = vector2Zero;
+                    if (dPadLeft.state == ButtonState.Pressed)
+                    {
+                        inputFromType.x = -1;
+                    }
+                    else if (dPadRight.state == ButtonState.Pressed)
+                    {
+                        inputFromType.x = 1;
+                    }
+                    if (dPadUp.state == ButtonState.Pressed)
+                    {
+                        inputFromType.y = 1;
+                    }
+                    else if (dPadDown.state == ButtonState.Pressed)
+                    {
+                        inputFromType.y = -1;
+                    }
+                    break;
+                default:
+                case InputTypeEnum.None:
+                    inputFromType = vector2Zero;
+                    break;
+            }
+            return inputFromType;
+        }
         /// <summary>
         /// Updates and sets the inputName (combined: 3-/3+ | not: 9+/10+) for the triggers.
         /// </summary>
-        internal void updateTriggerAxis()
+        internal void updateTriggerAxisInputName()
         {
             // Written, 24.10.2020
 
@@ -385,7 +470,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 16.10.2020
 
-            state = GamePad.GetState(playerIndex);
+            state = GamePad.GetState(playerIndex, MoControlsSaveData.loadedSaveData.xboxControllerDeadzoneType);
 
             if (state.IsConnected)
             {
@@ -420,7 +505,20 @@ namespace TommoJProductions.MoControls.XInputInterpreter
                 rightThumbstick.up.state = state.ThumbSticks.Right.Y > 0 ? state.ThumbSticks.Right.Y : 0;
                 rightThumbstick.down.state = state.ThumbSticks.Right.Y < 0 ? state.ThumbSticks.Right.Y : 0;
 
+                leftThumbStickState.x = state.ThumbSticks.Left.X;
+                leftThumbStickState.y = state.ThumbSticks.Left.Y;
+
+                rightThumbStickState.x = state.ThumbSticks.Right.X;
+                rightThumbStickState.y = state.ThumbSticks.Right.Y;
+
                 updateInputMap();
+            }
+            else if (anyInput)
+            {
+                anyInput = false;
+                anyButtonDown = false;
+                anyButtonPressed = false;
+                anyThumbstickInput = false;
             }
         }
         /// <summary>
@@ -477,7 +575,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 16.07.2018
 
-            if ((inputMap[inXboxButton.toString()] as XboxBoolState).state == ButtonState.Pressed)
+            if (this[inXboxButton].state == ButtonState.Pressed)
             {
                 return true;
             }
@@ -491,7 +589,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 16.07.2018
 
-            XboxBoolState button = inputMap[inXboxButton.toString()] as XboxBoolState;
+            XboxBoolState button = this[inXboxButton];
             if (button.previousState == ButtonState.Released && button.state == ButtonState.Pressed)
             {
                 return true;
@@ -506,7 +604,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 20.12.2018
 
-            XboxBoolState button = inputMap[inXboxButton.toString()] as XboxBoolState;
+            XboxBoolState button = this[inXboxButton];
             if (button.previousState == ButtonState.Pressed && button.state == ButtonState.Released)
             {
                 return true;
@@ -514,60 +612,22 @@ namespace TommoJProductions.MoControls.XInputInterpreter
             return false;
         }
         /// <summary>
-        /// If xbox button has been pressed; returns that xbox button, else returns <see cref="XboxButtonEnum.NULL"/>.
-        /// </summary>
-        internal XboxButtonEnum getAnyButtonPressed()
-        {
-            // Written, 18.07.2018
-
-            foreach (XboxButtonEnum xButton in Enum.GetValues(typeof(XboxButtonEnum)))
-            {
-                if (xButton != XboxButtonEnum.NULL)
-                {
-                    if (getButtonPressed(xButton))
-                    {
-                        return xButton;
-                    }
-                }
-            }
-            return XboxButtonEnum.NULL;
-        }
-        /// <summary>
-        /// If xbox button has been pressed down; returns that xbox button, else returns <see cref="XboxButtonEnum.NULL"/>.
-        /// </summary>
-        internal XboxButtonEnum getAnyButtonDown()
-        {
-            // Written, 18.07.2018
-
-            foreach (XboxButtonEnum xButton in Enum.GetValues(typeof(XboxButtonEnum)))
-            {
-                if (xButton != XboxButtonEnum.NULL)
-                {
-                    if (getButtonDown(xButton))
-                    {
-                        return xButton;
-                    }
-                }
-            }
-            return XboxButtonEnum.NULL;
-        }
-        /// <summary>
         /// Gets the left thumb sticks values.
         /// </summary>
-        internal GamePadThumbSticks.StickValue getLeftStick()
+        internal Vector2 getLeftStick()
         {
             // Written, 18.07.2018
 
-            return state.ThumbSticks.Left;
+            return leftThumbStickState;
         }
         /// <summary>
         /// Gets the right thumb sticks values.
         /// </summary>
-        internal GamePadThumbSticks.StickValue getRightStick()
+        internal Vector2 getRightStick()
         {
             // Written, 18.07.2018
 
-            return state.ThumbSticks.Right;
+            return rightThumbStickState;
         }
         /// <summary>
         /// Gets the left trigger. Ranges from 0.0f (not pressed) to 1.0f (fully pressed).
@@ -616,13 +676,42 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 16.07.2018 | Modified, 09.10.2020 | Modified, 02.06.2022
 
+            _anyInput = false;
+            _anyButtonPressed = false;
+            _anyButtonDown = false;
+            _anyThumbstickInput = false;
             for (int i = 0; i < xboxControls.Length; i++)
             {
                 inputMap[xboxControls[i].name] = xboxControls[i];
+
+                if (xboxControls[i] is XboxBoolState)
+                {
+                    XboxBoolState bs = xboxControls[i] as XboxBoolState;
+                    if (bs.state == ButtonState.Pressed)
+                    {
+                        _anyInput = true;
+                        _anyButtonPressed = true;
+                        if (bs.previousState == ButtonState.Released)
+                            _anyButtonDown = true;
+                        lastControlInput = xboxControls[i];
+                        continue;
+                    }
+                }
+                else if ((xboxControls[i] as XboxFloatState).state != 0)
+                {
+                    _anyInput = true;
+                    _anyThumbstickInput = true;
+                    lastControlInput = xboxControls[i];
+                    continue;
+                }
             }
+            anyInput = _anyInput;
+            anyButtonPressed = _anyButtonPressed;
+            anyButtonDown = _anyButtonDown;
+            anyThumbstickInput = _anyThumbstickInput;
         }
         /// <summary>
-        /// Handles all current rumbles.
+        /// sends a rumble effect to the xbox controller. of <see cref="playerIndex"/> (0 - 3)
         /// </summary>
         internal void setRumble(Vector2 rumblePow)
         {
@@ -630,14 +719,14 @@ namespace TommoJProductions.MoControls.XInputInterpreter
 
             if (rumblePow != prevRumblePow)
             {
-                GamePad.SetVibration(PlayerIndex.One, rumblePow.x, rumblePow.y);
+                GamePad.SetVibration(playerIndex, rumblePow.x, rumblePow.y);
                 prevRumblePow = rumblePow;
             }
         }
         /// <summary>
         /// Loads control asset textures.
         /// </summary>
-        private void loadControllerAssets()
+        private void loadAssetsToController()
         {
             // Written, 20.07.2018
 
@@ -677,7 +766,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
                     xboxControls[23].texture = MoControlsMod.assets.rsdown;
                 }
                 else
-                    MoControlsMod.print("Assets cannot be loaded to instance of xbox controller as assets ain't loaded.", Debugging.DebugTypeEnum.full);
+                    MoControlsMod.print("Assets arent loaded..", Debugging.DebugTypeEnum.full);
             }
             catch (Exception ex)
             {
@@ -691,26 +780,14 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         {
             // Written, 20.07.2018
 
-            if (inInputName != KeyCode.None.ToString()) // no point enumerating..
+            foreach (XboxControl xboxControl in xboxControls)
             {
-                foreach (XboxControl xboxControl in xboxControls)
+                if (xboxControl.inputName == inInputName)
                 {
-                    if (xboxControl.inputName == inInputName)
-                    {
-                        return xboxControl;
-                    }
+                    return xboxControl;
                 }
             }
             return null;
-        }
-        /// <summary>
-        /// Returns all the xbox controls.
-        /// </summary>
-        internal XboxControl[] getXboxControls()
-        {
-            // Written, 22.07.2018
-
-            return xboxControls;
         }
 
         #endregion

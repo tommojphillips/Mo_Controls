@@ -42,14 +42,6 @@ namespace TommoJProductions.MoControls
             set;
         }
         /// <summary>
-        /// Represents the mod to modify the inputs. Only vaild if the input to change is a mod keybind! if not <see langword="null"/>.
-        /// </summary>
-        public Mod mod
-        {
-            get;
-            set;
-        }
-        /// <summary>
         /// Reprents the mode to modify.
         /// </summary>
         public PlayerModeEnum? mode
@@ -69,11 +61,7 @@ namespace TommoJProductions.MoControls
         {
             // Written, 16.07.2018
 
-            reassignKey = false;
-            controlName = null;
-            index = 0;
-            mod = null;
-            mode = null;
+            reset();
         }
         /// <summary>
         /// Initializes a new instance of <see cref="ChangeInput"/> and assigns the classes properties to the parameters.
@@ -96,12 +84,24 @@ namespace TommoJProductions.MoControls
         #region Methods
 
         /// <summary>
+        /// resets this instance of <see cref="ChangeInput"/> and assigns the classes properties to the parameters.
+        /// </summary>
+        public void reset()
+        {
+            // Written, 30.07.2022
+
+            reassignKey = false;
+            controlName = null;
+            index = 0;
+            mode = null;
+        }
+
+        /// <summary>
         /// Changes the <see cref="changeInputResult"/> to it's "polling" state, with the values provided, <paramref name="inControlName"/>, + <paramref name="inIndex"/>. Which inturn lets <see cref="Update"/> branch to <see cref="monitorForInput"/>.
         /// </summary>
         /// <param name="inControlName">The game control to change.</param>
         /// <param name="inIndex">The index to change, Primary = 1, Secondary = 2.</param>
-        /// <param name="inMod">The mod to change its keybind.</param>
-        public void changeToPollingState(string inControlName, int inIndex, PlayerModeEnum? inMode = null, Mod inMod = null)
+        public void changeToPollingState(string inControlName, int inIndex, PlayerModeEnum? inMode = null)
         {
             // Written, 20.07.2018
 
@@ -110,7 +110,6 @@ namespace TommoJProductions.MoControls
                 reassignKey = true;
                 controlName = inControlName;
                 index = inIndex;
-                mod = inMod;
                 mode = inMode;
             }
         }

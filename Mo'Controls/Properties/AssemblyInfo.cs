@@ -12,13 +12,13 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 
 // Version information
-[assembly: AssemblyVersion("1.1.155.35")]
-//[assembly: AssemblyFileVersion("1.1.155.35")]
+[assembly: AssemblyVersion("1.1.216.5")]
+//[assembly: AssemblyFileVersion("1.1.216.5")]
 
 public class VersionInfo
 {
-	public const string lastestRelease = "05.06.2022 08:43 PM";
-	public const string version = "1.1.155.35";
+	public const string lastestRelease = "05.08.2022 02:15 PM";
+	public const string version = "1.1.216.5";
 
     /// <summary>
     /// Represents if the mod has been complied for x64

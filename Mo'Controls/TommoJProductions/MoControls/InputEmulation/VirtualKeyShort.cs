@@ -1,9 +1,11 @@
-﻿namespace TommoJProductions.MoControls.InputEmulation
+﻿using System;
+
+namespace TommoJProductions.MoControls.InputEmulation
 {
     /// <summary>
     /// Represents all keyboard keys as a short.
     /// </summary>
-    public enum VirtualKeyShort : short
+    public enum VirtualKeyShort : uint
     {
         ///<summary>
         ///Left mouse button

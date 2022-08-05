@@ -19,19 +19,11 @@ namespace TommoJProductions.Debugging
         {
             // Written, 28.12.2018
 
-            string debugConStr;
-#if DEBUG
-            debugConStr = "True";
-#else
-            debugConStr = "False";
-#endif
             MoControlsMod.print(String.Format("<b>MC Debug Stats:</b>" +
-                "\r\nmc_ReleaseVersion=<b>{0}</b>" +
                 "\r\nmc_DebugMode=<b>{1}</b>" +
                 "\r\nDEBUG Config=<b>{2}</b>",
-                MoControlsMod.isReleaseVersion,
                 MoControlsSaveData.loadedSaveData.debugMode,
-                debugConStr), DebugTypeEnum.none);
+                VersionInfo.IS_DEBUG_CONFIG), DebugTypeEnum.none);
         }
     }
 }

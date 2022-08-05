@@ -13,94 +13,56 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Returns the string representation of the provided <see cref="XboxButtonEnum"/>.
         /// </summary>
-        /// <param name="inXboxButtonEnum">The xbox button to convert to string.</param>
-        public static string toString(this XboxButtonEnum inXboxButtonEnum)
+        /// <param name="button">The xbox button to convert to string.</param>
+        public static string toString(this XboxButtonEnum button)
         {
             // Written, 17.07.2018
 
-            string value = null;
-            switch (inXboxButtonEnum)
-            {
-                case XboxButtonEnum.A:
-                    value = "A";
-                    break;
-                case XboxButtonEnum.B:
-                    value = "B";
-                    break;
-                case XboxButtonEnum.X:
-                    value = "X";
-                    break;
-                case XboxButtonEnum.Y:
-                    value = "Y";
-                    break;
-                case XboxButtonEnum.Back:
-                    value = "Back";
-                    break;
-                case XboxButtonEnum.Start:
-                    value = "Start";
-                    break;
-                case XboxButtonEnum.DPad_Up:
-                    value = "D-Pad Up";
-                    break;
-                case XboxButtonEnum.DPad_Down:
-                    value = "D-Pad Down";
-                    break;
-                case XboxButtonEnum.DPad_Left:
-                    value = "D-Pad Left";
-                    break;
-                case XboxButtonEnum.DPad_Right:
-                    value = "D-Pad Right";
-                    break;
-                case XboxButtonEnum.LS:
-                    value = "LS";
-                    break;
-                case XboxButtonEnum.RS:
-                    value = "RS";
-                    break;
-                case XboxButtonEnum.LB:
-                    value = "LB";
-                    break;
-                case XboxButtonEnum.RB:
-                    value = "RB";
-                    break;
-                case XboxButtonEnum.NULL:
-                    value = null;
-                    break;
-            }
-            return value;
+            return button.ToString().Replace("_", " ");
         }
+        /// <summary>
+        /// Returns the string representation of the provided <see cref="XboxAxisEnum"/>.
+        /// </summary>
+        /// <param name="button">The xbox axis to convert to string.</param>
+        public static string toString(this XboxAxisEnum axis)
+        {
+            // Written, 24.07.2022
+
+            return axis.ToString().Replace("_", " ");
+        }
+
         /// <summary>
         /// Performs a deadzone check.
         /// </summary>
-        /// <param name="inStickValue">The values to perform the check on.</param>
-        public static Vector2 doDeadzoneCheck(this Vector2 inStickValue, float inDeadzoneThreshhold, DeadzoneTypeEnum inDeadzoneType)
+        /// <param name="v2">The values to perform the check on.</param>
+        public static Vector2 doDeadzoneCheck(this Vector2 v2, DeadzoneTypeEnum deadzoneType, float deadzoneValue)
         {
             // Written, 02.08.2018
 
-            switch (inDeadzoneType)
+            switch (deadzoneType)
             {
                 case DeadzoneTypeEnum.Radial:
-                    if (inStickValue.magnitude < inDeadzoneThreshhold)
-                        inStickValue = Vector2.zero;
+                    if (v2.magnitude < deadzoneValue)
+                        v2 = XboxController.vector2Zero;
                     break;
                 case DeadzoneTypeEnum.ScaledRadial:
-                    if (inStickValue.magnitude < inDeadzoneThreshhold)
-                        inStickValue = Vector2.zero;
-                    inStickValue = inStickValue.normalized * ((inStickValue.magnitude - inDeadzoneThreshhold) / (1 - inDeadzoneThreshhold));
+                    if (v2.magnitude < deadzoneValue)
+                        v2 = XboxController.vector2Zero;
+                    else
+                        v2 = v2.normalized * ((v2.magnitude - deadzoneValue) / (1 - deadzoneValue));
                     break;
             }
-            return inStickValue;
+            return v2;
         }
         /// <summary>
         /// Performs sensitivity operation.
         /// </summary>
-        /// <param name="inStickValue">inValue.</param>
-        public static Vector2 doSensitivityOperation(this Vector2 inStickValue, float inSensitivityThreshhold)
+        /// <param name="v2">inValue.</param>
+        public static Vector2 doSensitivityOperation(this Vector2 v2, float sensitivity)
         {
             // Written, 07.08.2018
-
-            inStickValue.Set(inStickValue.x *= inSensitivityThreshhold, inStickValue.y *= inSensitivityThreshhold);
-            return inStickValue;
+                       
+            return v2 * sensitivity;
         }
         /// <summary>
         /// Gets the xbox control in the collection by name.

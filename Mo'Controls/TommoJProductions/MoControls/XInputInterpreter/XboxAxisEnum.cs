@@ -4,16 +4,16 @@
     {
         // Written, 09.10.2020
 
-        NULL,
-        leftTrigger,
-        rightTrigger,
-        leftJoyUp,
-        leftJoyDown,
-        leftJoyLeft,
-        leftJoyRight,
-        rightJoyUp,
-        rightJoyDown,
-        rightJoyLeft,
-        rightJoyRight,
+        None,
+        LT,
+        RT,
+        LS_Up,
+        LS_Down,
+        LS_Left,
+        LS_Right,
+        RS_Up,
+        RS_Down,
+        RS_Left,
+        RS_Right,
     }
 }

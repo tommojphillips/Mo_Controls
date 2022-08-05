@@ -31,77 +31,29 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         #region Properties
 
         /// <summary>
-        /// Returns a bool depending if the event, <see cref="ControllerConnected"/> to equal to null.
-        /// </summary>
-        public bool controllerConnectedEvent
-        {
-            get
-            {
-                if (ControllerConnected == null)
-                    return false;
-                return true;
-            }
-        }
-        /// <summary>
-        /// Returns a bool depending if the event, <see cref="ControllerDisconnected"/> to equal to null.
-        /// </summary>
-        public bool controllerDisconnectedEvent
-        {
-            get
-            {
-                if (ControllerDisconnected == null)
-                    return false;
-                return true;
-            }
-        }
-        /// <summary>
         /// Represents the controllers.
         /// </summary>
         internal XboxController controller
         {
-            get { return gameObject.GetComponent<XboxController>(); }
+            get;
+            set;
         }
         /// <summary>
         /// Represents the monitoring controller connections system.
         /// </summary>
-        public MonitorControllerConnections monitorControllerConnections
+        internal MonitorControllerConnections monitorControllerConnections
         {
             get;
-            private set;
-        }
-
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="XboxControllerManager"/> and sets the provided integer to <see cref="numOfControllersSupported"/> and adds a controller to the manager for every <see cref="numOfControllersSupported"/>.
-        /// </summary>
-        /// <param name="numOfControllersToSupport">The amount of controllers to support.</param>
-        public XboxControllerManager()
-        {
-            // Written, 16.07.2018
-
-            ControllerConnected = null;
-            ControllerDisconnected = null;
+            set;
         }
 
         #endregion
 
         #region Methods
 
-        private void Start()
+        private void Awake()
         {
-            try
-            {
-                gameObject.AddComponent<XboxController>();
-                monitorControllerConnections = gameObject.AddComponent<MonitorControllerConnections>();
-                MoControlsMod.print(nameof(XboxControllerManager) + ": Started", Debugging.DebugTypeEnum.full);
-            }
-            catch (Exception ex)
-            {
-                MSCLoader.ModConsole.Error(ex.StackTrace);
-            }
+            MoControlsMod.print(nameof(XboxControllerManager) + ": Initialized", Debugging.DebugTypeEnum.full);
         }
 
         #endregion
@@ -111,24 +63,30 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// <summary>
         /// Raises the <see cref="ControllerConnected"/> event.
         /// </summary>
-        /// <param name="inEventArgs">The event data.</param>
-        internal static void onControllerConnected(ControllerConnectionEventArgs inEventArgs)
+        /// <param name="e">The event data.</param>
+        internal void onControllerConnected(ControllerConnectionEventArgs e)
         {
             // Written, 16.07.2018
 
             if (ControllerConnected != null)
-                ControllerConnected.Invoke(null, inEventArgs);
+                ControllerConnected.Invoke(null, e);
+            if (MoControlsGO.controlManager.scrollCoroutine == null)
+                MoControlsGO.controlManager.scrollCoroutine = StartCoroutine(MoControlsGO.controlManager.scrollFunction());
+            MoControlsMod.print("<color=grey><i>Controller " + e.xboxController.index + "</i></color> <color=green>Connected</color>", Debugging.DebugTypeEnum.none);
         }
         /// <summary>
         /// Raises the <see cref="ControllerDisconnected"/> event.
         /// </summary>
-        /// <param name="inEventArgs">The event data.</param>
-        internal static void onControllerDisconnected(ControllerConnectionEventArgs inEventArgs)
+        /// <param name="e">The event data.</param>
+        internal void onControllerDisconnected(ControllerConnectionEventArgs e)
         {
             // Written, 16.07.2018
 
             if (ControllerDisconnected != null)
-                ControllerDisconnected.Invoke(null, inEventArgs);
+                ControllerDisconnected.Invoke(null, e);
+            if (MoControlsGO.controlManager.scrollCoroutine != null)
+                StopCoroutine(MoControlsGO.controlManager.scrollFunction());
+            MoControlsMod.print("<color=grey><i>Controller: " + e.xboxController.index + "</i></color> <color=red>Disconnected</color>", Debugging.DebugTypeEnum.none);
         }
 
         #endregion

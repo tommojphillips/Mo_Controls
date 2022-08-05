@@ -23,21 +23,18 @@ namespace TommoJProductions.Debugging
                 switch (inArgs[0])
                 {
                     case "0":
+                    case "none":
+                    case "n":
                         MoControlsSaveData.loadedSaveData.debugMode = DebugTypeEnum.none;
                         break;
                     case "1":
+                    case "partial":
+                    case "p":
                         MoControlsSaveData.loadedSaveData.debugMode = DebugTypeEnum.partial;
                         break;
                     case "2":
-                        MoControlsSaveData.loadedSaveData.debugMode = DebugTypeEnum.full;
-                        break;
-                    case "none":
-                        MoControlsSaveData.loadedSaveData.debugMode = DebugTypeEnum.none;
-                        break;
-                    case "partial":
-                        MoControlsSaveData.loadedSaveData.debugMode = DebugTypeEnum.partial;
-                        break;
                     case "full":
+                    case "f":
                         MoControlsSaveData.loadedSaveData.debugMode = DebugTypeEnum.full;
                         break;
                     default:

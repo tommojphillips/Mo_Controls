@@ -32,7 +32,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// 
         /// </summary>
-        private XboxButtonEnum keyName = XboxButtonEnum.NULL;
+        private XboxButtonEnum keyName = XboxButtonEnum.None;
         /// <summary>
         /// 
         /// </summary>
@@ -57,16 +57,14 @@ namespace TommoJProductions.MoControls
         {
             // Written, 18.12.2018
 
-            XboxController xc = MoControlsGO.xboxController;
-
-            if (xc.isConnected)
+            if (MoControlsGO.controlManager.xboxController.isConnected)
             {
-                if (xc.getButtonDown(keyName))
+                if (MoControlsGO.controlManager.xboxController.getButtonDown(keyName))
                 {
                     startTime = Time.time;
                     timer = startTime;
                 }
-                if (xc.getButtonPressed(keyName) && held == false)
+                if (MoControlsGO.controlManager.xboxController.getButtonPressed(keyName) && held == false)
                 {
                     timer += Time.deltaTime;
                     if (timer > (startTime + holdTime))
@@ -75,7 +73,7 @@ namespace TommoJProductions.MoControls
                         action?.Invoke();
                     }
                 }
-                if (xc.getButtonUp(keyName))
+                if (MoControlsGO.controlManager.xboxController.getButtonUp(keyName))
                 {
                     held = false;
                 }

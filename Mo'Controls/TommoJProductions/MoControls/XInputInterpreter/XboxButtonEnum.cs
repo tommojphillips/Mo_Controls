@@ -8,7 +8,7 @@
         /// <summary>
         /// Represents null.
         /// </summary>
-        NULL,
+        None,
         /// <summary>
         /// Represents the A button.
         /// </summary>
@@ -36,19 +36,19 @@
         /// <summary>
         /// Represents the D-Pad Up button.
         /// </summary>
-        DPad_Up,
+        D_Pad_Up,
         /// <summary>
         /// Represents the D-Pad Down button.
         /// </summary>
-        DPad_Down,
+        D_Pad_Down,
         /// <summary>
         /// Represents the D-Pad Left button.
         /// </summary>
-        DPad_Left,
+        D_Pad_Left,
         /// <summary>
         /// Represents the D-Pad Right button.
         /// </summary>
-        DPad_Right,
+        D_Pad_Right,
         /// <summary>
         /// Represents the Left Stick button.
         /// </summary>
@@ -65,9 +65,9 @@
         /// Represents the Right Bumper button.
         /// </summary>
         RB,
-        /// <summary>
+        /*/// <summary>
         /// Represents the Xbox logo/Guide button.
         /// </summary>
-        Guide,
+        Guide,*/
     }
 }

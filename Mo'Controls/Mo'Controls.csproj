@@ -65,6 +65,12 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>D:\Games\SteamApps\steamapps\common\My Summer Car\mysummercar_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>D:\Games\SteamApps\steamapps\common\My Summer Car\mysummercar_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-UnityScript-firstpass">
+      <HintPath>D:\Games\SteamApps\steamapps\common\My Summer Car\mysummercar_Data\Managed\Assembly-UnityScript-firstpass.dll</HintPath>
+    </Reference>
     <Reference Include="cInput">
       <HintPath>D:\Games\SteamApps\steamapps\common\My Summer Car\mysummercar_Data\Managed\cInput.dll</HintPath>
       <Private>False</Private>
@@ -98,6 +104,7 @@
     <Compile Include="TommoJProductions\Debugging\WriteCinputExternInputsCommand.cs" />
     <Compile Include="TommoJProductions\MoControls\AssetHolder.cs" />
     <Compile Include="TommoJProductions\MoControls\ChangeInput.cs" />
+    <Compile Include="TommoJProductions\MoControls\ControllerLook.cs" />
     <Compile Include="TommoJProductions\MoControls\ControlManager.cs" />
     <Compile Include="TommoJProductions\Debugging\Debug.cs" />
     <Compile Include="TommoJProductions\Debugging\DebugConsoleCommand.cs" />
@@ -105,6 +112,8 @@
     <Compile Include="TommoJProductions\Debugging\DebugTypeEnum.cs" />
     <Compile Include="TommoJProductions\Debugging\ListLoadedAssembliesConsoleCommand.cs" />
     <Compile Include="TommoJProductions\MoControls\Extentions.cs" />
+    <Compile Include="TommoJProductions\MoControls\ControllerMove.cs" />
+    <Compile Include="TommoJProductions\MoControls\FPSMove.cs" />
     <Compile Include="TommoJProductions\MoControls\GameControlsEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\GUI\GuiNav.cs" />
     <Compile Include="TommoJProductions\MoControls\HoldInputMono.cs" />
@@ -121,14 +130,16 @@
     <Compile Include="TommoJProductions\MoControls\InputEmulation\KeyEventF.cs" />
     <Compile Include="TommoJProductions\MoControls\InputEmulation\MouseEventButtons.cs" />
     <Compile Include="TommoJProductions\MoControls\InputEmulation\MouseEventF.cs" />
+    <Compile Include="TommoJProductions\MoControls\InputEmulation\NativeMessage.cs" />
     <Compile Include="TommoJProductions\MoControls\InputEmulation\ScanCodeShort.cs" />
     <Compile Include="TommoJProductions\MoControls\InputEmulation\VirtualKeyShort.cs" />
     <Compile Include="TommoJProductions\MoControls\MoControlsGO.cs" />
     <Compile Include="TommoJProductions\MoControls\MoControlsSaveData.cs" />
     <Compile Include="TommoJProductions\MoControls\MonitorInputData.cs" />
     <Compile Include="TommoJProductions\MoControls\InputEmulation\NativeMethods.cs" />
-    <Compile Include="TommoJProductions\MoControls\OldSaveDataException.cs" />
     <Compile Include="TommoJProductions\MoControls\PlayerModeEnum.cs" />
+    <Compile Include="TommoJProductions\MoControls\cInputMove.cs" />
+    <Compile Include="TommoJProductions\MoControls\UsingDeviceEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\DeadzoneTypeEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\InputEmulation\InputTypeEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\InputEmulation\MouseEmulator.cs" />
@@ -140,7 +151,6 @@
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxBoolState.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxButtonEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxAxisEnum.cs" />
-    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxControllerInputEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxControllerScroll.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxExtentions.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxControl.cs" />
@@ -150,7 +160,6 @@
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxRumble.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxJoyStick.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxFloatState.cs" />
-    <Compile Include="TommoJProductions\UnityRuntimeUpdateSchemesEnum.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="key.snk" />

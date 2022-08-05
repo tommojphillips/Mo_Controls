@@ -8,8 +8,11 @@ using TommoJProductions.MoControls.InputEmulation;
 using TommoJProductions.MoControls.XInputInterpreter;
 using UnityEngine;
 using XInputDotNetPure;
-using gui = UnityEngine.GUILayout;
-using ueGUI = UnityEngine.GUI;
+using static UnityEngine.GUILayout;
+using static UnityEngine.GUI;
+using ScrollViewScope = UnityEngine.GUILayout.ScrollViewScope;
+using System.ComponentModel;
+using System.Reflection;
 
 namespace TommoJProductions.MoControls.GUI
 {
@@ -26,18 +29,6 @@ namespace TommoJProductions.MoControls.GUI
 
         private string mouseSettingsValue = "";
         private string mouseSettingsValue1 = "";
-        private string pHorzGrav = "";
-        private string pHorzSens = "";
-        private string pHorzDead = "";
-        private string pVertGrav = "";
-        private string pVertSens = "";
-        private string pVertDead = "";
-        private string horzGrav = "";
-        private string horzSens = "";
-        private string horzDead = "";
-        private string vertGrav = "";
-        private string vertSens = "";
-        private string vertDead = "";
         /// <summary>
         /// Represents the scrool position of the scroll bar.
         /// </summary>
@@ -66,21 +57,55 @@ namespace TommoJProductions.MoControls.GUI
         /// Represents the scroll bar's offset.
         /// </summary>
         private const float SCROLL_BAR_OFFSET = 25f;
+        const string aboutMessage = "<b>Mo'Controls</b> allows the player to have a primary and secondary input for each in-game control," +
+                " the player could set all primary inputs to the keyboard and all secondary inputs to an Xbox Controller to have a seamless" +
+                " swap of the keyboard to Xbox Controller. Mo'Controls also allows the player to have different control profiles for when " +
+                "on foot and when in driving mode! So you can get more out of your controller!";         
+        string[] features = new string[]
+            {
+                "Xbox controller support",
+                "Assign two inputs to each game control",
+                "Mouse emulation; use your Xbox controller to control the mouse",
+                "Split control modes for driving & walking",
+                "Toggle tool/hand mode by holding down the <i>Start</i> button on a connected xbox controller for > 0.3sec",
+                "Controller gui navigation",
+                "FFB: Controller vibration/rumble effects; rumble options based on default (toplessgun) or rpm, wheel-slip, gear change. See (Settings => Xbox Controller",
+                "\nAuto-Enables scroll on the controller triggers if player is looking at something that has a Scroll function."
+            };          
+        const string footerMessage = "Developed by <b>Tommo J. Armytage. | Latest release: " + VersionInfo.version + "</b>";        
+        
+        private string joinPrefix = "\r\n# ";
+        
+        private GUISkin defaultSkin;
+
+        private GUIStyle marginStyle = new GUIStyle()
+        {
+            margin = new RectOffset() 
+            {
+                left = 100
+            }
+        };
+        private int itemWidth = 160;
+        private int marginOffset = 200;
+        private int maxItemsPerRow; 
+        private int drawCount;
 
         #endregion
 
         #region GUI Colors
 
-        private Color32 backgroundColor = new Color32(112, 112, 255, 255); // | Light-ist Blue
-        private Color32 primaryItemColor = new Color32(133, 162, 250, 255); // | Light-Vague Blue
-        private Color32 secondaryItemColor = new Color32(69, 114, 247, 255); // | Light Blue
-        private Color32 unselectedMenuButtonColor = new Color32(133, 162, 250, 255); // | Light-Vague Blue
-        private Color32 selectedMenuButtonColor = new Color32(80, 237, 90, 255); // Green
+        private Texture2D defaultBackgroundColor;
+        private Texture2D defaultButtonColor;
+        private Texture2D primaryItemColor;
+        private Texture2D moduleBackgroundColor;
+        private Texture2D unselectedMenuButtonColor;
+        private Texture2D selectedMenuButtonColor;
         private Color32 defaultContentColor = new Color32(255, 255, 255, 255); // | White
-        private Color xboxButtonPressedColor = Color.gray;
-        private Color32 moduleBackgroundColor = new Color32(85, 125, 170, 255); // | Soild Light-tone blue
+        private Color xboxButtonPressedContentColor = Color.gray;
+   
 
-        #endregion
+        #endregion 
+
 
         #region Relevant controls 
 
@@ -154,6 +179,20 @@ namespace TommoJProductions.MoControls.GUI
 
         #endregion
 
+        
+
+        #region drawToggleGroup Data
+
+        private bool containsColorTag;
+        private int indexOfColorTag;
+        private string newName;
+        private string colorTag;
+        private bool predict;
+        private object currentValue;
+        private Array enumValues;
+
+        #endregion
+
         #endregion
 
         #region Properties
@@ -162,16 +201,6 @@ namespace TommoJProductions.MoControls.GUI
         /// Represents the instance of the mod.
         /// </summary>
         private MoControlsMod mod => MoControlsMod.instance;
-        /// <summary>
-        /// Represents the mouse emulator. references <see cref="MoControlsMod.mouseEmulator"/>.
-        /// </summary>
-        private MouseEmulator mouseEmulator
-        {
-            get
-            {
-                return MoControlsGO.mouseEmulator;
-            }
-        }
         /// <summary>
         /// Represents the control manager.
         /// </summary>
@@ -183,27 +212,13 @@ namespace TommoJProductions.MoControls.GUI
             }
         }
         /// <summary>
-        /// Represents the change input result. references <see cref="MoControlsMod.changeInputResult"/>.
-        /// </summary>
-        private ChangeInput changeInputResult
-        {
-            get
-            {
-                return controlManager.changeInputResult;
-            }
-            set
-            {
-                controlManager.setChangeInput(value);
-            }
-        }
-        /// <summary>
         /// Represents the xbox controller. references <see cref="MoControlsMod.xboxController"/>.
         /// </summary>
         private XboxController xboxController
         {
             get
             {
-                return MoControlsGO.xboxController;
+                return controlManager.xboxController;
             }
         }
         /// <summary>
@@ -225,13 +240,9 @@ namespace TommoJProductions.MoControls.GUI
         /// <summary>
         /// Represents whether the gui should be opened or closed.
         /// </summary>
-        internal bool controlsGuiOpened
-        {
-            get;
-            private set;
-        } = false;
+        internal bool controlsGuiOpened { get; private set; } = false;
         /// <summary>
-        /// Represents the gui navigation system for the GUI.
+        /// Represents the gui navigation system for the 
         /// </summary>
         internal GuiNav guiNav
         {
@@ -241,112 +252,272 @@ namespace TommoJProductions.MoControls.GUI
 
         #endregion
 
+        #region unity runtime
+
+        private void Awake()
+        {
+            // Written, 08.10.2018
+
+            setUpGuiNav();
+            setUpOpenGuiHoldInput();
+            setUpGui();
+        }
+
+        private void Update()
+        {
+            // Written, 22.08.2018 | Updated, 04.08.2022
+
+            if (MoControlsMod.instance.openControlsGui.GetKeybindDown())
+                toggleGui();
+            if (controlsGuiOpened)
+            {
+                if (controlManager.changeInputResult.reassignKey)
+                {
+                    guiNav.enabled = false;
+                    MonitorInputData mid = Input.monitorForInput();
+                    if (mid.foundInput)
+                    {
+                        if (validateInput(mid))
+                        {
+                            controlManager.changeInput(mid.input);
+                        }
+                        else
+                        {
+                            controlManager.changeInputResult.reset();
+                        }
+                        guiNav.enabled = true;
+                    }
+                }
+                else
+                {
+                    if (UnityEngine.Input.GetKeyDown(KeyCode.Escape))
+                    {
+                        controlsGuiOpened = false;
+                        guiNav.enabled = false;
+                    }
+                }
+            }
+        }
+        
+        private void OnGUI()
+        {
+            // Written, 22.08.2018
+
+            skin.box.normal.background = defaultBackgroundColor;
+            if (controlsGuiOpened)
+            {
+                drawMainMenuGUI();
+                drawMainGUI();
+            }
+            else
+            {
+                drawOverlayGUI();
+            }
+            skin = defaultSkin;
+        }
+
+        #endregion
+
         #region Methods
 
         /// <summary>
-        /// Changes boolean to open/close the gui. 
+        /// Draws all overlays in mo'controls.
+        /// </summary>
+        private void drawOverlayGUI() 
+        {
+            // Written, 05.08.2022
+
+            using (new AreaScope(new Rect(Screen.width / 2, 5, 200, 200)))
+            {
+                if (MoControlsSaveData.loadedSaveData.displayCurrentPlayerModeOverlay)
+                    Label(String.Format("{0} ({1} mode)", MoControlsGO.controlManager.getCurrentPlayerMode, !controlManager.isInHandMode ? "Tool" : "Hand"));
+                if (controlManager.vehicle != null)
+                {
+                    if (MoControlsSaveData.loadedSaveData.displayFfbOverlay)
+                        drawForceFeedBackOverlayGUI();
+                    if (MoControlsSaveData.loadedSaveData.displayVehicleInfoOverlay)
+                        drawDrivetrainOverlay();
+                }
+                else
+                {
+                    Label("No supported vehicle found.\nCurrent vehicle: " + ControlManager.playerCurrentVehicle);
+                }
+            }
+        }
+        /// <summary>
+        /// checks the validity of the provided data.
+        /// </summary>
+        /// <param name="data">the data to validate</param>
+        /// <returns>returns <see langword="true"/> if <paramref name="data"/> is vaild</returns>
+        private bool validateInput(MonitorInputData data)
+        {
+            // Written, 04.08.2022
+
+            string cName = controlManager.changeInputResult.controlName;
+            if (MoControlsSaveData.loadedSaveData.usePlayerMoveAsInput)
+            {
+                if (cName == "PlayerLeft" || cName == "PlayerRight" || cName == "PlayerUp" || cName == "PlayerDown")
+                {
+                    XboxControl[] controls;
+                    switch (MoControlsSaveData.loadedSaveData.playerMove)
+                    {
+                        case InputTypeEnum.DPad:
+                            controls = xboxController.dPadControls;
+                            break;
+                        case InputTypeEnum.RS:
+                            controls = xboxController.rightThumbstick.controls;
+                            break;
+                        default:
+                        case InputTypeEnum.LS:
+                            controls = xboxController.leftThumbstick.controls;
+                            break;
+
+                    }
+                    if (controls.Any(c => c.inputName == data.input))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        /// <summary>
+        /// sets up gui references. eg, textures, default skin, maxitems in a row.
+        /// </summary>
+        private void setUpGui()
+        {
+            // Written, 04.08.2022
+
+            defaultBackgroundColor = createTextureFromColor(10, 10, new Color32(125, 125, 125, 255));
+            primaryItemColor = createTextureFromColor(10, 10, new Color32(85, 143, 255, 255));
+            moduleBackgroundColor = createTextureFromColor(10, 10, new Color32(85, 125, 170, 255));
+            unselectedMenuButtonColor = createTextureFromColor(10, 10, new Color32(133, 162, 250, 255));
+            selectedMenuButtonColor = createTextureFromColor(10, 10, new Color32(80, 237, 90, 255));
+            defaultButtonColor = createTextureFromColor(10, 10, new Color32(150, 150, 150, 255));
+
+            defaultSkin = ScriptableObject.CreateInstance(typeof(GUISkin)) as GUISkin;
+
+            maxItemsPerRow = (int)Math.Truncate((mainGuiWidth - marginOffset) / itemWidth);
+        }
+        /// <summary>
+        /// sets up the hold input for opening the gui.
+        /// </summary>
+        private void setUpOpenGuiHoldInput()
+        {
+            // Written, 04.08.2022
+
+            HoldInputMono him = gameObject.AddComponent<HoldInputMono>();
+            him.setData("Open Mod GUI", XboxButtonEnum.Back, 0.3f, toggleGui);
+        }
+        /// <summary>
+        /// sets up gui nav reference with controls. see: <see cref="guiNav"/>
+        /// </summary>
+        private void setUpGuiNav()
+        {
+            // Written, 04.08.2022
+
+            guiNav = gameObject.AddComponent<GuiNav>();
+            guiNav.setControls(XboxAxisEnum.RT, XboxButtonEnum.None, XboxAxisEnum.LT, XboxButtonEnum.None, XboxAxisEnum.None, XboxButtonEnum.RB, XboxAxisEnum.None, XboxButtonEnum.LB);
+            guiNav.enabled = false;
+        }
+        /// <summary>
+        /// creates a texure with the color provided.
+        /// </summary>
+        /// <param name="width">width of texture</param>
+        /// <param name="height">height of texture</param>
+        /// <param name="col">the color of the texture</param>
+        /// <returns>a new texture instance of color param: <paramref name="col"/></returns>
+        private Texture2D createTextureFromColor(int width, int height, Color col)
+        {
+            Color[] pix = new Color[width * height];
+
+            for (int i = 0; i < pix.Length; i++)
+                pix[i] = col;
+
+            Texture2D result = new Texture2D(width, height);
+            result.SetPixels(pix);
+            result.Apply();
+
+            return result;
+        }
+        /// <summary>
+        /// Draws a bool as a toggle.
+        /// </summary>
+        /// <param name="name">the name for the toggle.</param>
+        /// <param name="value">the value.</param>
+        /// <param name="saveSettings">reference to savesettings.</param>
+        /// <returns>returns true if <paramref name="value"/> has changed</returns>
+        private bool drawToggle(string name, ref bool value, ref bool saveSettings)
+        {
+            // Written, 25.07.2022
+
+            if (Toggle(value, name) != value)
+            {
+                value = !value;
+                saveSettings = true;
+                return true;
+            }
+            return false;
+        }        
+        /// <summary>
+        /// Draws all enums as toggles. in a group. only one can be selected.
+        /// </summary>
+        /// <typeparam name="T">the type enum this toggle group is drawing.</typeparam>
+        /// <param name="name">the name of this toggle group.</param>
+        /// <param name="reference">the current selected value.</param>
+        /// <param name="saveSettings">reference to savesettings.</param>
+        /// <returns>returns true if <paramref name="reference"/> has changed</returns>
+        private bool drawToggleGroup<T>(string name, ref T reference, ref bool saveSettings) where T : Enum
+        {
+            // Written, 03.08.2022
+
+            bool hasReferenceChanged = false;
+            containsColorTag = name.Contains("<color=");
+            if (containsColorTag)
+            {
+                indexOfColorTag = name.IndexOf("<color=");
+                newName = name.Substring(0, indexOfColorTag);
+                colorTag = name.Substring(indexOfColorTag);
+            }
+            else
+            {
+                newName = name;
+            }
+            enumValues = Enum.GetValues(typeof(T));
+            Label(newName + ":");
+            for (int i = 0; i < enumValues.Length; i++)
+            {
+                currentValue = enumValues.GetValue(i);
+                predict = reference.Equals(currentValue);
+                if (Toggle(predict, $"<b>{currentValue}:</b> {(containsColorTag ? colorTag : "")}{(predict ? "ON" : "")}{(containsColorTag ? "</color>" : "")}") != predict)
+                {
+                    reference = (T)currentValue;
+                    saveSettings = true;
+                    hasReferenceChanged = true;
+                }
+            }
+            return hasReferenceChanged;
+        }
+        /// <summary>
+        /// Changes boolean to open/close the  
         /// </summary>
         private void toggleGui()
         {
             // Written, 18.12.2018 | Modified, 09.10.2020
 
             controlsGuiOpened = !controlsGuiOpened;
-                FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = controlsGuiOpened;
+            controlManager.playerInMenu = controlsGuiOpened;
             guiNav.enabled = controlsGuiOpened;
         }
         /// <summary>
-        /// Occurs after game starts.
-        /// </summary>
-        private void Start()
-        {
-            // Written, 08.10.2018
-
-            //  mousesettings setup
-            // GUINav Set up
-            guiNav = gameObject.AddComponent<GuiNav>();
-            guiNav.setControls(
-                XboxAxisEnum.rightTrigger, XboxButtonEnum.NULL,
-                XboxAxisEnum.leftTrigger, XboxButtonEnum.NULL,
-                XboxAxisEnum.NULL, XboxButtonEnum.RB,
-                XboxAxisEnum.NULL, XboxButtonEnum.LB);
-            guiNav.enabled = false;
-            // Gui hold button set up
-            HoldInputMono him = gameObject.AddComponent<HoldInputMono>();
-            him.setData("Open Mod GUI",
-                XboxButtonEnum.Back,
-                0.3f,
-                toggleGui);
-            // printing gui mono start to modconsole.
-            MoControlsMod.print(nameof(MoControlsGUI) + ": Started", Debugging.DebugTypeEnum.full);
-        }
-        /// <summary>
-        /// on Update.
-        /// </summary>
-        private void Update()
-        {
-            // Written, 22.08.2018
-
-            if (MoControlsMod.instance.openControlsGui.GetKeybindDown())
-                toggleGui();
-            if (controlsGuiOpened)
-            {
-                if (UnityEngine.Input.GetKeyDown(KeyCode.Escape))
-                {
-                    controlsGuiOpened = false;
-                    guiNav.enabled = false;
-                }
-                if (changeInputResult.reassignKey)
-                {
-                    guiNav.enabled = false;
-                    MonitorInputData mid = Input.monitorForInput();
-                    if (mid.foundInput)
-                    {
-                        controlManager.changeInput(mid.input);
-                        guiNav.enabled = true;
-                    }
-                }
-            }
-        }
-        /// <summary>
-        /// on GUI.
-        /// </summary>
-        private void OnGUI()
-        {
-            // Written, 22.08.2018
-
-            try
-            {
-                if (controlsGuiOpened)
-                {
-                    drawMainMenuGUI();
-                    drawMainGUI();
-                }
-                else
-                {
-
-                    if (MoControlsSaveData.loadedSaveData.displayCurrentPlayerModeOverlay)
-                        drawPlayerModeOverlayGUI();
-                    if (MoControlsSaveData.loadedSaveData.displayFfbOverlay)
-                        drawForceFeedBackOverlayGUI();
-                    if (MoControlsSaveData.loadedSaveData.displayVehicleInfoOverlay)
-                        drawDrivetrainOverlay();
-                }
-            }
-            catch (Exception ex)
-            {
-                ModConsole.Error(ex.ToString());
-                controlsGuiOpened = false;
-            }
-        }
-        /// <summary>
-        /// Draws the main menu for the main gui.
+        /// Draws the main menu for the main 
         /// </summary>
         private void drawMainMenuGUI()
         {
             // Written, 22.08.2018
 
-            using (new gui.AreaScope(new Rect(mainGuiLeft + 5f, MENU_GUI_TOP, mainGuiWidth - SCROLL_BAR_OFFSET, MENU_GUI_HEIGHT)))
-            using (new gui.HorizontalScope())
+            using (new AreaScope(new Rect(mainGuiLeft + 5f, MENU_GUI_TOP, mainGuiWidth - SCROLL_BAR_OFFSET, MENU_GUI_HEIGHT)))
+            using (new HorizontalScope())
             {
                 if (drawGeneralMenu(mainGUIMenu, out MainGUIMenuEnum changedTo))
                 {
@@ -361,113 +532,90 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 22.08.2018
 
-            ueGUI.contentColor = defaultContentColor;
-            ueGUI.backgroundColor = backgroundColor;
-            using (new gui.AreaScope(new Rect(mainGuiLeft, MENU_GUI_TOP + MENU_GUI_HEIGHT, mainGuiWidth, Screen.height - (MAIN_GUI_TOP + MENU_GUI_TOP + MENU_GUI_HEIGHT))))
-            using (gui.ScrollViewScope scrollViewScope = new gui.ScrollViewScope(mainGUIScrollPosition, new GUILayoutOption[] { gui.Width(mainGuiWidth) }))
-            using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width(mainGuiWidth - SCROLL_BAR_OFFSET), gui.MaxWidth(mainGuiWidth - SCROLL_BAR_OFFSET) }))
+            bool saveSettings = false;
+            using (new AreaScope(new Rect(mainGuiLeft, MENU_GUI_TOP + MENU_GUI_HEIGHT, mainGuiWidth, Screen.height - (MAIN_GUI_TOP + MENU_GUI_TOP + MENU_GUI_HEIGHT)), ""))
+            using (ScrollViewScope scrollViewScope = new ScrollViewScope(mainGUIScrollPosition, Width(mainGuiWidth + SCROLL_BAR_OFFSET)))
+            using (new VerticalScope("box", Width(mainGuiWidth)))
             {
                 mainGUIScrollPosition = scrollViewScope.scrollPosition;
-                gui.Label($"<b>{mod.Name} v{mod.Version} by {mod.Author}</b>");
+                Label($"<b>{mod.Name} v{mod.Version} by {mod.Author}</b>");
                 if (mainGUIMenu != MainGUIMenuEnum.About)
-                    gui.Label($"<b>{MoControlsMod.instance.openControlsGui.Key}</b> GUI key bind.\n<b>{Input.noneKey}</b> Sets as None.\n<b>LMB</b> Selects.\n<b>RMB</b> Cancels.");
-                gui.Space(3.0f);
+                    Label($"<b>{MoControlsMod.instance.openControlsGui.Key}</b> GUI key bind.\n" +
+                        $"<b>{Input.noneKey}</b> Sets as None.\n" +
+                        $"<b>LMB</b> Selects.\n" +
+                        $"<b>RMB</b> Cancels.");
+                Space(3.0f);
                 switch (mainGUIMenu)
                 {
                     case MainGUIMenuEnum.About:
                         drawAboutContent();
                         break;
                     case MainGUIMenuEnum.DrivingControls:
-                        drawDrivingControlsContent();
+                        drawDrivingControlContent();
                         break;
                     case MainGUIMenuEnum.FootControls:
-                        drawFootControlsContent();
+                        drawFootControlContent(ref saveSettings);
                         break;
                     case MainGUIMenuEnum.Settings:
-                        drawSettingsContent();
+                        drawSettingsContent(ref saveSettings);
                         break;
                 }
+                skin.box.normal.background = moduleBackgroundColor;
+                using (new VerticalScope(marginStyle, Width(mainGuiWidth - marginOffset)))
+                using (new VerticalScope("box"))
+                {
+                    Label(footerMessage);
+                    Space(10f);
+                }
+                skin.box.normal.background = defaultBackgroundColor;
+
+                if (saveSettings)
+                {
+                    MoControlsSaveData.loadedSaveData.saveSettings();
+                }
             }
-        }
+        }        
         /// <summary>
-        /// Draws about content to the main gui.
+        /// Draws about content to the main 
         /// </summary>
         private void drawAboutContent()
         {
             // Written, 20.08.2018
-
-            string aboutMessage = "<b>Mo'Controls</b> allows the player to have a primary and secondary input for each in-game control," +
-                " the player could set all primary inputs to the keyboard and all secondary inputs to an Xbox Controller to have a seamless" +
-                " swap of the keyboard to Xbox Controller. Mo'Controls also allows the player to have different control profiles for when " +
-                "on foot and when in driving mode! So you can get more out of your controller! Key to toggle the GUI is " + MoControlsMod.instance.openControlsGui.Key +
-                " or <b>hold down the back button on a connected xbox controller for (> 0.3sec)</b>";
-            string[] features = new string[]
+                    
+            Space(5f);
+            skin.box.normal.background = moduleBackgroundColor;
+            using (new VerticalScope(marginStyle, Width(mainGuiWidth - marginOffset)))
             {
-                "Xbox controller support",
-                "Assign two inputs to each game control",
-                "Mouse emulation; use your Xbox controller to control the mouse",
-                "Split control modes for driving & walking",
-                "Toggle tool/hand mode by holding down the <i>Start</i> button on a connected xbox controller for > 0.3sec",
-                "Controller gui navigation",
-                "Controller vibration/rumble effects; rumble options based on default (toplessgun), rpm, wheel-slip, gear change. See (Settings => Xbox Controller",
-                "\nAuto-Enables scroll on the controller triggers if player is looking at something that has a Scroll function."
-            };
-            string footerMessage = "Developed by <b>Tommo J. Armytage. | Latest release: " + VersionInfo.version + "</b>";
-            string joinPrefix = "\r\n# ";
-
-            gui.Space(5f);
-
-            ueGUI.backgroundColor = moduleBackgroundColor;
-            using (new gui.HorizontalScope("box"))
-                gui.Label(String.Format("<b>About:</b>\r\n\r\n{0}", aboutMessage));
-            gui.Space(5f);
-            using (new gui.HorizontalScope("box"))
-                gui.Label(String.Format("<b>Features:</b>\r\n{0}{1}", joinPrefix, String.Join(joinPrefix, features)));
-            gui.Space(10f);
-            using (new gui.HorizontalScope("box"))
-                gui.Label(footerMessage);
-            ueGUI.backgroundColor = backgroundColor;
+                using (new HorizontalScope("box"))
+                    Label(String.Format("<b>About:</b>\r\n\r\n{0}", aboutMessage));
+                Space(5f);
+                using (new HorizontalScope("box"))
+                    Label(String.Format("<b>Features:</b>\r\n{0}{1}", joinPrefix, String.Join(joinPrefix, features)));
+            }
+            skin.box.normal.background = defaultBackgroundColor;
         }
         /// <summary>
-        /// Draws foot controls content to the main gui.
+        /// Draws settings content to the main 
         /// </summary>
-        private void drawFootControlsContent()
-        {
-            // Written, 02.09.2018
-
-            drawControlModeContent("Foot Controls", controlManager.footControls);
-        }
-        /// <summary>
-        /// Draws driving controls content to the main gui.
-        /// </summary>
-        private void drawDrivingControlsContent()
-        {
-            // Written, 02.09.2018
-
-            drawControlModeContent("Driving Controls", controlManager.drivingControls);
-        }
-        /// <summary>
-        /// Draws settings content to the main gui.
-        /// </summary>
-        private void drawSettingsContent()
+        private void drawSettingsContent(ref bool saveSettings)
         {
             // Written, 20.08.2018
 
-            gui.Space(3f);
-            gui.Label("<b>Settings</b>");
-            gui.Space(5f);
+            Space(3f);
+            Label("<b>Settings</b>");
+            Space(5f);
             drawSettingsMenu();
 
             switch (settingsMenu)
             {
                 case SettingsMenuEnum.MouseEmulation:
-                    drawMouseEmulationContent();
+                    drawMouseEmulationContent(ref saveSettings);
                     break;
                 case SettingsMenuEnum.XboxController:
-                    drawXboxControllerContent();
+                    drawXboxControllerContent(ref saveSettings);
                     break;
                 case SettingsMenuEnum.Axis:
-                    drawDisplayContent();
+                    drawDisplayContent(ref saveSettings);
                     break;
             }
         }
@@ -486,38 +634,86 @@ namespace TommoJProductions.MoControls.GUI
         /// <summary>
         /// Draws xbox controller settings/content.
         /// </summary>
-        private void drawXboxControllerContent()
+        private void drawXboxControllerContent(ref bool saveSettings)
         {
             // Written, 09.10.2018
 
-            gui.Label(string.Format("<b>Xbox Controller</b>: {0}", xboxController.isConnected ? "<color=green>connected</color>" : "<color=red>disconnected</color>"));
-            gui.Space(5f);
-            using (new gui.VerticalScope())
+            Label(string.Format("<b>Xbox Controller</b>: {0}", xboxController.isConnected ? "<color=green>connected</color>" : "<color=red>disconnected</color>"));
+            Space(5f);
+            skin.box.normal.background = moduleBackgroundColor;
+            using (new VerticalScope(marginStyle))
             {
-                ueGUI.backgroundColor = moduleBackgroundColor;
-                drawControllerFFBContent();
+                using (new HorizontalScope("box", Width(mainGuiWidth - marginOffset)))
+                {
+                    string message;
+
+                    using (new VerticalScope("box"))
+                    {
+                        Label($"using {(controlManager.usingController ? "controller" : "mouse/keyboard")}");
+                        
+                        Label($"unity: any key: {UnityEngine.Input.anyKey}");
+                        Label($"keyboard: any key {KeyboardEmulator.anyInput()}");
+
+                        Label($"Last keyboard input detected: {KeyboardEmulator.lastKeyPressed} ({KeyboardEmulator.currentKeyPressed})");
+                    }
+                    Space(5);
+                    if (xboxController.isConnected)
+                    {
+                        using (new VerticalScope("box"))
+                        {
+                            Label("Xbox inputs");
+                            Label($"any input: {xboxController.anyInput}");
+                            Label($"any boolState input: {xboxController.anyButtonPressed}");
+                            Label($"any floatState input: {xboxController.anyThumbstickInput}");
+
+                            if (xboxController.lastControlInput != null)
+                            {
+                                message = $"Last xbox input detected: {xboxController.lastControlInput.name} | ";
+                                
+                                if (xboxController.lastControlInput is XboxBoolState)
+                                {
+                                    message += (xboxController.lastControlInput as XboxBoolState).state;
+                                }
+                                else
+                                {
+                                    message += (xboxController.lastControlInput as XboxFloatState).state.ToString("F2");
+                                }
+                                Label(message);
+                            }
+                        }
+                    }
+                }
+
+                using (new VerticalScope(marginStyle))
+                {
+                    using (new HorizontalScope("box", Width(mainGuiWidth - marginOffset)))
+                    {
+                        drawToggleGroup("Controller deadzone type", ref MoControlsSaveData.loadedSaveData.xboxControllerDeadzoneType, ref saveSettings);
+                    }
+                }
+                drawControllerFFBContent(ref saveSettings);
                 drawControllerInputContent();
-                drawCombinedTriggerAxisContent();
-                ueGUI.backgroundColor = backgroundColor;
+                drawCombinedTriggerAxisContent(ref saveSettings);
             }
+            skin.box.normal.background = defaultBackgroundColor;
         }
         /// <summary>
         /// Draws combined trigger axis setting content.
         /// </summary>
-        private void drawCombinedTriggerAxisContent()
+        private void drawCombinedTriggerAxisContent(ref bool saveSettings)
         {
             // Written, 24.10.2020
 
-            using (new gui.HorizontalScope("box"))
+            using (new HorizontalScope("box", Width(mainGuiWidth - marginOffset)))
             {
                 bool combineTriggerAxis = MoControlsSaveData.loadedSaveData.combinedTriggerAxis;
-                if (gui.Toggle(combineTriggerAxis, String.Format("Combine trigger axis: {0}", combineTriggerAxis ? "<color=green>On</color>" : "<color=red>Off</color>")) != combineTriggerAxis)
+                if (Toggle(combineTriggerAxis, String.Format("Combine trigger axis: {0}", combineTriggerAxis ? "<color=green>On</color>" : "<color=red>Off</color>")) != combineTriggerAxis)
                 {
                     MoControlsSaveData.loadedSaveData.combinedTriggerAxis = !combineTriggerAxis;
-                    xboxController.updateTriggerAxis();
-                    MoControlsSaveData.loadedSaveData.saveSettings();
+                    xboxController.updateTriggerAxisInputName();
+                    saveSettings = true;
                 }
-                gui.Label("NOTE: after changing this value you will need to reassign desired gameContol inputs to triggers.");
+                Label("NOTE: after changing this value you will need to reassign desired gameContol inputs to triggers.");
             }
         }
         /// <summary>
@@ -527,66 +723,63 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 09.10.2018
 
-            using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width((mainGuiWidth) - SCROLL_BAR_OFFSET - 12.5f) }))
+            using (new VerticalScope("box", Width(mainGuiWidth - marginOffset)))
             {
-                gui.Label("<b>Xbox Controller Input Viewer: " + (xboxController.isConnected ? "<color=green>Connected</color></b>" : "<color=red>Disconnected</color></b>"));
-                int j = 0;
-                int itemWidth = 160;
-                int maxItemsPerRow = (int)(mainGuiWidth / itemWidth);
-                XboxControl[] xboxControls = xboxController.getXboxControls();
+                int colorIndex = 0;
+                Vector2 stickMovement;
+                bool isBoolState;
+                GUIStyle stickMovementStyle = new GUIStyle();
+                XboxControl[] controls = xboxController.xboxControls;
 
-                for (int i = 1; i < xboxControls.Length; i++)
+                for (int i = 1; i < controls.Length; i++)
                 {
                     i--;
-                    using (new gui.HorizontalScope())
+                    using (new HorizontalScope())
                     {
                         for (int n = 0; n < maxItemsPerRow; n++)
                         {
-                            if (i >= xboxControls.Length)
+                            if (i >= controls.Length)
                                 break;
-                            j++;
-                            if (j == 2)
+                            colorIndexCheck(ref colorIndex);
+                            using (new VerticalScope("box", new GUILayoutOption[] { Width(itemWidth), Height(32) }))
                             {
-                                j = 0;
-                                ueGUI.backgroundColor = primaryItemColor;
-                            }
-                            else
-                                ueGUI.backgroundColor = secondaryItemColor;
-                            using (new gui.VerticalScope("box", new GUILayoutOption[] { gui.Width(itemWidth), gui.Height(32) }))
-                            {
-                                using (new gui.HorizontalScope())
+                                using (new HorizontalScope())
                                 {
-                                    bool isBoolState = xboxControls[i] is XboxBoolState;
-                                    if (isBoolState && xboxController.isConnected && (xboxControls[i] as XboxBoolState).state == ButtonState.Pressed)
-                                        ueGUI.contentColor = xboxButtonPressedColor;
-                                    if (xboxController.lS == xboxControls[i])
+                                    isBoolState = controls[i] is XboxBoolState;
+                                    if (isBoolState && xboxController.isConnected && (controls[i] as XboxBoolState).state == ButtonState.Pressed)
                                     {
-                                        GamePadThumbSticks.StickValue ls = xboxController.getLeftStick();
-                                        gui.Label(xboxControls[i].texture, style: new GUIStyle() { contentOffset = new Vector2(ls.X * 3, -(ls.Y * 3)) });
+                                        contentColor = xboxButtonPressedContentColor;
                                     }
-                                    else if (xboxController.rS == xboxControls[i])
+                                    if (xboxController.lS == controls[i])
                                     {
-                                        GamePadThumbSticks.StickValue rs = xboxController.getRightStick();
-                                        gui.Label(xboxControls[i].texture, style: new GUIStyle() { contentOffset = new Vector2(rs.X * 3, -(rs.Y * 3)) });
+                                        stickMovement = xboxController.getLeftStick();
+                                        stickMovement.y *= -1;
+                                        stickMovementStyle.contentOffset = stickMovement * 3;
+                                        Label(controls[i].texture, style: stickMovementStyle);
+                                    }
+                                    else if (xboxController.rS == controls[i])
+                                    {
+                                        stickMovement = xboxController.getRightStick();
+                                        stickMovement.y *= -1;
+                                        stickMovementStyle.contentOffset = stickMovement * 3;
+                                        Label(controls[i].texture, style: stickMovementStyle);
                                     }
                                     else
-                                        gui.Label(xboxControls[i].texture);
-                                    ueGUI.contentColor = defaultContentColor;
-                                    using (new gui.VerticalScope())
+                                        Label(controls[i].texture);
+                                    contentColor = defaultContentColor;
+                                    using (new VerticalScope())
                                     {
-                                        gui.Label(xboxControls[i].inputName);
+                                        Label(controls[i].inputName);
                                         if (xboxController.isConnected)
                                         {
-                                            if (isBoolState)
-                                                gui.Label((xboxControls[i] as XboxBoolState).ToString());
-                                            else if (xboxControls[i] is XboxFloatState)
-                                                gui.Label((xboxControls[i] as XboxFloatState).ToString());
+                                            Label(controls[i].ToString());
                                         }
                                     }
                                 }
                             }
                             i++;
                         }
+                        colorIndexCheck(ref colorIndex);
                     }
                 }
             }
@@ -594,25 +787,25 @@ namespace TommoJProductions.MoControls.GUI
         /// <summary>
         /// Draws controller force feedback content.
         /// </summary>
-        private void drawControllerFFBContent()
+        private void drawControllerFFBContent(ref bool saveSettings)
         {
             // Written, 18.10.2020
 
-            bool _saveSettings = false;
             bool ffbOn = MoControlsSaveData.loadedSaveData.ffbOnXboxController;
             bool ffbOptDefault = MoControlsSaveData.loadedSaveData.ffbOption_default;
             bool ffbOptRpm = MoControlsSaveData.loadedSaveData.ffbOption_rpmLimiter;
             bool ffbOptWheelSlip = MoControlsSaveData.loadedSaveData.ffbOption_wheelSlip;
             bool ffbOptGearChange = MoControlsSaveData.loadedSaveData.ffbOption_gearChange;
-            if (gui.Toggle(ffbOn, String.Format("FFB: {0}", ffbOn ? "<color=green>On</color>" : "<color=red>Off</color>")) != ffbOn)
+            using (new HorizontalScope("box", Width(mainGuiWidth - marginOffset)))
             {
-                MoControlsSaveData.loadedSaveData.ffbOnXboxController = !ffbOn;
-                _saveSettings = true;
-            }
-            using (new gui.HorizontalScope("box"))
-            {
-                gui.Label("<i><b>FFB Options</b></i>");
-                if (gui.Toggle(ffbOptDefault, String.Format("Default ffb: {0}", ffbOptDefault ? "<color=green>On</color>" : "<color=red>Off</color>"))
+                if (Toggle(ffbOn, String.Format("FFB: {0}", ffbOn ? "<color=green>On</color>" : "<color=red>Off</color>")) != ffbOn)
+                {
+                    MoControlsSaveData.loadedSaveData.ffbOnXboxController = !ffbOn;
+                    xboxController.setRumble(XboxController.vector2Zero);
+                    saveSettings = true;
+                }
+                Label("<i><b>FFB Options</b></i>");
+                if (Toggle(ffbOptDefault, String.Format("Default ffb: {0}", ffbOptDefault ? "<color=green>On</color>" : "<color=red>Off</color>"))
                     != ffbOptDefault)
                 {
                     // only default opt allowed if enabled
@@ -626,131 +819,79 @@ namespace TommoJProductions.MoControls.GUI
                         if (ffbOptGearChange)
                             MoControlsSaveData.loadedSaveData.ffbOption_gearChange = false;
                     }
-                    _saveSettings = true;
+                    saveSettings = true;
                 }
-                if (gui.Toggle(ffbOptRpm, String.Format("RPM limiter ffb: {0}", ffbOptRpm ? "<color=green>On</color>" : "<color=red>Off</color>"))
+                if (Toggle(ffbOptRpm, String.Format("RPM limiter ffb: {0}", ffbOptRpm ? "<color=green>On</color>" : "<color=red>Off</color>"))
                    != ffbOptRpm)
                 {
                     MoControlsSaveData.loadedSaveData.ffbOption_rpmLimiter = !ffbOptRpm;
                     if (MoControlsSaveData.loadedSaveData.ffbOption_rpmLimiter)
                         if (MoControlsSaveData.loadedSaveData.ffbOption_default)
                             MoControlsSaveData.loadedSaveData.ffbOption_default = false;
-                    _saveSettings = true;
+                    saveSettings = true;
                 }
-                if (gui.Toggle(ffbOptWheelSlip, String.Format("Wheel slip ffb: {0}", ffbOptWheelSlip ? "<color=green>On</color>" : "<color=red>Off</color>"))
+                if (Toggle(ffbOptWheelSlip, String.Format("Wheel slip ffb: {0}", ffbOptWheelSlip ? "<color=green>On</color>" : "<color=red>Off</color>"))
                    != ffbOptWheelSlip)
                 {
                     MoControlsSaveData.loadedSaveData.ffbOption_wheelSlip = !ffbOptWheelSlip;
                     if (MoControlsSaveData.loadedSaveData.ffbOption_wheelSlip)
                         if (MoControlsSaveData.loadedSaveData.ffbOption_default)
                             MoControlsSaveData.loadedSaveData.ffbOption_default = false;
-                    _saveSettings = true;
+                    saveSettings = true;
                 }
-                if (gui.Toggle(ffbOptGearChange, String.Format("Gear change ffb: {0}", ffbOptGearChange ? "<color=green>On</color>" : "<color=red>Off</color>"))
+                if (Toggle(ffbOptGearChange, String.Format("Gear change ffb: {0}", ffbOptGearChange ? "<color=green>On</color>" : "<color=red>Off</color>"))
                   != ffbOptGearChange)
                 {
                     MoControlsSaveData.loadedSaveData.ffbOption_gearChange = !ffbOptGearChange;
                     if (MoControlsSaveData.loadedSaveData.ffbOption_gearChange)
                         if (MoControlsSaveData.loadedSaveData.ffbOption_default)
                             MoControlsSaveData.loadedSaveData.ffbOption_default = false;
-                    _saveSettings = true;
+                    saveSettings = true;
                 }
             }
-            if (_saveSettings)
-                MoControlsSaveData.loadedSaveData.saveSettings();
         }
         /// <summary>
-        /// Draws mouse emulation content to the main gui.
+        /// Draws mouse emulation content to the main 
         /// </summary>
-        private void drawMouseEmulationContent()
+        private void drawMouseEmulationContent(ref bool saveSettings)
         {
             // Written, 22.08.2018
 
             float tempValue;
-            bool saveSettings = false;
 
-            ueGUI.backgroundColor = moduleBackgroundColor;
-            gui.Label("<b>Mouse Emulation</b>");
-            gui.Space(5f);
+            skin.box.normal.background = moduleBackgroundColor;
+            Label("<b>Mouse Emulation</b>");
+            Space(5f);
+            using (new VerticalScope(marginStyle, Width(mainGuiWidth - marginOffset)))
+            {
+                using (new HorizontalScope("box"))
+                {
+                    Label("<b><color=" + (MoControlsSaveData.loadedSaveData.emulateMouse ? "green>ON" : "red>OFF") + "</color></b>");
+                    drawToggle($"<b>Emulate mouse for controller:</b> Using {MoControlsSaveData.loadedSaveData.mouseInputType}", ref MoControlsSaveData.loadedSaveData.emulateMouse, ref saveSettings);
+                }
+                using (new HorizontalScope())
+                {
+                    using (new HorizontalScope("box"))
+                    {
+                        Label("<i><b>Emulate mouse on joystick:</b></i>");
+                        GUIExtentions.drawPropertyEnum(ref MoControlsSaveData.loadedSaveData.mouseInputType, ref saveSettings);
+                    }
+                    using (new HorizontalScope("box"))
+                    {
+                        Label("<i><b>Deadzone type:</b></i>");
+                        GUIExtentions.drawPropertyEnum(ref MoControlsSaveData.loadedSaveData.mouseDeadzoneType, ref saveSettings);
+                    }
+                }
+                using (new HorizontalScope())
+                {
+                    using (new VerticalScope("box", Width(marginOffset)))
+                    {
+                        Label(String.Format("<b>Mouse Deadzone:</b> {0}", MoControlsSaveData.loadedSaveData.mouseDeadzone));
 
-            using (new gui.HorizontalScope("box"))
-            {
-                gui.Label("<b><color=" + (MoControlsSaveData.loadedSaveData.emulateMouse ? "green>ON" : "red>OFF") + "</color></b>");
-                if (gui.Toggle(MoControlsSaveData.loadedSaveData.emulateMouse, String.Format("<b>Emulate mouse for controller:</b> Using {0}", MoControlsSaveData.loadedSaveData.mouseInputType)) != MoControlsSaveData.loadedSaveData.emulateMouse)
-                {
-                    MoControlsSaveData.loadedSaveData.emulateMouse = !MoControlsSaveData.loadedSaveData.emulateMouse;
-                    saveSettings = true;
-                }
-            }
-            using (new gui.HorizontalScope())
-            {
-                bool _asInput;
-                using (new gui.HorizontalScope("box"))
-                {
-                    gui.Label("<i><b>Emulate mouse on joystick:</b></i>");
-                    // As left + right thumb stick settings are grouped; need to manually change other value..
-                    _asInput = MoControlsSaveData.loadedSaveData.mouseInputType == InputTypeEnum.LS;
-                    if (gui.Toggle(_asInput, String.Format("<b>Left Stick:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
-                    {
-                        if (!_asInput)
-                        {
-                            MoControlsSaveData.loadedSaveData.mouseInputType = InputTypeEnum.LS;
-                            saveSettings = true;
-                        }
-                    }
-                    _asInput = MoControlsSaveData.loadedSaveData.mouseInputType == InputTypeEnum.RS;
-                    if (gui.Toggle(_asInput, String.Format("<b>Right Stick:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
-                    {
-                        if (!_asInput)
-                        {
-                            MoControlsSaveData.loadedSaveData.mouseInputType = InputTypeEnum.RS;
-                            saveSettings = true;
-                        }
-                    }
-                    _asInput = MoControlsSaveData.loadedSaveData.mouseInputType == InputTypeEnum.DPad;
-                    if (gui.Toggle(_asInput, String.Format("<b>Directional Pad:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
-                    {
-                        if (!_asInput)
-                        {
-                            MoControlsSaveData.loadedSaveData.mouseInputType = InputTypeEnum.DPad;
-                            saveSettings = true;
-                        }
-                    }
-                }
-                using (new gui.HorizontalScope("box"))
-                {
-                    gui.Label("<i><b>Deadzone type:</b></i>");
-                    _asInput = MoControlsSaveData.loadedSaveData.mouseDeadzoneType == DeadzoneTypeEnum.Radial;
-                    if (gui.Toggle(_asInput, String.Format("<b>Radial:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
-                    {
-                        if (!_asInput)
-                        {
-                            MoControlsSaveData.loadedSaveData.mouseDeadzoneType = DeadzoneTypeEnum.Radial;
-                            saveSettings = true;
-                        }
-                    }
-                    _asInput = MoControlsSaveData.loadedSaveData.mouseDeadzoneType == DeadzoneTypeEnum.ScaledRadial;
-                    if (gui.Toggle(_asInput, String.Format("<b>Scaled Radial:</b> {0}", _asInput ? "<color=green>ON</color>" : "")) != _asInput)
-                    {
-                        if (!_asInput)
-                        {
-                            MoControlsSaveData.loadedSaveData.mouseDeadzoneType = DeadzoneTypeEnum.ScaledRadial;
-                            saveSettings = true;
-                        }
-                    }
-                }
-            }
-            using (new gui.HorizontalScope())
-            {
-                using (new gui.HorizontalScope("box")) 
-                {
-                    gui.Label(String.Format("<b>Mouse Deadzone:</b> {0}", MoControlsSaveData.loadedSaveData.mouseDeadzone));
-                    using (new gui.VerticalScope("box"))
-                    {
                         if (string.IsNullOrEmpty(mouseSettingsValue))
                             mouseSettingsValue = MoControlsSaveData.loadedSaveData.mouseDeadzone.ToString();
-                        mouseSettingsValue = gui.TextField(mouseSettingsValue);
-                        if (gui.Button("Set Mouse Deadzone"))
+                        mouseSettingsValue = TextField(mouseSettingsValue);
+                        if (Button("Set Mouse Deadzone"))
                         {
                             if (float.TryParse(mouseSettingsValue, out tempValue))
                             {
@@ -759,16 +900,14 @@ namespace TommoJProductions.MoControls.GUI
                             }
                         }
                     }
-                }
-                using (new gui.HorizontalScope("box")) 
-                {
-                    gui.Label(String.Format("<b>Mouse Sensitivity:</b> {0}", MoControlsSaveData.loadedSaveData.mouseSensitivity));
-                    using (new gui.VerticalScope("box"))
+                    using (new VerticalScope("box", Width(marginOffset)))
                     {
+                        Label(String.Format("<b>Mouse Sensitivity:</b> {0}", MoControlsSaveData.loadedSaveData.mouseSensitivity));
+
                         if (string.IsNullOrEmpty(mouseSettingsValue1))
                             mouseSettingsValue1 = MoControlsSaveData.loadedSaveData.mouseSensitivity.ToString();
-                        mouseSettingsValue1 = gui.TextField(mouseSettingsValue1);
-                        if (gui.Button("Set Mouse Sensitivity"))
+                        mouseSettingsValue1 = TextField(mouseSettingsValue1);
+                        if (Button("Set Mouse Sensitivity"))
                         {
                             if (float.TryParse(mouseSettingsValue1, out tempValue))
                             {
@@ -778,152 +917,165 @@ namespace TommoJProductions.MoControls.GUI
                         }
                     }
                 }
-            }
-            gui.Space(5f);
-            ueGUI.backgroundColor = moduleBackgroundColor;
-            using (new gui.VerticalScope())
-            {
-                gui.Label("<i><b>Mouse inputs:</b></i>");
-                ueGUI.backgroundColor = primaryItemColor;
-                using (new gui.HorizontalScope())
+                Space(5f);
+                using (new VerticalScope())
                 {
-                    using (new gui.VerticalScope("box"))
+                    Label("<i><b>Mouse inputs:</b></i>");
+                    using (new HorizontalScope(Width(itemWidth)))
                     {
-                        gui.Label(String.Format("<b>{0}:</b>", MoControlsMod.instance.lmbPrimaryInput.Name));
-                        using (new gui.HorizontalScope())
+                        skin.box.normal.background = primaryItemColor;
+                        using (new VerticalScope("box"))
                         {
-                            drawCommonControl("Modifier", MoControlsMod.instance.lmbPrimaryInput.ID, MoControlsMod.instance.lmbPrimaryInput.Modifier.ToString(), 1, inMod: mod);
-                            drawCommonControl("Input", MoControlsMod.instance.lmbPrimaryInput.ID, MoControlsMod.instance.lmbPrimaryInput.Key.ToString(), 2, inMod: mod);
+
+                            Label(String.Format("<b>{0}:</b>", MoControlsMod.instance.lmbPrimaryInput.Name));
+                            using (new HorizontalScope())
+                            {
+                                drawCommonControl(MoControlsMod.instance.lmbPrimaryInput.ID, MoControlsMod.instance.lmbPrimaryInput.Modifier.ToString(), 1);
+                                drawCommonControl(MoControlsMod.instance.lmbPrimaryInput.ID, MoControlsMod.instance.lmbPrimaryInput.Key.ToString(), 2);
+                            }
+                        }
+                        skin.box.normal.background = moduleBackgroundColor;
+                        using (new VerticalScope("box"))
+                        {
+                            Label(String.Format("<b>{0}:</b>", MoControlsMod.instance.lmbSecondaryInput.Name));
+                            using (new HorizontalScope())
+                            {
+                                drawCommonControl(MoControlsMod.instance.lmbSecondaryInput.ID, MoControlsMod.instance.lmbSecondaryInput.Modifier.ToString(), 1);
+                                drawCommonControl(MoControlsMod.instance.lmbSecondaryInput.ID, MoControlsMod.instance.lmbSecondaryInput.Key.ToString(), 2);
+                            }
                         }
                     }
-                    ueGUI.backgroundColor = secondaryItemColor;
-                    using (new gui.VerticalScope("box"))
+                    using (new HorizontalScope(Width(itemWidth)))
                     {
-                        gui.Label(String.Format("<b>{0}:</b>", MoControlsMod.instance.lmbSecondaryInput.Name));
-                        using (new gui.HorizontalScope())
+                        skin.box.normal.background = moduleBackgroundColor;
+                        using (new VerticalScope("box"))
                         {
-                            drawCommonControl("Modifier", MoControlsMod.instance.lmbSecondaryInput.ID, MoControlsMod.instance.lmbSecondaryInput.Modifier.ToString(), 1, inMod: mod);
-                            drawCommonControl("Input", MoControlsMod.instance.lmbSecondaryInput.ID, MoControlsMod.instance.lmbSecondaryInput.Key.ToString(), 2, inMod: mod);
+                            Label(String.Format("<b>{0}:</b>", MoControlsMod.instance.rmbPrimaryInput.Name));
+                            using (new HorizontalScope())
+                            {
+                                drawCommonControl(MoControlsMod.instance.rmbPrimaryInput.ID, MoControlsMod.instance.rmbPrimaryInput.Modifier.ToString(), 1);
+                                drawCommonControl(MoControlsMod.instance.rmbPrimaryInput.ID, MoControlsMod.instance.rmbPrimaryInput.Key.ToString(), 2);
+                            }
+                        }
+                        skin.box.normal.background = primaryItemColor;
+                        using (new VerticalScope("box"))
+                        {
+                            Label(String.Format("<b>{0}:</b>", MoControlsMod.instance.rmbSecondaryInput.Name));
+                            using (new HorizontalScope())
+                            {
+                                drawCommonControl(MoControlsMod.instance.rmbSecondaryInput.ID, MoControlsMod.instance.rmbSecondaryInput.Modifier.ToString(), 1);
+                                drawCommonControl(MoControlsMod.instance.rmbSecondaryInput.ID, MoControlsMod.instance.rmbSecondaryInput.Key.ToString(), 2);
+                            }
                         }
                     }
                 }
-                ueGUI.backgroundColor = primaryItemColor;
-                using (new gui.HorizontalScope())
-                {
-                    using (new gui.VerticalScope("box"))
-                    {
-                        gui.Label(String.Format("<b>{0}:</b>", MoControlsMod.instance.rmbPrimaryInput.Name));
-                        using (new gui.HorizontalScope())
-                        {
-                            drawCommonControl("Modifier", MoControlsMod.instance.rmbPrimaryInput.ID, MoControlsMod.instance.rmbPrimaryInput.Modifier.ToString(), 1, inMod: mod);
-                            drawCommonControl("Input", MoControlsMod.instance.rmbPrimaryInput.ID, MoControlsMod.instance.rmbPrimaryInput.Key.ToString(), 2, inMod: mod);
-                        }
-                    }
-                    ueGUI.backgroundColor = secondaryItemColor;
-                    using (new gui.VerticalScope("box"))
-                    {
-                        gui.Label(String.Format("<b>{0}:</b>", MoControlsMod.instance.rmbSecondaryInput.Name));
-                        using (new gui.HorizontalScope())
-                        {
-                            drawCommonControl("Modifier", MoControlsMod.instance.rmbSecondaryInput.ID, MoControlsMod.instance.rmbSecondaryInput.Modifier.ToString(), 1, inMod: mod);
-                            drawCommonControl("Input", MoControlsMod.instance.rmbSecondaryInput.ID, MoControlsMod.instance.rmbSecondaryInput.Key.ToString(), 2, inMod: mod);
-                        }
-                    }
-                }
             }
-            ueGUI.backgroundColor = backgroundColor;
-            gui.Space(5f);
-            if (saveSettings)
-            {
-                MoControlsSaveData.loadedSaveData.saveSettings();
-            }
+            skin.box.normal.background = defaultBackgroundColor;
         }
         /// <summary>
-        /// Draws display settings content to the main gui.
+        /// Draws display settings content to the main 
         /// </summary>
-        private void drawDisplayContent()
+        private void drawDisplayContent(ref bool saveSettings)
         {
             // Written, 22.08.2018
 
-            ueGUI.backgroundColor = moduleBackgroundColor;
-            bool _saveSettings = false;
+            skin.box.normal.background = moduleBackgroundColor;
+            using (new VerticalScope(marginStyle, Width(mainGuiWidth - marginOffset)))
+            {
+                using (new HorizontalScope())
+                {
+                    using (new VerticalScope("box"))
+                    {
+                        Label("Overlays:");
+                        drawToggle("Display current player mode overlay", ref MoControlsSaveData.loadedSaveData.displayCurrentPlayerModeOverlay, ref saveSettings);
+                        drawToggle("Display force feedback overlay", ref MoControlsSaveData.loadedSaveData.displayFfbOverlay, ref saveSettings);
+                        drawToggle("Display vehicle info overlay", ref MoControlsSaveData.loadedSaveData.displayVehicleInfoOverlay, ref saveSettings);
+                    }
+                    using (new VerticalScope("box"))
+                    {
+                        drawToggleGroup("Debug mode<color=green>", ref MoControlsSaveData.loadedSaveData.debugMode, ref saveSettings);
+                    }
+                }
 
-            using (new gui.HorizontalScope("box"))
-            {
-                if (gui.Toggle(MoControlsSaveData.loadedSaveData.displayCurrentPlayerModeOverlay, "Display current player mode overlay") != MoControlsSaveData.loadedSaveData.displayCurrentPlayerModeOverlay)
+                using (new VerticalScope("box"))
                 {
-                    MoControlsSaveData.loadedSaveData.displayCurrentPlayerModeOverlay = !MoControlsSaveData.loadedSaveData.displayCurrentPlayerModeOverlay;
-                    _saveSettings = true;
+                    if (Button("Reset Mo'Controls save data", Width(200)))
+                    {
+                        MoControlsSaveData.resetLoadedSettings();
+                    }
+                    using (new HorizontalScope("box"))
+                    {
+                        if (Button("Calibrate cInput", Width(200)))
+                        {
+                            controlManager.loadControlsToCInput(controlManager.footControls);
+                            cInput.Calibrate();
+                            controlManager.loadControlsToCInput(controlManager.drivingControls);
+                            cInput.Calibrate();
+                            controlManager.loadControlsToCInput(controlManager.blankControls);
+                        }
+                        Label("- calibrates analog (axis) inputs to their default/neutral position");
+                    }
                 }
-                if (gui.Toggle(MoControlsSaveData.loadedSaveData.displayFfbOverlay, "Display force feedback overlay") != MoControlsSaveData.loadedSaveData.displayFfbOverlay)
-                {
-                    MoControlsSaveData.loadedSaveData.displayFfbOverlay = !MoControlsSaveData.loadedSaveData.displayFfbOverlay;
-                    _saveSettings = true;
+                using (new VerticalScope("box"))
+                { 
+                    bool hasChanged = drawToggleGroup("Device detection<color=green>", ref MoControlsSaveData.loadedSaveData.deviceDetection, ref saveSettings);
+
+                    if (hasChanged) 
+                    {
+                        if (MoControlsSaveData.loadedSaveData.deviceDetection != UsingDeviceEnum.Auto)
+                        {
+                            controlManager.usingController = MoControlsSaveData.loadedSaveData.deviceDetection == UsingDeviceEnum.xboxController;
+                        }
+                    }
                 }
-                if (gui.Toggle(MoControlsSaveData.loadedSaveData.displayVehicleInfoOverlay, "Display vehicle info overlay") != MoControlsSaveData.loadedSaveData.displayVehicleInfoOverlay)
+
+                using (new HorizontalScope("box"))
                 {
-                    MoControlsSaveData.loadedSaveData.displayVehicleInfoOverlay = !MoControlsSaveData.loadedSaveData.displayVehicleInfoOverlay;
-                    _saveSettings = true;
+                    Label("<i><b><color=blue>C</color><color=yellow>o</color>lo<color=red>r</color> <color=purple>M</color>ix<color=green>e</color>r</b></i>");
                 }
             }
-            drawPlayerMovementAxisSettings();
-            
-            using (new gui.HorizontalScope("box"))
-            {
-                gui.Label("<i><b><color=blue>C</color><color=yellow>o</color>lo<color=red>r</color> <color=purple>M</color>ix<color=green>e</color>r</b></i>");
-                gui.Space(3f);
-            }
-            ueGUI.backgroundColor = backgroundColor;
-            if (_saveSettings)
-            {
-                MoControlsSaveData.loadedSaveData.saveSettings();
-            }
+            skin.box.normal.background = defaultBackgroundColor;
         }
         /// <summary>
-        /// Draws the player mode overlay.
+        /// Draws a common control for the 
         /// </summary>
-        private void drawPlayerModeOverlayGUI()
-        {
-            // Written, 22.08.2018
-
-            using (new gui.AreaScope(new Rect(Screen.width / 2, 1, 180, 20)))
-            {
-                gui.Label(String.Format("{0} ({1} mode)", ControlManager.getCurrentPlayerMode.ToString(), !controlManager.isInHandMode ? "Tool" : "Hand"));
-            }
-        }
-        /// <summary>
-        /// Draws a common control for the gui.
-        /// </summary>
-        private void drawCommonControl(string inTitle, string inControlName, string inInputName, int inIndex, PlayerModeEnum? inMode = null, Mod inMod = null)
+        private void drawCommonControl(string inControlName, string inInputName, int inIndex, PlayerModeEnum? inMode = null)
         {
             // Written, 01.08.2018
 
-            string reassignMessage =
-                changeInputResult.controlName == inControlName
-                && changeInputResult.index == inIndex
-                && changeInputResult.mod == inMod
-                && changeInputResult.mode == inMode ? "<b>Awaiting key input</b>" : null;
-            XboxControl xboxControl = xboxController?.getXboxControlByInputName(inInputName);
+            string reassignMessage = null;
+            if (controlManager.changeInputResult.controlName == inControlName && controlManager.changeInputResult.index == inIndex && controlManager.changeInputResult.mode == inMode)
+                reassignMessage = "<b>Awaiting key input</b>";
+            XboxControl xboxControl;
             bool buttonClicked = false;
-            ueGUI.backgroundColor = unselectedMenuButtonColor;
-            if (xboxControl?.texture != null && reassignMessage == null && MoControlsMod.assetsLoaded)
+            skin.box.normal.background = unselectedMenuButtonColor;
+            using (new HorizontalScope(Width(75)))
             {
-                if (gui.Button(xboxControl.texture))
+                if (reassignMessage == null)
                 {
-                    buttonClicked = true;
+                    xboxControl = xboxController.getXboxControlByInputName(inInputName);
+                    if (xboxControl != null && MoControlsMod.assetsLoaded)
+                    {
+                        if (Button(xboxControl.texture))
+                        {
+                            buttonClicked = true;
+                        }
+                    }
+                    else if (Button(inInputName))
+                    {
+                        buttonClicked = true;
+                    }
+                }
+                else 
+                {
+                    Label(reassignMessage);
                 }
             }
-            else
+            skin.box.normal.background = defaultBackgroundColor;
+
+            if (buttonClicked && !controlManager.changeInputResult.reassignKey)
             {
-                if (gui.Button(reassignMessage ?? (!MoControlsMod.assetsLoaded && xboxControl?.texture == null ? "<b><color=red>Asset not loaded</color></b> " : "") + inInputName))
-                {
-                    buttonClicked = true;
-                }
-            }
-            ueGUI.backgroundColor = backgroundColor;
-            if (buttonClicked)
-            {
-                changeInputResult.changeToPollingState(inControlName, inIndex, inMode, inMod);
+                controlManager.changeInputResult.changeToPollingState(inControlName, inIndex, inMode);
             }
         }
         /// <summary>
@@ -932,53 +1084,58 @@ namespace TommoJProductions.MoControls.GUI
         /// <param name="inControlInputs">The list to draw.</param>
         private void drawControlModeContent(string inTitle, string[,] inControlInputs)
         {
-            // Written, 02.09.2018
+            // Written, 30.07.2022
 
-            gui.Space(3f);
-            gui.Label(String.Format("<b>{0}</b>", inTitle));
-            onlyShowRelevantControls = gui.Toggle(onlyShowRelevantControls, "Show Relevant Controls");
-            gui.Space(5f);
-            int j = 0;
-            for (int i = 0; i < inControlInputs.GetLength(0); i++)
+            int length = inControlInputs.GetLength(0);
+            int rowTotal = length / maxItemsPerRow;
+            int rowStartindex = 0;
+            int colorIndex = 0;
+
+            Label($"<b>{inTitle}</b> {drawCount}");
+            onlyShowRelevantControls = Toggle(onlyShowRelevantControls, "Show Relevant Controls");
+
+            drawCount = 0;
+
+            // control list
+            for (int row = 0; row <= rowTotal; row++)
             {
-                string gameControlName = inControlInputs[i, 0];
-                GameControlsEnum gameControl = gameControlName.getGameControl();
-                bool drawControl = false;
-                if (onlyShowRelevantControls)
+                using (new HorizontalScope(Width(mainGuiWidth - marginOffset)))
                 {
-                    if (mainGUIMenu == MainGUIMenuEnum.DrivingControls)
+                    for (int i = rowStartindex; i < length; i++)
                     {
-                        if (relevantDrivingControls.Contains(gameControl))
-                            drawControl = true;
-                    }
-                    else
-                    {
-                        if (mainGUIMenu == MainGUIMenuEnum.FootControls)
-                        {
-                            if (relevantFootControls.Contains(gameControl))
-                                drawControl = true;
-                        }
-                    }
-                }
-                else
-                    drawControl = true;
-                if (drawControl)
-                {
-                    j++;
-                    if (j == 2)
-                    {
-                        j = 0;
-                        ueGUI.backgroundColor = primaryItemColor;
-                    }
-                    else
-                        ueGUI.backgroundColor = secondaryItemColor;
+                        if (drawCount >= (row + 1) * maxItemsPerRow)
+                            break;
 
-                    gui.Space(3f);
-                    using (new gui.VerticalScope("box"))
-                    {
-                        gui.Label(String.Format("<b>{0}:</b>", gameControl.getGameControlAlias(true)));
-                        using (new gui.HorizontalScope())
+                        rowStartindex++;
+                        GameControlsEnum gameControl = inControlInputs[i, 0].getGameControl();
+                        bool drawControl = false;
+                        if (onlyShowRelevantControls)
                         {
+                            if (mainGUIMenu == MainGUIMenuEnum.DrivingControls)
+                            {
+                                if (relevantDrivingControls.Contains(gameControl))
+                                    drawControl = true;
+                            }
+                            else if (mainGUIMenu == MainGUIMenuEnum.FootControls)
+                            {
+                                if (relevantFootControls.Contains(gameControl))
+                                    drawControl = true;
+                            }
+                        }
+                        else
+                            drawControl = true;
+
+                        if (!drawControl)
+                            continue;
+
+                        drawCount++;
+
+                        colorIndexCheck(ref colorIndex);
+
+                        using (new VerticalScope("box", new GUILayoutOption[] { Width(itemWidth), Height(75) }))
+                        {
+                            Label(String.Format("<b>{0}:</b>", gameControl.getGameControlAlias(true)));
+
                             bool isControls = mainGUIMenu == MainGUIMenuEnum.FootControls;
                             PlayerModeEnum? playerMode;
                             if (isControls)
@@ -991,56 +1148,46 @@ namespace TommoJProductions.MoControls.GUI
                                 else
                                     playerMode = null;
                             }
-
-                            drawCommonControl("Primary Input", gameControlName, inControlInputs[i, 1], 1, playerMode);
-                            drawCommonControl("Secondary Input", gameControlName, inControlInputs[i, 2], 2, playerMode);
+                            using (new HorizontalScope())
+                            {
+                                drawCommonControl(inControlInputs[i, 0], inControlInputs[i, 1], 1, playerMode);
+                                drawCommonControl(inControlInputs[i, 0], inControlInputs[i, 2], 2, playerMode);
+                            }
                         }
-
-
                     }
-                    ueGUI.backgroundColor = backgroundColor;
-                    gui.Space(3f);
+                    colorIndexCheck(ref colorIndex);
+                    skin.box.normal.background = defaultBackgroundColor;
                 }
             }
         }
-       
         /// <summary>
         /// Draws a menu with the provided Enum, <typeparamref name="T"/>.
         /// </summary>
-        private bool drawGeneralMenu<T>(T inSelected, out T inChangedTo)
+        private bool drawGeneralMenu<T>(T inSelected, out T inChangedTo) where T : Enum
         {
             // Written, 09.10.2018
 
-            using (new gui.HorizontalScope("box"))
+            using (new HorizontalScope("box"))
             {
                 foreach (T _enum in Enum.GetValues(typeof(T)))
                 {
                     bool isSelected = _enum.Equals(inSelected);
-                    string title = null;
-                    if (_enum is XboxControllerInputMapEnum)
-                        title = (_enum as XboxControllerInputMapEnum?).toString();
-                    else
-                        if (_enum is SettingsMenuEnum)
-                        title = (_enum as SettingsMenuEnum?).toString();
-                    else
-                            if (_enum is MainGUIMenuEnum)
-                        title = (_enum as MainGUIMenuEnum?).toString();
 
                     if (isSelected)
-                        ueGUI.backgroundColor = selectedMenuButtonColor;
+                        skin.button.normal.background = selectedMenuButtonColor;
                     else
-                        ueGUI.backgroundColor = unselectedMenuButtonColor;
+                        skin.button.normal.background = unselectedMenuButtonColor;
 
-                    if (gui.Button(title ?? _enum.ToString()) && !isSelected)
+                    if (Button(_enum.ToString()) && !isSelected)
                     {
                         inChangedTo = _enum;
                         return true;
                     }
                 }
-                ueGUI.backgroundColor = backgroundColor;
-                inChangedTo = inSelected;
-                return false;
             }
+            skin.button.normal.background = defaultButtonColor;
+            inChangedTo = inSelected;
+            return false;
         }
         /// <summary>
         /// Draws force feedback overlay
@@ -1049,19 +1196,7 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 16.10.2020
 
-            using (new gui.AreaScope(new Rect(Screen.width / 2, 20, 200, 200)))
-            {
-                if (controlManager.vehicle != null)
-                {
-                    gui.Label(String.Format("FFB: {0}\nLast Rumble Sent: {1}",
-                        controlManager.getFfbSetOpt().ToString("0.###"),
-                        xboxController.prevRumblePow.magnitude.ToString("0.###")));
-                }
-                else
-                {
-                    gui.Label("No supported vehicle found.\nCurrent vehicle: " + ControlManager.playerCurrentVehicle);
-                }
-            }
+            Label($"FFB: {controlManager.getFfbSetOpt().ToString("0.###")}\nLast Rumble Sent: {xboxController.prevRumblePow.sqrMagnitude.ToString("0.###")}");
         }
         /// <summary>
         /// Draws drivetrain related info as a overlay.
@@ -1070,123 +1205,69 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 18.10.2020
 
-            using (new gui.AreaScope(new Rect(200 + Screen.width / 2, 22, 200, 300)))
-            {
-                if (controlManager.vehicle != null)
-                {
-                    Drivetrain dt = controlManager.drivetrain;
-                    CarDynamics cd = controlManager.carDynamics;
-                    gui.Label(new StringBuilder().AppendFormat("{9} drivetrain:\nRpm: {2}\nRange: {0}-{1}\nRev Limiter: {3} ({4})\nShift Triggered: {5} ({6})\nLongitudeSlip: {7}\nLateralSlip: {8}",
-                        dt.minRPM.ToString("0"),
-                        dt.maxRPM,
-                        dt.rpm.ToString("0"),
-                        dt.revLimiterTriggered,
-                        dt.revLimiterTime,
-                        dt.shiftTriggered,
-                        dt.shiftTime,
-                        dt.poweredWheels.Max(_wheel => _wheel.longitunalSlipVelo).ToString("0.###"),
-                        dt.poweredWheels.Max(_wheel => _wheel.lateralSlipVelo).ToString("0.###"),
-                        String.IsNullOrEmpty(ControlManager.currentVehicleName) ? "NaN" : ControlManager.currentVehicleName).ToString());;
-
-                }
-                else
-                {
-                    gui.Label("No supported vehicle found.\nCurrent vehicle: " + ControlManager.playerCurrentVehicle);
-                }
-            }
+            Drivetrain dt = controlManager.drivetrain;
+            Label(new StringBuilder().AppendFormat("drivetrain:\nRpm: {2}\nRange: {0}-{1}\nRev Limiter: {3} ({4})\nShift Triggered: {5} ({6})\nLongitudeSlip: {7}\nLateralSlip: {8}",
+                dt.minRPM.ToString("0"),
+                dt.maxRPM,
+                dt.rpm.ToString("0"),
+                dt.revLimiterTriggered,
+                dt.revLimiterTime,
+                dt.shiftTriggered,
+                dt.shiftTime,
+                dt.poweredWheels.Max(_wheel => _wheel.longitunalSlipVelo).ToString("0.###"),
+                dt.poweredWheels.Max(_wheel => _wheel.lateralSlipVelo).ToString("0.###")).ToString());
         }
-
-        private void drawPlayerMovementAxisSettings() 
+        private void drawFootControlContent(ref bool saveSettings)
         {
-            // Player movement: gravity, sensitivity and deadzone settings 
-            bool saveSettings = false;
+            // Written, 03.08.2022
 
-            gui.Label("<b>PlayerHorizontal</b>");
-            using (new gui.HorizontalScope())
+            using (new VerticalScope(marginStyle))
             {
-                drawCInputAxisEdit("Gravity", ref pHorzGrav, ref MoControlsSaveData.loadedSaveData.playerHorzGravity, ref saveSettings, cInputAxisEditType.gravity, cInputAxisEditMember.PlayerHorizontal);
-                drawCInputAxisEdit("Sensitivity", ref pHorzSens, ref MoControlsSaveData.loadedSaveData.playerHorzSensitivity, ref saveSettings, cInputAxisEditType.sensitivity, cInputAxisEditMember.PlayerHorizontal);
-                drawCInputAxisEdit("Deadzone", ref pHorzDead, ref MoControlsSaveData.loadedSaveData.playerHorzDeadzone, ref saveSettings, cInputAxisEditType.deadzone, cInputAxisEditMember.PlayerHorizontal);
-            }
-            gui.Label("<b>PlayerVertical</b>");
-            using (new gui.HorizontalScope())
-            {
-                drawCInputAxisEdit("Gravity", ref pVertGrav, ref MoControlsSaveData.loadedSaveData.playerVertGravity, ref saveSettings, cInputAxisEditType.gravity, cInputAxisEditMember.PlayerVertical);
-                drawCInputAxisEdit("Sensitivity", ref pVertSens, ref MoControlsSaveData.loadedSaveData.playerVertSensitivity, ref saveSettings, cInputAxisEditType.sensitivity, cInputAxisEditMember.PlayerVertical);
-                drawCInputAxisEdit("Deadzone", ref pVertDead, ref MoControlsSaveData.loadedSaveData.playerVertDeadzone, ref saveSettings, cInputAxisEditType.deadzone, cInputAxisEditMember.PlayerVertical);
-            }
-            gui.Label("<b>Horizontal</b>");
-            using (new gui.HorizontalScope())
-            {
-                drawCInputAxisEdit("Gravity", ref horzGrav, ref MoControlsSaveData.loadedSaveData.horzGravity, ref saveSettings, cInputAxisEditType.gravity, cInputAxisEditMember.Horizontal);
-                drawCInputAxisEdit("Sensitivity", ref horzSens, ref MoControlsSaveData.loadedSaveData.horzSensitivity, ref saveSettings, cInputAxisEditType.sensitivity, cInputAxisEditMember.Horizontal);
-                drawCInputAxisEdit("Deadzone", ref horzDead, ref MoControlsSaveData.loadedSaveData.horzDeadzone, ref saveSettings, cInputAxisEditType.deadzone, cInputAxisEditMember.Horizontal);
-            }
-            gui.Label("<b>Vertical</b>");
-            using (new gui.HorizontalScope())
-            {   
-                drawCInputAxisEdit("Gravity", ref vertGrav, ref MoControlsSaveData.loadedSaveData.vertGravity, ref saveSettings, cInputAxisEditType.gravity, cInputAxisEditMember.Vertical);
-                drawCInputAxisEdit("Sensitivity", ref vertSens, ref MoControlsSaveData.loadedSaveData.vertSensitivity, ref saveSettings, cInputAxisEditType.sensitivity, cInputAxisEditMember.Vertical);
-                drawCInputAxisEdit("Deadzone", ref vertDead, ref MoControlsSaveData.loadedSaveData.vertDeadzone, ref saveSettings, cInputAxisEditType.deadzone, cInputAxisEditMember.Vertical);
-            }
-
-            // save settings
-            if (saveSettings)
-            {
-                MoControlsSaveData.loadedSaveData.saveSettings();
-            }
-        }
-
-        #endregion
-
-        private void drawCInputAxisEdit(string name, ref string value, ref float property, ref bool saveSettings, cInputAxisEditType editType, cInputAxisEditMember editMember) 
-        {
-            float _value;
-
-            using (new gui.HorizontalScope("box"))
-            {
-                gui.Label($"<b>{name}</b> {property}");
-                using (new gui.VerticalScope("box"))
+                using (new VerticalScope("box"))
                 {
-                    if (string.IsNullOrEmpty(value))
-                        value = property.ToString();
-                    value = gui.TextField(value);
-                    if (gui.Button($"Set {name}"))
+                    bool changed = drawToggle("Use player move as input", ref MoControlsSaveData.loadedSaveData.usePlayerMoveAsInput, ref saveSettings);
+
+                    if (MoControlsSaveData.loadedSaveData.usePlayerMoveAsInput)
                     {
-                        if (float.TryParse(value, out _value))
+                        if (changed)
                         {
-                            switch (editType)
-                            {
-                                case cInputAxisEditType.deadzone:
-                                    cInput.SetAxisDeadzone(editMember.ToString(), _value);
-                                    break;
-                                case cInputAxisEditType.sensitivity:
-                                    cInput.SetAxisSensitivity(editMember.ToString(), _value);
-                                    break;
-                                case cInputAxisEditType.gravity:
-                                    cInput.SetAxisGravity(editMember.ToString(), _value);
-                                    break;
-                            }
-                            property = _value;
-                            saveSettings = true;
+                            MoControlsSaveData.loadedSaveData.playerMove = InputTypeEnum.LS;
                         }
+                        drawToggleGroup("Player Move", ref MoControlsSaveData.loadedSaveData.playerMove, ref saveSettings);
+                    }
+                    else if (changed)
+                    {
+                        MoControlsSaveData.loadedSaveData.playerMove = InputTypeEnum.None;
                     }
                 }
+                drawControlModeContent("Foot Controls", controlManager.footControls);
+            }
+        }
+        private void drawDrivingControlContent()
+        {
+            // Written, 03.08.2022
+
+            using (new VerticalScope(marginStyle))
+            {
+                drawControlModeContent("Driving Controls", controlManager.drivingControls);
+            }
+        }
+        private void colorIndexCheck(ref int colorIndex)
+        {
+            // Written, 03.08.2022
+
+            colorIndex++;
+            if (colorIndex == 2)
+            {
+                colorIndex = 0;
+                skin.box.normal.background = primaryItemColor;
+            }
+            else
+            {
+                skin.box.normal.background = moduleBackgroundColor;
             }
         }
 
-        enum cInputAxisEditType
-        {
-            deadzone,
-            sensitivity,
-            gravity
-        }
-        enum cInputAxisEditMember
-        {
-            Vertical,
-            Horizontal,
-            PlayerVertical,
-            PlayerHorizontal
-        }
+        #endregion        
     }
 }

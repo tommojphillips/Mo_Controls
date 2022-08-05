@@ -32,7 +32,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
 
         #region Constructors
 
-        public XboxBoolState(string inInputName, string inXboxButtonName, XboxControlTypeEnum inType) : base(inInputName, inXboxButtonName, inType)
+        public XboxBoolState(string inInputName, string inXboxButtonName, XboxControlTypeEnum inType = XboxControlTypeEnum.Button) : base(inInputName, inXboxButtonName, inType)
         {
             // Written, 20.07.2018
 

@@ -1,6 +1,7 @@
 ﻿using TommoJProductions.MoControls.GUI;
 using TommoJProductions.MoControls.InputEmulation;
 using TommoJProductions.MoControls.XInputInterpreter;
+using TommoJProductions.MoControls.XInputInterpreter.Monitoring;
 using UnityEngine;
 
 namespace TommoJProductions.MoControls
@@ -14,30 +15,6 @@ namespace TommoJProductions.MoControls
 
         #region Properties
 
-        /// <summary>
-        /// Represents whether or not the modules had an error.
-        /// </summary>
-        internal bool moduleError { private get; set; }
-        /// <summary>
-        /// Represents whether or not the settings are loaded.
-        /// </summary>
-        internal bool settingsLoaded { get; private set; }
-        /// <summary>
-        /// Represents whether or not all the modules have started.
-        /// </summary>
-        internal bool modulesStarted
-        {
-            get
-            {
-                if (moControlsGui != null
-                    && controlManager != null
-                    && mouseEmulator != null
-                    && xboxControllerManager != null
-                    && xboxController != null)
-                    return true;
-                return false;
-            }
-        }
         /// <summary>
         /// Represents the GUI for the mod.
         /// </summary>
@@ -62,24 +39,6 @@ namespace TommoJProductions.MoControls
             get;
             private set;
         }
-        /// <summary>
-        /// Represents the xbox controller manager.
-        /// </summary>
-        internal static XboxControllerManager xboxControllerManager
-        {
-            get;
-            private set;
-        }
-        /// <summary>
-        /// Represents an xbox controller.
-        /// </summary>
-        internal static XboxController xboxController
-        {
-            get
-            {
-                return xboxControllerManager.controller;
-            }
-        }
 
         #endregion
 
@@ -92,31 +51,14 @@ namespace TommoJProductions.MoControls
         {
             // Written, 18.10.2020
 
-            xboxControllerManager = gameObject.AddComponent<XboxControllerManager>();
             controlManager = gameObject.AddComponent<ControlManager>();
+            controlManager.xboxControllerManager = gameObject.AddComponent<XboxControllerManager>();
+            controlManager.xboxControllerManager.controller = gameObject.AddComponent<XboxController>();
+            controlManager.xboxControllerManager.monitorControllerConnections = gameObject.AddComponent<MonitorControllerConnections>();
+
             mouseEmulator = gameObject.AddComponent<MouseEmulator>();
             moControlsGui = gameObject.AddComponent<MoControlsGUI>();
-            XboxControllerManager.ControllerConnected += xboxControllerManager_ControllerConnected;
-            XboxControllerManager.ControllerDisconnected += xboxControllerManager_ControllerDisconnected;
             MoControlsMod.print(nameof(MoControlsGO) + ": Started", Debugging.DebugTypeEnum.full);
-        }
-
-        #endregion
-
-        #region Event handlers
-
-        private void xboxControllerManager_ControllerDisconnected(object sender, ControllerConnectionEventArgs e)
-        {
-            // Written, 08.10.2018
-
-            MoControlsMod.print("<color=grey><i>Controller: " + e.xboxController.index + "</i></color> <color=red>Disconnected</color>", Debugging.DebugTypeEnum.none);
-        }
-
-        private void xboxControllerManager_ControllerConnected(object inSender, ControllerConnectionEventArgs inE)
-        {
-            // Written, 08.10.2018
-
-            MoControlsMod.print("<color=grey><i>Controller " + inE.xboxController.index + "</i></color> <color=green>Connected</color>", Debugging.DebugTypeEnum.none);
         }
 
         #endregion

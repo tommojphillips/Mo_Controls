@@ -1,4 +1,6 @@
-﻿namespace TommoJProductions.MoControls
+﻿using UnityEngine;
+
+namespace TommoJProductions.MoControls
 {
     internal static class Extentions
     {
@@ -283,6 +285,13 @@
                     break;
             }
             return gameControlName;
+        }
+
+        internal static Vector2 toVector2(this XInputDotNetPure.GamePadThumbSticks.StickValue stickValue)
+        {
+            // Written, 31.07.2022
+
+            return new Vector2(stickValue.X, stickValue.Y);
         }
     }
 }
