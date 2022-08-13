@@ -1,11 +1,12 @@
 ﻿using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
+
+using JetBrains.Annotations;
+
 using MSCLoader;
 using System;
-using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using TommoJProductions.Debugging;
 using TommoJProductions.MoControls.GUI;
@@ -19,7 +20,7 @@ namespace TommoJProductions.MoControls
     /// <summary>
     /// Represents the control manager for mo Controls.
     /// </summary>
-    public class ControlManager : MonoBehaviour
+    public class ControlManager : SingletonMonoBehaviour<ControlManager>
     {
         // Written, 22.08.2018
 
@@ -32,19 +33,37 @@ namespace TommoJProductions.MoControls
             public int rtIndex;
             public int rtIndex2;
         }
+        public struct VehicleData 
+        {
+            // Written, 07.08.2022
+
+            public AxisCarController controller;
+            public Drivetrain drivetrain;
+            public CarDynamics dynamics;
+            public GameObject vehicle;
+
+            public readonly static VehicleData defaultVehicleData = default(VehicleData);
+
+            public VehicleData(AxisCarController controller)
+            {
+                this.controller = controller;
+                drivetrain = controller.GetComponent<Drivetrain>();
+                dynamics = controller.GetComponent<CarDynamics>();
+                vehicle = controller.gameObject;
+            }
+        }
+
+        internal Camera playerCamera;
+        internal GameObject player;
+
+        #region Events 
 
         public event Action onPlayerModeChanged = delegate { };
 
+        #endregion
+
         #region Fields
 
-        /// <summary>
-        /// Represents the handmode gameobject 
-        /// </summary>
-        private const string handModeLocation = "PLAYER/Pivot/AnimPivot/Camera/FPSCamera/1Hand_Assemble";
-        /// <summary>
-        /// Represents the tool mode gameobject
-        /// </summary>
-        private const string toolModeLocation = "PLAYER/Pivot/AnimPivot/Camera/FPSCamera/2Spanner";
         /// <summary>
         /// Represents logic to enable scroll to a connected xbox controllers' triggers. enabled when player is in tool mode.
         /// </summary>
@@ -52,23 +71,11 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents the current car dynamics. used for forcefeedback.
         /// </summary>
-        internal CarDynamics carDynamics;
-        /// <summary>
-        /// Represents the drivetrain gamobject. used for ffb.
-        /// </summary>
-        internal Drivetrain drivetrain;
-        /// <summary>
-        /// Represents the satsuma gameobject. used for forcefeedback.
-        /// </summary>
-        internal GameObject vehicle;
+        internal VehicleData ffbVehicle;
         /// <summary>
         /// Reprsents the current player mode. (cache)
         /// </summary>
-        private PlayerModeEnum currentPlayerMode; 
-        /// <summary>
-        /// the previous player mode. (cache)
-        /// </summary>
-        private PlayerModeEnum previousPlayerMode;
+        private PlayerModeEnum currentPlayerMode = PlayerModeEnum.InMenu; 
 
         private readonly string[,] _blankControls = new string[,]
                 {
@@ -115,6 +122,8 @@ namespace TommoJProductions.MoControls
                        { "fifth", "None", "None", },
                        { "sixth", "None", "None", },
                 };
+        private string[,] _drivingControls;
+        private string[,] _footControls;
 
         #region raycast scrollables fields.
 
@@ -126,7 +135,6 @@ namespace TommoJProductions.MoControls
         private FsmBool handEmpty;
         private PlayMakerFSM pickUp;
 
-        private FsmBool _playerInMenu;
         /// <summary>
         /// Reprsents the current player mode fsm string. used to cached reference in <see cref="getCurrentPlayerMode"/>.
         /// </summary>
@@ -139,6 +147,9 @@ namespace TommoJProductions.MoControls
 
         private ScrollParameters footControlsScrollParameters = new ScrollParameters();
         private ScrollParameters drivingControlsScrollParameters = new ScrollParameters();
+
+        private XboxControllerScroll.XboxControlGroup scrollDown = new XboxControllerScroll.XboxControlGroup(XboxAxisEnum.LT);
+        private XboxControllerScroll.XboxControlGroup scrollUp = new XboxControllerScroll.XboxControlGroup(XboxAxisEnum.RT);
         
         private ControllerLook controllerLookX;
         private ControllerLook controllerLookY;
@@ -156,6 +167,13 @@ namespace TommoJProductions.MoControls
         internal bool usingController = false;
         private bool deviceChanged = false;
         private bool playerStopped = false;
+        private bool updateCursorSet = false;
+
+        internal Dictionary<string, VehicleData> vehicles = new Dictionary<string, VehicleData>();
+        internal string[] vehicleNames;
+
+        private GameObject raycastScrollableGameObject;
+        private RaycastHit raycastScrollableHit;
 
         #endregion
 
@@ -173,9 +191,9 @@ namespace TommoJProductions.MoControls
             set
             {
                 if (currentPlayerMode == PlayerModeEnum.Driving)
-                    drivingControls = value;
+                    _drivingControls = value;
                 else if (currentPlayerMode == PlayerModeEnum.OnFoot)
-                    footControls = value;
+                    _footControls = value;
             }
         }
         /// <summary>
@@ -185,7 +203,7 @@ namespace TommoJProductions.MoControls
         {
             get
             {
-                if (MoControlsGO.moControlsGui.controlsGuiOpened || playerInMenu)
+                if (MoControlsGUI.instance.controlsGuiOpened || playerInMenu.Value)
                     return PlayerModeEnum.InMenu;
                 switch (playerCurrentVehicle)
                 {
@@ -205,9 +223,9 @@ namespace TommoJProductions.MoControls
             private set;
         }
         /// <summary>
-        /// Represents the player current vehicle state. (PlayMakerGlobals)
+        /// player current vehicle string (cache => PlayMakerGlobals).
         /// </summary>
-        internal static string playerCurrentVehicle
+        internal static string playerCurrentVehicle 
         {
             get
             {
@@ -216,6 +234,7 @@ namespace TommoJProductions.MoControls
                 return _playerCurrentVehicle.Value;
             }
         }
+
         /// <summary>
         /// Represents the change input result for the mod.
         /// </summary>
@@ -227,19 +246,11 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents the current foot controls.
         /// </summary>
-        internal string[,] footControls
-        {
-            get;
-            private set;
-        }
+        internal string[,] footControls => _footControls;
         /// <summary>
         /// Represents the current driving controls.
         /// </summary>
-        internal string[,] drivingControls
-        {
-            get;
-            private set;
-        }
+        internal string[,] drivingControls => _drivingControls;
         /// <summary>
         /// Represents blank controls.
         /// </summary>
@@ -251,40 +262,11 @@ namespace TommoJProductions.MoControls
         internal bool isInHandMode => pickUp.Active;
 
         /// <summary>
-        /// Represents the xbox controller manager.
-        /// </summary>
-        internal XboxControllerManager xboxControllerManager
-        {
-            get;
-            set;
-        }
-        /// <summary>
         /// Represents an xbox controller.
         /// </summary>
-        internal XboxController xboxController
-        {
-            get
-            {
-                return xboxControllerManager.controller;
-            }
-        }
+        private XboxController controller;
 
-        internal bool playerInMenu 
-        {
-            get 
-            {
-                if (_playerInMenu == null)
-                    _playerInMenu = FsmVariables.GlobalVariables.GetFsmBool("PlayerInMenu");
-                return _playerInMenu.Value;
-            }
-            set
-            {
-                if (_playerInMenu == null)
-                    _playerInMenu = FsmVariables.GlobalVariables.GetFsmBool("PlayerInMenu");
-                _playerInMenu.Value = value;
-
-            }
-        }
+        internal FsmBool playerInMenu { get; private set; }
 
         #endregion
 
@@ -294,16 +276,18 @@ namespace TommoJProductions.MoControls
         {
             // Written, 05.08.2022
 
-            onPlayerModeChanged += onPlayerModeChanged_deviceCheck;
             onPlayerModeChanged += onPlayerModeChanged_loadControlsToCInput;
+            onPlayerModeChanged += onPlayerModeChanged_handleFfbOnXboxController;
+            //onPlayerModeChanged += changeDrivingControls;
         }
 
         private void OnDisable()
         {
             // Written, 05.08.2022
 
-            onPlayerModeChanged -= onPlayerModeChanged_deviceCheck;
             onPlayerModeChanged -= onPlayerModeChanged_loadControlsToCInput;
+            onPlayerModeChanged -= onPlayerModeChanged_handleFfbOnXboxController;
+            //onPlayerModeChanged -= changeDrivingControls;
         }
         private void OnApplicationQuit()
         {
@@ -315,21 +299,27 @@ namespace TommoJProductions.MoControls
         {
             // Written, 31.07.2022
 
+            playerInMenu = FsmVariables.GlobalVariables.GetFsmBool("PlayerInMenu");
             changeInputResult = new ChangeInput();
         }
         private void Start()
         {
             // Written, 08.10.2018 | Modifed, 07.2022
 
-            GameObject player = Camera.main.transform.root.gameObject;
+            GameObject pov = PlayMakerGlobals.Instance.Variables.FindFsmGameObject("POV").Value;
+            playerCamera = pov.GetComponent<Camera>();  
+
+            player = pov.transform.root.gameObject;
             pickUp = GameObject.Find("PLAYER/Pivot/AnimPivot/Camera/FPSCamera/1Hand_Assemble/Hand").GetPlayMaker("PickUp");
             handEmpty = pickUp.FsmVariables.FindFsmBool("HandEmpty");
-            setControls(MoControlsSaveData.loadedSaveData.footControls, MoControlsSaveData.loadedSaveData.drivingControls);
+            _drivingControls = MoControlsSaveData.loadedSaveData.drivingControls;
+            _footControls = MoControlsSaveData.loadedSaveData.footControls;
             HoldInputMono him = gameObject.AddComponent<HoldInputMono>();
             him.setData("Toggle Tool Mode", XboxButtonEnum.Start, 0.3f, toggleToolMode);
             toolModeScroll = gameObject.AddComponent<XboxControllerScroll>();
-            toolModeScroll.setControls(scrollUpA: XboxAxisEnum.RT, scrollDownA: XboxAxisEnum.LT);
+            toolModeScroll.setControls(scrollDown, scrollUp);
             raycastScrollableMask = LayerMask.GetMask("Parts", "Dashboard", "Bolts", "DontCollide");
+            controller = XboxControllerManager.instance.controller;
 
             controllerLookX = player.AddComponent<ControllerLook>();
             mouseLookX = player.GetComponent<MouseLook>();
@@ -338,7 +328,7 @@ namespace TommoJProductions.MoControls
             mouseLookX.enabled = false;
             controllerLookX.enabled = false;
 
-            controllerLookY = Camera.main.transform.parent.gameObject.AddComponent<ControllerLook>();
+            controllerLookY = pov.transform.parent.gameObject.AddComponent<ControllerLook>();
             mouseLookY = controllerLookY.GetComponent<MouseLook>();
             controllerLookY.axis = MouseLook.RotationAxes.MouseY;
             controllerLookY.mouseLook = mouseLookY;
@@ -362,18 +352,25 @@ namespace TommoJProductions.MoControls
 
             FsmHook.FsmInject(player, "Stop", playerStopping);
             FsmHook.FsmInject(player, "Move", playerMoving);
+
+            getAllVehicleReferences();
+            //setCarControllerReferences();
+
+            ffbVehicle = VehicleData.defaultVehicleData;
+
+            playerMoveAsInputEnableCheck();      
         }
+
         private void Update()
         {
             // Written, 31.08.2018 | Updated, 30.05.2022
 
             playerModeCheck();
-            handleFfbOnXboxController();
             mouseControllerSwitch();
             if (usingController)
             {
-                MoControlsGO.mouseEmulator.simulateLeftClick();
-                MoControlsGO.mouseEmulator.simulateRightClick();
+                MouseEmulator.instance.simulateLeftClick();
+                MouseEmulator.instance.simulateRightClick();
             }
         }
 
@@ -385,17 +382,16 @@ namespace TommoJProductions.MoControls
         {
             // Written, 04.06.2022
 
-            while (xboxController.isConnected)
+            while (controller.isConnected)
             {
+                yield return null;
                 if (currentPlayerMode == PlayerModeEnum.InMenu)
                 {
                     toolModeScroll.enabled = false;
-                    yield return null;
                     continue;
                 }
                 if (isInHandMode && handEmpty.Value)
                 {
-                    yield return null;
                     toolModeScroll.enabled = detectScrollable();
                 }
                 else
@@ -408,7 +404,7 @@ namespace TommoJProductions.MoControls
                         scrollPassed = true;
                         for (int i = 0; i < currentControls.GetLength(0); i++)
                         {
-                            if (footControls[i, 1] == xboxController.lT.inputName)
+                            if (footControls[i, 1] == controller.lT.inputName)
                             {
                                 footControlsScrollParameters.ltInput = footControls[i, 1];
                                 footControlsScrollParameters.ltIndex = i;
@@ -417,7 +413,7 @@ namespace TommoJProductions.MoControls
 
                                 scrollSet = true;
                             }
-                            else if (footControls[i, 2] == xboxController.lT.inputName)
+                            else if (footControls[i, 2] == controller.lT.inputName)
                             {
                                 footControlsScrollParameters.ltInput = footControls[i, 2];
                                 footControlsScrollParameters.ltIndex = i;
@@ -427,7 +423,7 @@ namespace TommoJProductions.MoControls
                                 scrollSet = true;
                             }
 
-                            if (drivingControls[i, 1] == xboxController.lT.inputName)
+                            if (drivingControls[i, 1] == controller.lT.inputName)
                             { 
                                 drivingControlsScrollParameters.ltInput = drivingControls[i, 1];
                                 drivingControlsScrollParameters.ltIndex = i;
@@ -436,7 +432,7 @@ namespace TommoJProductions.MoControls
 
                                 scrollSet = true;
                             }
-                            else if (drivingControls[i, 2] == xboxController.lT.inputName)
+                            else if (drivingControls[i, 2] == controller.lT.inputName)
                             {
                                 drivingControlsScrollParameters.ltInput = drivingControls[i, 2];
                                 drivingControlsScrollParameters.ltIndex = i;
@@ -446,7 +442,7 @@ namespace TommoJProductions.MoControls
                                 scrollSet = true;
                             }
 
-                            if (footControls[i, 1] == xboxController.rT.inputName)
+                            if (footControls[i, 1] == controller.rT.inputName)
                             {
                                 footControlsScrollParameters.rtInput = footControls[i, 1];
                                 footControlsScrollParameters.rtIndex = i;
@@ -455,7 +451,7 @@ namespace TommoJProductions.MoControls
 
                                 scrollSet = true;
                             }
-                            else if (footControls[i, 2] == xboxController.rT.inputName)
+                            else if (footControls[i, 2] == controller.rT.inputName)
                             {
                                 footControlsScrollParameters.rtInput = footControls[i, 2];
                                 footControlsScrollParameters.rtIndex = i;
@@ -465,7 +461,7 @@ namespace TommoJProductions.MoControls
                                 scrollSet = true;
                             }
 
-                            if (drivingControls[i, 1] == xboxController.rT.inputName)
+                            if (drivingControls[i, 1] == controller.rT.inputName)
                             {
                                 drivingControlsScrollParameters.rtInput = drivingControls[i, 1];
                                 drivingControlsScrollParameters.rtIndex = i;
@@ -474,7 +470,7 @@ namespace TommoJProductions.MoControls
 
                                 scrollSet = true;
                             }
-                            else if (drivingControls[i, 2] == xboxController.rT.inputName)
+                            else if (drivingControls[i, 2] == controller.rT.inputName)
                             {
                                 drivingControlsScrollParameters.rtInput = drivingControls[i, 2];
                                 drivingControlsScrollParameters.rtIndex = i;
@@ -498,7 +494,6 @@ namespace TommoJProductions.MoControls
                 else if (scrollPassed)
                 {
                     scrollPassedReset();
-                    continue;
                 }
             }
             scrollCoroutine = null;
@@ -508,6 +503,31 @@ namespace TommoJProductions.MoControls
 
         #region Methods
 
+        internal void playerMoveAsInputEnableCheck() 
+        {
+            // Written, 09.08.2022
+
+            for (int i = 15; i <= 19; i++) // player move and jump index range.
+            {
+                XboxControl xboxControl;
+                for (int j = 0; j < controller.xboxControls.Length; j++)
+                {
+                    xboxControl = controller.xboxControls[j];
+                                        
+                    if (xboxControl.inputName == footControls[i, 1])
+                        footControls[i, 1] = Keys.None;
+
+                    if (xboxControl.inputName == footControls[i, 2])
+                        footControls[i, 2] = Keys.None;
+
+                    if (xboxControl.inputName == drivingControls[i, 1])
+                        drivingControls[i, 1] = Keys.None;
+
+                    if (xboxControl.inputName == drivingControls[i, 2])
+                        drivingControls[i, 2] = Keys.None;
+                }
+            }
+        }
         /// <summary>
         /// switches controls from keyboard/mouse to controller.
         /// </summary>
@@ -520,22 +540,22 @@ namespace TommoJProductions.MoControls
 
             if (usingController)
             {
-                if (KeyboardEmulator.anyInput() || (!MoControlsGO.mouseEmulator.enabled && ((uInput.GetAxisRaw("Mouse X") != 0) || (uInput.GetAxisRaw("Mouse Y") != 0))))
+                if (KeyboardEmulator.anyInput() || (!MouseEmulator.instance.enabled && ((uInput.GetAxisRaw("Mouse X") != 0) || (uInput.GetAxisRaw("Mouse Y") != 0))))
                 {
                     usingController = false;
                     deviceChanged = true;
                 }
             }
-            else if (xboxController.anyInput)
+            else if (controller.anyInput)
             {
                 usingController = true;
                 deviceChanged = true;
             }
 
-            if (deviceChanged && !playerInMenu)
+            if (deviceChanged && !playerInMenu.Value)
             {
-                deviceChanged = false;
                 setDevice();
+                deviceChanged = false;
             }
         }
         /// <summary>
@@ -547,29 +567,33 @@ namespace TommoJProductions.MoControls
 
             if (usingController)
             {
+                if (deviceChanged)
+                {
+                    controllerLookY.rotationY = (float)rotationYFieldInfo.GetValue(mouseLookY);
+                }
+
                 mouseLookX.enabled = false;
                 mouseLookY.enabled = false;
-                controllerLookY.rotationY = (float)rotationYFieldInfo.GetValue(mouseLookY);
                 controllerLookX.enabled = true;
                 controllerLookY.enabled = true;
-                if (!playerStopped)
-                {
-                    fpsMove.enabled = false;
-                    controllerMove.enabled = true;
-                }
             }
             else
             {
-                rotationYFieldInfo.SetValue(controllerLookY.mouseLook, controllerLookY.rotationY);
+                if (deviceChanged)
+                {
+                    rotationYFieldInfo.SetValue(controllerLookY.mouseLook, controllerLookY.rotationY);
+                }
+
                 mouseLookX.enabled = true;
                 mouseLookY.enabled = true;
                 controllerLookX.enabled = false;
                 controllerLookY.enabled = false;
-                if (!playerStopped)
-                {
-                    fpsMove.enabled = true;
-                    controllerMove.enabled = false;
-                }
+            }
+
+            if (!playerStopped)
+            {
+                fpsMove.enabled = !usingController;
+                controllerMove.enabled = usingController;
             }
         }
         /// <summary>
@@ -580,8 +604,7 @@ namespace TommoJProductions.MoControls
             // Written, 05.08.2022
 
             if (currentPlayerMode != getCurrentPlayerMode)
-            {
-                previousPlayerMode = currentPlayerMode;                                
+            {                              
                 currentPlayerMode = getCurrentPlayerMode;
                 onPlayerModeChanged.Invoke();
                 MoControlsMod.print("Control Mode changed: " + currentPlayerMode, DebugTypeEnum.full);
@@ -620,20 +643,24 @@ namespace TommoJProductions.MoControls
         {
             // Written, 23.07.2022
 
-            raycastedFsms = raycastForScrollable()?.GetComponents<PlayMakerFSM>();
+            raycastScrollableGameObject = raycastForScrollableMask();
 
+            if (!raycastScrollableGameObject)
+                return false;
+
+            raycastedFsms = raycastScrollableGameObject.GetComponents<PlayMakerFSM>();
             if (raycastedFsms != null)
             {
-                for (int i = 0; i < raycastedFsms.Length; i++)
+                for (int fsm = 0; fsm < raycastedFsms.Length; fsm++)
                 {
-                    for (int j = 0; j < raycastedFsms[i].FsmStates.Length; j++)
+                    for (int state = 0; state < raycastedFsms[fsm].FsmStates.Length; state++)
                     {
-                        activeState = raycastedFsms[i].FsmStates[j];
-                        for (int n = 0; n < activeState.Actions.Length; n++)
+                        activeState = raycastedFsms[fsm].FsmStates[state];
+                        for (int action = 0; action < activeState.Actions.Length; action++)
                         {
-                            if (activeState != null && activeState.Actions[n] is GetAxis)
+                            if (activeState != null && activeState.Actions[action] is GetAxis)
                             {
-                                if ((activeState.Actions[n] as GetAxis).axisName.Value == "Mouse ScrollWheel")
+                                if ((activeState.Actions[action] as GetAxis).axisName.Value == "Mouse ScrollWheel")
                                     return true;
                             }
                         }
@@ -643,15 +670,15 @@ namespace TommoJProductions.MoControls
             return false;
         }
         /// <summary>
-        /// Raycast for gameobjects on the included layers.
+        /// Raycast for gameobjects on the <see cref="raycastScrollableMask"/>
         /// </summary>
-        private GameObject raycastForScrollable()
+        private GameObject raycastForScrollableMask()
         {
             // Written, 31.05.2022
 
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(uInput.mousePosition), out RaycastHit hit, 1, raycastScrollableMask))
+            if (Physics.Raycast(playerCamera.ScreenPointToRay(uInput.mousePosition), out raycastScrollableHit, 1, raycastScrollableMask))
             {
-                return hit.collider.gameObject;
+                return raycastScrollableHit.collider.gameObject;
             }
             return null;
         }
@@ -671,71 +698,58 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// loads <see cref="currentControls"/> set to cinput.
         /// </summary>
-        private void loadCurrentControlsToCInput()
-        {
-            // Written, 31.08.2018
-
-            loadControlsToCInput(currentControls);
-        }
-        /// <summary>
-        /// Assigns the control groups.
-        /// </summary>
-        /// <param name="inFootControls">The group of foot controls to assign.</param>
-        /// <param name="inDrivingControls">The group of driving controls to assign.</param>
-        internal void setControls(string[,] inFootControls, string[,] inDrivingControls)
-        {
-            // Written, 22.08.2018
-
-            footControls = inFootControls;
-            drivingControls = inDrivingControls;
-        }
+        private void loadCurrentControlsToCInput() => loadControlsToCInput(currentControls);
         /// <summary>
         /// Sets the provided game control in provided mode.
         /// </summary>
         /// <param name="inMode"></param>
-        private void setGameControl(PlayerModeEnum inMode, string inControlName, int inIndex, string inInput)
+        private void setGameControl(string inputName)
         {
             // Written, 02.09.2018
 
-            switch (inMode)
+            switch (changeInputResult.mode)
             {
                 case PlayerModeEnum.Driving:
-                    for (int i = 0; i < drivingControls.GetLength(0); i++)
-                    {
-                        string _controlName = drivingControls[i, 0];
-                        if (inControlName == _controlName)
-                        {
-                            drivingControls[i, inIndex] = inInput;
-                            break;
-                        }
-                    }
-                    if (currentPlayerMode == inMode)
-                        loadCurrentControlsToCInput();
+                    changeControl(inputName, ref _drivingControls);
                     break;
                 case PlayerModeEnum.OnFoot:
-                    for (int i = 0; i < footControls.GetLength(0); i++)
-                    {
-                        string _controlName = footControls[i, 0];
-                        if (inControlName == _controlName)
-                        {
-                            footControls[i, inIndex] = inInput;
-                            break;
-                        }
-                    }
-                    if (currentPlayerMode == inMode)
-                        loadCurrentControlsToCInput();
+                    changeControl(inputName, ref _footControls);
                     break;
             }
         }
+        private void changeKeyBind() 
+        {
+            // Written, 08.08.2022
+
+
+        }
         /// <summary>
-        /// Changes the input for a control defined in <see cref="changeInputResult"/> to the provided input string, <paramref name="inInput"/>.
+        /// Changes a input on the provided control list <see cref="controls"/>. all values in <see cref="changeInputResult"/>.
         /// </summary>
-        /// <param name="inInput">The input to assign.</param>
-        internal void changeInput(string inInput)
+        /// <param name="inputName">the input name to change to</param>
+        /// <param name="controls">the control list to change a input name in</param>
+        private void changeControl(string inputName, ref string[,] controls)
+        {
+            // Written, 07.08.2022
+
+            for (int i = 0; i < controls.GetLength(0); i++)
+            {
+                if (changeInputResult.controlName == controls[i, 0])
+                {
+                    controls[i, changeInputResult.index] = inputName;
+                    break;
+                }
+            }
+        }
+        /// <summary>
+        /// Changes the input for a control defined in <see cref="changeInputResult"/> to the provided input string, <paramref name="inputName"/>.
+        /// </summary>
+        /// <param name="inputName">The input name to assign. eg => Joy Axis 3+</param>
+        internal void changeInput(string inputName)
         {
             // Written, 09.07.2018 | Updated, 30.05.2022
            
-            setGameControl((PlayerModeEnum)changeInputResult.mode, changeInputResult.controlName, changeInputResult.index, inInput);
+            setGameControl(inputName);
             MoControlsSaveData.loadedSaveData.saveSettings();
             changeInputResult.reset();
         }
@@ -756,29 +770,7 @@ namespace TommoJProductions.MoControls
             if (toggleToolModeRoutine != null)
                 StopCoroutine(toggleToolModeRoutine);
             toggleToolModeRoutine = StartCoroutine(KeyboardEmulator.simulateKeyPressCoroutine(wVk));
-        }
-        /// <summary>
-        /// Handles ffb on the xbox controller.
-        /// </summary>
-        private void handleFfbOnXboxController()
-        {
-            // Written, 16.10.2020
-
-            if (MoControlsSaveData.loadedSaveData.ffbOnXboxController)
-            {
-                if (setFfbForVehicle())
-                {
-                    if (vehicle)
-                    {
-                        xboxController.setRumble(getFfbSetOpt());
-                    }
-                }
-                else if (xboxController.prevRumblePow != XboxController.vector2Zero)
-                {
-                    xboxController.setRumble(XboxController.vector2Zero);
-                }
-            }
-        }
+        }        
         /// <summary>
         /// Gets set options for ffb and returns the result as a vector2.
         /// </summary>
@@ -811,8 +803,8 @@ namespace TommoJProductions.MoControls
         {
             // Written, 23.10.2020
 
-            if (drivetrain.changingGear)
-                return drivetrain.rpm / drivetrain.maxRPM;
+            if (ffbVehicle.drivetrain.changingGear)
+                return ffbVehicle.drivetrain.rpm / ffbVehicle.drivetrain.maxRPM;
             return 0;
         }
         /// <summary>
@@ -822,8 +814,8 @@ namespace TommoJProductions.MoControls
         {
             // Written, 18.10.2020 || updated, 28.09.2021
             
-            if (drivetrain.revLimiterTriggered)
-                return drivetrain.rpm / drivetrain.maxRPM;
+            if (ffbVehicle.drivetrain.revLimiterTriggered)
+                return ffbVehicle.drivetrain.rpm / ffbVehicle.drivetrain.maxRPM;
             return 0;
         }
         /// <summary>
@@ -833,7 +825,7 @@ namespace TommoJProductions.MoControls
         {
             // Written, 18.10.2020
 
-            return new Vector2(drivetrain.poweredWheels[0].longitudinalSlip, drivetrain.poweredWheels[1].longitudinalSlip);
+            return new Vector2(ffbVehicle.drivetrain.poweredWheels[0].longitudinalSlip, ffbVehicle.drivetrain.poweredWheels[1].longitudinalSlip);
         }
         /// <summary>
         /// Represents the default ffb (designed for a wheel) doesnt work properly
@@ -842,7 +834,7 @@ namespace TommoJProductions.MoControls
         {
             // Written, 18.10.2020
 
-            return carDynamics.forceFeedback / 100;
+            return ffbVehicle.dynamics.forceFeedback / 100;
         }
         /// <summary>
         /// Converts ffb float value to a vector 2 for xbox rumble events.
@@ -868,41 +860,91 @@ namespace TommoJProductions.MoControls
 
             if (playerCurrentVehicle != ffbCurrentSupportedVehicleName)
             {
-                ffbCurrentSupportedVehicleName = playerCurrentVehicle;
+                string key;
                 switch (playerCurrentVehicle)
                 {
                     case "Satsuma":
-                        vehicle = GameObject.Find("SATSUMA(557kg, 248)");
+                        key = "SATSUMA(557kg, 248)";
                         break;
                     case "Jonnez":
-                        vehicle = GameObject.Find("JONNEZ ES(Clone)");
+                        key = "JONNEZ ES(Clone)";
                         break;
                     case "Kekmet":
-                        vehicle = GameObject.Find("KEKMET(350-400psi)");
+                        key = "KEKMET(350-400psi)";
                         break;
                     case "Hayosiko":
-                        vehicle = GameObject.Find("HAYOSIKO(1500kg, 250)");
+                        key = "HAYOSIKO(1500kg, 250)";
                         break;
                     case "Gifu":
-                        vehicle = GameObject.Find("GIFU(750/450psi)");
+                        key = "GIFU(750/450psi)";
+                        break;
+                    case "Ruscko":
+                        key = "RCO_RUSCKO12(270)";
+                        break;
+                    case "Ferndale":
+                        key = "FERNDALE(1630kg)";
+                        break;
+                    case "Combine":
+                        key = "COMBINE(350-400psi)";
                         break;
                     default:
-                        vehicle = null;
+                    case "":
+                        key = "";
                         break;
                 }
-                if (vehicle != null)
+                if (vehicles.ContainsKey(key))
                 {
-                    carDynamics = vehicle.GetComponent<CarDynamics>();
-                    drivetrain = vehicle.GetComponent<Drivetrain>();
+                    ffbVehicle = vehicles[key];
+                    ffbCurrentSupportedVehicleName = key;
+                }
+                else
+                {
+                    ffbVehicle = VehicleData.defaultVehicleData;
                 }
             }
-            return vehicle != null;
+            return ffbVehicle.vehicle != null;
+        }
+
+        internal void getAllVehicleReferences()
+        {
+            // Written, 07.08.2022
+
+            AxisCarController[] carControllers = Resources.FindObjectsOfTypeAll<AxisCarController>();
+            vehicleNames = new string[carControllers.Length];
+            vehicles.Clear();
+            for (int i = 0; i < carControllers.Length; i++)
+            {
+                vehicleNames[i] = carControllers[i].name;
+                vehicles.Add(vehicleNames[i], new VehicleData(carControllers[i]));
+            }
         }
 
         #endregion
 
         #region Event Handlers
+        
+        /// <summary>
+        /// Handles ffb on the xbox controller.
+        /// </summary>
+        private void onPlayerModeChanged_handleFfbOnXboxController()
+        {
+            // Written, 16.10.2020
 
+            if (MoControlsSaveData.loadedSaveData.ffbOnXboxController)
+            {
+                if (setFfbForVehicle())
+                {
+                    if (ffbVehicle.vehicle)
+                    {
+                        controller.setRumble(getFfbSetOpt());
+                    }
+                }
+                else if (controller.prevRumblePow != XboxController.vector2Zero)
+                {
+                    controller.setRumble(XboxController.vector2Zero);
+                }
+            }
+        }
         private void onPlayerModeChanged_loadControlsToCInput()
         {
             // Written, 05.08.2022
@@ -910,15 +952,6 @@ namespace TommoJProductions.MoControls
             loadCurrentControlsToCInput();
         }
 
-        private void onPlayerModeChanged_deviceCheck()
-        {
-            // Written, 05.08.2022
-            
-            if (previousPlayerMode == PlayerModeEnum.InMenu)
-            {
-                setDevice();
-            }
-        }
         private void playerStopping()
         {
             // Written, 04.08.2022
@@ -939,35 +972,27 @@ namespace TommoJProductions.MoControls
         }
         private void updateCursor()
         {
-            // Written, 23.07.2022
+            // Written, 06.08.2022
 
-            if (usingController)
+            if (!updateCursorSet)
             {
-                controllerLookX.enabled = true;
-                controllerLookY.enabled = true;
-                if (!playerStopped)
-                {
-                    controllerMove.enabled = true;
-                }
+                updateCursorSet = true;
+                setDevice();
+                MouseEmulator.instance.enabled = false;
             }
-            else
-            {
-                mouseLookX.enabled = true;
-                mouseLookY.enabled = true;
-            }
-            MoControlsGO.mouseEmulator.enabled = false;
         }
         private void inMenu()
         {
             // Written, 23.07.2022
 
+            updateCursorSet = false;
             mouseLookX.enabled = false;
             mouseLookY.enabled = false;
             controllerLookX.enabled = false;
             controllerLookY.enabled = false;
             controllerMove.enabled = false;
-
-            MoControlsGO.mouseEmulator.enabled = true;
+            fpsMove.enabled = false;
+            MouseEmulator.instance.enabled = true;
         }
 
         #endregion

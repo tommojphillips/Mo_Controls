@@ -1,5 +1,9 @@
 ﻿using System;
+
+using MSCLoader;
+
 using TommoJProductions.MoControls.XInputInterpreter.Monitoring;
+
 using UnityEngine;
 
 namespace TommoJProductions.MoControls.XInputInterpreter
@@ -7,7 +11,7 @@ namespace TommoJProductions.MoControls.XInputInterpreter
     /// <summary>
     /// Represents an xbox controller manager, that manages xbox controllers that are added to it.
     /// </summary>
-    public class XboxControllerManager : MonoBehaviour
+    public class XboxControllerManager : SingletonMonoBehaviour<XboxControllerManager>
     {
         // Written, 16.07.2018
 
@@ -17,14 +21,6 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         /// Represents the amount of supported controllers for the application.
         /// </summary>
         public const int numOfControllersSupported = 1;
-        /// <summary>
-        /// Represents an event that occurs when an xbox controller is connected.
-        /// </summary>
-        public static event EventHandler<ControllerConnectionEventArgs> ControllerConnected;
-        /// <summary>
-        /// Represents an event that occurs when an xbox controller is disconnected.
-        /// </summary>
-        public static event EventHandler<ControllerConnectionEventArgs> ControllerDisconnected;
 
         #endregion
 
@@ -36,59 +32,50 @@ namespace TommoJProductions.MoControls.XInputInterpreter
         internal XboxController controller
         {
             get;
-            set;
-        }
-        /// <summary>
-        /// Represents the monitoring controller connections system.
-        /// </summary>
-        internal MonitorControllerConnections monitorControllerConnections
-        {
-            get;
-            set;
+            private set;
         }
 
         #endregion
 
-        #region Methods
+        #region Constructor
 
-        private void Awake()
+        public XboxControllerManager()
         {
-            MoControlsMod.print(nameof(XboxControllerManager) + ": Initialized", Debugging.DebugTypeEnum.full);
+            XboxController.connected += controllerConnected;
+            XboxController.disconnected += controllerDisconnected;
+            controller = new XboxController();
+        }
+
+
+        #endregion
+
+        #region Unity runtime
+
+        private void Update()
+        {
+            // Written, 23.10.2020
+
+            controller.update();
+        }
+        private void LateUpdate()
+        {
+            controller.refresh();
         }
 
         #endregion
 
-        #region Events
-
-        /// <summary>
-        /// Raises the <see cref="ControllerConnected"/> event.
-        /// </summary>
-        /// <param name="e">The event data.</param>
-        internal void onControllerConnected(ControllerConnectionEventArgs e)
+        private void controllerDisconnected(XboxController controller) 
         {
-            // Written, 16.07.2018
-
-            if (ControllerConnected != null)
-                ControllerConnected.Invoke(null, e);
-            if (MoControlsGO.controlManager.scrollCoroutine == null)
-                MoControlsGO.controlManager.scrollCoroutine = StartCoroutine(MoControlsGO.controlManager.scrollFunction());
-            MoControlsMod.print("<color=grey><i>Controller " + e.xboxController.index + "</i></color> <color=green>Connected</color>", Debugging.DebugTypeEnum.none);
-        }
-        /// <summary>
-        /// Raises the <see cref="ControllerDisconnected"/> event.
-        /// </summary>
-        /// <param name="e">The event data.</param>
-        internal void onControllerDisconnected(ControllerConnectionEventArgs e)
-        {
-            // Written, 16.07.2018
-
-            if (ControllerDisconnected != null)
-                ControllerDisconnected.Invoke(null, e);
-            if (MoControlsGO.controlManager.scrollCoroutine != null)
-                StopCoroutine(MoControlsGO.controlManager.scrollFunction());
-            MoControlsMod.print("<color=grey><i>Controller: " + e.xboxController.index + "</i></color> <color=red>Disconnected</color>", Debugging.DebugTypeEnum.none);
+            if (ControlManager.instance.scrollCoroutine != null)
+                StopCoroutine(ControlManager.instance.scrollFunction());
+            MoControlsMod.print("<color=grey><i>Controller: " + controller.index + "</i></color> <color=red>Disconnected</color>", Debugging.DebugTypeEnum.none);
         }
 
-        #endregion
+        private void controllerConnected(XboxController controller) 
+        {
+            if (ControlManager.instance.scrollCoroutine == null)
+                ControlManager.instance.scrollCoroutine = StartCoroutine(ControlManager.instance.scrollFunction());
+            MoControlsMod.print("<color=grey><i>Controller " + controller.index + "</i></color> <color=green>Connected</color>", Debugging.DebugTypeEnum.none);
+        }
     }
 }

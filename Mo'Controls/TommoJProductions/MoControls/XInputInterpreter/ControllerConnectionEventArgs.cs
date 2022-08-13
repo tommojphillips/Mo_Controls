@@ -18,13 +18,9 @@ namespace TommoJProductions.MoControls.XInputInterpreter
             private set;
         }
 
-        /// <summary>
-        /// Initalizes a new instance of, <see cref="ControllerConnectionEventArgs"/> and assigns <see cref="xboxController"/> to the parameter, <paramref name="inXboxController"/>.
-        /// </summary>
-        /// <param name="inXboxController">The xbox controller that was connected.</param>
-        public ControllerConnectionEventArgs(XboxController inXboxController)
+        public void setData(XboxController inXboxController)
         {
-            // Written, 16.07.2018
+            // Written, 05.08.2022
 
             xboxController = inXboxController;
         }

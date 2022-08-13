@@ -23,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
     <LangVersion>7.1</LangVersion>
     <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -33,12 +34,14 @@
     <WarningLevel>4</WarningLevel>
     <LangVersion>7.1</LangVersion>
     <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <PlatformTarget>x64</PlatformTarget>
     <OutputPath>bin\x64\Debug\</OutputPath>
     <DefineConstants>DEBUG;x64;</DefineConstants>
     <Optimize>false</Optimize>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <PlatformTarget>x64</PlatformTarget>
@@ -48,6 +51,7 @@
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <DocumentationFile>
     </DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
@@ -139,7 +143,9 @@
     <Compile Include="TommoJProductions\MoControls\InputEmulation\NativeMethods.cs" />
     <Compile Include="TommoJProductions\MoControls\PlayerModeEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\cInputMove.cs" />
+    <Compile Include="TommoJProductions\MoControls\SingletonMonoBehaviour.cs" />
     <Compile Include="TommoJProductions\MoControls\UsingDeviceEnum.cs" />
+    <Compile Include="TommoJProductions\MoControls\XboxCarController.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\DeadzoneTypeEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\InputEmulation\InputTypeEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\InputEmulation\MouseEmulator.cs" />

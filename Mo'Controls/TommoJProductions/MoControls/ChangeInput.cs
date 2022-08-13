@@ -1,4 +1,6 @@
-﻿using MSCLoader;
+﻿using System;
+
+using MSCLoader;
 
 namespace TommoJProductions.MoControls
 {
@@ -8,6 +10,13 @@ namespace TommoJProductions.MoControls
     public class ChangeInput
     {
         // Written, 11.07.2018
+
+        public enum ChangeInputType 
+        {
+            GameControl,
+            KeyBind,
+            XboxButton
+        }
 
         #region Properties
 
@@ -49,6 +58,9 @@ namespace TommoJProductions.MoControls
             get;
             set;
         }
+        public ChangeInputType type { get; set; }
+
+        public Action action { get; set; }
 
         #endregion
 
@@ -62,21 +74,6 @@ namespace TommoJProductions.MoControls
             // Written, 16.07.2018
 
             reset();
-        }
-        /// <summary>
-        /// Initializes a new instance of <see cref="ChangeInput"/> and assigns the classes properties to the parameters.
-        /// </summary>
-        /// <param name="inReassignKey">Indicates if the program should begin ressign key function.</param>
-        /// <param name="inInputName">The name of the input to change. If <paramref name="inReassignKey"/> is equal to false, this should be null.</param>
-        /// <param name="inIndex">The input to change, either 1 or 2; 1 for primary input, 2 for secondary input. if <paramref name="inReassignKey"/> is equal to <see langword="false"/>, this should be equal to 0</param>
-        public ChangeInput(bool inReassignKey, string inInputName, int inIndex, PlayerModeEnum? inMode = null)
-        {
-            // Written, 11.07.2018
-
-            reassignKey = inReassignKey;
-            controlName = inInputName;
-            index = inIndex;
-            mode = inMode;
         }
 
         #endregion
@@ -94,23 +91,27 @@ namespace TommoJProductions.MoControls
             controlName = null;
             index = 0;
             mode = null;
+            type = 0;
+            action = null;
         }
 
         /// <summary>
-        /// Changes the <see cref="changeInputResult"/> to it's "polling" state, with the values provided, <paramref name="inControlName"/>, + <paramref name="inIndex"/>. Which inturn lets <see cref="Update"/> branch to <see cref="monitorForInput"/>.
+        /// Changes the <see cref="changeInputResult"/> to it's "polling" state, with the values provided, <paramref name="controlName"/>, + <paramref name="index"/>. Which inturn lets <see cref="Update"/> branch to <see cref="monitorForInput"/>.
         /// </summary>
-        /// <param name="inControlName">The game control to change.</param>
-        /// <param name="inIndex">The index to change, Primary = 1, Secondary = 2.</param>
-        public void changeToPollingState(string inControlName, int inIndex, PlayerModeEnum? inMode = null)
+        /// <param name="controlName">The game control to change.</param>
+        /// <param name="index">The index to change, Primary = 1, Secondary = 2.</param>
+        public void changeToPollingState(string controlName, int index, PlayerModeEnum? mode, ChangeInputType type, Action action)
         {
             // Written, 20.07.2018
 
             if (!reassignKey)
             {
                 reassignKey = true;
-                controlName = inControlName;
-                index = inIndex;
-                mode = inMode;
+                this.controlName = controlName;
+                this.index = index;
+                this.mode = mode;
+                this.type = type;
+                this.action = action;
             }
         }
 

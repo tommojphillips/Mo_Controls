@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace TommoJProductions.MoControls
+﻿namespace TommoJProductions.MoControls
 {
     public enum UsingDeviceEnum
     {

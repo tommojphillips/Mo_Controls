@@ -7,7 +7,7 @@ using NM = TommoJProductions.MoControls.InputEmulation.NativeMethods;
 
 namespace TommoJProductions.MoControls.InputEmulation
 {
-    public class MouseEmulator : MonoBehaviour
+    public class MouseEmulator : SingletonMonoBehaviour<MouseEmulator>
     {
         // Written, 01.08.2018
 
@@ -16,12 +16,12 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// <summary>
         /// Returns the current position of the cursor.
         /// </summary>
-        public static Point getCursorPosition
+        public Point getCursorPosition
         {
             get
             {
-                if (NM.GetCursorPos(out Point point))
-                    return point;
+                if (NM.GetCursorPos(out cursorPos))
+                    return cursorPos;
                 return Point.Empty;
             }
         }
@@ -64,8 +64,13 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// </summary>
         public const int MOUSE_SCROLL_VALUE = 120;
 
-        Vector2 stickValue;
-        Point mouseMove;
+        private XboxController controller;
+
+        private Vector2 stickValue;
+        private Point mouseMove;
+        private Point cursorPos;
+
+        private static InputUnion mouseData;
 
         #endregion
 
@@ -76,6 +81,12 @@ namespace TommoJProductions.MoControls.InputEmulation
             // Written, 08.10.2018
 
             mouseMove = new Point();
+            mouseData = new InputUnion();
+            mouseData.mi = new MouseInput();
+            mouseData.ki = new KeyboardInput();
+            mouseData.hi = new HardwareInput();
+
+            controller = XboxControllerManager.instance.controller;
         }
         private void Update()
         {
@@ -94,11 +105,17 @@ namespace TommoJProductions.MoControls.InputEmulation
 
             if (MoControlsSaveData.loadedSaveData.emulateMouse)
             {
-                if (MoControlsGO.controlManager.xboxController.isConnected)
+                if (controller.isConnected)
                 {
-                    stickValue = MoControlsGO.controlManager.xboxController.getInputFromTypeRaw(MoControlsSaveData.loadedSaveData.mouseInputType);
+                    stickValue = controller.getInputFromTypeRaw(MoControlsSaveData.loadedSaveData.mouseInputType);
+                    if (!MoControlsSaveData.loadedSaveData.mouseInputUseRawInput)
+                        stickValue = controller.getInputFromTypeRaw(MoControlsSaveData.loadedSaveData.mouseInputType)
+                            .doDeadzoneCheck(MoControlsSaveData.loadedSaveData.mouseDeadzoneType, MoControlsSaveData.loadedSaveData.mouseDeadzone)
+                            .doSensitivityOperation(MoControlsSaveData.loadedSaveData.mouseSensitivity);
+
                     if (stickValue.sqrMagnitude > 0)
                     {
+                        stickValue *= MoControlsSaveData.loadedSaveData.mouseSensitivity;
                         mouseMove.X = (int)stickValue.x;
                         mouseMove.Y = (int)stickValue.y * -1;
                         simulateMouseMove(mouseMove);
@@ -109,27 +126,21 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// <summary>
         /// Creates required stuff to simulate mouse movement.
         /// </summary>
-        /// <param name="x">The MoControlsGO.controlManager.xboxController.</param>
+        /// <param name="x">The x.</param>
         /// <param name="y">The y.</param>
         /// <param name="data">Data to pass.</param>
         /// <param name="time">The time of event.</param>
         /// <param name="flag">flags to pass.</param>
-        private static InputUnion createMouseInput(int x, int y, uint data, uint time, MouseEventF flag)
+        private static InputUnion reuseMouseInputData(int x, int y, uint data, uint time, MouseEventF flag)
         {
             // Written, 06.10.2020
 
-            InputUnion result = new InputUnion
-            {
-                mi = new MouseInput()
-                {
-                    dx = x,
-                    dy = y,
-                    mouseData = data,
-                    time = time,
-                    dwFlags = flag
-                }
-            };
-            return result;
+            mouseData.mi.dx = x;
+            mouseData.mi.dy = y;
+            mouseData.mi.time = time;
+            mouseData.mi.mouseData = data;
+            mouseData.mi.dwFlags = flag;            
+            return mouseData;
         }
         /// <summary>
         /// Simulates mouse movement.
@@ -178,7 +189,7 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// Simulates scrolling of the mouse wheel. (One mouse click = 120). Positive = Scroll up | Negitive = Scroll doen.
         /// </summary>
         /// <param name="inScrollAmount">The amount to scroll. default 120.</param>
-        internal static void simulateScroll(int inScrollAmount)
+        internal void simulateScroll(int inScrollAmount)
         {
             // Written, 08.10.2020
 
@@ -196,7 +207,7 @@ namespace TommoJProductions.MoControls.InputEmulation
 
             Input[] inputs = new Input[1];
             inputs[0].type = 0;
-            inputs[0].U = createMouseInput(point.X, point.Y, wData, 0, eventF);
+            inputs[0].U = reuseMouseInputData(point.X, point.Y, wData, 0, eventF);
             NM.SendInput((uint)inputs.Length, inputs, Input.Size);
         }
 

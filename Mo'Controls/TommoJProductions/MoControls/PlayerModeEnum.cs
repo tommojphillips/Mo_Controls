@@ -1,14 +1,10 @@
 ﻿namespace TommoJProductions.MoControls
 {
     /// <summary>
-    /// Represents all player modes in msc.
+    /// Represents play modes in msc. On foot, Driving, In menu.
     /// </summary>
     public enum PlayerModeEnum
     {
-        /// <summary>
-        /// Reps null.
-        /// </summary>
-        Null,
         /// <summary>
         /// Represents the player is on foot.
         /// </summary>

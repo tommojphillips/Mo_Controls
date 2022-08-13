@@ -7,12 +7,22 @@ namespace TommoJProductions.MoControls
 {
     public class AssetHolder
     {
-        public bool result
+        public Texture2D[] textures
         {
             get;
-            private set;
+            set;
         }
-        public Texture2D[] textures
+        public Texture2D blankKey
+        {
+            get;
+            set;
+        }
+        public Texture2D controllerIcon
+        {
+            get;
+            set;
+        }
+        public Texture2D mouseIcon
         {
             get;
             set;
@@ -142,83 +152,86 @@ namespace TommoJProductions.MoControls
             get;
             set;
         }
+        public Texture2D rsPress
+        {
+            get;
+            set;
+        }
+        public Texture2D lsPress
+        {
+            get;
+            set;
+        }
 
         public AssetHolder(UnityEngine.Object[] inAssets)
         {
             // Written, 15.10.2018
 
-            if (inAssets.Count() == 25)
+            Texture2D[] textures = new Texture2D[inAssets.Length];
+            for (int i = 0; i < inAssets.Length; i++)
             {
-                Texture2D[] textures = new Texture2D[inAssets.Length];
-                for (int i = 0; i < inAssets.Length; i++)
+                if (inAssets[i] is Texture2D)
                 {
-                    if (inAssets[i] is Texture2D)
-                    {
-                        textures[i] = inAssets[i] as Texture2D;
-                        if (textures[i] is null)
-                            MoControlsMod.print("<color=red>Unsuccessfully</color> loaded texture, texure is null" + textures[i].name, DebugTypeEnum.full);
-                        else
-                            MoControlsMod.print("<color=green>successfully</color> loaded texture, " + textures[i].name, DebugTypeEnum.full);
-                    }
+                    textures[i] = inAssets[i] as Texture2D;
+                    if (textures[i] is null)
+                        MoControlsMod.print("<color=red>Unsuccessfully</color> loaded texture, texure is null" + textures[i].name, DebugTypeEnum.full);
                     else
-                    {
-                        MoControlsMod.print("<color=red>Error loading texture</color>, <color=grey><b><i>" + (inAssets[i]?.name ?? "[Asset name null]") + ".</i></b></color>", DebugTypeEnum.full);
-                    }
+                        MoControlsMod.print("<color=green>successfully</color> loaded texture, " + textures[i].name, DebugTypeEnum.full);
                 }
-                this.textures = textures;
-
-                try
+                else
                 {
-                    // setting textures.
-                    a = this.textures.First(_texture => _texture.name == "xc_a");
-                    b = this.textures.First(_texture => _texture.name == "xc_b");
-                    x = this.textures.First(_texture => _texture.name == "xc_x");
-                    y = this.textures.First(_texture => _texture.name == "xc_y");
-                    back = this.textures.First(_texture => _texture.name == "xc_back");
-                    start = this.textures.First(_texture => _texture.name == "xc_start");
-                    lb = this.textures.First(_texture => _texture.name == "xc_lb");
-                    rb = this.textures.First(_texture => _texture.name == "xc_rb");
-                    lt = this.textures.First(_texture => _texture.name == "xc_lt");
-                    rt = this.textures.First(_texture => _texture.name == "xc_rt");
-                    dp = this.textures.First(_texture => _texture.name == "xc_dp");
-                    dpup = this.textures.First(_texture => _texture.name == "xc_dpu");
-                    dpdown = this.textures.First(_texture => _texture.name == "xc_dpd");
-                    dpleft = this.textures.First(_texture => _texture.name == "xc_dpl");
-                    dpright = this.textures.First(_texture => _texture.name == "xc_dpr");
-                    ls = this.textures.First(_texture => _texture.name == "xc_ls");
-                    lsup = this.textures.First(_texture => _texture.name == "xc_lsu");
-                    lsdown = this.textures.First(_texture => _texture.name == "xc_lsd");
-                    lsleft = this.textures.First(_texture => _texture.name == "xc_lsl");
-                    lsright = this.textures.First(_texture => _texture.name == "xc_lsr");
-                    rs = this.textures.First(_texture => _texture.name == "xc_rs");
-                    rsup = this.textures.First(_texture => _texture.name == "xc_rsu");
-                    rsdown = this.textures.First(_texture => _texture.name == "xc_rsd");
-                    rsleft = this.textures.First(_texture => _texture.name == "xc_rsl");
-                    rsright = this.textures.First(_texture => _texture.name == "xc_rsr");
-
-                    if (a is null || b is null || x is null || y is null || lb is null ||
-                        rb is null || back is null || start is null || ls is null ||
-                        rs is null || lt is null || rt is null || dp is null ||
-                        dpdown is null || dpup is null || dpleft is null || dpright is null ||
-                        lsup is null || lsdown is null || lsleft is null || lsright is null ||
-                        rsdown is null || rsup is null || rsleft is null || rsright is null)
-                    {
-                        throw new NullReferenceException("One or more assets are null..");
-                    }
-                }
-                catch (NullReferenceException ex)
-                {
-                    result = false;
-                    MoControlsMod.print("<color=red>Error occured when setting asset textures...</color>.\r\n<b>Message:</b>" + ex.Message + "\r\nStacktrace:\r\n" + ex.StackTrace, DebugTypeEnum.full);
-                    throw;
+                    MoControlsMod.print("<color=red>Error loading texture</color>, <color=grey><b><i>" + (inAssets[i]?.name ?? "[Asset name null]") + ".</i></b></color>", DebugTypeEnum.full);
                 }
             }
-            else
+            this.textures = textures;
+
+            try
             {
-                result = false;
-                MoControlsMod.print("<color=red>Error not all assets could be found..</color>.", DebugTypeEnum.full);
+                // setting textures.
+                a = this.textures.First(_texture => _texture.name == "xc_a");
+                b = this.textures.First(_texture => _texture.name == "xc_b");
+                x = this.textures.First(_texture => _texture.name == "xc_x");
+                y = this.textures.First(_texture => _texture.name == "xc_y");
+                back = this.textures.First(_texture => _texture.name == "xc_back");
+                start = this.textures.First(_texture => _texture.name == "xc_start");
+                lb = this.textures.First(_texture => _texture.name == "xc_lb");
+                rb = this.textures.First(_texture => _texture.name == "xc_rb");
+                lt = this.textures.First(_texture => _texture.name == "xc_lt");
+                rt = this.textures.First(_texture => _texture.name == "xc_rt");
+                dp = this.textures.First(_texture => _texture.name == "xc_dp");
+                dpup = this.textures.First(_texture => _texture.name == "xc_dpu");
+                dpdown = this.textures.First(_texture => _texture.name == "xc_dpd");
+                dpleft = this.textures.First(_texture => _texture.name == "xc_dpl");
+                dpright = this.textures.First(_texture => _texture.name == "xc_dpr");
+                ls = this.textures.First(_texture => _texture.name == "xc_ls");
+                lsup = this.textures.First(_texture => _texture.name == "xc_lsu");
+                lsdown = this.textures.First(_texture => _texture.name == "xc_lsd");
+                lsleft = this.textures.First(_texture => _texture.name == "xc_lsl");
+                lsright = this.textures.First(_texture => _texture.name == "xc_lsr");
+                rs = this.textures.First(_texture => _texture.name == "xc_rs");
+                rsup = this.textures.First(_texture => _texture.name == "xc_rsu");
+                rsdown = this.textures.First(_texture => _texture.name == "xc_rsd");
+                rsleft = this.textures.First(_texture => _texture.name == "xc_rsl");
+                rsright = this.textures.First(_texture => _texture.name == "xc_rsr");
+                controllerIcon = this.textures.First(_texture => _texture.name == "xc_icon");
+                mouseIcon = this.textures.First(_texture => _texture.name == "mouse_icon");
+                blankKey = this.textures.First(_texture => _texture.name == "blank_key");
+                lsPress = this.textures.First(_texture => _texture.name == "xc_ls_press");
+                rsPress = this.textures.First(_texture => _texture.name == "xc_rs_press");
             }
-            result = true;
+            catch (NullReferenceException ex)
+            {
+                MoControlsMod.print("<color=red>Error occured when setting asset textures...</color>.\r\n<b>Message:</b>" + ex.Message + "\r\nStacktrace:\r\n" + ex.StackTrace, DebugTypeEnum.full);
+                throw;
+            }
+
+            if (a == null || b == null || x == null || y == null || lb == null || rb == null || back == null || start == null || ls == null ||
+                rs == null || lt == null || rt == null || dp == null || dpdown == null || dpup == null || dpleft == null || dpright == null ||
+                lsup == null || lsdown == null || lsleft == null || lsright == null || rsdown == null || rsup == null || rsleft == null || rsright == null ||
+                controllerIcon == null || mouseIcon == null || blankKey == null)
+            {
+                MoControlsMod.print("<color=red>Error</color> - could not find one or more textures by name. possible asset name change.", DebugTypeEnum.none);
+            }
         }
     }
 }

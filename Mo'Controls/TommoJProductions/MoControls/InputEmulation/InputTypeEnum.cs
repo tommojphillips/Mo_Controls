@@ -19,6 +19,5 @@ namespace TommoJProductions.MoControls.InputEmulation
         /// </summary>
         [Description("D-Pad")]
         DPad,
-        None,
     }
 }

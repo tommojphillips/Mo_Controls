@@ -39,16 +39,17 @@ namespace TommoJProductions.MoControls
                 foundInput = false,
                 input = null,
             };
-            XboxController xc = MoControlsGO.controlManager.xboxController;
+            XboxController xc = XboxControllerManager.instance.controller;
+
             // Check xbox controller for input.
             if (xc.isConnected)
             {
-                if (xc.getRightTrigger() > 0.5f)
+                if (xc.rT.state > 0.5f)
                 {
                     monitorInputData.foundInput = true;
                     monitorInputData.input = xc.rT.inputName;
                 }
-                if (xc.getLeftTrigger() > 0.5f)
+                if (xc.lT.state > 0.5f)
                 {
                     monitorInputData.foundInput = true;
                     monitorInputData.input = xc.lT.inputName;
@@ -73,42 +74,42 @@ namespace TommoJProductions.MoControls
                     monitorInputData.foundInput = true;
                     monitorInputData.input = xc.dPadRight.inputName;
                 }
-                if (xc.getLeftStick().x > 0.0f)
+                if (xc.getLeftStick().x > 0.5f)
                 {
                     monitorInputData.foundInput = true;
                     monitorInputData.input = xc.leftThumbstick.right.inputName;
                 }
-                if (xc.getLeftStick().x < 0.0f)
+                if (xc.getLeftStick().x < -0.5f)
                 {
                     monitorInputData.foundInput = true;
                     monitorInputData.input = xc.leftThumbstick.left.inputName;
                 }
-                if (xc.getLeftStick().y > 0.0f)
+                if (xc.getLeftStick().y > 0.5f)
                 {
                     monitorInputData.foundInput = true;
                     monitorInputData.input = xc.leftThumbstick.up.inputName;
                 }
-                if (xc.getLeftStick().y < 0.0f)
+                if (xc.getLeftStick().y < -0.5f)
                 {
                     monitorInputData.foundInput = true;
                     monitorInputData.input = xc.leftThumbstick.down.inputName;
                 }
-                if (xc.getRightStick().x > 0.0f)
+                if (xc.getRightStick().x > 0.5f)
                 {
                     monitorInputData.foundInput = true;
                     monitorInputData.input = xc.rightThumbstick.right.inputName;
                 }
-                if (xc.getRightStick().x < 0.0f)
+                if (xc.getRightStick().x < -0.5f)
                 {
                     monitorInputData.foundInput = true;
                     monitorInputData.input = xc.rightThumbstick.left.inputName;
                 }
-                if (xc.getRightStick().y > 0.0f)
+                if (xc.getRightStick().y > 0.5f)
                 {
                     monitorInputData.foundInput = true;
                     monitorInputData.input = xc.rightThumbstick.up.inputName;
                 }
-                if (xc.getRightStick().y < 0.0f)
+                if (xc.getRightStick().y < -0.5f)
                 {
                     monitorInputData.foundInput = true;
                     monitorInputData.input = xc.rightThumbstick.down.inputName;
@@ -146,7 +147,7 @@ namespace TommoJProductions.MoControls
                                 }
                                 else
                                 {
-                                    MoControlsGO.controlManager.changeInputResult.reset();
+                                    ControlManager.instance.changeInputResult.reset();
                                 }
                             }
 
@@ -155,6 +156,7 @@ namespace TommoJProductions.MoControls
                     }
                 }
             }
+            
             return monitorInputData;
         }
 

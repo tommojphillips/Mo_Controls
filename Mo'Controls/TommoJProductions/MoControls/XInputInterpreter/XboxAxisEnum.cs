@@ -1,5 +1,8 @@
 ﻿namespace TommoJProductions.MoControls.XInputInterpreter
 {
+    /// <summary>
+    /// reps xbox axis names. NOTE cannot change these values. as logic replaces _ with a space " ". (toString())
+    /// </summary>
     public enum XboxAxisEnum
     {
         // Written, 09.10.2020

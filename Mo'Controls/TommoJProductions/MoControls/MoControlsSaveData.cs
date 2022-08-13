@@ -1,5 +1,4 @@
 ﻿using MSCLoader;
-using System;
 using System.IO;
 using TommoJProductions.MoControls.InputEmulation;
 using TommoJProductions.MoControls.XInputInterpreter;
@@ -16,42 +15,7 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents the file name for the save data file.
         /// </summary>
-        public const string fileName = "Mo_ControlsSaveData.txt";
-        /// <summary>
-        /// Represents the default save for the save file.
-        /// </summary>
-        public static MoControlsSaveData defaultSave
-        {
-            get
-            {
-                return new MoControlsSaveData()
-                {
-                    moControlsVersion = MoControlsMod.instance.Version,
-                    debugMode = Debugging.DebugTypeEnum.none,
-                    emulateMouse = true,
-                    mouseInputType = InputTypeEnum.RS,
-                    mouseDeadzoneType = DeadzoneTypeEnum.ScaledRadial,
-                    mouseDeadzone = MouseEmulator.DEFAULT_DEADZONE,
-                    mouseSensitivity = MouseEmulator.DEFAULT_SENSITIVITY,
-                    displayCurrentPlayerModeOverlay = true,
-                    footControls = defaultFootControls,
-                    drivingControls = defaultDrivingControls,
-                    displayFfbOverlay = false,
-                    ffbOnXboxController = false,
-                    ffbOption_default = false,
-                    ffbOption_rpmLimiter = false,
-                    ffbOption_wheelSlip = true,
-                    displayVehicleInfoOverlay = false,
-                    ffbOption_gearChange = true,
-                    combinedTriggerAxis = false,
-                    deviceDetection = UsingDeviceEnum.Auto,
-                    playerMove = InputTypeEnum.LS,
-                    playerJump = XboxButtonEnum.Y,
-                    usePlayerMoveAsInput = true,
-                    xboxControllerDeadzoneType = GamePadDeadZone.IndependentAxes                    
-                };
-            }
-        }
+        public const string fileName = "Mo_ControlsSaveData.txt";        
         /// <summary>
         /// returns new defualt array of driving controls
         /// </summary>
@@ -134,7 +98,7 @@ namespace TommoJProductions.MoControls
                         { "PlayerRight", "D", "" },
                         { "PlayerUp", "W", "" },
                         { "PlayerDown", "S", "" },
-                        { "Jump", "Space", "JoystickButton3" },
+                        { "Jump", "Space", "" },
                         { "Run", "LeftShift", "JoystickButton8" },
                         { "Zoom", "LeftControl", "Joy Axis 7+" },
                         { "Use", "F", "JoystickButton2" },
@@ -169,29 +133,43 @@ namespace TommoJProductions.MoControls
 
         #region save data fields
 
-        public string moControlsVersion;
-        public Debugging.DebugTypeEnum debugMode;
-        public bool emulateMouse;
-        public InputTypeEnum mouseInputType;
-        public DeadzoneTypeEnum mouseDeadzoneType;
-        public float mouseDeadzone;
-        public float mouseSensitivity;
-        public bool displayCurrentPlayerModeOverlay;
-        public string[,] footControls;
-        public string[,] drivingControls;
-        public bool ffbOnXboxController;
-        public bool displayFfbOverlay;
-        public bool ffbOption_default;
-        public bool ffbOption_rpmLimiter;
-        public bool ffbOption_wheelSlip;
-        public bool displayVehicleInfoOverlay;
-        public bool ffbOption_gearChange;
-        public bool combinedTriggerAxis;
-        public UsingDeviceEnum deviceDetection;
-        public InputTypeEnum playerMove;
-        public XboxButtonEnum playerJump;
-        public bool usePlayerMoveAsInput;
-        public GamePadDeadZone xboxControllerDeadzoneType;
+        public string moControlsVersion = MoControlsMod.instance.Version;
+        public Debugging.DebugTypeEnum debugMode = Debugging.DebugTypeEnum.none;
+        public bool displayCurrentPlayerModeOverlay = true;
+        public string[,] footControls = defaultFootControls;
+        public string[,] drivingControls = defaultDrivingControls;
+        public bool ffbOnXboxController = false;
+        public bool displayFfbOverlay = false;
+        public bool ffbOption_default = false;
+        public bool ffbOption_rpmLimiter = false;
+        public bool ffbOption_wheelSlip = true;
+        public bool displayVehicleInfoOverlay = false;
+        public bool ffbOption_gearChange = true;
+        public bool combinedTriggerAxis = false;
+        public UsingDeviceEnum deviceDetection = UsingDeviceEnum.Auto;
+        public GamePadDeadZone xboxControllerDeadzoneType = GamePadDeadZone.IndependentAxes;
+        public bool showHPatternShifterGameControls = false;
+        public float monitorControllerConnectionsTimeStep = 5;
+
+        public bool usePlayerMoveAsInput = true;
+        public bool playerMoveUseRawInput = true;
+        public float playerMoveDeadzone = 0;
+        public DeadzoneTypeEnum playerMoveDeadzoneType = DeadzoneTypeEnum.ScaledRadial;
+        public InputTypeEnum playerMove = InputTypeEnum.LS;
+        public XboxButtonEnum playerJump = XboxButtonEnum.Y;
+
+        public InputTypeEnum playerLook = InputTypeEnum.RS;
+        public bool playerLookUseRawInput = true;
+        public float playerLookDeadzone = 0;
+        public float playerLookSensitivityMultiplier = 1;
+        public DeadzoneTypeEnum playerLookDeadzoneType = DeadzoneTypeEnum.ScaledRadial;
+
+        public bool emulateMouse =  true;
+        public bool mouseInputUseRawInput = true;
+        public float mouseDeadzone = 0;
+        public float mouseSensitivity = 10;
+        public InputTypeEnum mouseInputType = InputTypeEnum.RS;
+        public DeadzoneTypeEnum mouseDeadzoneType = DeadzoneTypeEnum.ScaledRadial;
 
         #endregion
 
@@ -201,9 +179,12 @@ namespace TommoJProductions.MoControls
         {
             // Written, 04.08.2022
 
-            loadedSaveData = defaultSave;
+            loadedSaveData = new MoControlsSaveData();
             loadedSaveData.saveSettings();
         }
+        /// <summary>
+        /// Saves this instance to a file.
+        /// </summary>
         internal void saveSettings()
         {
             // Written, 17.10.2020

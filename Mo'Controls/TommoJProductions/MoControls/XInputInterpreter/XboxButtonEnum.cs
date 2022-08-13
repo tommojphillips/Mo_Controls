@@ -1,7 +1,7 @@
 ﻿namespace TommoJProductions.MoControls.XInputInterpreter
 {
     /// <summary>
-    /// Represents all xbox buttons.
+    /// Represents all xbox buttons. NOTE cannot change these values. as logic replaces _ with a space " ". (toString())
     /// </summary>
     public enum XboxButtonEnum
     {

@@ -14,22 +14,34 @@ namespace TommoJProductions.MoControls
 
 		private XboxController controller;
 
-		private Vector2 input => controller.getInputFromTypeRaw(MoControlsSaveData.loadedSaveData.mouseInputType);
+		private Vector2 _input;
+
+		private Vector2 getInput() 
+		{
+				if (MoControlsSaveData.loadedSaveData.playerLookUseRawInput)
+					return controller.getInputFromTypeRaw(MoControlsSaveData.loadedSaveData.playerLook);
+				else
+					return controller.getInputFromTypeRaw(MoControlsSaveData.loadedSaveData.playerLook)
+						.doDeadzoneCheck(MoControlsSaveData.loadedSaveData.playerLookDeadzoneType, MoControlsSaveData.loadedSaveData.playerLookDeadzone)
+						.doSensitivityOperation(MoControlsSaveData.loadedSaveData.playerLookSensitivityMultiplier);			
+		}
 
 		private void Start() 
 		{
-			controller = MoControlsGO.controlManager.xboxController;
+			controller = XboxControllerManager.instance.controller;
 		}
 
 		private void Update()
 		{
+			_input = getInput();
+
 			if (axis == MouseLook.RotationAxes.MouseX)
 			{
-				transform.Rotate(0f, input.x * mouseLook.sensitivityX, 0f);
+				transform.Rotate(0f, _input.x * mouseLook.sensitivityX, 0f);
 			}
 			else
 			{
-				rotationY += input.y * mouseLook.sensitivityY;
+				rotationY += _input.y * mouseLook.sensitivityY;
 				rotationY = Mathf.Clamp(rotationY, minY, maxY);
 				transform.localEulerAngles = new Vector3(-rotationY, transform.localEulerAngles.y, 0f);
 			}

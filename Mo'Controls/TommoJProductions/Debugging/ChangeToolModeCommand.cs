@@ -15,7 +15,7 @@ namespace TommoJProductions.Debugging
 
             if (args.Length == 0)
             {
-                MoControlsGO.controlManager.toggleToolMode();
+                ControlManager.instance.toggleToolMode();
                 MoControlsMod.print("Command executed successfully", DebugTypeEnum.none);
             }
             else

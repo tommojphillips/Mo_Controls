@@ -17,12 +17,20 @@ namespace TommoJProductions.MoControls
 		public virtual void Awake()
 		{
 			input = new Vector3();
-			motor = Camera.main.transform.root.gameObject.GetComponent<CharacterMotor>();
+			motor = ControlManager.instance.player.gameObject.GetComponent<CharacterMotor>();
 		}
 		public virtual void Update()
 		{
 			input.x = inputX;
-			input.z = inputY;
+			input.z = inputY; 
+			if (input != Vector3.zero)
+			{
+				float num = input.magnitude;
+				input /= num;
+				num = Mathf.Min(1, num);
+				num *= num;
+				input *= num;
+			}
 			motor.inputMoveDirection = transform.rotation * input;
 			motor.inputJump = inputJump;
 		}

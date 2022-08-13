@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+
+using UnityEngine;
 
 namespace TommoJProductions.MoControls
 {
@@ -147,6 +149,7 @@ namespace TommoJProductions.MoControls
             }
             return (GameControlsEnum)gameControl;
         }
+
         internal static string getName(this GameControlsEnum inGameControl)
         {
             // Written, 20.01.2019
@@ -287,11 +290,6 @@ namespace TommoJProductions.MoControls
             return gameControlName;
         }
 
-        internal static Vector2 toVector2(this XInputDotNetPure.GamePadThumbSticks.StickValue stickValue)
-        {
-            // Written, 31.07.2022
 
-            return new Vector2(stickValue.X, stickValue.Y);
-        }
     }
 }

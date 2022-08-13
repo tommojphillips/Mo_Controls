@@ -2,9 +2,9 @@
 {
     public enum MainGUIMenuEnum
     {
-        About,
-        FootControls,
-        DrivingControls,
-        Settings,
+        About = 0,
+        FootControls = 1,
+        DrivingControls = 2,
+        Settings = 3,
     }
 }

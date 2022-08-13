@@ -46,9 +46,16 @@ namespace TommoJProductions.MoControls
         /// </summary>
         private string hiName = "hi_name";
 
+        private XboxController controller;
+
         #endregion
 
         #region Methods
+
+        private void Start() 
+        {
+            controller = XboxControllerManager.instance.controller;
+        }
 
         /// <summary>
         /// Updates every frame.
@@ -57,14 +64,14 @@ namespace TommoJProductions.MoControls
         {
             // Written, 18.12.2018
 
-            if (MoControlsGO.controlManager.xboxController.isConnected)
+            if (controller.isConnected)
             {
-                if (MoControlsGO.controlManager.xboxController.getButtonDown(keyName))
+                if (controller.getButtonDown(keyName))
                 {
                     startTime = Time.time;
                     timer = startTime;
                 }
-                if (MoControlsGO.controlManager.xboxController.getButtonPressed(keyName) && held == false)
+                if (controller.getButtonPressed(keyName) && held == false)
                 {
                     timer += Time.deltaTime;
                     if (timer > (startTime + holdTime))
@@ -73,7 +80,7 @@ namespace TommoJProductions.MoControls
                         action?.Invoke();
                     }
                 }
-                if (MoControlsGO.controlManager.xboxController.getButtonUp(keyName))
+                if (controller.getButtonUp(keyName))
                 {
                     held = false;
                 }

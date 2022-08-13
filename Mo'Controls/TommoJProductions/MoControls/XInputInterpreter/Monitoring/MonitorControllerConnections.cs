@@ -6,48 +6,94 @@ namespace TommoJProductions.MoControls.XInputInterpreter.Monitoring
     /// <summary>
     /// Represents monitoring methods for monitoring controller connections.
     /// </summary>
-    public class MonitorControllerConnections : MonoBehaviour
+    public class MonitorControllerConnections : SingletonMonoBehaviour<MonitorControllerConnections>
     {
         // Written, 16.07.2018
 
-        #region fields
+        #region fields / Properties
 
-        private ControllerConnection controllerConnection = new ControllerConnection();
-        internal Coroutine routine;
+        private ControllerConnection controllerConnection;
+        private ControllerConnectionEventArgs eventArgs;
+        private XboxController controller;
+        private WaitForSeconds step;
+
+        internal Coroutine routine { get; private set; }
+
+        #endregion
+
+        #region Constructors
+
+        public MonitorControllerConnections()
+        {
+            // Written, 05.08.2022
+
+            controllerConnection = new ControllerConnection();
+            eventArgs = new ControllerConnectionEventArgs();
+        }
+
+        #endregion
+
+        #region unity runtime
+
+        private void Start()
+        {
+            // Written, 05.08.2022
+
+            controller = XboxControllerManager.instance.controller;
+            setTimeStep();
+            startMonitoring();
+        }
+
+        #endregion
+
+        #region IEnumerators
+
+        private IEnumerator updateCoroutine()
+        {
+            // Written, 16.07.2018 | Modified, 05.07.2022
+
+            /*while (isActiveAndEnabled)
+            {
+                if (controller.isConnected != controllerConnection.currentConnectionStatus)
+                {
+                    controllerConnection.previousConnectionStatus = controllerConnection.currentConnectionStatus;
+                    controllerConnection.currentConnectionStatus = controller.isConnected;
+
+                    eventArgs.setData(controller);
+
+                    if (controllerConnection.currentConnectionStatus == true)
+                    {
+                        XboxControllerManager.instance.onControllerConnected(eventArgs);
+                    }
+                    else if (controllerConnection.currentConnectionStatus == false)
+                    {
+                        XboxControllerManager.instance.onControllerDisconnected(eventArgs);
+                    }
+                }
+                yield return step;
+            }*/
+            yield return null;
+        }
 
         #endregion
 
         #region Methods
-                
-        private void OnEnable()
-        {
-            // Written, 05.07.2022
 
-            routine = StartCoroutine(updateCoroutine());
+        internal void setTimeStep()
+        {
+            // Written, 05.08.2022
+            
+            step = new WaitForSeconds(MoControlsSaveData.loadedSaveData.monitorControllerConnectionsTimeStep);
         }
-        private IEnumerator updateCoroutine()
+        internal void startMonitoring() 
         {
-            // Written, 16.07.2018
+            // Written, 05.08.2022
 
-            while (isActiveAndEnabled)
+            if (routine != null)
             {
-                if (MoControlsGO.controlManager.xboxController.isConnected != controllerConnection.currentConnectionStatus)
-                {
-                    controllerConnection.previousConnectionStatus = controllerConnection.currentConnectionStatus;
-                    controllerConnection.currentConnectionStatus = MoControlsGO.controlManager.xboxController.isConnected;
-
-                    if (controllerConnection.currentConnectionStatus == true)
-                    {
-                        MoControlsGO.controlManager.xboxControllerManager.onControllerConnected(new ControllerConnectionEventArgs(MoControlsGO.controlManager.xboxController));
-                    }
-                    else if (controllerConnection.currentConnectionStatus == false)
-                    {
-                        MoControlsGO.controlManager.xboxControllerManager.onControllerDisconnected(new ControllerConnectionEventArgs(MoControlsGO.controlManager.xboxController));
-                    }
-                }
-                yield return null;
+                StopCoroutine(routine);
             }
-            routine = null;
+            routine = StartCoroutine(updateCoroutine());
         }
 
         #endregion

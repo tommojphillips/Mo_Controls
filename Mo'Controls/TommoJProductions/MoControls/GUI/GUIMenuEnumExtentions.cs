@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -33,10 +34,12 @@ namespace TommoJProductions.MoControls.GUI
                     return "Mouse Emulation";
                 case SettingsMenuEnum.XboxController:
                     return "Xbox Controller";
+                case SettingsMenuEnum.Axis:
                 default:
                     return inSettingsGUIMenu.ToString();
             }
         }
+        private static StringBuilder builder;
         internal static string getGameControlAlias(this GameControlsEnum inGameControl, bool inPreserveAcronyms)
         {
             // Written, 16.09.2018
@@ -67,7 +70,7 @@ namespace TommoJProductions.MoControls.GUI
                     try
                     {
                         MSCLoader.Mod mod = MSCLoader.ModLoader.LoadedMods.Where(_mod => _mod.ID == "handbrakemod").ToArray()[0];
-                        alias = "Handbrake; <color=green>Using Handbrake Mod <b>v" + mod.Version + "</b></color>";
+                        alias = "<color=green>Handbrake Mod<b> v" + mod.Version + "</b></color>";
                     }
                     catch (IndexOutOfRangeException)
                     {
@@ -78,41 +81,74 @@ namespace TommoJProductions.MoControls.GUI
                     alias = "Wrist Watch";
                     break;
                 default:
-                    string gameControlName = inGameControl.getName();
-                    if (String.IsNullOrEmpty(gameControlName))
+                    string gameControlName = inGameControl.ToString();
+                    if (gameControlName == GameControlsEnum.Null.ToString())
                         return string.Empty;
-                    StringBuilder newText = new StringBuilder(gameControlName.Length * 2);
-                    newText.Append(gameControlName[0]);
+                    builder = new StringBuilder(gameControlName.Length * 2);
+                    builder.Append(gameControlName[0]);
                     for (int i = 1; i < gameControlName.Length; i++)
                     {
                         if (char.IsUpper(gameControlName[i]))
                             if ((gameControlName[i - 1] != ' ' && !char.IsUpper(gameControlName[i - 1])) ||
                                 (inPreserveAcronyms && char.IsUpper(gameControlName[i - 1]) &&
                                  i < gameControlName.Length - 1 && !char.IsUpper(gameControlName[i + 1])))
-                                newText.Append(' ');
-                        newText.Append(gameControlName[i]);
+                                builder.Append(' ');
+                        builder.Append(gameControlName[i]);
                     }
-                    alias = newText.ToString();
+                    alias = builder.ToString();
                     break;
             }
             return alias;
         }
-        
+
+        private static Dictionary<string, string> descriptionCache = new Dictionary<string, string>();
+        private static DescriptionAttribute[] temp_descriptionArray;
+        private static string temp_descriptionString;
+        private static MemberInfo temp_descriptionMember;
+        private static string temp_descriptionKey;
         /// <summary>
         /// Gets <see cref="DescriptionAttribute.Description"/> on provided object type. if attribute doesn't exist, returns <see cref="MemberInfo.Name"/>
         /// </summary>
         /// <param name="mi">the member info to get info from.</param>
         public static string getDescription(this MemberInfo mi)
         {
-            // Written, 07.07.2022
+            // Written, 06.08.2022
 
-            object o = mi.GetCustomAttributes(typeof(DescriptionAttribute), false);
-            DescriptionAttribute[] d = o as DescriptionAttribute[];
-            if (d != null && d.Length > 0)
+            temp_descriptionKey = mi.DeclaringType?.Name + mi.Name;
+            if (descriptionCache.ContainsKey(temp_descriptionKey))
             {
-                return d[0].Description;
+                return descriptionCache[temp_descriptionKey] ?? mi.Name;
             }
-            return mi.Name;
+            addDesCache(temp_descriptionKey, mi);
+            return temp_descriptionString;
+        }
+        public static string getDescription(this Type type, string memberName)
+        {
+            // Written, 06.08.2022
+
+            temp_descriptionKey = type.Name + memberName;
+            if (descriptionCache.ContainsKey(temp_descriptionKey))
+            {
+                return descriptionCache[temp_descriptionKey] ?? memberName;
+            }
+            temp_descriptionMember = type.GetMember(memberName)?[0];
+            addDesCache(temp_descriptionKey, temp_descriptionMember);
+            return temp_descriptionString;
+        }
+        private static void addDesCache(string key, MemberInfo mi) 
+        {
+            // Written, 06.08.2022
+
+            temp_descriptionArray = mi.GetCustomAttributes(typeof(DescriptionAttribute), false) as DescriptionAttribute[];
+            if (temp_descriptionArray.Length > 0)
+            {
+                temp_descriptionString = temp_descriptionArray[0].Description;
+            }
+            else
+            {
+                temp_descriptionString = null;
+            }
+            descriptionCache.Add(key, temp_descriptionString);
         }
         /// <summary>
         /// [GUI] draws an enum that can be edited as a list of toggles.

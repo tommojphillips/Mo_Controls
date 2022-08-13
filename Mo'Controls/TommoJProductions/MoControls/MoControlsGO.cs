@@ -1,7 +1,6 @@
 ﻿using TommoJProductions.MoControls.GUI;
 using TommoJProductions.MoControls.InputEmulation;
 using TommoJProductions.MoControls.XInputInterpreter;
-using TommoJProductions.MoControls.XInputInterpreter.Monitoring;
 using UnityEngine;
 
 namespace TommoJProductions.MoControls
@@ -15,31 +14,6 @@ namespace TommoJProductions.MoControls
 
         #region Properties
 
-        /// <summary>
-        /// Represents the GUI for the mod.
-        /// </summary>
-        internal static MoControlsGUI moControlsGui
-        {
-            get;
-            private set;
-        }
-        /// <summary>
-        /// Represents the control manager.
-        /// </summary>
-        internal static ControlManager controlManager
-        {
-            get;
-            private set;
-        }
-        /// <summary>
-        /// Represents an emulator for the mouse.
-        /// </summary>
-        internal static MouseEmulator mouseEmulator
-        {
-            get;
-            private set;
-        }
-
         #endregion
 
         #region Methods
@@ -51,13 +25,11 @@ namespace TommoJProductions.MoControls
         {
             // Written, 18.10.2020
 
-            controlManager = gameObject.AddComponent<ControlManager>();
-            controlManager.xboxControllerManager = gameObject.AddComponent<XboxControllerManager>();
-            controlManager.xboxControllerManager.controller = gameObject.AddComponent<XboxController>();
-            controlManager.xboxControllerManager.monitorControllerConnections = gameObject.AddComponent<MonitorControllerConnections>();
+            gameObject.AddComponent<ControlManager>();
+            gameObject.AddComponent<XboxControllerManager>();
 
-            mouseEmulator = gameObject.AddComponent<MouseEmulator>();
-            moControlsGui = gameObject.AddComponent<MoControlsGUI>();
+            gameObject.AddComponent<MouseEmulator>();
+            gameObject.AddComponent<MoControlsGUI>();
             MoControlsMod.print(nameof(MoControlsGO) + ": Started", Debugging.DebugTypeEnum.full);
         }
 

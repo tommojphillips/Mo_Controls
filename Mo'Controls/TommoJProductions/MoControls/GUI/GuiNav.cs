@@ -1,7 +1,5 @@
 ﻿using System;
-using TommoJProductions.MoControls.InputEmulation;
 using TommoJProductions.MoControls.XInputInterpreter;
-using UnityEngine;
 
 namespace TommoJProductions.MoControls.GUI
 {
@@ -16,18 +14,17 @@ namespace TommoJProductions.MoControls.GUI
         /// <summary>
         /// Represents the GUI for the mod.
         /// </summary>
-        private MoControlsGUI moControlsGUI
-        {
-            get
-            {
-                return MoControlsGO.moControlsGui;
-            }
-        }
+        private MoControlsGUI moControlsGUI;
 
-        protected XboxAxisEnum menuDownA { get; private set; } = XboxAxisEnum.None;
-        protected XboxAxisEnum menuUpA { get; private set; } = XboxAxisEnum.None;
-        protected XboxButtonEnum menuDownB { get; private set; } = XboxButtonEnum.LB;
-        protected XboxButtonEnum menuUpB { get; private set; } = XboxButtonEnum.RB;
+        protected XboxControlGroup menuUp { get; private set; } = new XboxControlGroup() { buttonInput = XboxButtonEnum.RB };
+        protected XboxControlGroup menuDown { get; private set; } = new XboxControlGroup() { buttonInput = XboxButtonEnum.LB };
+
+
+        private void Start() 
+        {
+            base.Start();
+            moControlsGUI = MoControlsGUI.instance;
+        }
 
         #region Methods
 
@@ -49,12 +46,12 @@ namespace TommoJProductions.MoControls.GUI
         {
             // Written, 04.01.2019
 
-            if (xboxController.isConnected)
+            if (controller.isConnected)
             {
                 int mainMenuItemCount = Enum.GetNames(typeof(MainGUIMenuEnum)).Length - 1;
                 int settingsMenuItemCount = Enum.GetNames(typeof(SettingsMenuEnum)).Length - 1;
 
-                if (hasInputFromAxisOrButton(menuDownA, menuDownB) > 0)
+                if (hasInputFromAxisOrButton(menuDown) > 0)
                 {
                     if (moControlsGUI.mainGUIMenu == 0)
                     {
@@ -73,7 +70,7 @@ namespace TommoJProductions.MoControls.GUI
                         moControlsGUI.mainGUIMenu--;
                     }
                 }
-                else if (hasInputFromAxisOrButton(menuUpA, menuUpB) > 0)
+                else if (hasInputFromAxisOrButton(menuUp) > 0)
                 {
                     if (moControlsGUI.mainGUIMenu == (MainGUIMenuEnum)mainMenuItemCount)
                     {
@@ -98,26 +95,16 @@ namespace TommoJProductions.MoControls.GUI
         /// Sets all xbox controls. NOTE: only set either 'A' (axis) OR 'B' (button) variants of each control type, eg, scrollUpA & scrollUpB. otherwise will
         /// only detect axis input variant.
         /// </summary>
-        internal void setControls(XboxAxisEnum scrollUpA = XboxAxisEnum.None, XboxButtonEnum scrollUpB = XboxButtonEnum.None,
-            XboxAxisEnum scrollDownA = XboxAxisEnum.None, XboxButtonEnum scrollDownB = XboxButtonEnum.None,
-            XboxAxisEnum menuUpA = XboxAxisEnum.None, XboxButtonEnum menuUpB = XboxButtonEnum.None,
-            XboxAxisEnum menuDownA = XboxAxisEnum.None, XboxButtonEnum menuDownB = XboxButtonEnum.None)
+        internal void setControls(XboxControlGroup scrollDown, XboxControlGroup scrollUp, XboxControlGroup menuDown, XboxControlGroup menuUp)
         {
             // Written, 31.07.2022
 
-            base.setControls(scrollUpA, scrollUpB, scrollDownA, scrollDownB);
+            setControls(scrollDown, scrollUp);
 
-            // Menu Down
-            if (menuDownA != XboxAxisEnum.None)
-                this.menuDownA = menuDownA;
-            if (menuDownB != XboxButtonEnum.None)
-                this.menuDownB = menuDownB;
-            // Menu Up
-            if (menuUpA != XboxAxisEnum.None)
-                this.menuUpA = menuUpA;
-            if (menuUpB != XboxButtonEnum.None)
-                this.menuUpB = menuUpB;
+            this.menuDown = menuDown;
+            this.menuUp = menuUp;
         }
+
         #endregion
     }
 }

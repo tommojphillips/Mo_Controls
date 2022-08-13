@@ -19,12 +19,16 @@ namespace TommoJProductions.MoControls
 
         public void Start()
 		{
-			controller = MoControlsGO.controlManager.xboxController;
+			controller = XboxControllerManager.instance.controller;
 		}
 		public override void Update()
 		{
-			if (controller.isConnected)
+			if (controller.isConnected && MoControlsSaveData.loadedSaveData.usePlayerMoveAsInput)
 			{
+				input = controller.getInputFromTypeRaw(MoControlsSaveData.loadedSaveData.playerMove);
+				if (!MoControlsSaveData.loadedSaveData.playerMoveUseRawInput)
+					input.doDeadzoneCheck(MoControlsSaveData.loadedSaveData.playerMoveDeadzoneType, MoControlsSaveData.loadedSaveData.playerMoveDeadzone);
+
 				input = controller.getInputFromTypeRaw(MoControlsSaveData.loadedSaveData.playerMove);
 				base.Update();				
 			}
