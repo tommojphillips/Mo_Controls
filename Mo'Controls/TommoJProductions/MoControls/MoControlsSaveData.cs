@@ -98,7 +98,7 @@ namespace TommoJProductions.MoControls
                         { "PlayerRight", "D", "" },
                         { "PlayerUp", "W", "" },
                         { "PlayerDown", "S", "" },
-                        { "Jump", "Space", "" },
+                        { "Jump", "Space", "JoystickButton4" },
                         { "Run", "LeftShift", "JoystickButton8" },
                         { "Zoom", "LeftControl", "Joy Axis 7+" },
                         { "Use", "F", "JoystickButton2" },
@@ -156,7 +156,6 @@ namespace TommoJProductions.MoControls
         public float playerMoveDeadzone = 0;
         public DeadzoneTypeEnum playerMoveDeadzoneType = DeadzoneTypeEnum.ScaledRadial;
         public InputTypeEnum playerMove = InputTypeEnum.LS;
-        public XboxButtonEnum playerJump = XboxButtonEnum.Y;
 
         public InputTypeEnum playerLook = InputTypeEnum.RS;
         public bool playerLookUseRawInput = true;
@@ -170,6 +169,7 @@ namespace TommoJProductions.MoControls
         public float mouseSensitivity = 10;
         public InputTypeEnum mouseInputType = InputTypeEnum.RS;
         public DeadzoneTypeEnum mouseDeadzoneType = DeadzoneTypeEnum.ScaledRadial;
+        public bool disablePlayerMoveWhileInMenu = false;
 
         #endregion
 

@@ -10,7 +10,7 @@ using static UnityEngine.GUILayout;
 using static UnityEngine.GUI;
 using ScrollViewScope = UnityEngine.GUILayout.ScrollViewScope;
 using MSCLoader;
-using TommoJProductions.MoControls.XInputInterpreter.Monitoring;
+using System.Reflection;
 
 namespace TommoJProductions.MoControls.GUI
 {
@@ -63,7 +63,7 @@ namespace TommoJProductions.MoControls.GUI
         /// </summary>
         private const float SCROLL_BAR_OFFSET = 25f;
 
-        private const string footerMessage = "Developed by <b>Tommo J. Armytage. | Latest release: " + VersionInfo.version + "</b>"; 
+        private const string footerMessage = "Developed by <b>Tommo J. Armytage. | Latest release: " + VersionInfo.lastestRelease + "</b>"; 
         private const string aboutMessage = "<b>Mo'Controls</b> allows the player to have a primary and secondary input for each in-game control," +
                 " the player could set all primary inputs to the keyboard and all secondary inputs to an Xbox Controller to have a seamless" +
                 " swap of the keyboard to Xbox Controller. Mo'Controls also allows the player to have different control profiles for when " +
@@ -297,16 +297,7 @@ namespace TommoJProductions.MoControls.GUI
                     {
                         if (validateInput(mid))
                         {
-                            switch (controlManager.changeInputResult.type)
-                            {
-                                case ChangeInput.ChangeInputType.GameControl:
-                                    controlManager.changeInput(mid.input);
-                                    break;
-                                case ChangeInput.ChangeInputType.KeyBind:
-                                    break;
-                                case ChangeInput.ChangeInputType.XboxButton:
-                                    break;
-                            }
+                            controlManager.changeInput(mid);
                         }
                         else
                         {
@@ -587,8 +578,8 @@ namespace TommoJProductions.MoControls.GUI
                                 Label(String.Format("<b>{0}:</b>", MoControlsMod.instance.lmbPrimaryInput.Name));
                                 using (new HorizontalScope())
                                 {
-                                    drawCommonControl(MoControlsMod.instance.lmbPrimaryInput.ID, MoControlsMod.instance.lmbPrimaryInput.Modifier.ToString(), 1, type: ChangeInput.ChangeInputType.KeyBind);
-                                    drawCommonControl(MoControlsMod.instance.lmbPrimaryInput.ID, MoControlsMod.instance.lmbPrimaryInput.Key.ToString(), 2, type: ChangeInput.ChangeInputType.KeyBind);
+                                    drawKeybindControl(MoControlsMod.instance.lmbPrimaryInput.ID, MoControlsMod.instance.lmbPrimaryInput.Modifier.ToString(), 1, mod);
+                                    drawKeybindControl(MoControlsMod.instance.lmbPrimaryInput.ID, MoControlsMod.instance.lmbPrimaryInput.Key.ToString(), 2, mod);
                                 }
                             }
                             skin.box.normal.background = moduleBackgroundColor;
@@ -597,8 +588,8 @@ namespace TommoJProductions.MoControls.GUI
                                 Label(String.Format("<b>{0}:</b>", MoControlsMod.instance.lmbSecondaryInput.Name));
                                 using (new HorizontalScope())
                                 {
-                                    drawCommonControl(MoControlsMod.instance.lmbSecondaryInput.ID, MoControlsMod.instance.lmbSecondaryInput.Modifier.ToString(), 1, type: ChangeInput.ChangeInputType.KeyBind);
-                                    drawCommonControl(MoControlsMod.instance.lmbSecondaryInput.ID, MoControlsMod.instance.lmbSecondaryInput.Key.ToString(), 2, type: ChangeInput.ChangeInputType.KeyBind);
+                                    drawKeybindControl(MoControlsMod.instance.lmbSecondaryInput.ID, MoControlsMod.instance.lmbSecondaryInput.Modifier.ToString(), 1, mod);
+                                    drawKeybindControl(MoControlsMod.instance.lmbSecondaryInput.ID, MoControlsMod.instance.lmbSecondaryInput.Key.ToString(), 2, mod);
                                 }
                             }
                         }
@@ -610,8 +601,8 @@ namespace TommoJProductions.MoControls.GUI
                                 Label(String.Format("<b>{0}:</b>", MoControlsMod.instance.rmbPrimaryInput.Name));
                                 using (new HorizontalScope())
                                 {
-                                    drawCommonControl(MoControlsMod.instance.rmbPrimaryInput.ID, MoControlsMod.instance.rmbPrimaryInput.Modifier.ToString(), 1, type: ChangeInput.ChangeInputType.KeyBind);
-                                    drawCommonControl(MoControlsMod.instance.rmbPrimaryInput.ID, MoControlsMod.instance.rmbPrimaryInput.Key.ToString(), 2, type: ChangeInput.ChangeInputType.KeyBind);
+                                    drawKeybindControl(MoControlsMod.instance.rmbPrimaryInput.ID, MoControlsMod.instance.rmbPrimaryInput.Modifier.ToString(), 1, mod);
+                                    drawKeybindControl(MoControlsMod.instance.rmbPrimaryInput.ID, MoControlsMod.instance.rmbPrimaryInput.Key.ToString(), 2, mod);
                                 }
                             }
                             skin.box.normal.background = primaryItemColor;
@@ -620,8 +611,8 @@ namespace TommoJProductions.MoControls.GUI
                                 Label(String.Format("<b>{0}:</b>", MoControlsMod.instance.rmbSecondaryInput.Name));
                                 using (new HorizontalScope())
                                 {
-                                    drawCommonControl(MoControlsMod.instance.rmbSecondaryInput.ID, MoControlsMod.instance.rmbSecondaryInput.Modifier.ToString(), 1, type: ChangeInput.ChangeInputType.KeyBind);
-                                    drawCommonControl(MoControlsMod.instance.rmbSecondaryInput.ID, MoControlsMod.instance.rmbSecondaryInput.Key.ToString(), 2, type: ChangeInput.ChangeInputType.KeyBind);
+                                    drawKeybindControl(MoControlsMod.instance.rmbSecondaryInput.ID, MoControlsMod.instance.rmbSecondaryInput.Modifier.ToString(), 1, mod);
+                                    drawKeybindControl(MoControlsMod.instance.rmbSecondaryInput.ID, MoControlsMod.instance.rmbSecondaryInput.Key.ToString(), 2, mod);
                                 }
                             }
                             skin.box.normal.background = moduleBackgroundColor;
@@ -747,15 +738,6 @@ namespace TommoJProductions.MoControls.GUI
                 }
                 using (new VerticalScope("box"))
                 {
-                    Label("Time Steps");
-                    bool changed = drawPropertyEdit("Monitor controller connections", ref MoControlsSaveData.loadedSaveData.monitorControllerConnectionsTimeStep, ref saveSettings);                    
-                    if (changed)
-                    {
-                        MonitorControllerConnections.instance.setTimeStep();
-                    }
-                }
-                using (new VerticalScope("box"))
-                {
                     Label("Vehicles:");
                     if (Button("Refresh Dictionary", Width(200)))
                     {
@@ -791,7 +773,7 @@ namespace TommoJProductions.MoControls.GUI
             string cName = controlManager.changeInputResult.controlName;
             if (MoControlsSaveData.loadedSaveData.usePlayerMoveAsInput)
             {
-                if (cName == "PlayerLeft" || cName == "PlayerRight" || cName == "PlayerUp" || cName == "PlayerDown" || cName == "Jump")
+                if (cName == "PlayerLeft" || cName == "PlayerRight" || cName == "PlayerUp" || cName == "PlayerDown")
                 {
                     return !controller.xboxControls.Any(c => c.inputName == data.input);
                 }
@@ -1220,55 +1202,22 @@ namespace TommoJProductions.MoControls.GUI
             }
         }
 
-        /// <summary>
-        /// Draws a common control for the 
-        /// </summary>
-        private void drawCommonControl(string inControlName, string inInputName, int inIndex, PlayerModeEnum? inMode = null, ChangeInput.ChangeInputType type = ChangeInput.ChangeInputType.GameControl, Action action = null)
+        private bool drawReassignableControl(string inputName, string controlName, int index)
         {
-            // Written, 01.08.2018
+            // Written, 18.08.2022
 
             string reassignMessage = null;
-            if (controlManager.changeInputResult.controlName == inControlName && controlManager.changeInputResult.index == inIndex && controlManager.changeInputResult.mode == inMode)
+            if (controlManager.changeInputResult.controlName == controlName && controlManager.changeInputResult.index == index)
                 reassignMessage = "<b>Awaiting key input</b>";
-            XboxControl xboxControl;
             bool buttonClicked = false;
             skin.box.normal.background = unselectedMenuButtonColor;
             using (new HorizontalScope(Width(commonControlWidth)))
             {
                 if (reassignMessage == null)
                 {
-                    xboxControl = controller.getXboxControlByInputName(inInputName);
-                    if (xboxControl != null && MoControlsMod.assetsLoaded)
-                    {
-                        if (xboxControl == controller.lS)
-                        {
-                            xboxInputStyle.normal.background = MoControlsMod.assets.lsPress;
-                            xboxInputStyle.hover.background = MoControlsMod.assets.lsPress;
-                        }
-                        else if (xboxControl == controller.rS)
-                        {
-                            xboxInputStyle.normal.background = MoControlsMod.assets.rsPress;
-                            xboxInputStyle.hover.background = MoControlsMod.assets.rsPress;
-                        }
-                        else
-                        {
-                            xboxInputStyle.normal.background = xboxControl.texture;
-                            xboxInputStyle.hover.background = xboxControl.texture;
-                        }
-                        if (Button("", xboxInputStyle, Width(48), Height(48)))
-                        {
-                            buttonClicked = true;
-                        }
-                    }
-                    else
-                    {
-                        if (Button(inInputName, keyButtonStyle, Height(48)))
-                        {
-                            buttonClicked = true;
-                        }
-                    }
+                    buttonClicked = drawGenericControl(inputName);
                 }
-                else 
+                else
                 {
                     Label(reassignMessage, Height(48));
                 }
@@ -1277,13 +1226,78 @@ namespace TommoJProductions.MoControls.GUI
 
             if (buttonClicked && !controlManager.changeInputResult.reassignKey)
             {
-                controlManager.changeInputResult.changeToPollingState(inControlName, inIndex, inMode, type, action);
+                return true;
             }
+            return false;
         }
         /// <summary>
-        /// draws the control input list.
+        /// draws a xbox or keyboard button icon. returns true if button was clicked.
         /// </summary>
-        /// <param name="controls">The list to draw.</param>
+        /// <param name="inputName">The input name that was clicked.</param>
+        /// <returns>returns true if button was clicked.</returns>
+        private bool drawGenericControl(string inputName)
+        {
+            // Written, 18.08.2022
+
+            XboxControl xboxControl = controller.getXboxControlByInputName(inputName);
+            if (xboxControl != null && MoControlsMod.assetsLoaded)
+            {
+                if (xboxControl == controller.lS)
+                {
+                    xboxInputStyle.normal.background = MoControlsMod.assets.lsPress;
+                    xboxInputStyle.hover.background = MoControlsMod.assets.lsPress;
+                }
+                else if (xboxControl == controller.rS)
+                {
+                    xboxInputStyle.normal.background = MoControlsMod.assets.rsPress;
+                    xboxInputStyle.hover.background = MoControlsMod.assets.rsPress;
+                }
+                else
+                {
+                    xboxInputStyle.normal.background = xboxControl.texture;
+                    xboxInputStyle.hover.background = xboxControl.texture;
+                }
+                if (Button("", xboxInputStyle, Width(48), Height(48)))
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if (Button(inputName, keyButtonStyle, Height(48)))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        private void drawGameControl(string controlName, string input, int index, PlayerModeEnum mode) 
+        {
+            // Written, 18.08.2022
+
+            bool toPollState = drawReassignableControl(input, controlName, index);
+
+            if (toPollState)
+            {
+                controlManager.changeInputResult.changeToPollingState(controlName, index, mode);
+            }
+        }
+        private void drawKeybindControl(string KeybindName, string input, int index, Mod mod)
+        {
+            // Written, 18.08.2022
+
+            bool toPollState = drawReassignableControl(input, KeybindName, index);
+
+            if (toPollState)
+            {
+                controlManager.changeInputResult.changeToPollingState(KeybindName, index, mod);
+            }
+        }
+        
+        /// <summary>
+                  /// draws the control input list.
+                  /// </summary>
+                  /// <param name="controls">The list to draw.</param>
         private void drawControlModeContent(string name, string[,] controls, ref bool saveSettings)
         {
             // Written, 30.07.2022
@@ -1354,11 +1368,11 @@ namespace TommoJProductions.MoControls.GUI
                             {
                                 using (new HorizontalScope(centerStyle))
                                 {
-                                    drawCommonControl(controls[i, 0], controls[i, 1], 1, playerMode);
+                                    drawGameControl(controls[i, 0], controls[i, 1], 1, (PlayerModeEnum)playerMode);
                                 }
                                 using (new HorizontalScope(centerStyle))
                                 {
-                                    drawCommonControl(controls[i, 0], controls[i, 2], 2, playerMode);
+                                    drawGameControl(controls[i, 0], controls[i, 2], 2, (PlayerModeEnum)playerMode);
                                 }
 
                             }

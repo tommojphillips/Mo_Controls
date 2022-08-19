@@ -1,9 +1,5 @@
 ﻿using System;
-
 using MSCLoader;
-
-using TommoJProductions.MoControls.XInputInterpreter.Monitoring;
-
 using UnityEngine;
 
 namespace TommoJProductions.MoControls.XInputInterpreter

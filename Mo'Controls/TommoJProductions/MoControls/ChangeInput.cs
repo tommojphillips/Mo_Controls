@@ -2,6 +2,8 @@
 
 using MSCLoader;
 
+using TommoJProductions.MoControls.XInputInterpreter;
+
 namespace TommoJProductions.MoControls
 {
     /// <summary>
@@ -14,8 +16,7 @@ namespace TommoJProductions.MoControls
         public enum ChangeInputType 
         {
             GameControl,
-            KeyBind,
-            XboxButton
+            KeyBind
         }
 
         #region Properties
@@ -23,44 +24,31 @@ namespace TommoJProductions.MoControls
         /// <summary>
         /// Represents whether to reassign a key or not.
         /// </summary>
-        public bool reassignKey
-        {
-            get;
-            set;
-        }
+        public bool reassignKey { get; set; }
         /// <summary>
         /// Represents the name of the input to change; if <see cref="reassignKey"/> is false, this is equal to null. 
         /// The input name should equal the one from <see cref="cInput"/>.
         /// If ressign key is a mod keybind, (<see cref="mod"/> != <see langword="null"/>) then this, <see cref="controlName"/> should equal 
         /// <see cref="Keybind.ID"/> property.
         /// </summary>
-        public string controlName
-        {
-            get;
-            set;
-        }
+        public string controlName { get; set; }
         /// <summary>
         /// Represents which input to modify, either 1 for primary input, or 2 for secondary input. If <see cref="reassignKey"/> is false, this is equal to null. 
         /// The input name should equal the one from <see cref="cInput"/>. 
         /// If ressign key is a mod keybind, (<see cref="mod"/> != <see langword="null"/>) then this, <see cref="index"/> should either equal 1 
         /// for <see cref="Keybind.Key"/> or 2 for <see cref="Keybind.Modifier"/>.
         /// </summary>
-        public int index
-        {
-            get;
-            set;
-        }
+        public int index { get; set; }
         /// <summary>
         /// Reprents the mode to modify.
         /// </summary>
-        public PlayerModeEnum? mode
-        {
-            get;
-            set;
-        }
+        public PlayerModeEnum? mode { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public ChangeInputType type { get; set; }
 
-        public Action action { get; set; }
+        public Mod mod { get; set; }
 
         #endregion
 
@@ -92,7 +80,7 @@ namespace TommoJProductions.MoControls
             index = 0;
             mode = null;
             type = 0;
-            action = null;
+            mod = null;
         }
 
         /// <summary>
@@ -100,7 +88,7 @@ namespace TommoJProductions.MoControls
         /// </summary>
         /// <param name="controlName">The game control to change.</param>
         /// <param name="index">The index to change, Primary = 1, Secondary = 2.</param>
-        public void changeToPollingState(string controlName, int index, PlayerModeEnum? mode, ChangeInputType type, Action action)
+        public void changeToPollingState(string controlName, int index, PlayerModeEnum mode)
         {
             // Written, 20.07.2018
 
@@ -110,8 +98,20 @@ namespace TommoJProductions.MoControls
                 this.controlName = controlName;
                 this.index = index;
                 this.mode = mode;
-                this.type = type;
-                this.action = action;
+                type = ChangeInputType.GameControl;
+            }
+        }
+        public void changeToPollingState(string keybindName, int index, Mod mod)
+        {
+            // Written, 18.08.2022
+
+            if (!reassignKey)
+            {
+                reassignKey = true;
+                this.controlName = keybindName;
+                this.index = index;
+                type = ChangeInputType.KeyBind;
+                this.mod = mod;
             }
         }
 

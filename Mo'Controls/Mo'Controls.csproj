@@ -152,8 +152,6 @@
     <Compile Include="TommoJProductions\MoControls\InputEmulation\MouseInput.cs" />
     <Compile Include="TommoJProductions\MoControls\MoControlsMod.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\ControllerConnectionEventArgs.cs" />
-    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\Monitoring\ControllerConnection.cs" />
-    <Compile Include="TommoJProductions\MoControls\XInputInterpreter\Monitoring\MonitorControllerConnections.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxBoolState.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxButtonEnum.cs" />
     <Compile Include="TommoJProductions\MoControls\XInputInterpreter\XboxAxisEnum.cs" />

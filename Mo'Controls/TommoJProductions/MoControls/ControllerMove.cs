@@ -1,4 +1,10 @@
-﻿using TommoJProductions.MoControls.XInputInterpreter;
+﻿using System.Linq;
+
+using HutongGames.PlayMaker;
+
+using MSCLoader;
+
+using TommoJProductions.MoControls.XInputInterpreter;
 using UnityEngine;
 
 namespace TommoJProductions.MoControls
@@ -9,27 +15,26 @@ namespace TommoJProductions.MoControls
 
 		private XboxController controller;
 
-		private Vector2 input;
+		private Vector2 _moveInput;
 
-        public override float inputX => input.x;
+        public override float inputX => _moveInput.x;
 
-        public override float inputY => input.y;
+        public override float inputY => _moveInput.y;
 
-		public override bool inputJump => controller.getButtonDown(MoControlsSaveData.loadedSaveData.playerJump);
+		public override bool inputJump => cInput.GetButtonDown("Jump");
 
-        public void Start()
-		{
+		public void Start()
+		{			
 			controller = XboxControllerManager.instance.controller;
 		}
 		public override void Update()
 		{
 			if (controller.isConnected && MoControlsSaveData.loadedSaveData.usePlayerMoveAsInput)
 			{
-				input = controller.getInputFromTypeRaw(MoControlsSaveData.loadedSaveData.playerMove);
+				_moveInput = controller.getInputFromTypeRaw(MoControlsSaveData.loadedSaveData.playerMove);
 				if (!MoControlsSaveData.loadedSaveData.playerMoveUseRawInput)
-					input.doDeadzoneCheck(MoControlsSaveData.loadedSaveData.playerMoveDeadzoneType, MoControlsSaveData.loadedSaveData.playerMoveDeadzone);
+					_moveInput.doDeadzoneCheck(MoControlsSaveData.loadedSaveData.playerMoveDeadzoneType, MoControlsSaveData.loadedSaveData.playerMoveDeadzone);
 
-				input = controller.getInputFromTypeRaw(MoControlsSaveData.loadedSaveData.playerMove);
 				base.Update();				
 			}
 		}
