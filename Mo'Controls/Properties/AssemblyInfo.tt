@@ -13,7 +13,7 @@
         minor = Convert.ToInt32(matches[0].Groups["minor"].Value);
 
         int r = Convert.ToInt32(matches[0].Groups["revision"].Value);
-        revision = (int)(DateTime.UtcNow - new DateTime(2022,1,1)).TotalDays;
+        revision = (int)(DateTime.UtcNow - new DateTime(2024,11,1)).TotalDays;
         build = Convert.ToInt32(matches[0].Groups["build"].Value);
         if (r != revision)
         {

@@ -84,9 +84,12 @@ namespace TommoJProductions.MoControls
                 {
                        { "Left", "None", "None", },
                        { "Right", "None", "None", },
-                       { "Throttle", "None", "None", },
-                       { "Brake", "None", "None", },
-                       { "Clutch", "None", "None", },
+                       { "ThrottleOn", "None", "None", },
+                       { "ThrottleOff", "None", "None", },
+                       { "BrakeOn", "None", "None", },
+                       { "BrakeOff", "None", "None", },
+                       { "ClutchOn", "None", "None", },
+                       { "ClutchOff", "None", "None", },
                        { "ShiftUp", "None", "None", },
                        { "ShiftDown", "None", "None", },
                        { "IndicatorLeft", "None", "None", },
@@ -687,9 +690,15 @@ namespace TommoJProductions.MoControls
         {
             // Written, 31.08.2018 | Modified, 04.08.2022
 
-            for (int i = 0; i < controls.GetLength(0); i++)
+            int len = controls.GetLength(0);
+            for (int i = 0; i < len; i++)
             {
-                cInput.ChangeKey(controls[i, 0], controls[i, 1], controls[i, 2]);
+                try {
+                    cInput.ChangeKey(controls[i, 0], controls[i, 1], controls[i, 2]);
+                }
+                catch (Exception e) {
+                    MoControlsMod.print($"Failed to change {controls[i, 0]} cinput key.", DebugTypeEnum.none);
+                }
             }
         }
         /// <summary>
