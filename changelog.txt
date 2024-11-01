@@ -1,0 +1,69 @@
+Mo'Controls v1.3.0.7 - 01.11.2024
+# fixed up keybinds not working.
+
+Mo'Controls v1.2.230.130 - 19.08.2022
+# refactored debug related stuff.
+# refactored GuiNav and XboxControllerScroll.
+# implemented anyInput method for keyboard emulator. returns true if any key was pressed that frame.
+# refactored mouseEmulator.
+# implemented new native method, PeekMessage.
+# improved performance of monitorControllerConnections.
+- mod now performs much better.
+# implemented bool: anyInput for xboxController. anyInput is updated when the controller state is updated.
+# changed how scrollFunction is started. now started when xbox controller connects.
+# refactored xbox extentions.
+# implemented new method of moving the player with a controller.
+# implemented new method of player looking with a controller.
+# refactored input
+# refactored control manager.
+# overhaul of control manager.
+# implemented keyboard/mouse - controller switch logic.
+# mod now auto detects if player is using a controller or keyboard/mouse.
+ - can be overriden by "device detection" setting.
+# under foot controls => setting "playerMove" option is available instead of use of standard cinput assignment. (list of controls). new setting allows user to select left stick or right stick or dpad to control the movement of the player. this is now direct. (xbox controller => player move )instead of standard cinput implementation (xbox controller => cInput => unity input system => player move).  which was causing deadzone issues that i couldn't control as the input data was going through so many other unknown logic.
+# Fixed player movement always wanting to drift sideways/forwards etc.
+# implemented new player look logic. player look is now also direct (xbox controller => player look) instead of always emulating the mouse for the xbox controller to be able to look. (xbox controller => mouse emulator => move cursor).
+ - now mouse emulator is only on in the menus (playerInMenu). otherwise mod uses new controllerLook logic to move the player camera, much like the game initially does it.
+as both standard look and new controller look conflicted with eachother when both enabled. i had to implement new controller/mouse switch logic to switch between using controller look/move logic and default cInput look/move logic by enabling/disabling said behaviours.
+# fixed bug where if user exits game while looking at a scrollable function, trigger assignments weren't reset.
+# modified wheel slip ffb setting logic
+# reworked mod GUI.
+# modified fps move input logic
+# changed how player camera is referenced
+# implemented player move direct input.
+# reworked control manager.
+# detect device now correctly detects mouse movement (Mouse/Keyboard) when in mod GUI.
+# updated version stuff.
+
+Mo'Controls v1.1.155.35 - 06.06.2022
+# [detectScrollable] now works in driving mode!!
+# Split [GuiNav] logic into [XboxControllerScroll] and [GuiNav]. [XboxControllerScroll] can only scroll the mouse wheel. While guiNav can do both, scroll and change gui menu as [GuiNav] is derived from [XboxController].
+# Refactored [guiNav]/[xboxControllerScroll] code.
+# Implemented auto versioning and auto latest version date. so i dont have too anymore. (one less thing to have to think about.
+# Refactored gui logic code.
+# Modified access modifiers.
+# Refactored xbox controller code.
+# Modified how detectScrollable detects if player is looking at a mouse-scroll-action-enabled-object
+# Implemented logic to change trigger inputs to none while detecting a scrollable. When [detectScrollable]'s state changes from detecting to not (player stops looking at a scrollable item) trigger inputs are set back to the input prior to scrollable interaction.
+# Modified how [ControlManager] handles FFB on an xbox controller.
+# Modifed how [ControlManager] resets Rumble on an xbox controller.
+# implemented Mod.Description.
+
+
+Mo'Controls v1.1.7.2 - 02.06.2022
+# fix bug where control mode is not set on first game load. (no controls)
+
+Mo'Controls v1.1.7 - 31.05.2022
+# Fixed not being able to select right stick in mouse emulation settings.
+# removed unused mod keybind related fields.
+# updated feature list.
+# renamed settings menu type, Display to Axis.
+# updated supported modloader ver to 1.2.6
+# Implemented detect scrollable logic =>
+now if the players hand is empty and in hand mode, ControlManager now auto enables mousescroll on the xbox controller triggers if the player is looking at something that has scroll logic, eg. Oil Filter, Window winders.
+# amended default save data.
+
+Mo'Controls v1.1.6 - 30.05.2022
+* Removed Mod Keybinds logic from mod completely as mscmodloader has changed and now does not expose needed data.
+* Fixed not being able to rotate picked up items.
+* Modified Axis.Gravity default values from 3 to 100 | player controls are now 107% more responsive. NOTE: to gain these chances you must deleted the mo controls save data file.
