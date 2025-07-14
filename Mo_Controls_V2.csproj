@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E5E06FF9-9241-4CDC-83B5-CB1A2E346E5F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TommoJProductions.MoControlsV2</RootNamespace>
+    <AssemblyName>Mo_Controls_V2</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;X64</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>X64</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;X86</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>X86</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="UIManager.cs" />
+    <Compile Include="CameraManager.cs" />
+    <Compile Include="ChangeInput.cs" />
+    <Compile Include="Commands.cs" />
+    <Compile Include="ControllerLook.cs" />
+    <Compile Include="ControlManager.cs" />
+    <Compile Include="FPSLook.cs" />
+    <Compile Include="MouseInput\MouseEmulator.cs" />
+    <Compile Include="MouseInput\User32Structs.cs" />
+    <Compile Include="MouseInput\User32Imports.cs" />
+    <Compile Include="MoControlsV2Mod.cs" />
+    <Compile Include="MoMouseLook.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AssemblyInfo.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="XInput\XInputStructs.cs" />
+    <Compile Include="XInput\XInputGamepad.cs" />
+    <Compile Include="XInput\XInputImports.cs" />
+    <Compile Include="XInput\DeadzoneUtils.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>F:\SteamLibrary\steamapps\common\My Summer Car\mysummercar_Data\Managed\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\SteamLibrary\steamapps\common\My Summer Car\mysummercar_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="cInput, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\SteamLibrary\steamapps\common\My Summer Car\mysummercar_Data\Managed\cInput.dll</HintPath>
+    </Reference>
+    <Reference Include="MSCLoader, Version=1.2.11.284, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\SteamLibrary\steamapps\common\My Summer Car\mysummercar_Data\Managed\MSCLoader.dll</HintPath>
+    </Reference>
+    <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\SteamLibrary\steamapps\common\My Summer Car\mysummercar_Data\Managed\PlayMaker.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="UnityEngine">
+      <HintPath>F:\SteamLibrary\steamapps\common\My Summer Car\mysummercar_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\SteamLibrary\steamapps\common\My Summer Car\mysummercar_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Properties\AssemblyInfo.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
+    </Content>
+    <None Include="Resources\mocontrolsv2.assetbundle" />
+    <None Include="Resources\XInputInterface.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>REM define msc mods dir if not defined in environment.
+IF "%25MSC_DIR%25" == "" (
+  SET "MSC_DIR=F:\SteamLibrary\steamapps\common\My Summer Car\Mods"
+)
+
+ECHO MODS DIR: %25MSC_DIR%25
+ECHO CONFIG: $(ConfigurationName)
+
+IF NOT EXIST "%25MSC_DIR%25" (
+  ECHO Error. mods dir not found. update MSC_DIR env var.
+  ECHO dir. %25MSC_DIR%25
+) ELSE (
+    COPY "$(TargetPath)" "%25MSC_DIR%25" /y &gt;nul
+
+    IF /i "$(ConfigurationName)" == "debug" (
+      IF EXIST "%25MSC_DIR%25\debug.bat" (
+        COPY "$(TargetDir)$(TargetName).pdb" "%25MSC_DIR%25" /y &gt;nul
+        CD "%25MSC_DIR%25"
+        CALL "%25MSC_DIR%25\debug.bat"
+        DEL "%25MSC_DIR%25\$(TargetName).pdb" /q &gt;nul
+      ) ELSE (
+        ECHO Error. %25MSC_DIR%25\debug.bat not found. Are you in Debug mode?
+      )
+    )
+)</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>REM update version
+"$(DevEnvDir)TextTransform.exe" -a !!BuildConfiguration!$(Configuration) "$(ProjectDir)Properties\AssemblyInfo.tt"
+
+REM define mo_controls_v2.unity3d file if not defined in environment.
+IF "%25MO_CONTROLS_V2_UNITY3D%25" == "" (
+  SET "MO_CONTROLS_V2_UNITY3D=Q:\Unity\msc bundles\AssetBundles\mo_controls_v2.unity3d"
+)
+
+SET "MO_CONTROLS_V2_UNITY3D_LOC=$(ProjectDir)Resources\mo_controls_v2.unity3d"
+
+REM copy mo_controls_v2.unity3d into Resouces folder
+IF EXIST "%25MO_CONTROLS_V2_UNITY3D%25" (
+    ECHO Copying %25MO_CONTROLS_V2_UNITY3D%25 -^&gt; %25MO_CONTROLS_V2_UNITY3D_LOC%25
+    COPY "%25MO_CONTROLS_V2_UNITY3D%25" "%25MO_CONTROLS_V2_UNITY3D_LOC%25" /y
+) else (
+    ECHO ERR: %25MO_CONTROLS_V2_UNITY3D%25 not found. Update MO_CONTROLS_V2_UNITY3D env var.
+)</PreBuildEvent>
+  </PropertyGroup>
+</Project>
