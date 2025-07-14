@@ -1,3 +1,7 @@
+Mo'Controls v2.0.0.1 - 15.07.2025
+# complete mod rewrite
+# New UI
+
 Mo'Controls v1.3.0.7 - 01.11.2024
 # fixed up keybinds not working.
 
