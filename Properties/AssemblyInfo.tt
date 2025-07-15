@@ -83,7 +83,7 @@ using System.Resources;
 
 // Version information
 [assembly: AssemblyVersion("<#= this.major #>.<#= this.minor #>.<#= this.revision #>.<#= this.build #>")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("<#= this.major #>.<#= this.minor #>.<#= this.revision #>.<#= this.build #>")]
 
 namespace <#= this.namespaceName #>.<#= this.assemblyTitle.Replace(" ", "") #> {
 

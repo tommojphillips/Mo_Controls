@@ -14,14 +14,14 @@ using System.Resources;
 [assembly: NeutralResourcesLanguage("en-AU")]
 
 // Version information
-[assembly: AssemblyVersion("2.0.0.4")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("2.0.0.2")]
+[assembly: AssemblyFileVersion("2.0.0.2")]
 
 namespace TommoJProductions.MoControlsV2 {
 
     public class VersionInfo {
-	    public const string lastestRelease = "15.07.2025 12:34 AM";
-	    public const string version = "2.0.0.4";
+	    public const string lastestRelease = "15.07.2025 02:57 PM";
+	    public const string version = "2.0.0.2";
 
 #if X64
         internal const bool IS_X64 = true;

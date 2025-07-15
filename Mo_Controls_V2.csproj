@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TommoJProductions.MoControlsV2</RootNamespace>
-    <AssemblyName>Mo_Controls_V2</AssemblyName>
+    <AssemblyName>Mo_Controls</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>

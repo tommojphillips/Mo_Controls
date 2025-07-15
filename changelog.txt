@@ -1,3 +1,6 @@
+Mo'Controls v2.0.0.2 - 15.07.2025
+# Changed dll name from Mo_Controls_V2.dll to Mo_Controls.dll.
+
 Mo'Controls v2.0.0.1 - 15.07.2025
 # complete mod rewrite
 # New UI
