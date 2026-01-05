@@ -248,9 +248,16 @@ namespace TommoJProductions.MoControlsV2 {
         private Color header_text_color;
         private Scrollbar scrollbar;
 
+        Text header_text;
+        Text header_shadow;
+
         public void Update() {
-            change_input.update();
-            context_input.update();
+            if (ui_go.activeInHierarchy) {
+                change_input.update();
+                context_input.update();
+                update_connection_status();
+            }
+
             if (UnityEngine.Input.GetKeyDown(KeyCode.F7)) {
                 toggle_UI();
             }
@@ -294,19 +301,6 @@ namespace TommoJProductions.MoControlsV2 {
             };
         }
 
-        private string get_menu_tab_text(MENU_ITEMS i) {
-            switch (i) {
-                case MENU_ITEMS.FOOT_CONTROLS:
-                    return "Foot";
-                case MENU_ITEMS.DRIVING_CONTROLS:
-                    return "Driving";
-                case MENU_ITEMS.SETTINGS:
-                    return "Settings";
-                default:
-                    return "Unk";
-            }
-        }
-
         private void create_control(List<string> blacklist, Transform tab_transform, int i, ref int count) {
             if (blacklist.Contains(ControlManager.control_names[i])) {
                 return;
@@ -346,6 +340,9 @@ namespace TommoJProductions.MoControlsV2 {
             settings_tab = ui_go.transform.Find($"UI/Settings_Tab").gameObject;
             context_settings = ui_go.transform.Find($"UI/Context_Settings").gameObject;
             scrollbar = ui_go.transform.Find("UI/Scrollbar").GetComponent<Scrollbar>();
+
+            header_text = ui_go.transform.Find("UI/Connection/Text").GetComponent<Text>();
+            header_shadow = ui_go.transform.Find("UI/Connection/Shadow").GetComponent<Text>();
 
             scrollbar.value = 1;
 
@@ -401,6 +398,29 @@ namespace TommoJProductions.MoControlsV2 {
             context_pointer_handler = context_settings.AddComponent<Pointer_Handler>();
         }
         
+        private void update_connection_status() {
+            string connection;
+            if (ControlManager.controller.state.is_connected) {
+                connection = "Connected";
+            }
+            else {
+                connection = "Disconnected";
+            }
+            header_text.text = connection;
+            header_shadow.text = connection;
+        }
+        private string get_menu_tab_text(MENU_ITEMS i) {
+            switch (i) {
+                case MENU_ITEMS.FOOT_CONTROLS:
+                    return "Foot";
+                case MENU_ITEMS.DRIVING_CONTROLS:
+                    return "Driving";
+                case MENU_ITEMS.SETTINGS:
+                    return "Settings";
+                default:
+                    return "Unk";
+            }
+        }
         private void set_settings() {
 
             on_deadzone_changed_ls(ControlManager.controller.deadzone.ls);
@@ -480,7 +500,7 @@ namespace TommoJProductions.MoControlsV2 {
 
                     t2 = foot_controls_tab.transform.Find("Content");
                     t = t2.GetComponent<RectTransform>();
-                    t.sizeDelta = new Vector2(t.sizeDelta.x, ((foot_count/5)+(foot_count%5)) * 115);
+                    t.sizeDelta = new Vector2(t.sizeDelta.x, (((foot_count/5)+(foot_count%5))*115)-15);
                     t.anchoredPosition = new Vector2(0, 0);
                     break;
                 case MENU_ITEMS.DRIVING_CONTROLS:
@@ -491,7 +511,7 @@ namespace TommoJProductions.MoControlsV2 {
 
                     t2 = driving_controls_tab.transform.Find("Content");
                     t = t2.GetComponent<RectTransform>();
-                    t.sizeDelta = new Vector2(t.sizeDelta.x, ((driving_count/5)+(driving_count%5)) * 115);
+                    t.sizeDelta = new Vector2(t.sizeDelta.x, (((driving_count/5)+(driving_count%5))*115)-15);
                     t.anchoredPosition = new Vector2(0, 0);
                     break;
                 case MENU_ITEMS.SETTINGS:
