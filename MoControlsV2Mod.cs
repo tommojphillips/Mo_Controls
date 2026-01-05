@@ -7,11 +7,11 @@ using System;
 namespace TommoJProductions.MoControlsV2 {
     public struct MoControlsV2Assets {
         public GameObject UI_prefab;
-        public Sprite[] spirtes;
+        public Sprite[] sprites;
 
         public MoControlsV2Assets(int sprite_count) {
             UI_prefab = null;
-            spirtes = new Sprite[sprite_count];
+            sprites = new Sprite[sprite_count];
         }
     }
 
