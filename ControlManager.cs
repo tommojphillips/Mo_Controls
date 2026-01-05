@@ -42,7 +42,7 @@ namespace TommoJProductions.MoControlsV2 {
         public static readonly List<string> driving_controls_blacklist = new List<string> {
             "ThrottleOn", "ThrottleOff", "BrakeOn", "BrakeOff", "ClutchOn", "ClutchOff", "StartEngine", "Handbrake1",
             "PlayerLeft", "PlayerRight", "PlayerUp", "PlayerDown", "Jump", "Run", "Crouch", "Push", "PlayerVertical",
-            "PlayerHorizontal", "Vertical", "Up", "Down", "Left", "Right"
+            "PlayerHorizontal", "Vertical", "Up", "Down", "Left", "Right", "Urinate"
         };
 
         private static FsmBool m_player_in_menu;
@@ -257,25 +257,25 @@ namespace TommoJProductions.MoControlsV2 {
             set_control(PLAYER_MODE.DRIVING_MODE, "MouseLookY", XINPUT_GAMEPAD_INPUT.RS_Y);
         }
         public static void set_default_deadzones() {
-            controller.deadzone.ls = 15f;
-            controller.deadzone.rs = 15f;
-            controller.deadzone.lt = 10f;
-            controller.deadzone.rt = 10f;
+            m_controller.deadzone.ls = 15f;
+            m_controller.deadzone.rs = 15f;
+            m_controller.deadzone.lt = 10f;
+            m_controller.deadzone.rt = 10f;
         }
         public static void set_default_sensitivity() {
 #if MOUSE_MOVE_EMU
-            mouse_emulator.sensitivity_x = 15;
-            mouse_emulator.sensitivity_y = 15;
+            m_mouse_emulator.sensitivity_x = 15;
+            m_mouse_emulator.sensitivity_y = 15;
 #endif
-            mouse_emulator.sensitivity_scroll = 30;
-            camera_manager.controller_look_x.sensitivity = 65;
-            camera_manager.controller_look_y.sensitivity = 65;
+            m_mouse_emulator.sensitivity_scroll = 30;
+            m_camera_manager.controller_look_x.sensitivity = 65;
+            m_camera_manager.controller_look_y.sensitivity = 65;
         }
 
         public static bool get_input(string description) {
             if (description != null) {
                 if (current_controls.TryGetValue(description, out XINPUT_GAMEPAD_INPUT v)) {
-                    return controller.get_input(v) != 0;                    
+                    return m_controller.get_input(v) != 0;                    
                 }
             }
             return false;
@@ -283,7 +283,7 @@ namespace TommoJProductions.MoControlsV2 {
         public static float get_axis(string description) {
             if (description != null) {
                 if (current_controls.TryGetValue(description, out XINPUT_GAMEPAD_INPUT c)) {
-                    return controller.get_input(c);      
+                    return m_controller.get_input(c);      
                 }
             }
             return 0;
@@ -291,7 +291,7 @@ namespace TommoJProductions.MoControlsV2 {
         public static bool get_input_down(string description) {
             if (description != null) {
                 if (current_controls.TryGetValue(description, out XINPUT_GAMEPAD_INPUT v)) {
-                    return controller.get_input_down(v);                    
+                    return m_controller.get_input_down(v);                    
                 }
             }
             return false;
@@ -299,7 +299,7 @@ namespace TommoJProductions.MoControlsV2 {
         public static bool get_input_up(string description) {
             if (description != null) {
                 if (current_controls.TryGetValue(description, out XINPUT_GAMEPAD_INPUT v)) {
-                    return controller.get_input_up(v);                    
+                    return m_controller.get_input_up(v);                    
                 }
             }
             return false;
