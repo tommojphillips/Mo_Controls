@@ -6,19 +6,23 @@ namespace TommoJProductions.MoControlsV2 {
 
         public ControllerLook controller_look_x;
         public ControllerLook controller_look_y;
-        public MoMouseLook mouseLookX;
-        public MoMouseLook mouseLookY;
+        public MoMouseLook mouse_look_x;
+        public MoMouseLook mouse_look_y;
 
         public void load() {
             hook_mouse_look();
 
             GameObject player = GameObject.Find("PLAYER");
             controller_look_x = player.AddComponent<ControllerLook>();
-            mouseLookX = player.AddComponent<MoMouseLook>();
+            controller_look_x.use_raw_input = true;
+            mouse_look_x = player.AddComponent<MoMouseLook>();
+            mouse_look_x.use_raw_input = false;
 
             GameObject pov = GameObject.Find("PLAYER/Pivot/AnimPivot/Camera/FPSCamera");
             controller_look_y = pov.AddComponent<ControllerLook>();
-            mouseLookY = pov.AddComponent<MoMouseLook>();
+            controller_look_y.use_raw_input = true;
+            mouse_look_y = pov.AddComponent<MoMouseLook>();
+            mouse_look_y.use_raw_input = false;
         }
 
         private void hook_mouse_look() {
