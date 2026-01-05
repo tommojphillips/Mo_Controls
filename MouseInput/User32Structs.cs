@@ -1,30 +1,21 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+
 namespace TommoJProductions.MoControlsV2.MouseInput {
 
     public enum MOUSE_EVENT : uint {
-        ABSOLUTE = 0x8000,
-        HWHEEL = 0x01000,
-        MOVE = 0x0001,
-        LEFTDOWN = 0x0002,
-        LEFTUP = 0x0004,
-        RIGHTDOWN = 0x0008,
-        RIGHTUP = 0x0010,
-        MIDDLEDOWN = 0x0020,
-        MIDDLEUP = 0x0040,
-        WHEEL = 0x0800,
-        XDOWN = 0x0080,
-        XUP = 0x0100
-    }
-
-    public enum MOUSE_EVENT_CLICK_BUTTON0 : uint {
-        DOWN = 0x0002,
-        UP   = 0x0004
-    }
-
-    public enum MOUSE_EVENT_CLICK_BUTTON1 : uint {
-        DOWN = 0x0008,
-        UP   = 0x0010
+        MOVE       = 0x00000001,
+        LEFTDOWN   = 0x00000002,
+        LEFTUP     = 0x00000004,
+        RIGHTDOWN  = 0x00000008,
+        RIGHTUP    = 0x00000010,
+        MIDDLEDOWN = 0x00000020,
+        MIDDLEUP   = 0x00000040,
+        XDOWN      = 0x00000080,
+        XUP        = 0x00000100,
+        WHEEL      = 0x00000800,
+        HWHEEL     = 0x00001000,
+        ABSOLUTE   = 0x00008000,
     }
 
     public enum MOUSE_EVENT_BUTTON : uint {
@@ -55,11 +46,8 @@ namespace TommoJProductions.MoControlsV2.MouseInput {
 
     [StructLayout(LayoutKind.Sequential)]
     public struct Input {
-
         public uint type;
         public MouseInput mi;
-
-        public static int Size => Marshal.SizeOf(typeof(Input));
-
+        public static int size => Marshal.SizeOf(typeof(Input));
     }
 }

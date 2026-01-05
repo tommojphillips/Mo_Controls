@@ -77,7 +77,9 @@ namespace TommoJProductions.MoControlsV2 {
             m_mouse_emulator.update_mouse_scroll();
             update_tool_mode_button();
             update_player_mode();
+#if MOUSE_MOVE_EMU
             update_in_menu();
+#endif
         }
 
         public void load() {
@@ -144,11 +146,13 @@ namespace TommoJProductions.MoControlsV2 {
                 on_player_mode_changed();
             }
         }
+#if MOUSE_MOVE_EMU
         private void update_in_menu() {
             if (m_player_in_menu.Value) {
                 m_mouse_emulator.update_mouse_postion();
             }
         }
+#endif
         public void update_tool_mode_button() {
             if (m_controller.state.is_connected) {
                 if (ControlManager.get_input_down("ToolMode")) {
@@ -199,8 +203,10 @@ namespace TommoJProductions.MoControlsV2 {
             cInput.SetKey("MouseButton1", "None");
             cInput.SetKey("MouseScroll-", "None");
             cInput.SetKey("MouseScroll+", "None");
+#if MOUSE_MOVE_EMU
             cInput.SetKey("MouseMoveX", "None");
             cInput.SetKey("MouseMoveY", "None");
+#endif
             cInput.SetKey("MouseLookX", "None");
             cInput.SetKey("MouseLookY", "None");
         }
@@ -223,10 +229,10 @@ namespace TommoJProductions.MoControlsV2 {
             set_control(PLAYER_MODE.FOOT_MODE, "ReachLeft", XInputGamepad.INPUT.LB);
             set_control(PLAYER_MODE.FOOT_MODE, "MouseButton0", XInputGamepad.INPUT.A);
             set_control(PLAYER_MODE.FOOT_MODE, "MouseButton1", XInputGamepad.INPUT.B);
-            set_control(PLAYER_MODE.FOOT_MODE, "MouseMoveX", XInputGamepad.INPUT.RS_X);
+#if MOUSE_MOVE_EMU
             set_control(PLAYER_MODE.FOOT_MODE, "MouseMoveY", XInputGamepad.INPUT.RS_Y);
             set_control(PLAYER_MODE.FOOT_MODE, "MouseLookX", XInputGamepad.INPUT.RS_X);
-            set_control(PLAYER_MODE.FOOT_MODE, "MouseLookY", XInputGamepad.INPUT.RS_Y);
+#endif
             set_control(PLAYER_MODE.FOOT_MODE, "MouseScroll-", XInputGamepad.INPUT.LT);
             set_control(PLAYER_MODE.FOOT_MODE, "MouseScroll+", XInputGamepad.INPUT.RT);
 
@@ -244,10 +250,10 @@ namespace TommoJProductions.MoControlsV2 {
             set_control(PLAYER_MODE.DRIVING_MODE, "ReachRight", XInputGamepad.INPUT.DPAD_RIGHT);
             set_control(PLAYER_MODE.DRIVING_MODE, "MouseButton0", XInputGamepad.INPUT.A);
             set_control(PLAYER_MODE.DRIVING_MODE, "MouseButton1", XInputGamepad.INPUT.RB);
-            set_control(PLAYER_MODE.DRIVING_MODE, "MouseMoveX", XInputGamepad.INPUT.RS_X);
+#if MOUSE_MOVE_EMU
             set_control(PLAYER_MODE.DRIVING_MODE, "MouseMoveY", XInputGamepad.INPUT.RS_Y);
             set_control(PLAYER_MODE.DRIVING_MODE, "MouseLookX", XInputGamepad.INPUT.RS_X);
-            set_control(PLAYER_MODE.DRIVING_MODE, "MouseLookY", XInputGamepad.INPUT.RS_Y);
+#endif
         }
         public static void set_default_deadzones() {
             controller.deadzone.ls = 15f;
@@ -256,8 +262,10 @@ namespace TommoJProductions.MoControlsV2 {
             controller.deadzone.rt = 10f;
         }
         public static void set_default_sensitivity() {
+#if MOUSE_MOVE_EMU
             mouse_emulator.sensitivity_x = 15;
             mouse_emulator.sensitivity_y = 15;
+#endif
             mouse_emulator.sensitivity_scroll = 30;
             camera_manager.controller_look_x.sensitivity = 65;
             camera_manager.controller_look_y.sensitivity = 65;
