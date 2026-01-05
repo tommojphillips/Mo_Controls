@@ -17,9 +17,9 @@ namespace TommoJProductions.MoControlsV2 {
 
     public class ControlManager : MonoBehaviour {
 
-        public static Dictionary<string, XInputGamepad.INPUT> foot_controls;
-        public static Dictionary<string, XInputGamepad.INPUT> driving_controls;
-        public static Dictionary<string, XInputGamepad.INPUT> current_controls {
+        public static Dictionary<string, XINPUT_GAMEPAD_INPUT> foot_controls;
+        public static Dictionary<string, XINPUT_GAMEPAD_INPUT> driving_controls;
+        public static Dictionary<string, XINPUT_GAMEPAD_INPUT> current_controls {
             get {
                 switch (player_mode) {
                     case PLAYER_MODE.FOOT_MODE:
@@ -46,18 +46,17 @@ namespace TommoJProductions.MoControlsV2 {
         };
 
         private static FsmBool m_player_in_menu;
-        private static FsmBool m_player_stop;
         private static FsmString m_player_vehicle;
         private static PlayMakerFSM m_pick_up;
         private static PlayMakerFSM m_select_item;
         private static FsmBool m_hand_empty;
-        private static XInputGamepad m_controller;
+        private static XInput_Gamepad m_controller;
         private static MouseEmulator m_mouse_emulator;
         private static List<string> m_control_names;
         private static PLAYER_MODE m_player_mode;
         private static CameraManager m_camera_manager;
 
-        public static XInputGamepad controller => m_controller;
+        public static XInput_Gamepad controller => m_controller;
         public static PLAYER_MODE player_mode => m_player_mode;
         public static string player_vehicle => m_player_vehicle.Value;
         public static bool hand_empty => m_hand_empty.Value;
@@ -87,15 +86,14 @@ namespace TommoJProductions.MoControlsV2 {
             get_cinput_control_list();
             hook_cinput();
 
-            foot_controls = new Dictionary<string, XInputGamepad.INPUT>();
-            driving_controls = new Dictionary<string, XInputGamepad.INPUT>();
+            foot_controls = new Dictionary<string, XINPUT_GAMEPAD_INPUT>();
+            driving_controls = new Dictionary<string, XINPUT_GAMEPAD_INPUT>();
 
-            m_controller = new XInputGamepad(GAMEPAD_INDEX.ONE);
+            m_controller = new XInput_Gamepad(XINPUT_GAMEPAD_INDEX.ONE);
             m_mouse_emulator = new MouseEmulator();
             m_camera_manager = new CameraManager();
             m_camera_manager.load();
             m_player_vehicle = PlayMakerGlobals.Instance.Variables.FindFsmString("PlayerCurrentVehicle");
-            m_player_stop = PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerStop");
             m_pick_up = GameObject.Find("PLAYER/Pivot/AnimPivot/Camera/FPSCamera/1Hand_Assemble/Hand").gameObject.GetPlayMaker("PickUp");
             m_hand_empty = m_pick_up.FsmVariables.FindFsmBool("HandEmpty");
             m_select_item = GameObject.Find("PLAYER/Pivot/AnimPivot/Camera/FPSCamera/SelectItem").gameObject.GetPlayMaker("Selection");
@@ -106,7 +104,7 @@ namespace TommoJProductions.MoControlsV2 {
             set_default_sensitivity();
         }
 
-        public static void set_control(PLAYER_MODE mode, string key, XInputGamepad.INPUT c) {
+        public static void set_control(PLAYER_MODE mode, string key, XINPUT_GAMEPAD_INPUT c) {
             switch (mode) {
                 case PLAYER_MODE.FOOT_MODE:
                     if (ControlManager.foot_controls.ContainsKey(key)) {
@@ -127,8 +125,8 @@ namespace TommoJProductions.MoControlsV2 {
             }
         }
 
-        public static void get_control(PLAYER_MODE mode, string key, out XInputGamepad.INPUT c) {
-            c = XInputGamepad.INPUT.NONE;
+        public static void get_control(PLAYER_MODE mode, string key, out XINPUT_GAMEPAD_INPUT c) {
+            c = XINPUT_GAMEPAD_INPUT.NONE;
             switch (mode) {
                 case PLAYER_MODE.FOOT_MODE:
                     ControlManager.foot_controls.TryGetValue(key, out c);
@@ -143,7 +141,6 @@ namespace TommoJProductions.MoControlsV2 {
             PLAYER_MODE new_player_mode = m_player_vehicle.Value == "" ? PLAYER_MODE.FOOT_MODE : PLAYER_MODE.DRIVING_MODE;
             if (m_player_mode != new_player_mode) {
                 m_player_mode = new_player_mode;
-                on_player_mode_changed();
             }
         }
 #if MOUSE_MOVE_EMU
@@ -214,46 +211,50 @@ namespace TommoJProductions.MoControlsV2 {
         public static void set_default_controls() {
 
             foot_controls.Clear();
-            set_control(PLAYER_MODE.FOOT_MODE, "DrivingMode", XInputGamepad.INPUT.BACK);
-            set_control(PLAYER_MODE.FOOT_MODE, "ToolMode", XInputGamepad.INPUT.START);
-            set_control(PLAYER_MODE.FOOT_MODE, "PlayerHorizontal", XInputGamepad.INPUT.LS_X);
-            set_control(PLAYER_MODE.FOOT_MODE, "PlayerVertical", XInputGamepad.INPUT.LS_Y);
-            set_control(PLAYER_MODE.FOOT_MODE, "Jump", XInputGamepad.INPUT.Y);
-            set_control(PLAYER_MODE.FOOT_MODE, "Crouch", XInputGamepad.INPUT.RS);
-            set_control(PLAYER_MODE.FOOT_MODE, "Run", XInputGamepad.INPUT.LS);
-            set_control(PLAYER_MODE.FOOT_MODE, "Use", XInputGamepad.INPUT.X);
-            set_control(PLAYER_MODE.FOOT_MODE, "Finger", XInputGamepad.INPUT.DPAD_LEFT);
-            set_control(PLAYER_MODE.FOOT_MODE, "Smoking", XInputGamepad.INPUT.DPAD_RIGHT);
-            set_control(PLAYER_MODE.FOOT_MODE, "Push", XInputGamepad.INPUT.DPAD_DOWN);
-            set_control(PLAYER_MODE.FOOT_MODE, "Zoom", XInputGamepad.INPUT.DPAD_UP);
-            set_control(PLAYER_MODE.FOOT_MODE, "ReachLeft", XInputGamepad.INPUT.LB);
-            set_control(PLAYER_MODE.FOOT_MODE, "MouseButton0", XInputGamepad.INPUT.A);
-            set_control(PLAYER_MODE.FOOT_MODE, "MouseButton1", XInputGamepad.INPUT.B);
+            set_control(PLAYER_MODE.FOOT_MODE, "DrivingMode", XINPUT_GAMEPAD_INPUT.BACK);
+            set_control(PLAYER_MODE.FOOT_MODE, "ToolMode", XINPUT_GAMEPAD_INPUT.START);
+            set_control(PLAYER_MODE.FOOT_MODE, "PlayerHorizontal", XINPUT_GAMEPAD_INPUT.LS_X);
+            set_control(PLAYER_MODE.FOOT_MODE, "PlayerVertical", XINPUT_GAMEPAD_INPUT.LS_Y);
+            set_control(PLAYER_MODE.FOOT_MODE, "Jump", XINPUT_GAMEPAD_INPUT.Y);
+            set_control(PLAYER_MODE.FOOT_MODE, "Crouch", XINPUT_GAMEPAD_INPUT.RS);
+            set_control(PLAYER_MODE.FOOT_MODE, "Run", XINPUT_GAMEPAD_INPUT.LS);
+            set_control(PLAYER_MODE.FOOT_MODE, "Use", XINPUT_GAMEPAD_INPUT.X);
+            set_control(PLAYER_MODE.FOOT_MODE, "Finger", XINPUT_GAMEPAD_INPUT.DPAD_LEFT);
+            set_control(PLAYER_MODE.FOOT_MODE, "Smoking", XINPUT_GAMEPAD_INPUT.DPAD_RIGHT);
+            set_control(PLAYER_MODE.FOOT_MODE, "Push", XINPUT_GAMEPAD_INPUT.DPAD_DOWN);
+            set_control(PLAYER_MODE.FOOT_MODE, "Zoom", XINPUT_GAMEPAD_INPUT.DPAD_UP);
+            set_control(PLAYER_MODE.FOOT_MODE, "ReachLeft", XINPUT_GAMEPAD_INPUT.LB);
+            set_control(PLAYER_MODE.FOOT_MODE, "MouseButton0", XINPUT_GAMEPAD_INPUT.A);
+            set_control(PLAYER_MODE.FOOT_MODE, "MouseButton1", XINPUT_GAMEPAD_INPUT.B);
 #if MOUSE_MOVE_EMU
-            set_control(PLAYER_MODE.FOOT_MODE, "MouseMoveY", XInputGamepad.INPUT.RS_Y);
-            set_control(PLAYER_MODE.FOOT_MODE, "MouseLookX", XInputGamepad.INPUT.RS_X);
+            set_control(PLAYER_MODE.FOOT_MODE, "MouseMoveX", XINPUT_GAMEPAD_INPUT.RS_X);
+            set_control(PLAYER_MODE.FOOT_MODE, "MouseMoveY", XINPUT_GAMEPAD_INPUT.RS_Y);
 #endif
-            set_control(PLAYER_MODE.FOOT_MODE, "MouseScroll-", XInputGamepad.INPUT.LT);
-            set_control(PLAYER_MODE.FOOT_MODE, "MouseScroll+", XInputGamepad.INPUT.RT);
+            set_control(PLAYER_MODE.FOOT_MODE, "MouseLookX", XINPUT_GAMEPAD_INPUT.RS_X);
+            set_control(PLAYER_MODE.FOOT_MODE, "MouseLookY", XINPUT_GAMEPAD_INPUT.RS_Y);
+            set_control(PLAYER_MODE.FOOT_MODE, "MouseScroll-", XINPUT_GAMEPAD_INPUT.LT);
+            set_control(PLAYER_MODE.FOOT_MODE, "MouseScroll+", XINPUT_GAMEPAD_INPUT.RT);
 
             driving_controls.Clear();
-            set_control(PLAYER_MODE.DRIVING_MODE, "DrivingMode", XInputGamepad.INPUT.BACK);
-            set_control(PLAYER_MODE.DRIVING_MODE, "ToolMode", XInputGamepad.INPUT.START);
-            set_control(PLAYER_MODE.DRIVING_MODE, "Throttle", XInputGamepad.INPUT.RT);
-            set_control(PLAYER_MODE.DRIVING_MODE, "Brake", XInputGamepad.INPUT.LT);
-            set_control(PLAYER_MODE.DRIVING_MODE, "Clutch", XInputGamepad.INPUT.LB);
-            set_control(PLAYER_MODE.DRIVING_MODE, "Horizontal", XInputGamepad.INPUT.LS_X);
-            set_control(PLAYER_MODE.DRIVING_MODE, "ShiftUp", XInputGamepad.INPUT.B);
-            set_control(PLAYER_MODE.DRIVING_MODE, "ShiftDown", XInputGamepad.INPUT.X);
-            set_control(PLAYER_MODE.DRIVING_MODE, "Zoom", XInputGamepad.INPUT.DPAD_UP);
-            set_control(PLAYER_MODE.DRIVING_MODE, "ReachLeft", XInputGamepad.INPUT.DPAD_LEFT);
-            set_control(PLAYER_MODE.DRIVING_MODE, "ReachRight", XInputGamepad.INPUT.DPAD_RIGHT);
-            set_control(PLAYER_MODE.DRIVING_MODE, "MouseButton0", XInputGamepad.INPUT.A);
-            set_control(PLAYER_MODE.DRIVING_MODE, "MouseButton1", XInputGamepad.INPUT.RB);
+            set_control(PLAYER_MODE.DRIVING_MODE, "DrivingMode", XINPUT_GAMEPAD_INPUT.BACK);
+            set_control(PLAYER_MODE.DRIVING_MODE, "ToolMode", XINPUT_GAMEPAD_INPUT.START);
+            set_control(PLAYER_MODE.DRIVING_MODE, "Throttle", XINPUT_GAMEPAD_INPUT.RT);
+            set_control(PLAYER_MODE.DRIVING_MODE, "Brake", XINPUT_GAMEPAD_INPUT.LT);
+            set_control(PLAYER_MODE.DRIVING_MODE, "Clutch", XINPUT_GAMEPAD_INPUT.LB);
+            set_control(PLAYER_MODE.DRIVING_MODE, "Horizontal", XINPUT_GAMEPAD_INPUT.LS_X);
+            set_control(PLAYER_MODE.DRIVING_MODE, "ShiftUp", XINPUT_GAMEPAD_INPUT.B);
+            set_control(PLAYER_MODE.DRIVING_MODE, "ShiftDown", XINPUT_GAMEPAD_INPUT.X);
+            set_control(PLAYER_MODE.DRIVING_MODE, "Zoom", XINPUT_GAMEPAD_INPUT.DPAD_UP);
+            set_control(PLAYER_MODE.DRIVING_MODE, "ReachLeft", XINPUT_GAMEPAD_INPUT.DPAD_LEFT);
+            set_control(PLAYER_MODE.DRIVING_MODE, "ReachRight", XINPUT_GAMEPAD_INPUT.DPAD_RIGHT);
+            set_control(PLAYER_MODE.DRIVING_MODE, "MouseButton0", XINPUT_GAMEPAD_INPUT.A);
+            set_control(PLAYER_MODE.DRIVING_MODE, "MouseButton1", XINPUT_GAMEPAD_INPUT.RB);
 #if MOUSE_MOVE_EMU
-            set_control(PLAYER_MODE.DRIVING_MODE, "MouseMoveY", XInputGamepad.INPUT.RS_Y);
-            set_control(PLAYER_MODE.DRIVING_MODE, "MouseLookX", XInputGamepad.INPUT.RS_X);
+            set_control(PLAYER_MODE.DRIVING_MODE, "MouseMoveX", XINPUT_GAMEPAD_INPUT.RS_X);
+            set_control(PLAYER_MODE.DRIVING_MODE, "MouseMoveY", XINPUT_GAMEPAD_INPUT.RS_Y);
 #endif
+            set_control(PLAYER_MODE.DRIVING_MODE, "MouseLookX", XINPUT_GAMEPAD_INPUT.RS_X);
+            set_control(PLAYER_MODE.DRIVING_MODE, "MouseLookY", XINPUT_GAMEPAD_INPUT.RS_Y);
         }
         public static void set_default_deadzones() {
             controller.deadzone.ls = 15f;
@@ -273,7 +274,7 @@ namespace TommoJProductions.MoControlsV2 {
 
         public static bool get_input(string description) {
             if (description != null) {
-                if (current_controls.TryGetValue(description, out XInputGamepad.INPUT v)) {
+                if (current_controls.TryGetValue(description, out XINPUT_GAMEPAD_INPUT v)) {
                     return controller.get_input(v) != 0;                    
                 }
             }
@@ -281,7 +282,7 @@ namespace TommoJProductions.MoControlsV2 {
         }
         public static float get_axis(string description) {
             if (description != null) {
-                if (current_controls.TryGetValue(description, out XInputGamepad.INPUT c)) {
+                if (current_controls.TryGetValue(description, out XINPUT_GAMEPAD_INPUT c)) {
                     return controller.get_input(c);      
                 }
             }
@@ -289,7 +290,7 @@ namespace TommoJProductions.MoControlsV2 {
         }
         public static bool get_input_down(string description) {
             if (description != null) {
-                if (current_controls.TryGetValue(description, out XInputGamepad.INPUT v)) {
+                if (current_controls.TryGetValue(description, out XINPUT_GAMEPAD_INPUT v)) {
                     return controller.get_input_down(v);                    
                 }
             }
@@ -297,16 +298,11 @@ namespace TommoJProductions.MoControlsV2 {
         }
         public static bool get_input_up(string description) {
             if (description != null) {
-                if (current_controls.TryGetValue(description, out XInputGamepad.INPUT v)) {
+                if (current_controls.TryGetValue(description, out XINPUT_GAMEPAD_INPUT v)) {
                     return controller.get_input_up(v);                    
                 }
             }
             return false;
-        }
-
-        /* Callbacks/Events */
-        private void on_player_mode_changed() {
-            MoControlsV2Mod.log("Control Mode changed: " + m_player_mode);
         }
     }
 

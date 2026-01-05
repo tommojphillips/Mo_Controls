@@ -37,7 +37,7 @@ namespace TommoJProductions.MoControlsV2 {
 
         private GameObject manager_go;
         private ControlManager control_manager;
-        private UIManager ui_manager;
+        private UI_Manager ui_manager;
 
         public static Mod mod;
 
@@ -61,7 +61,7 @@ namespace TommoJProductions.MoControlsV2 {
         }
 
         private void load_ui_manager() {
-            ui_manager = manager_go.AddComponent<UIManager>();
+            ui_manager = manager_go.AddComponent<UI_Manager>();
             ui_manager.load();
         }
 
@@ -74,12 +74,12 @@ namespace TommoJProductions.MoControlsV2 {
             ConsoleCommand.Add(new WriteCinputExternInputsCommand());
         }
 
-        private static void validate_controller_input(int index, out XInputGamepad.INPUT c) {
-            if (index < (int)XInputGamepad.INPUT.COUNT && index >= 0) {
-                c = (XInputGamepad.INPUT)index;
+        private static void validate_controller_input(int index, out XINPUT_GAMEPAD_INPUT c) {
+            if (index < (int)XINPUT_GAMEPAD_INPUT.COUNT && index >= 0) {
+                c = (XINPUT_GAMEPAD_INPUT)index;
             }
             else {
-                c = XInputGamepad.INPUT.NONE;
+                c = XINPUT_GAMEPAD_INPUT.NONE;
             }
         }
 
@@ -95,7 +95,7 @@ namespace TommoJProductions.MoControlsV2 {
                 key = $"foot_{ControlManager.control_names[i]}";
                 if (SaveLoad.ValueExists(mod, key)) {
                     int index = SaveLoad.ReadValue<int>(mod, key);
-                    validate_controller_input(index, out XInputGamepad.INPUT c);
+                    validate_controller_input(index, out XINPUT_GAMEPAD_INPUT c);
                     ControlManager.set_control(PLAYER_MODE.FOOT_MODE, ControlManager.control_names[i], c);
                 }
 
@@ -103,7 +103,7 @@ namespace TommoJProductions.MoControlsV2 {
                 key = $"driving_{ControlManager.control_names[i]}";
                 if (SaveLoad.ValueExists(mod, key)) {
                     int index = SaveLoad.ReadValue<int>(mod, key);
-                    validate_controller_input(index, out XInputGamepad.INPUT c);
+                    validate_controller_input(index, out XINPUT_GAMEPAD_INPUT c);
                     ControlManager.set_control(PLAYER_MODE.DRIVING_MODE, ControlManager.control_names[i], c);
                 }
             }
@@ -117,8 +117,10 @@ namespace TommoJProductions.MoControlsV2 {
             /* Load Sensitivity */
             MoControlsV2Util.load<float>(mod, "mouse_look_x_sensitivity", ref ControlManager.camera_manager.controller_look_x.sensitivity, delegate (float v) { return v >= 0; });
             MoControlsV2Util.load<float>(mod, "mouse_look_y_sensitivity", ref ControlManager.camera_manager.controller_look_y.sensitivity, delegate (float v) { return v >= 0; });
+#if MOUSE_MOVE_EMU
             MoControlsV2Util.load<float>(mod, "mouse_move_x_sensitivity", ref ControlManager.mouse_emulator.sensitivity_x, delegate (float v) { return v >= 0; });
             MoControlsV2Util.load<float>(mod, "mouse_move_y_sensitivity", ref ControlManager.mouse_emulator.sensitivity_y, delegate (float v) { return v >= 0; });
+#endif
             MoControlsV2Util.load<float>(mod, "mouse_scroll_sensitivity", ref ControlManager.mouse_emulator.sensitivity_scroll, delegate (float v) { return v >= 0; });
         }
 
