@@ -10,18 +10,18 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Tommo J. Productions")]
 [assembly: AssemblyProduct("MoControlsV2")]
-[assembly: AssemblyCopyright("Tommo J. Productions Copyright © 2025")]
+[assembly: AssemblyCopyright("Tommo J. Productions Copyright © 2026")]
 [assembly: NeutralResourcesLanguage("en-AU")]
 
 // Version information
-[assembly: AssemblyVersion("2.0.0.2")]
-[assembly: AssemblyFileVersion("2.0.0.2")]
+[assembly: AssemblyVersion("2.0.0.168")]
+[assembly: AssemblyFileVersion("2.0.0.168")]
 
 namespace TommoJProductions.MoControlsV2 {
 
     public class VersionInfo {
-	    public const string lastestRelease = "15.07.2025 02:57 PM";
-	    public const string version = "2.0.0.2";
+	    public const string lastestRelease = "05.01.2026 05:14 PM";
+	    public const string version = "2.0.0.168";
 
 #if X64
         internal const bool IS_X64 = true;
