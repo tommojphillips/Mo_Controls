@@ -577,8 +577,8 @@ namespace TommoJProductions.MoControlsV2 {
             assets.sprites[27] = create_sprite(ab, "xc_dpr.png");
             assets.sprites[28] = create_sprite(ab, "xc_dpu.png");
             assets.sprites[29] = create_sprite(ab, "xc_dpd.png");
-            assets.sprites[30] = null;//create_sprite(ab, "xc_dpx.png");
-            assets.sprites[31] = null;//create_sprite(ab, "xc_dpy.png");
+            assets.sprites[30] = create_sprite(ab, "xc_dpx.png");
+            assets.sprites[31] = create_sprite(ab, "xc_dpy.png");
 
             ab.Unload(false);
         }
