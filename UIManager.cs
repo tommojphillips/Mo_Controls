@@ -421,6 +421,9 @@ namespace TommoJProductions.MoControlsV2 {
                     return "Unk";
             }
         }
+        private float cal_content_height(int count, int items_per_row, float item_height) {
+            return ((count / items_per_row) + Mathf.Clamp01(count % items_per_row)) * item_height;
+        }
         private void set_settings() {
 
             on_deadzone_changed_ls(ControlManager.controller.deadzone.ls);
@@ -500,7 +503,7 @@ namespace TommoJProductions.MoControlsV2 {
 
                     t2 = foot_controls_tab.transform.Find("Content");
                     t = t2.GetComponent<RectTransform>();
-                    t.sizeDelta = new Vector2(t.sizeDelta.x, (((foot_count/5)+(foot_count%5))*115)-15);
+                    t.sizeDelta = new Vector2(t.sizeDelta.x, cal_content_height(foot_count, 5, 116));
                     t.anchoredPosition = new Vector2(0, 0);
                     break;
                 case MENU_ITEMS.DRIVING_CONTROLS:
@@ -511,7 +514,7 @@ namespace TommoJProductions.MoControlsV2 {
 
                     t2 = driving_controls_tab.transform.Find("Content");
                     t = t2.GetComponent<RectTransform>();
-                    t.sizeDelta = new Vector2(t.sizeDelta.x, (((driving_count/5)+(driving_count%5))*115)-15);
+                    t.sizeDelta = new Vector2(t.sizeDelta.x, cal_content_height(driving_count, 5, 116));
                     t.anchoredPosition = new Vector2(0, 0);
                     break;
                 case MENU_ITEMS.SETTINGS:
