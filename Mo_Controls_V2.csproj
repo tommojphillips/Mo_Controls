@@ -52,6 +52,40 @@
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UPD_VER_Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;X64</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UPD_VER_Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;X86</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UPD_VER_Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>X64</DefineConstants>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'UPD_VER_Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>X86</DefineConstants>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="UIManager.cs" />
     <Compile Include="CameraManager.cs" />
@@ -83,30 +117,37 @@
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>F:\SteamLibrary\steamapps\common\My Summer Car\mysummercar_Data\Managed\0Harmony.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>F:\SteamLibrary\steamapps\common\My Summer Car\mysummercar_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="cInput, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>F:\SteamLibrary\steamapps\common\My Summer Car\mysummercar_Data\Managed\cInput.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MSCLoader, Version=1.2.11.284, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>F:\SteamLibrary\steamapps\common\My Summer Car\mysummercar_Data\Managed\MSCLoader.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>F:\SteamLibrary\steamapps\common\My Summer Car\mysummercar_Data\Managed\PlayMaker.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine">
       <HintPath>F:\SteamLibrary\steamapps\common\My Summer Car\mysummercar_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>F:\SteamLibrary\steamapps\common\My Summer Car\mysummercar_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -144,20 +185,39 @@ IF NOT EXIST "%25MSC_DIR%25" (
     COPY "$(TargetPath)" "%25MSC_DIR%25" /y &gt;nul
 
     IF /i "$(ConfigurationName)" == "debug" (
-      IF EXIST "%25MSC_DIR%25\debug.bat" (
-        COPY "$(TargetDir)$(TargetName).pdb" "%25MSC_DIR%25" /y &gt;nul
-        CD "%25MSC_DIR%25"
-        CALL "%25MSC_DIR%25\debug.bat"
-        DEL "%25MSC_DIR%25\$(TargetName).pdb" /q &gt;nul
-      ) ELSE (
-        ECHO Error. %25MSC_DIR%25\debug.bat not found. Are you in Debug mode?
-      )
+        GOTO dbg
     )
+    IF /i "$(ConfigurationName)" == "upd_ver_debug" (
+        GOTO dbg
+    )
+)
+
+EXIT /b 0
+
+:dbg
+IF EXIST "%25MSC_DIR%25\debug.bat" (
+    COPY "$(TargetDir)$(TargetName).pdb" "%25MSC_DIR%25" /y &gt;nul
+     CD "%25MSC_DIR%25"
+     CALL "%25MSC_DIR%25\debug.bat"
+     DEL "%25MSC_DIR%25\$(TargetName).pdb" /q &gt;nul
+) ELSE (
+    ECHO Error. %25MSC_DIR%25\debug.bat not found. Are you in Debug mode?
 )</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>REM update version
+    <PreBuildEvent>IF /i "$(ConfigurationName)" == "upd_ver_release" (
+    GOTO upd_ver
+)
+IF /i "$(ConfigurationName)" == "upd_ver_debug" (
+    GOTO upd_ver
+)
+GOTO copy_asset_bundle
+
+:upd_ver
+REM update version
 "$(DevEnvDir)TextTransform.exe" -a !!BuildConfiguration!$(Configuration) "$(ProjectDir)Properties\AssemblyInfo.tt"
+
+: copy_asset_bundle
 
 REM define mo_controls_v2.unity3d file if not defined in environment.
 IF "%25MO_CONTROLS_V2_UNITY3D%25" == "" (
