@@ -40,10 +40,12 @@ namespace TommoJProductions.MoControlsV2 {
         private UI_Manager ui_manager;
 
         public static Mod mod;
+        public static SettingsKeybind ui_toggle_keybind;
 
         public override void ModSetup() {
             mod = this;
             SetupFunction(Setup.OnLoad, on_load);
+            SetupFunction(Setup.ModSettings, on_settings);
         }
 
         private void on_load() {
@@ -54,6 +56,9 @@ namespace TommoJProductions.MoControlsV2 {
             load_settings();
             load_ui_manager();
             log("Loaded");
+        }
+        private void on_settings() {
+            ui_toggle_keybind = Keybind.Add("toggle_ui", "Toggle UI", KeyCode.F7);
         }
 
         private void create_manager_gameobject() {

@@ -258,7 +258,7 @@ namespace TommoJProductions.MoControlsV2 {
                 update_connection_status();
             }
 
-            if (UnityEngine.Input.GetKeyDown(KeyCode.F7)) {
+            if (MoControlsV2Mod.ui_toggle_keybind.GetKeybindDown()) {
                 toggle_UI();
             }
         }
