@@ -17,7 +17,7 @@ Installation:
 1.) Copy "Mo_Controls.dll" into your mods folder
 
 If you like the mod give it a rating on:
-nexusmods: https://www.nexusmods.com/mysummercar/mods/8940
+nexusmods: https://www.nexusmods.com/mysummercar/mods/14
 racedepartment: https://www.racedepartment.com/downloads/mocontrols.22028/
 
 Thanks to all the people who support and appreciate the project.
