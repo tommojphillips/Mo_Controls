@@ -1,6 +1,6 @@
-06.01.2026 [DD.MM.YYYY]
+07.01.2026 [DD.MM.YYYY]
 Mod: Mo'Controls
-Version: 2.0.0.188
+Version: 2.0.0.191
 Arthor: tommojphillips
 
 About:
@@ -22,7 +22,7 @@ racedepartment: https://www.racedepartment.com/downloads/mocontrols.22028/
 
 Thanks to all the people who support and appreciate the project.
 
-Cheers -Tommo J. Armytage. (tommojphillips)
+Cheers -Tom J. Armytage. (tommojphillips)
 
 # Please let me know if you are having issues or you have found a potential bug! Thanks.
 # If you like my mod, please review it!
