@@ -122,10 +122,6 @@ namespace TommoJProductions.MoControlsV2 {
             /* Load Sensitivity */
             MoControlsV2Util.load<float>(mod, "mouse_look_x_sensitivity", ref ControlManager.camera_manager.controller_look_x.sensitivity, delegate (float v) { return v >= 0; });
             MoControlsV2Util.load<float>(mod, "mouse_look_y_sensitivity", ref ControlManager.camera_manager.controller_look_y.sensitivity, delegate (float v) { return v >= 0; });
-#if MOUSE_MOVE_EMU
-            MoControlsV2Util.load<float>(mod, "mouse_move_x_sensitivity", ref ControlManager.mouse_emulator.sensitivity_x, delegate (float v) { return v >= 0; });
-            MoControlsV2Util.load<float>(mod, "mouse_move_y_sensitivity", ref ControlManager.mouse_emulator.sensitivity_y, delegate (float v) { return v >= 0; });
-#endif
             MoControlsV2Util.load<float>(mod, "mouse_scroll_sensitivity", ref ControlManager.mouse_emulator.sensitivity_scroll, delegate (float v) { return v >= 0; });
         }
 

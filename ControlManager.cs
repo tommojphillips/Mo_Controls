@@ -72,13 +72,9 @@ namespace TommoJProductions.MoControlsV2 {
 
         private void Update() {
             m_controller.get_state();
-            m_mouse_emulator.update_mouse_buttons();
-            m_mouse_emulator.update_mouse_scroll();
             update_tool_mode_button();
             update_player_mode();
-#if MOUSE_MOVE_EMU
-            update_in_menu();
-#endif
+            update_in_game();
         }
 
         public void load() {
@@ -143,13 +139,12 @@ namespace TommoJProductions.MoControlsV2 {
                 m_player_mode = new_player_mode;
             }
         }
-#if MOUSE_MOVE_EMU
-        private void update_in_menu() {
-            if (m_player_in_menu.Value) {
-                m_mouse_emulator.update_mouse_postion();
+        private void update_in_game() {
+            if (!m_player_in_menu.Value) {
+                m_mouse_emulator.update_mouse_buttons();
+                m_mouse_emulator.update_mouse_scroll();
             }
         }
-#endif
         public void update_tool_mode_button() {
             if (m_controller.state.is_connected) {
                 if (ControlManager.get_input_down("ToolMode")) {
@@ -200,10 +195,6 @@ namespace TommoJProductions.MoControlsV2 {
             cInput.SetKey("MouseButton1", "None");
             cInput.SetKey("MouseScroll-", "None");
             cInput.SetKey("MouseScroll+", "None");
-#if MOUSE_MOVE_EMU
-            cInput.SetKey("MouseMoveX", "None");
-            cInput.SetKey("MouseMoveY", "None");
-#endif
             cInput.SetKey("MouseLookX", "None");
             cInput.SetKey("MouseLookY", "None");
         }
@@ -226,10 +217,6 @@ namespace TommoJProductions.MoControlsV2 {
             set_control(PLAYER_MODE.FOOT_MODE, "ReachLeft", XINPUT_GAMEPAD_INPUT.LB);
             set_control(PLAYER_MODE.FOOT_MODE, "MouseButton0", XINPUT_GAMEPAD_INPUT.A);
             set_control(PLAYER_MODE.FOOT_MODE, "MouseButton1", XINPUT_GAMEPAD_INPUT.B);
-#if MOUSE_MOVE_EMU
-            set_control(PLAYER_MODE.FOOT_MODE, "MouseMoveX", XINPUT_GAMEPAD_INPUT.RS_X);
-            set_control(PLAYER_MODE.FOOT_MODE, "MouseMoveY", XINPUT_GAMEPAD_INPUT.RS_Y);
-#endif
             set_control(PLAYER_MODE.FOOT_MODE, "MouseLookX", XINPUT_GAMEPAD_INPUT.RS_X);
             set_control(PLAYER_MODE.FOOT_MODE, "MouseLookY", XINPUT_GAMEPAD_INPUT.RS_Y);
             set_control(PLAYER_MODE.FOOT_MODE, "MouseScroll-", XINPUT_GAMEPAD_INPUT.LT);
@@ -249,10 +236,6 @@ namespace TommoJProductions.MoControlsV2 {
             set_control(PLAYER_MODE.DRIVING_MODE, "ReachRight", XINPUT_GAMEPAD_INPUT.DPAD_RIGHT);
             set_control(PLAYER_MODE.DRIVING_MODE, "MouseButton0", XINPUT_GAMEPAD_INPUT.A);
             set_control(PLAYER_MODE.DRIVING_MODE, "MouseButton1", XINPUT_GAMEPAD_INPUT.RB);
-#if MOUSE_MOVE_EMU
-            set_control(PLAYER_MODE.DRIVING_MODE, "MouseMoveX", XINPUT_GAMEPAD_INPUT.RS_X);
-            set_control(PLAYER_MODE.DRIVING_MODE, "MouseMoveY", XINPUT_GAMEPAD_INPUT.RS_Y);
-#endif
             set_control(PLAYER_MODE.DRIVING_MODE, "MouseLookX", XINPUT_GAMEPAD_INPUT.RS_X);
             set_control(PLAYER_MODE.DRIVING_MODE, "MouseLookY", XINPUT_GAMEPAD_INPUT.RS_Y);
         }
@@ -263,10 +246,6 @@ namespace TommoJProductions.MoControlsV2 {
             m_controller.deadzone.rt = 10f;
         }
         public static void set_default_sensitivity() {
-#if MOUSE_MOVE_EMU
-            m_mouse_emulator.sensitivity_x = 15;
-            m_mouse_emulator.sensitivity_y = 15;
-#endif
             m_mouse_emulator.sensitivity_scroll = 30;
             m_camera_manager.controller_look_x.sensitivity = 65;
             m_camera_manager.controller_look_y.sensitivity = 65;

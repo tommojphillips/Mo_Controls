@@ -377,11 +377,7 @@ namespace TommoJProductions.MoControlsV2 {
             create_slider(out deadzone_rt, on_deadzone_changed_rt, settings_tab.transform, 3, ControlManager.controller.deadzone.rt);
             create_slider(out sensitivity_mouse_look_x, on_sensitivity_changed_mouse_look_x, settings_tab.transform, 4, ControlManager.camera_manager.controller_look_x.sensitivity);
             create_slider(out sensitivity_mouse_look_y, on_sensitivity_changed_mouse_look_y, settings_tab.transform, 5, ControlManager.camera_manager.controller_look_y.sensitivity);
-#if MOUSE_MOVE_EMU
-            create_slider(out sensitivity_mouse_move_x, on_sensitivity_changed_mouse_move_x, settings_tab.transform, 6, ControlManager.mouse_emulator.sensitivity_x);
-            create_slider(out sensitivity_mouse_move_y, on_sensitivity_changed_mouse_move_y, settings_tab.transform, 7, ControlManager.mouse_emulator.sensitivity_y);
-#endif
-            create_slider(out sensitivity_mouse_scroll, on_sensitivity_changed_mouse_scroll, settings_tab.transform, 8, ControlManager.mouse_emulator.sensitivity_scroll);
+            create_slider(out sensitivity_mouse_scroll, on_sensitivity_changed_mouse_scroll, settings_tab.transform, 6, ControlManager.mouse_emulator.sensitivity_scroll);
 
             create_button(out reset_controls, on_reset_settings, settings_tab.transform, 0, "Reset Controls");
             create_button(out reset_deadzones, on_reset_deadzones, settings_tab.transform, 1, "Reset Deadzones");
@@ -432,12 +428,6 @@ namespace TommoJProductions.MoControlsV2 {
             on_deadzone_changed_rt(ControlManager.controller.deadzone.rt);
             on_sensitivity_changed_mouse_look_x(ControlManager.camera_manager.controller_look_x.sensitivity);
             on_sensitivity_changed_mouse_look_y(ControlManager.camera_manager.controller_look_y.sensitivity);
-
-#if MOUSE_MOVE_EMU
-            on_sensitivity_changed_mouse_move_x(ControlManager.mouse_emulator.sensitivity_x);
-            on_sensitivity_changed_mouse_move_y(ControlManager.mouse_emulator.sensitivity_y);
-#endif
-            
             on_sensitivity_changed_mouse_scroll(ControlManager.mouse_emulator.sensitivity_scroll);
 
             Control_Struct button = new Control_Struct();
@@ -741,21 +731,6 @@ namespace TommoJProductions.MoControlsV2 {
             ControlManager.camera_manager.controller_look_y.sensitivity = v;
             MoControlsV2Mod.save_setting($"mouse_look_y_sensitivity", v);
         }
-#if MOUSE_MOVE_EMU
-        private void on_sensitivity_changed_mouse_move_x(float v) {
-            sensitivity_mouse_move_x.text.text = $"Mouse Move X Sen: {v}";
-            sensitivity_mouse_move_x.slider.value = v;
-            ControlManager.mouse_emulator.sensitivity_x = v;
-            MoControlsV2Mod.save_setting($"mouse_move_x_sensitivity", v);
-        }
-
-        private void on_sensitivity_changed_mouse_move_y(float v) {
-            sensitivity_mouse_move_y.text.text = $"Mouse Move Y Sen: {v}";
-            sensitivity_mouse_move_y.slider.value = v;
-            ControlManager.mouse_emulator.sensitivity_y = v;
-            MoControlsV2Mod.save_setting($"mouse_move_y_sensitivity", v);
-        }
-#endif
         private void on_sensitivity_changed_mouse_scroll(float v) {
             sensitivity_mouse_scroll.text.text = $"Mouse Scroll Sen: {v}";
             sensitivity_mouse_scroll.slider.value = v;
@@ -783,11 +758,6 @@ namespace TommoJProductions.MoControlsV2 {
         private void on_reset_sensitivity() {
             SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"mouse_look_x_sensitivity");
             SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"mouse_look_y_sensitivity");
-
-#if MOUSE_MOVE_EMU
-            SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"mouse_move_x_sensitivity");
-            SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"mouse_move_y_sensitivity");
-#endif
             ControlManager.set_default_sensitivity();
             set_settings();
         }
