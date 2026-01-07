@@ -97,19 +97,31 @@ namespace TommoJProductions.MoControlsV2 {
             for (int i = 0; i < ControlManager.control_names.Count; ++i) {
 
                 /* Load foot controls */
-                key = $"foot_{ControlManager.control_names[i]}";
+                key = $"foot_input_{ControlManager.control_names[i]}";
                 if (SaveLoad.ValueExists(mod, key)) {
                     int index = SaveLoad.ReadValue<int>(mod, key);
                     validate_controller_input(index, out XINPUT_GAMEPAD_INPUT c);
-                    ControlManager.set_control(PLAYER_MODE.FOOT_MODE, ControlManager.control_names[i], c);
+                    ControlManager.set_control(PLAYER_MODE.FOOT_MODE, ControlManager.control_names[i], c, XINPUT_GAMEPAD_INPUT.NONE);
+                }
+                key = $"foot_modifier_{ControlManager.control_names[i]}";
+                if (SaveLoad.ValueExists(mod, key)) {
+                    int index = SaveLoad.ReadValue<int>(mod, key);
+                    validate_controller_input(index, out XINPUT_GAMEPAD_INPUT c);
+                    ControlManager.set_control(PLAYER_MODE.FOOT_MODE, ControlManager.control_names[i], null, c);
                 }
 
                 /* Load driving controls */
-                key = $"driving_{ControlManager.control_names[i]}";
+                key = $"driving_input_{ControlManager.control_names[i]}";
                 if (SaveLoad.ValueExists(mod, key)) {
                     int index = SaveLoad.ReadValue<int>(mod, key);
                     validate_controller_input(index, out XINPUT_GAMEPAD_INPUT c);
-                    ControlManager.set_control(PLAYER_MODE.DRIVING_MODE, ControlManager.control_names[i], c);
+                    ControlManager.set_control(PLAYER_MODE.DRIVING_MODE, ControlManager.control_names[i], c, XINPUT_GAMEPAD_INPUT.NONE);
+                }
+                key = $"driving_modifier_{ControlManager.control_names[i]}";
+                if (SaveLoad.ValueExists(mod, key)) {
+                    int index = SaveLoad.ReadValue<int>(mod, key);
+                    validate_controller_input(index, out XINPUT_GAMEPAD_INPUT c);
+                    ControlManager.set_control(PLAYER_MODE.DRIVING_MODE, ControlManager.control_names[i], null, c);
                 }
             }
 

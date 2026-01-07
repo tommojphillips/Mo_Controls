@@ -49,15 +49,15 @@ namespace TommoJProductions.MoControlsV2 {
         public Button button;
         public Image image;
 
-        public Button_Struct(Transform transform) {
+        public Button_Struct(Transform transform, string name = "Button") {
             item = null;
             text = null;
             button = null;
             image = null;
-            load(transform);
+            load(transform, name);
         }
 
-        public void load(Transform transform) {
+        public void load(Transform transform, string name = "Button") {
             if (transform == null) {
                 item = null;
                 text = null;
@@ -68,57 +68,9 @@ namespace TommoJProductions.MoControlsV2 {
             }
 
             item = transform;
-            text = item.Find("Button/Text").GetComponent<Text>();
-            button = item.Find("Button").GetComponent<Button>();
-            image = item.Find("Button").GetComponent<Image>();
-
-            text.color = Color.black;
-        }
-
-        public void add_listener(UnityAction hook) {
-            button.onClick.AddListener(hook);
-        }
-
-        public void enable(bool enable) {
-            item.gameObject.SetActive(enable);
-        }
-
-        public void set_text(string str) {
-            text.text = str;
-        }
-
-        public void set_sprite(Sprite sprite) {
-            image.sprite = sprite;
-        }
-    }
-    public struct Image_Struct {
-        public Transform item;
-        public Text text;
-        public Button button;
-        public Image image;
-
-        public Image_Struct(Transform transform) {
-            item = null;
-            text = null;
-            button = null;
-            image = null;
-            load(transform);
-        }
-
-        public void load(Transform transform) {
-            if (transform == null) {
-                item = null;
-                text = null;
-                button = null;
-                image = null;
-                MoControlsV2Mod.error("image_struct: transform was null.");
-                return;
-            }
-
-            item = transform;
-            text = item.Find("Image/Text").GetComponent<Text>();
-            button = item.Find("Image").GetComponent<Button>();
-            image = item.Find("Image").GetComponent<Image>();
+            text = item.Find($"{name}/Text").GetComponent<Text>();
+            button = item.Find(name).GetComponent<Button>();
+            image = item.Find(name).GetComponent<Image>();
 
             text.color = Color.black;
         }
@@ -143,13 +95,19 @@ namespace TommoJProductions.MoControlsV2 {
         public Transform item;
         public Text text;
         public Button button;
-        public Image image;
+        public Button button1;
+        public Button button2;
+        public Image image1;
+        public Image image2;
 
         public Control_Struct(Transform transform) {
             item = null;
             text = null;
             button = null;
-            image = null;
+            button1 = null;
+            button2 = null;
+            image1 = null;
+            image2 = null;
             load(transform);
         }
 
@@ -158,7 +116,10 @@ namespace TommoJProductions.MoControlsV2 {
                 item = null;
                 text = null;
                 button = null;
-                image = null;
+                button1 = null;
+                button2 = null;
+                image1 = null;
+                image2 = null;
                 MoControlsV2Mod.error("control_struct: transform was null.");
                 return;
             }
@@ -166,25 +127,34 @@ namespace TommoJProductions.MoControlsV2 {
             item = transform;
             text = item.Find("Button/Text").GetComponent<Text>();
             button = item.Find("Button").GetComponent<Button>();
-            image = item.Find("Image").GetComponent<Image>();
+            button1 = item.Find("Image").GetComponent<Button>();
+            button2 = item.Find("Image 1").GetComponent<Button>();
+            image1 = item.Find("Image").GetComponent<Image>();
+            image2 = item.Find("Image 1").GetComponent<Image>();
 
             text.color = Color.black;
         }
 
-        public void add_listener(UnityAction hook) {
+        public void add_listener_input(UnityAction hook) {
             button.onClick.AddListener(hook);
         }
-
+        public void add_listener_modifier(UnityAction hook) {
+            button2.onClick.AddListener(hook);
+        }
+        public void add_listener_context(UnityAction hook) {
+            button1.onClick.AddListener(hook);
+        }
         public void enable(bool enable) {
             item.gameObject.SetActive(enable);
         }
-
         public void set_text(string str) {
             text.text = str;
         }
-
-        public void set_sprite(Sprite sprite) {
-            image.sprite = sprite;
+        public void set_input_sprite(Sprite sprite) {
+            image1.sprite = sprite;
+        }
+        public void set_modifier_sprite(Sprite sprite) {
+            image2.sprite = sprite;
         }
     }
     public class Pointer_Handler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
@@ -230,16 +200,10 @@ namespace TommoJProductions.MoControlsV2 {
         private Slider_Struct deadzone_rt;
         private Slider_Struct sensitivity_mouse_look_x;
         private Slider_Struct sensitivity_mouse_look_y;
-#if MOUSE_MOVE_EMU
-        private Slider_Struct sensitivity_mouse_move_x;
-        private Slider_Struct sensitivity_mouse_move_y;
-#endif
         private Slider_Struct sensitivity_mouse_scroll;
         private Button_Struct reset_controls;
         private Button_Struct reset_deadzones;
         private Button_Struct reset_sensitivity;
-
-        private Dictionary<XINPUT_GAMEPAD_INPUT, XINPUT_GAMEPAD_INPUT[]> context_dic;
 
         private int foot_count;
         private int driving_count;
@@ -269,54 +233,21 @@ namespace TommoJProductions.MoControlsV2 {
             load_asset_bundle();
             create_ui();
             set_settings();
-
-            context_dic = new Dictionary<XINPUT_GAMEPAD_INPUT, XINPUT_GAMEPAD_INPUT[]>() {
-                { XINPUT_GAMEPAD_INPUT.LS_X, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.LS_LEFT, XINPUT_GAMEPAD_INPUT.LS_RIGHT } },
-                { XINPUT_GAMEPAD_INPUT.LS_LEFT, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.LS_X } },
-                { XINPUT_GAMEPAD_INPUT.LS_RIGHT, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.LS_X } },
-
-                { XINPUT_GAMEPAD_INPUT.LS_Y, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.LS_UP, XINPUT_GAMEPAD_INPUT.LS_DOWN } },
-                { XINPUT_GAMEPAD_INPUT.LS_UP, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.LS_Y } },
-                { XINPUT_GAMEPAD_INPUT.LS_DOWN, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.LS_Y } },
-
-                { XINPUT_GAMEPAD_INPUT.RS_X, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.RS_LEFT, XINPUT_GAMEPAD_INPUT.RS_RIGHT } },
-                { XINPUT_GAMEPAD_INPUT.RS_LEFT, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.RS_X } },
-                { XINPUT_GAMEPAD_INPUT.RS_RIGHT, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.RS_X } },
-
-                { XINPUT_GAMEPAD_INPUT.RS_Y, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.RS_UP, XINPUT_GAMEPAD_INPUT.RS_DOWN } },
-                { XINPUT_GAMEPAD_INPUT.RS_UP, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.RS_Y } },
-                { XINPUT_GAMEPAD_INPUT.RS_DOWN, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.RS_Y } },
-                
-                { XINPUT_GAMEPAD_INPUT.DPAD_X, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.DPAD_LEFT, XINPUT_GAMEPAD_INPUT.DPAD_RIGHT } },
-                { XINPUT_GAMEPAD_INPUT.DPAD_LEFT, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.DPAD_X } },
-                { XINPUT_GAMEPAD_INPUT.DPAD_RIGHT, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.DPAD_X } },
-
-                { XINPUT_GAMEPAD_INPUT.DPAD_Y, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.DPAD_UP, XINPUT_GAMEPAD_INPUT.DPAD_DOWN } },
-                { XINPUT_GAMEPAD_INPUT.DPAD_UP, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.DPAD_Y } },
-                { XINPUT_GAMEPAD_INPUT.DPAD_DOWN, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.DPAD_Y } },
-
-                { XINPUT_GAMEPAD_INPUT.Trigger_Axis, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.LT, XINPUT_GAMEPAD_INPUT.RT } },
-                { XINPUT_GAMEPAD_INPUT.LT, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.Trigger_Axis } },
-                { XINPUT_GAMEPAD_INPUT.RT, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.Trigger_Axis } },
-            };
         }
 
-        private void create_control(List<string> blacklist, Transform tab_transform, int i, ref int count) {
-            if (blacklist.Contains(ControlManager.control_names[i])) {
-                return;
+        private void create_control(string[] blacklist, Transform tab_transform, int i, ref int count) {
+            for (int j = 0; j < blacklist.Length; j++) {
+                if (blacklist[j] == ControlManager.control_names[i]) {
+                    return;
+                }
             }
 
-            Transform transform = tab_transform.Find($"Content/Item {i}");
             int c_index = i;
-            Button_Struct button_struct = new Button_Struct(transform);
-            Image_Struct image_struct = new Image_Struct(transform);
-
-            button_struct.enable(true);
-            button_struct.add_listener(delegate () { on_control_button_pressed(c_index); });
-
-            image_struct.enable(true);
-            image_struct.add_listener(delegate () { on_context_menu_open(c_index); });
-
+            Control_Struct control = new Control_Struct(tab_transform.Find($"Content/Item {i}"));
+            control.enable(true);
+            control.add_listener_input(delegate () { on_control_button_pressed(c_index); });
+            control.add_listener_modifier(delegate () { on_control_modifier_pressed(c_index); });
+            control.add_listener_context(delegate () { on_context_menu_open(c_index); });
             count++;
         }
         private void create_slider(out Slider_Struct slider, UnityAction<float> on_changed, Transform tab_transform, int i, float initial_value) {
@@ -343,8 +274,6 @@ namespace TommoJProductions.MoControlsV2 {
 
             header_text = ui_go.transform.Find("UI/Connection/Text").GetComponent<Text>();
             header_shadow = ui_go.transform.Find("UI/Connection/Shadow").GetComponent<Text>();
-
-            scrollbar.value = 1;
 
             /* Header/Version */
             header_text_color = ui_go.transform.Find("UI/Header/Text").GetComponent<Text>().color;
@@ -430,41 +359,68 @@ namespace TommoJProductions.MoControlsV2 {
             on_sensitivity_changed_mouse_look_y(ControlManager.camera_manager.controller_look_y.sensitivity);
             on_sensitivity_changed_mouse_scroll(ControlManager.mouse_emulator.sensitivity_scroll);
 
-            Control_Struct button = new Control_Struct();
+            Control_Struct button = new Control_Struct();            
             for (int i = 0; i < ControlManager.control_names.Count; i++) {
-                if (ControlManager.foot_controls_blacklist.Contains(ControlManager.control_names[i])) {
+                bool blacklist = false;
+                for (int j = 0; j < ControlManager.foot_controls_blacklist.Length; j++) {
+                    if (ControlManager.foot_controls_blacklist[j] == ControlManager.control_names[i]) {
+                        blacklist = true;
+                        break;
+                    }
+                }
+                if (blacklist) {
                     continue;
                 }
 
-                ControlManager.get_control(PLAYER_MODE.FOOT_MODE, ControlManager.control_names[i], out XINPUT_GAMEPAD_INPUT c);
+                ControlManager.get_control(PLAYER_MODE.FOOT_MODE, ControlManager.control_names[i], out control_input c);
                 button.load(foot_controls_tab.transform.Find($"Content/Item {i}"));
                 button.set_text(ControlManager.control_names[i]);
-                button.set_sprite(assets.sprites[(int)c]);
+                button.set_input_sprite(assets.sprites[(int)c.input]);
+                button.set_modifier_sprite(assets.sprites[(int)c.modifier]);
             }
 
             for (int i = 0; i < ControlManager.control_names.Count; i++) {
-                if (ControlManager.driving_controls_blacklist.Contains(ControlManager.control_names[i])) {
+                bool blacklist = false; 
+                for (int j = 0; j < ControlManager.driving_controls_blacklist.Length; j++) {
+                    if (ControlManager.driving_controls_blacklist[j] == ControlManager.control_names[i]) {
+                        blacklist = true;
+                        break;
+                    }
+                }
+                if (blacklist) {
                     continue;
                 }
 
-                ControlManager.get_control(PLAYER_MODE.DRIVING_MODE, ControlManager.control_names[i], out XINPUT_GAMEPAD_INPUT c);                
+                ControlManager.get_control(PLAYER_MODE.DRIVING_MODE, ControlManager.control_names[i], out control_input c);                
                 button.load(driving_controls_tab.transform.Find($"Content/Item {i}"));
                 button.set_text(ControlManager.control_names[i]);
-                button.set_sprite(assets.sprites[(int)c]);                
+                button.set_input_sprite(assets.sprites[(int)c.input]);
+                button.set_modifier_sprite(assets.sprites[(int)c.modifier]);
             }
         }
         private void toggle_UI() {
             ui_go.SetActive(!ui_go.activeInHierarchy);
             ControlManager.player_in_menu = ui_go.activeInHierarchy;
         }
-        private void set_control_value(PLAYER_MODE mode, string key, XINPUT_GAMEPAD_INPUT input) {
-            ControlManager.set_control(mode, key, input);
+        private void set_control_input(PLAYER_MODE mode, string key, XINPUT_GAMEPAD_INPUT input) {
+            ControlManager.set_control(mode, key, input, null);
             switch (mode) {
                 case PLAYER_MODE.FOOT_MODE:
-                    MoControlsV2Mod.save_setting($"foot_{key}", (int)input);
+                    MoControlsV2Mod.save_setting($"foot_input_{key}", (int)input);
                     break;
                 case PLAYER_MODE.DRIVING_MODE:
-                    MoControlsV2Mod.save_setting($"driving_{key}", (int)input);
+                    MoControlsV2Mod.save_setting($"driving_input_{key}", (int)input);
+                    break;
+            }
+        }
+        private void set_control_modifier(PLAYER_MODE mode, string key, XINPUT_GAMEPAD_INPUT modifier) {
+            ControlManager.set_control(mode, key, null, modifier);
+            switch (mode) {
+                case PLAYER_MODE.FOOT_MODE:
+                    MoControlsV2Mod.save_setting($"foot_modifier_{key}", (int)modifier);
+                    break;
+                case PLAYER_MODE.DRIVING_MODE:
+                    MoControlsV2Mod.save_setting($"driving_modifier_{key}", (int)modifier);
                     break;
             }
         }
@@ -495,6 +451,7 @@ namespace TommoJProductions.MoControlsV2 {
                     t = t2.GetComponent<RectTransform>();
                     t.sizeDelta = new Vector2(t.sizeDelta.x, cal_content_height(foot_count, 5, 116));
                     t.anchoredPosition = new Vector2(0, 0);
+                    scrollbar.value = 1;
                     break;
                 case MENU_ITEMS.DRIVING_CONTROLS:
                     foot_controls_tab.SetActive(false);
@@ -506,6 +463,7 @@ namespace TommoJProductions.MoControlsV2 {
                     t = t2.GetComponent<RectTransform>();
                     t.sizeDelta = new Vector2(t.sizeDelta.x, cal_content_height(driving_count, 5, 116));
                     t.anchoredPosition = new Vector2(0, 0);
+                    scrollbar.value = 1;
                     break;
                 case MENU_ITEMS.SETTINGS:
                     foot_controls_tab.SetActive(false);
@@ -573,54 +531,61 @@ namespace TommoJProductions.MoControlsV2 {
             ab.Unload(false);
         }
 
+        private void get_ui_control(int i, out Transform t, out PLAYER_MODE mode) {
+            switch (selected_tab) {
+                case MENU_ITEMS.FOOT_CONTROLS:
+                    t = foot_controls_tab.transform.Find($"Content/Item {i}");
+                    mode = PLAYER_MODE.FOOT_MODE;
+                    break;
+                case MENU_ITEMS.DRIVING_CONTROLS:
+                    t = driving_controls_tab.transform.Find($"Content/Item {i}");
+                    mode = PLAYER_MODE.DRIVING_MODE;
+                    break;
+                default:
+                    t = null;
+                    mode = 0;
+                    return;
+            }
+        }
+
         /* Callbacks/Events */
         private void on_control_button_reassigned(XINPUT_GAMEPAD_INPUT i, bool cancelled) {
-            /* Reset Text */
             change_input.control.set_text(change_input.control_name);
 
-            /* If the reassignment has been cancelled. 
-             * Don't update the texture or set the value */
             if (cancelled) {
                 return;
             }
 
-            /* Set Texture */
-            change_input.control.set_sprite(assets.sprites[(int)i]);
-
-            /* Set control value */
-            set_control_value(change_input.player_mode, change_input.control_name, i);
-
-            /* If MouseButton0 is being reassigned and mouse click is down. Send a mouse click up event. */
-            if (change_input.control_name == "MouseButton0") {
-                ControlManager.mouse_emulator.simulate_mouse_button(MOUSE_EVENT.LEFTUP);
-            }
-
-            /* If MouseButton1 is being reassigned and mouse click is down. Send a mouse click up event. */
-            if (change_input.control_name == "MouseButton1") {
-                ControlManager.mouse_emulator.simulate_mouse_button(MOUSE_EVENT.RIGHTUP);
-            }
+            change_input.control.set_input_sprite(assets.sprites[(int)i]);
+            set_control_input(change_input.player_mode, change_input.control_name, i);
         }
         private void on_control_button_pressed(int i) {
             if (!change_input.reassign_key) {
-                Transform t;
-                PLAYER_MODE player_mode;
-                switch (selected_tab) {
-                    case MENU_ITEMS.FOOT_CONTROLS:
-                        t = foot_controls_tab.transform.Find($"Content/Item {i}");
-                        player_mode = PLAYER_MODE.FOOT_MODE;
-                        break;
-                    case MENU_ITEMS.DRIVING_CONTROLS:
-                        t = driving_controls_tab.transform.Find($"Content/Item {i}");
-                        player_mode = PLAYER_MODE.DRIVING_MODE;
-                        break;
-                    default:
-                        return;
-                }
-                change_input.to_polling_state(ControlManager.control_names[i], i, player_mode, t);
-                change_input.control.set_text("key assigning");
+                change_input.on_reassign_key = on_control_button_reassigned;
+                get_ui_control(i, out Transform t, out PLAYER_MODE mode);
+                change_input.to_polling_state(ControlManager.control_names[i], i, mode, t);
+                change_input.control.set_text("Key");
             }
         }
-        
+        private void on_control_modifier_reassigned(XINPUT_GAMEPAD_INPUT i, bool cancelled) {
+            change_input.control.set_text(change_input.control_name);
+
+            if (cancelled) {
+                return;
+            }
+
+            change_input.control.set_modifier_sprite(assets.sprites[(int)i]);
+            set_control_modifier(change_input.player_mode, change_input.control_name, i);
+        }
+        private void on_control_modifier_pressed(int i) {
+            if (!change_input.reassign_key) {
+                change_input.on_reassign_key = on_control_modifier_reassigned;
+                get_ui_control(i, out Transform t, out PLAYER_MODE mode);
+                change_input.to_polling_state(ControlManager.control_names[i], i, mode, t);
+                change_input.control.set_text("Modifier");
+            }
+        }
+
         private void on_context_menu_close() {
             context_settings.SetActive(false);
             context_input.reset();
@@ -633,12 +598,12 @@ namespace TommoJProductions.MoControlsV2 {
                 Transform t;
                 switch (selected_tab) {
                     case MENU_ITEMS.FOOT_CONTROLS:
-                        k = ControlManager.foot_controls[ControlManager.control_names[i]];
+                        k = ControlManager.foot_controls[ControlManager.control_names[i]].input;
                         t = foot_controls_tab.transform.Find($"Content/Item {i}");
                         player_mode = PLAYER_MODE.FOOT_MODE;
                         break;
                     case MENU_ITEMS.DRIVING_CONTROLS:
-                        k = ControlManager.driving_controls[ControlManager.control_names[i]];
+                        k = ControlManager.driving_controls[ControlManager.control_names[i]].input;
                         t = driving_controls_tab.transform.Find($"Content/Item {i}");
                         player_mode = PLAYER_MODE.DRIVING_MODE;
                         break;
@@ -647,8 +612,8 @@ namespace TommoJProductions.MoControlsV2 {
                 }
 
                 /* Check if this gamepad input has any context input */
-                if (!context_dic.TryGetValue(k, out XINPUT_GAMEPAD_INPUT[] inputs)) {
-                    context_settings.SetActive(false);
+                if (!ControlManager.context_dic.TryGetValue(k, out XINPUT_GAMEPAD_INPUT[] inputs)) {
+                    on_context_menu_close();
                     return;
                 }
 
@@ -684,14 +649,8 @@ namespace TommoJProductions.MoControlsV2 {
         }
         private void context_menu_reassign(int i) {
             MoControlsV2Mod.log("Context item " + i.ToString());
-
-            /* Set Texture */
-            context_input.control.set_sprite(assets.sprites[(int)context_input.context_inputs[i]]);
-
-            /* Set control value */
-            set_control_value(context_input.player_mode, context_input.control_name, context_input.context_inputs[i]);
-
-            /* Close context menu */
+            context_input.control.set_input_sprite(assets.sprites[(int)context_input.context_inputs[i]]);
+            set_control_input(context_input.player_mode, context_input.control_name, context_input.context_inputs[i]);
             on_context_menu_close();
         }
 
