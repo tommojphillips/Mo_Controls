@@ -162,12 +162,10 @@ namespace TommoJProductions.MoControlsV2 {
 
         public void OnPointerEnter(PointerEventData eventData) {
             hover = true;
-            MoControlsV2Mod.log("Context hover enter");
         }
 
         public void OnPointerExit(PointerEventData eventData) {
             hover = false;
-            MoControlsV2Mod.log("Context hover exit");
         }
 
         public void reset() {
@@ -234,7 +232,54 @@ namespace TommoJProductions.MoControlsV2 {
             create_ui();
             set_settings();
         }
+        private void load_asset_bundle() {
+            assets = new Mo_Controls_V2_Assets((int)XINPUT_GAMEPAD_INPUT.COUNT);
 
+            MoControlsV2Mod.log($"Loading asset bundle");
+            AssetBundle ab = AssetBundle.CreateFromMemoryImmediate(Properties.Resources.assetbundle);
+
+            MoControlsV2Mod.log($"Loading ui prefabs");
+            if (!assets.UI_prefab) {
+                /* load ui prefab */
+                assets.UI_prefab = ab.LoadAsset<GameObject>("Mo_Controls_UI.prefab");
+                assets.UI_prefab.SetActive(false);
+            }
+
+            assets.sprites[0] = create_sprite(ab, "xc_blank.png");
+            assets.sprites[1] = create_sprite(ab, "xc_a.png");
+            assets.sprites[2] = create_sprite(ab, "xc_b.png");
+            assets.sprites[3] = create_sprite(ab, "xc_x.png");
+            assets.sprites[4] = create_sprite(ab, "xc_y.png");
+            assets.sprites[5] = create_sprite(ab, "xc_start.png");
+            assets.sprites[6] = create_sprite(ab, "xc_back.png");
+            assets.sprites[7] = create_sprite(ab, "xc_lb.png");
+            assets.sprites[8] = create_sprite(ab, "xc_rb.png");
+            assets.sprites[9] = create_sprite(ab, "xc_lt.png");
+            assets.sprites[10] = create_sprite(ab, "xc_rt.png");
+            assets.sprites[11] = null;//create_sprite(ab, "trigger_axis.png");
+            assets.sprites[12] = create_sprite(ab, "xc_ls_press.png");
+            assets.sprites[13] = create_sprite(ab, "xc_lsl.png");
+            assets.sprites[14] = create_sprite(ab, "xc_lsr.png");
+            assets.sprites[15] = create_sprite(ab, "xc_lsu.png");
+            assets.sprites[16] = create_sprite(ab, "xc_lsd.png");
+            assets.sprites[17] = create_sprite(ab, "xc_lsx.png");
+            assets.sprites[18] = create_sprite(ab, "xc_lsy.png");
+            assets.sprites[19] = create_sprite(ab, "xc_rs_press.png");
+            assets.sprites[20] = create_sprite(ab, "xc_rsl.png");
+            assets.sprites[21] = create_sprite(ab, "xc_rsr.png");
+            assets.sprites[22] = create_sprite(ab, "xc_rsu.png");
+            assets.sprites[23] = create_sprite(ab, "xc_rsd.png");
+            assets.sprites[24] = create_sprite(ab, "xc_rsx.png");
+            assets.sprites[25] = create_sprite(ab, "xc_rsy.png");
+            assets.sprites[26] = create_sprite(ab, "xc_dpl.png");
+            assets.sprites[27] = create_sprite(ab, "xc_dpr.png");
+            assets.sprites[28] = create_sprite(ab, "xc_dpu.png");
+            assets.sprites[29] = create_sprite(ab, "xc_dpd.png");
+            assets.sprites[30] = create_sprite(ab, "xc_dpx.png");
+            assets.sprites[31] = create_sprite(ab, "xc_dpy.png");
+
+            ab.Unload(false);
+        }
         private void create_control(string[] blacklist, Transform tab_transform, int i, ref int count) {
             for (int j = 0; j < blacklist.Length; j++) {
                 if (blacklist[j] == Control_Manager.control_names[i]) {
@@ -277,8 +322,8 @@ namespace TommoJProductions.MoControlsV2 {
 
             /* Header/Version */
             header_text_color = ui_go.transform.Find("UI/Header/Text").GetComponent<Text>().color;
-            ui_go.transform.Find("UI/Header/Text").GetComponent<Text>().text = $"Mo`Controls v{VersionInfo.version}";
-            ui_go.transform.Find("UI/Header/Shadow").GetComponent<Text>().text = $"Mo`Controls v{VersionInfo.version}";
+            ui_go.transform.Find("UI/Header/Text").GetComponent<Text>().text = $"Mo`Controls v{VersionInfo.full_version}";
+            ui_go.transform.Find("UI/Header/Shadow").GetComponent<Text>().text = $"Mo`Controls v{VersionInfo.full_version}";
 
             /* Menu Items */
             for (MENU_ITEMS i = 0; i < MENU_ITEMS.COUNT; i++) {
@@ -322,7 +367,16 @@ namespace TommoJProductions.MoControlsV2 {
 
             context_pointer_handler = context_settings.AddComponent<Pointer_Handler>();
         }
-        
+        private Sprite create_sprite(AssetBundle ab, string asset_name) {
+            try {
+                return Sprite.Create(ab.LoadAsset<Texture2D>(asset_name), Rect.MinMaxRect(0, 0, 100, 100), Vector2.zero);
+            }
+            catch (Exception e) {
+                MoControlsV2Mod.error($"Failed to create sprite for asset: {asset_name}. Error: {e.StackTrace}");
+                return null;
+            }
+        }
+                
         private void update_connection_status() {
             string connection;
             if (Control_Manager.controller.state.is_connected) {
@@ -473,64 +527,6 @@ namespace TommoJProductions.MoControlsV2 {
                     break;
             }
         }
-        private Sprite create_sprite(AssetBundle ab, string asset_name) {
-            try {
-                return Sprite.Create(ab.LoadAsset<Texture2D>(asset_name), Rect.MinMaxRect(0, 0, 100, 100), Vector2.zero);
-            }
-            catch (Exception e) {
-                MoControlsV2Mod.error($"Failed to create sprite for asset: {asset_name}. Error: {e.StackTrace}");
-                return null;
-            }
-        }
-        private void load_asset_bundle() {
-            assets = new Mo_Controls_V2_Assets((int)XINPUT_GAMEPAD_INPUT.COUNT);
-
-            MoControlsV2Mod.log($"Loading asset bundle");
-            AssetBundle ab = AssetBundle.CreateFromMemoryImmediate(Properties.Resources.assetbundle);
-
-            MoControlsV2Mod.log($"Loading ui prefabs");
-            if (!assets.UI_prefab) {
-                /* load ui prefab */
-                assets.UI_prefab = ab.LoadAsset<GameObject>("Mo_Controls_UI.prefab");
-                assets.UI_prefab.SetActive(false);
-            }
-
-            assets.sprites[0] = create_sprite(ab, "xc_blank.png");
-            assets.sprites[1] = create_sprite(ab, "xc_a.png");
-            assets.sprites[2] = create_sprite(ab, "xc_b.png");
-            assets.sprites[3] = create_sprite(ab, "xc_x.png");
-            assets.sprites[4] = create_sprite(ab, "xc_y.png");
-            assets.sprites[5] = create_sprite(ab, "xc_start.png");
-            assets.sprites[6] = create_sprite(ab, "xc_back.png");
-            assets.sprites[7] = create_sprite(ab, "xc_lb.png");
-            assets.sprites[8] = create_sprite(ab, "xc_rb.png");
-            assets.sprites[9] = create_sprite(ab, "xc_lt.png");
-            assets.sprites[10] = create_sprite(ab, "xc_rt.png");
-            assets.sprites[11] = null;//create_sprite(ab, "trigger_axis.png");
-            assets.sprites[12] = create_sprite(ab, "xc_ls_press.png");
-            assets.sprites[13] = create_sprite(ab, "xc_lsl.png");
-            assets.sprites[14] = create_sprite(ab, "xc_lsr.png");
-            assets.sprites[15] = create_sprite(ab, "xc_lsu.png");
-            assets.sprites[16] = create_sprite(ab, "xc_lsd.png");
-            assets.sprites[17] = create_sprite(ab, "xc_lsx.png");
-            assets.sprites[18] = create_sprite(ab, "xc_lsy.png");
-            assets.sprites[19] = create_sprite(ab, "xc_rs_press.png");
-            assets.sprites[20] = create_sprite(ab, "xc_rsl.png");
-            assets.sprites[21] = create_sprite(ab, "xc_rsr.png");
-            assets.sprites[22] = create_sprite(ab, "xc_rsu.png");
-            assets.sprites[23] = create_sprite(ab, "xc_rsd.png");
-            assets.sprites[24] = create_sprite(ab, "xc_rsx.png");
-            assets.sprites[25] = create_sprite(ab, "xc_rsy.png");
-            assets.sprites[26] = create_sprite(ab, "xc_dpl.png");
-            assets.sprites[27] = create_sprite(ab, "xc_dpr.png");
-            assets.sprites[28] = create_sprite(ab, "xc_dpu.png");
-            assets.sprites[29] = create_sprite(ab, "xc_dpd.png");
-            assets.sprites[30] = create_sprite(ab, "xc_dpx.png");
-            assets.sprites[31] = create_sprite(ab, "xc_dpy.png");
-
-            ab.Unload(false);
-        }
-
         private void get_ui_control(int i, out Transform t, out PLAYER_MODE mode) {
             switch (selected_tab) {
                 case MENU_ITEMS.FOOT_CONTROLS:
@@ -567,6 +563,7 @@ namespace TommoJProductions.MoControlsV2 {
                 change_input.control.set_text("Key");
             }
         }
+        
         private void on_control_modifier_reassigned(XINPUT_GAMEPAD_INPUT i, bool cancelled) {
             change_input.control.set_text(change_input.control_name);
 
@@ -648,7 +645,6 @@ namespace TommoJProductions.MoControlsV2 {
             }
         }
         private void context_menu_reassign(int i) {
-            MoControlsV2Mod.log("Context item " + i.ToString());
             context_input.control.set_input_sprite(assets.sprites[(int)context_input.context_inputs[i]]);
             set_control_input(context_input.player_mode, context_input.control_name, context_input.context_inputs[i]);
             on_context_menu_close();

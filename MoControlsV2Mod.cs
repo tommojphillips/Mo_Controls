@@ -32,7 +32,7 @@ namespace TommoJProductions.MoControlsV2 {
         public override string ID => "Mo_Controls";
         public override string Name => "Mo'Controls";
         public override string Author => "tommojphillips";
-        public override string Version => VersionInfo.version;
+        public override string Version => VersionInfo.full_version;
         public override string Description => "Mo'Controls";
 
         private GameObject manager_go;
@@ -156,11 +156,11 @@ namespace TommoJProductions.MoControlsV2 {
         }
 
         internal static void log(string message) {
-            ModConsole.Log("<b>Mo'Controls V2</b>: " + message);
+            ModConsole.Log("<b>Mo'Controls</b>: " + message);
         }
 
         internal static void error(string message) {
-            ModConsole.Log("<b>Mo'Controls V2</b>: " + message);
+            ModConsole.Log("<b>Mo'Controls</b>: " + message);
         }
     }
 }

@@ -1,4 +1,4 @@
-// VERSION 1.1
+// VERSION 1.2
 
 
 using System.Reflection;
@@ -8,20 +8,22 @@ using System.Resources;
 [assembly: AssemblyTitle("MoControlsV2")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Tommo J. Productions")]
+[assembly: AssemblyCompany("tommojphillips")]
 [assembly: AssemblyProduct("MoControlsV2")]
-[assembly: AssemblyCopyright("Tommo J. Productions Copyright © 2026")]
+[assembly: AssemblyCopyright("tommojphillips Copyright © 2026")]
 [assembly: NeutralResourcesLanguage("en-AU")]
 
 // Version information
-[assembly: AssemblyVersion("2.0.0.191")]
-[assembly: AssemblyFileVersion("2.0.0.191")]
+[assembly: AssemblyVersion("2.0.0.195")]
+[assembly: AssemblyFileVersion("2.0.0.195")]
 
 namespace TommoJProductions.MoControlsV2 {
 
     public class VersionInfo {
-	    public const string lastestRelease = "07.01.2026 02:38 PM";
-	    public const string version = "2.0.0.191";
+	    public const string lastestRelease = "08.01.2026 03:18 PM";
+	    public const string version = "2.0.0";
+	    public const string full_version = "2.0.0.195";
+	    public const string build = "195";
 
 #if X64
         internal const bool IS_X64 = true;

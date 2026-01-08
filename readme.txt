@@ -1,11 +1,11 @@
-07.01.2026 [DD.MM.YYYY]
+08.01.2026 [DD.MM.YYYY]
 Mod: Mo'Controls
-Version: 2.0.0.191
-Arthor: tommojphillips
+Version: 2.0.0.195
+Arthur: tommojphillips
 
 About:
 
-Mo'Controls adds controller support to My Summer Car/My Winter Car using XInput as a backend. 
+Mo'Controls adds controller support to My Summer Car/My Winter Car using XInput. 
 
 # Default key to toggle the GUI is F7 
 # Split Control Profiles
