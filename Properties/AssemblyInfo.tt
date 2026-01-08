@@ -1,4 +1,4 @@
-// VERSION 1.1
+// VERSION 1.2
 
 <#@ template debug="true" hostspecific="true" language="C#" #>
 <#@ output extension=".cs" #>
@@ -15,13 +15,10 @@
     string historyFile = ttPath.Replace(ttFileName, "FileHistory.txt");
     bool historyFileExist = File.Exists(historyFile);
     string historyVersion;
-    if (historyFileExist)
-    {
+    if (historyFileExist) {
         historyVersion = File.ReadAllText(historyFile);
-
     }
-    else
-    {
+    else {
         historyVersion = "0.0.0.0";
     }
 
@@ -29,36 +26,24 @@
     MatchCollection historyMatches;
     Regex historyPattern = new Regex("(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<revision>\\d+)\\.(?<build>\\d+)");
     historyMatches = historyPattern.Matches(historyVersion);
-    if (historyMatches.Count == 1)
-    {
+    if (historyMatches.Count == 1) {
         historyRevision = Convert.ToInt32(historyMatches[0].Groups["revision"].Value);
     }
 
     string path = ttPath.Replace(".tt", ".cs");
     bool assemblyInfoExists = File.Exists(path);
 
-    if (assemblyInfoExists)
-    {
+    if (assemblyInfoExists) {
         string output = File.ReadAllText(path);
         Regex pattern = new Regex("AssemblyVersion\\(\"(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<revision>\\d+)\\.(?<build>\\d+)\"\\)");
         MatchCollection matches = pattern.Matches(output);
-        if (matches.Count == 1)
-        {
+        if (matches.Count == 1) {
             major = Convert.ToInt32(matches[0].Groups["major"].Value);
             minor = Convert.ToInt32(matches[0].Groups["minor"].Value);
-
-            if (autoRevisionUpdateDaily)
-            {
-                revision = (int)(DateTime.UtcNow - new DateTime(2022, 1, 1)).TotalDays;
-            }
-            else
-            {
-                revision = Convert.ToInt32(matches[0].Groups["revision"].Value);
-            }
+            revision = Convert.ToInt32(matches[0].Groups["revision"].Value);
             build = Convert.ToInt32(matches[0].Groups["build"].Value) + 1;
 
-            if (historyRevision != revision)
-            {
+            if (historyRevision != revision) {
                 build = 0;
             }
         }
@@ -89,7 +74,9 @@ namespace <#= this.namespaceName #>.<#= this.assemblyTitle.Replace(" ", "") #> {
 
     public class VersionInfo {
 	    public const string lastestRelease = "<#= DateTime.Now.ToString("dd.MM.yyyy hh:mm tt") #>";
-	    public const string version = "<#= $"{major}.{minor}.{revision}.{build}" #>";
+	    public const string version = "<#= $"{major}.{minor}.{revision}" #>";
+	    public const string full_version = "<#= $"{major}.{minor}.{revision}.{build}" #>";
+	    public const string build = "<#= $"{build}" #>";
 
 #if X64
         internal const bool IS_X64 = true;
@@ -111,9 +98,7 @@ namespace <#= this.namespaceName #>.<#= this.assemblyTitle.Replace(" ", "") #> {
     int revision = 0;
     int build = 0;
     string assemblyTitle = "MoControlsV2";
-    string assemblyAuthor = "Tommo J. Productions";
+    string assemblyAuthor = "tommojphillips";
     string namespaceName = "TommoJProductions";
-    string ttFileName = "AssemblyInfo.tt";
-    bool autoRevisionUpdateDaily = false;
-    
+    string ttFileName = "AssemblyInfo.tt";    
 #>
