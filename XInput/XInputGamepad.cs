@@ -18,7 +18,7 @@ namespace TommoJProductions.MoControlsV2.XInput {
         }
 
         public XInput_Gamepad_State get_state() {
-            uint result = XINPUT_IMPORTS.xinput_get_state(player_index, out raw_state);
+            uint result = XInput_Imports.xinput_get_state(player_index, out raw_state);
             if (result == 0) {
                 prev_state = state;
                 update_state(raw_state, deadzone);
@@ -29,7 +29,7 @@ namespace TommoJProductions.MoControlsV2.XInput {
             return state;
         }
 
-        public void set_state(XInput_Gamepad_Vibration vibration) => XINPUT_IMPORTS.xinput_set_state(player_index, vibration);
+        public void set_state(XInput_Gamepad_Vibration vibration) => XInput_Imports.xinput_set_state(player_index, vibration);
 
         public void update_state(XInput_Gamepad_Raw_State raw_state, XInput_Gamepad_Deadzone deadzone) {
             state.is_connected = true;
@@ -48,10 +48,10 @@ namespace TommoJProductions.MoControlsV2.XInput {
             state.dpad.down = (raw_state.gamepad.buttons & (ushort)XINPUT_BUTTON_MASKS.DPAD_DOWN) != 0 ? XINPUT_BUTTON_STATE.PRESSED : XINPUT_BUTTON_STATE.RELEASED;
             state.dpad.left = (raw_state.gamepad.buttons & (ushort)XINPUT_BUTTON_MASKS.DPAD_LEFT) != 0 ? XINPUT_BUTTON_STATE.PRESSED : XINPUT_BUTTON_STATE.RELEASED;
             state.dpad.right = (raw_state.gamepad.buttons & (ushort)XINPUT_BUTTON_MASKS.DPAD_RIGHT) != 0 ? XINPUT_BUTTON_STATE.PRESSED : XINPUT_BUTTON_STATE.RELEASED;
-            state.thumbsticks.left = DeadzoneUtils.apply_stick_deadzone(raw_state.gamepad.ls_x, raw_state.gamepad.ls_y, deadzone.ls);
-            state.thumbsticks.right = DeadzoneUtils.apply_stick_deadzone(raw_state.gamepad.rs_x, raw_state.gamepad.rs_y, deadzone.rs);
-            state.triggers.left = DeadzoneUtils.apply_trigger_deadzone(raw_state.gamepad.lt, deadzone.lt);
-            state.triggers.right = DeadzoneUtils.apply_trigger_deadzone(raw_state.gamepad.rt, deadzone.rt);
+            state.thumbsticks.left = Deadzone_Utils.apply_stick_deadzone(raw_state.gamepad.ls_x, raw_state.gamepad.ls_y, deadzone.ls);
+            state.thumbsticks.right = Deadzone_Utils.apply_stick_deadzone(raw_state.gamepad.rs_x, raw_state.gamepad.rs_y, deadzone.rs);
+            state.triggers.left = Deadzone_Utils.apply_trigger_deadzone(raw_state.gamepad.lt, deadzone.lt);
+            state.triggers.right = Deadzone_Utils.apply_trigger_deadzone(raw_state.gamepad.rt, deadzone.rt);
         }
 
         public void reset_state() {

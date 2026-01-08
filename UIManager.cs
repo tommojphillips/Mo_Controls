@@ -184,7 +184,7 @@ namespace TommoJProductions.MoControlsV2 {
             COUNT,
         };
 
-        private MoControlsV2Assets assets;
+        private Mo_Controls_V2_Assets assets;
         private Change_Input change_input;
         private Context_Input context_input;
         private MENU_ITEMS selected_tab;
@@ -237,7 +237,7 @@ namespace TommoJProductions.MoControlsV2 {
 
         private void create_control(string[] blacklist, Transform tab_transform, int i, ref int count) {
             for (int j = 0; j < blacklist.Length; j++) {
-                if (blacklist[j] == ControlManager.control_names[i]) {
+                if (blacklist[j] == Control_Manager.control_names[i]) {
                     return;
                 }
             }
@@ -292,21 +292,21 @@ namespace TommoJProductions.MoControlsV2 {
             /*Foot/Driving tab */
             foot_count = 0;
             driving_count = 0;
-            for (int i = 0; i < ControlManager.control_names.Count; i++) {
-                create_control(ControlManager.foot_controls_blacklist, foot_controls_tab.transform, i, ref foot_count);
-                create_control(ControlManager.driving_controls_blacklist, driving_controls_tab.transform, i, ref driving_count);
+            for (int i = 0; i < Control_Manager.control_names.Count; i++) {
+                create_control(Control_Manager.foot_controls_blacklist, foot_controls_tab.transform, i, ref foot_count);
+                create_control(Control_Manager.driving_controls_blacklist, driving_controls_tab.transform, i, ref driving_count);
             }
 
             set_tab(0);
 
             /* settings_tab */
-            create_slider(out deadzone_ls, on_deadzone_changed_ls, settings_tab.transform, 0, ControlManager.controller.deadzone.ls);
-            create_slider(out deadzone_rs, on_deadzone_changed_rs, settings_tab.transform, 1, ControlManager.controller.deadzone.rs);
-            create_slider(out deadzone_lt, on_deadzone_changed_lt, settings_tab.transform, 2, ControlManager.controller.deadzone.lt);
-            create_slider(out deadzone_rt, on_deadzone_changed_rt, settings_tab.transform, 3, ControlManager.controller.deadzone.rt);
-            create_slider(out sensitivity_mouse_look_x, on_sensitivity_changed_mouse_look_x, settings_tab.transform, 4, ControlManager.camera_manager.controller_look_x.sensitivity);
-            create_slider(out sensitivity_mouse_look_y, on_sensitivity_changed_mouse_look_y, settings_tab.transform, 5, ControlManager.camera_manager.controller_look_y.sensitivity);
-            create_slider(out sensitivity_mouse_scroll, on_sensitivity_changed_mouse_scroll, settings_tab.transform, 6, ControlManager.mouse_emulator.sensitivity_scroll);
+            create_slider(out deadzone_ls, on_deadzone_changed_ls, settings_tab.transform, 0, Control_Manager.controller.deadzone.ls);
+            create_slider(out deadzone_rs, on_deadzone_changed_rs, settings_tab.transform, 1, Control_Manager.controller.deadzone.rs);
+            create_slider(out deadzone_lt, on_deadzone_changed_lt, settings_tab.transform, 2, Control_Manager.controller.deadzone.lt);
+            create_slider(out deadzone_rt, on_deadzone_changed_rt, settings_tab.transform, 3, Control_Manager.controller.deadzone.rt);
+            create_slider(out sensitivity_mouse_look_x, on_sensitivity_changed_mouse_look_x, settings_tab.transform, 4, Control_Manager.camera_manager.controller_look_x.sensitivity);
+            create_slider(out sensitivity_mouse_look_y, on_sensitivity_changed_mouse_look_y, settings_tab.transform, 5, Control_Manager.camera_manager.controller_look_y.sensitivity);
+            create_slider(out sensitivity_mouse_scroll, on_sensitivity_changed_mouse_scroll, settings_tab.transform, 6, Control_Manager.mouse_emulator.sensitivity_scroll);
 
             create_button(out reset_controls, on_reset_settings, settings_tab.transform, 0, "Reset Controls");
             create_button(out reset_deadzones, on_reset_deadzones, settings_tab.transform, 1, "Reset Deadzones");
@@ -325,7 +325,7 @@ namespace TommoJProductions.MoControlsV2 {
         
         private void update_connection_status() {
             string connection;
-            if (ControlManager.controller.state.is_connected) {
+            if (Control_Manager.controller.state.is_connected) {
                 connection = "Connected";
             }
             else {
@@ -351,19 +351,19 @@ namespace TommoJProductions.MoControlsV2 {
         }
         private void set_settings() {
 
-            on_deadzone_changed_ls(ControlManager.controller.deadzone.ls);
-            on_deadzone_changed_rs(ControlManager.controller.deadzone.rs);
-            on_deadzone_changed_lt(ControlManager.controller.deadzone.lt);
-            on_deadzone_changed_rt(ControlManager.controller.deadzone.rt);
-            on_sensitivity_changed_mouse_look_x(ControlManager.camera_manager.controller_look_x.sensitivity);
-            on_sensitivity_changed_mouse_look_y(ControlManager.camera_manager.controller_look_y.sensitivity);
-            on_sensitivity_changed_mouse_scroll(ControlManager.mouse_emulator.sensitivity_scroll);
+            on_deadzone_changed_ls(Control_Manager.controller.deadzone.ls);
+            on_deadzone_changed_rs(Control_Manager.controller.deadzone.rs);
+            on_deadzone_changed_lt(Control_Manager.controller.deadzone.lt);
+            on_deadzone_changed_rt(Control_Manager.controller.deadzone.rt);
+            on_sensitivity_changed_mouse_look_x(Control_Manager.camera_manager.controller_look_x.sensitivity);
+            on_sensitivity_changed_mouse_look_y(Control_Manager.camera_manager.controller_look_y.sensitivity);
+            on_sensitivity_changed_mouse_scroll(Control_Manager.mouse_emulator.sensitivity_scroll);
 
             Control_Struct button = new Control_Struct();            
-            for (int i = 0; i < ControlManager.control_names.Count; i++) {
+            for (int i = 0; i < Control_Manager.control_names.Count; i++) {
                 bool blacklist = false;
-                for (int j = 0; j < ControlManager.foot_controls_blacklist.Length; j++) {
-                    if (ControlManager.foot_controls_blacklist[j] == ControlManager.control_names[i]) {
+                for (int j = 0; j < Control_Manager.foot_controls_blacklist.Length; j++) {
+                    if (Control_Manager.foot_controls_blacklist[j] == Control_Manager.control_names[i]) {
                         blacklist = true;
                         break;
                     }
@@ -372,17 +372,17 @@ namespace TommoJProductions.MoControlsV2 {
                     continue;
                 }
 
-                ControlManager.get_control(PLAYER_MODE.FOOT_MODE, ControlManager.control_names[i], out control_input c);
+                Control_Manager.get_control(PLAYER_MODE.FOOT_MODE, Control_Manager.control_names[i], out Control_Input c);
                 button.load(foot_controls_tab.transform.Find($"Content/Item {i}"));
-                button.set_text(ControlManager.control_names[i]);
+                button.set_text(Control_Manager.control_names[i]);
                 button.set_input_sprite(assets.sprites[(int)c.input]);
                 button.set_modifier_sprite(assets.sprites[(int)c.modifier]);
             }
 
-            for (int i = 0; i < ControlManager.control_names.Count; i++) {
+            for (int i = 0; i < Control_Manager.control_names.Count; i++) {
                 bool blacklist = false; 
-                for (int j = 0; j < ControlManager.driving_controls_blacklist.Length; j++) {
-                    if (ControlManager.driving_controls_blacklist[j] == ControlManager.control_names[i]) {
+                for (int j = 0; j < Control_Manager.driving_controls_blacklist.Length; j++) {
+                    if (Control_Manager.driving_controls_blacklist[j] == Control_Manager.control_names[i]) {
                         blacklist = true;
                         break;
                     }
@@ -391,19 +391,19 @@ namespace TommoJProductions.MoControlsV2 {
                     continue;
                 }
 
-                ControlManager.get_control(PLAYER_MODE.DRIVING_MODE, ControlManager.control_names[i], out control_input c);                
+                Control_Manager.get_control(PLAYER_MODE.DRIVING_MODE, Control_Manager.control_names[i], out Control_Input c);                
                 button.load(driving_controls_tab.transform.Find($"Content/Item {i}"));
-                button.set_text(ControlManager.control_names[i]);
+                button.set_text(Control_Manager.control_names[i]);
                 button.set_input_sprite(assets.sprites[(int)c.input]);
                 button.set_modifier_sprite(assets.sprites[(int)c.modifier]);
             }
         }
         private void toggle_UI() {
             ui_go.SetActive(!ui_go.activeInHierarchy);
-            ControlManager.player_in_menu = ui_go.activeInHierarchy;
+            Control_Manager.player_in_menu = ui_go.activeInHierarchy;
         }
         private void set_control_input(PLAYER_MODE mode, string key, XINPUT_GAMEPAD_INPUT input) {
-            ControlManager.set_control(mode, key, input, null);
+            Control_Manager.set_control(mode, key, input, null);
             switch (mode) {
                 case PLAYER_MODE.FOOT_MODE:
                     MoControlsV2Mod.save_setting($"foot_input_{key}", (int)input);
@@ -414,7 +414,7 @@ namespace TommoJProductions.MoControlsV2 {
             }
         }
         private void set_control_modifier(PLAYER_MODE mode, string key, XINPUT_GAMEPAD_INPUT modifier) {
-            ControlManager.set_control(mode, key, null, modifier);
+            Control_Manager.set_control(mode, key, null, modifier);
             switch (mode) {
                 case PLAYER_MODE.FOOT_MODE:
                     MoControlsV2Mod.save_setting($"foot_modifier_{key}", (int)modifier);
@@ -483,7 +483,7 @@ namespace TommoJProductions.MoControlsV2 {
             }
         }
         private void load_asset_bundle() {
-            assets = new MoControlsV2Assets((int)XINPUT_GAMEPAD_INPUT.COUNT);
+            assets = new Mo_Controls_V2_Assets((int)XINPUT_GAMEPAD_INPUT.COUNT);
 
             MoControlsV2Mod.log($"Loading asset bundle");
             AssetBundle ab = AssetBundle.CreateFromMemoryImmediate(Properties.Resources.assetbundle);
@@ -563,7 +563,7 @@ namespace TommoJProductions.MoControlsV2 {
             if (!change_input.reassign_key) {
                 change_input.on_reassign_key = on_control_button_reassigned;
                 get_ui_control(i, out Transform t, out PLAYER_MODE mode);
-                change_input.to_polling_state(ControlManager.control_names[i], i, mode, t);
+                change_input.to_polling_state(Control_Manager.control_names[i], i, mode, t);
                 change_input.control.set_text("Key");
             }
         }
@@ -581,7 +581,7 @@ namespace TommoJProductions.MoControlsV2 {
             if (!change_input.reassign_key) {
                 change_input.on_reassign_key = on_control_modifier_reassigned;
                 get_ui_control(i, out Transform t, out PLAYER_MODE mode);
-                change_input.to_polling_state(ControlManager.control_names[i], i, mode, t);
+                change_input.to_polling_state(Control_Manager.control_names[i], i, mode, t);
                 change_input.control.set_text("Modifier");
             }
         }
@@ -598,12 +598,12 @@ namespace TommoJProductions.MoControlsV2 {
                 Transform t;
                 switch (selected_tab) {
                     case MENU_ITEMS.FOOT_CONTROLS:
-                        k = ControlManager.foot_controls[ControlManager.control_names[i]].input;
+                        k = Control_Manager.foot_controls[Control_Manager.control_names[i]].input;
                         t = foot_controls_tab.transform.Find($"Content/Item {i}");
                         player_mode = PLAYER_MODE.FOOT_MODE;
                         break;
                     case MENU_ITEMS.DRIVING_CONTROLS:
-                        k = ControlManager.driving_controls[ControlManager.control_names[i]].input;
+                        k = Control_Manager.driving_controls[Control_Manager.control_names[i]].input;
                         t = driving_controls_tab.transform.Find($"Content/Item {i}");
                         player_mode = PLAYER_MODE.DRIVING_MODE;
                         break;
@@ -612,7 +612,7 @@ namespace TommoJProductions.MoControlsV2 {
                 }
 
                 /* Check if this gamepad input has any context input */
-                if (!ControlManager.context_dic.TryGetValue(k, out XINPUT_GAMEPAD_INPUT[] inputs)) {
+                if (!Control_Manager.context_dic.TryGetValue(k, out XINPUT_GAMEPAD_INPUT[] inputs)) {
                     on_context_menu_close();
                     return;
                 }
@@ -639,7 +639,7 @@ namespace TommoJProductions.MoControlsV2 {
                 t2.position = UnityEngine.Input.mousePosition;
                 t2.sizeDelta = new Vector2(grid.cellSize.x, grid.cellSize.y * inputs.Length);
 
-                context_input.to_polling_state(ControlManager.control_names[i], i, player_mode, t, inputs);
+                context_input.to_polling_state(Control_Manager.control_names[i], i, player_mode, t, inputs);
             }
         }
         private void on_context_menu_click() {
@@ -657,52 +657,52 @@ namespace TommoJProductions.MoControlsV2 {
         private void on_deadzone_changed_ls(float v) {
             deadzone_ls.text.text = $"LS Deadzone: {v}";
             deadzone_ls.slider.value = v;
-            ControlManager.controller.deadzone.ls = v;
+            Control_Manager.controller.deadzone.ls = v;
             MoControlsV2Mod.save_setting($"ls_deadzone", v);
         }
         private void on_deadzone_changed_rs(float v) {
             deadzone_rs.text.text = $"RS Deadzone: {v}";
             deadzone_rs.slider.value = v;
-            ControlManager.controller.deadzone.rs = v;
+            Control_Manager.controller.deadzone.rs = v;
             MoControlsV2Mod.save_setting($"rs_deadzone", v);
         }
         private void on_deadzone_changed_lt(float v) {
             deadzone_lt.text.text = $"LT Deadzone: {v}";
             deadzone_lt.slider.value = v;
-            ControlManager.controller.deadzone.lt = v;
+            Control_Manager.controller.deadzone.lt = v;
             MoControlsV2Mod.save_setting($"lt_deadzone", v);
         }
         private void on_deadzone_changed_rt(float v) {
             deadzone_rt.text.text = $"RT Deadzone: {v}";
             deadzone_rt.slider.value = v;
-            ControlManager.controller.deadzone.rt = v;
+            Control_Manager.controller.deadzone.rt = v;
             MoControlsV2Mod.save_setting($"rt_deadzone", v);
         }
         private void on_sensitivity_changed_mouse_look_x(float v) {
             sensitivity_mouse_look_x.text.text = $"Mouse Look X Sen: {v}";
             sensitivity_mouse_look_x.slider.value = v;
-            ControlManager.camera_manager.controller_look_x.sensitivity = v;
+            Control_Manager.camera_manager.controller_look_x.sensitivity = v;
             MoControlsV2Mod.save_setting($"mouse_look_x_sensitivity", v);
         }
         private void on_sensitivity_changed_mouse_look_y(float v) {
             sensitivity_mouse_look_y.text.text = $"Mouse Look Y Sen: {v}";
             sensitivity_mouse_look_y.slider.value = v;
-            ControlManager.camera_manager.controller_look_y.sensitivity = v;
+            Control_Manager.camera_manager.controller_look_y.sensitivity = v;
             MoControlsV2Mod.save_setting($"mouse_look_y_sensitivity", v);
         }
         private void on_sensitivity_changed_mouse_scroll(float v) {
             sensitivity_mouse_scroll.text.text = $"Mouse Scroll Sen: {v}";
             sensitivity_mouse_scroll.slider.value = v;
-            ControlManager.mouse_emulator.sensitivity_scroll = v;
+            Control_Manager.mouse_emulator.sensitivity_scroll = v;
             MoControlsV2Mod.save_setting($"mouse_scroll_sensitivity", v);
         }
         private void on_reset_settings() {
-            for (int i = 0; i < ControlManager.control_names.Count; i++) {
-                SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"foot_{ControlManager.control_names[i]}");
-                SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"driving_{ControlManager.control_names[i]}");
+            for (int i = 0; i < Control_Manager.control_names.Count; i++) {
+                SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"foot_{Control_Manager.control_names[i]}");
+                SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"driving_{Control_Manager.control_names[i]}");
             }
 
-            ControlManager.set_default_controls();
+            Control_Manager.set_default_controls();
             set_settings();
         }
         private void on_reset_deadzones() {
@@ -711,13 +711,13 @@ namespace TommoJProductions.MoControlsV2 {
             SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"lt_deadzone");
             SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"rt_deadzone");
 
-            ControlManager.set_default_deadzones();
+            Control_Manager.set_default_deadzones();
             set_settings();
         }
         private void on_reset_sensitivity() {
             SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"mouse_look_x_sensitivity");
             SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"mouse_look_y_sensitivity");
-            ControlManager.set_default_sensitivity();
+            Control_Manager.set_default_sensitivity();
             set_settings();
         }
     }

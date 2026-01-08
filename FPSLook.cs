@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 namespace TommoJProductions.MoControlsV2 {
-    public abstract class FPSLook : MonoBehaviour {
+    public abstract class FPS_Look : MonoBehaviour {
       
         public MouseLook mouse_look;
         public static float rotationY;

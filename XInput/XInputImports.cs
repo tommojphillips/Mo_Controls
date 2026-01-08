@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 
 namespace TommoJProductions.MoControlsV2.XInput {
-    public static class XINPUT_IMPORTS {
+    public static class XInput_Imports {
 
         [DllImport("xinput1_4.dll", EntryPoint = "XInputGetState")]
         public static extern uint xinput_get_state(XINPUT_GAMEPAD_INDEX index, out XInput_Gamepad_Raw_State state);

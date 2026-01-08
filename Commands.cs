@@ -8,8 +8,8 @@ using TommoJProductions.MoControlsV2.XInput;
 
 namespace TommoJProductions.MoControlsV2 {
     
-    public class WriteCinputExternInputsCommand : ConsoleCommand {
-
+    public class Cinput_Extern_Command : ConsoleCommand {
+        
         public override string Name => "cinputextern";
         public override string Help => $"Writes all cInput external inputs to {CINPUT_EXTERN_INPT_OUTPUT_PATH}";
 

@@ -2,30 +2,30 @@
 
 namespace TommoJProductions.MoControlsV2.MouseInput {
 
-    public class MouseEmulator {
+    public class Mouse_Emulator {
         private float scroll_delta;
         public float sensitivity_scroll;        
 
         public void update_mouse_buttons() {
-            if (ControlManager.get_input_down("MouseButton0")) {
+            if (Control_Manager.get_input_down("MouseButton0")) {
                 simulate_mouse_button(MOUSE_EVENT.LEFTDOWN);
             }
-            else if (ControlManager.get_input_up("MouseButton0")) {
+            else if (Control_Manager.get_input_up("MouseButton0")) {
                 simulate_mouse_button(MOUSE_EVENT.LEFTUP);
             }
 
-            if (ControlManager.get_input_down("MouseButton1")) {
+            if (Control_Manager.get_input_down("MouseButton1")) {
                 simulate_mouse_button(MOUSE_EVENT.RIGHTDOWN);
             }
-            else if (ControlManager.get_input_up("MouseButton1")) {
+            else if (Control_Manager.get_input_up("MouseButton1")) {
                 simulate_mouse_button(MOUSE_EVENT.RIGHTUP);
             }
         }
 
         public void update_mouse_scroll() {
-            scroll_delta -= ControlManager.get_axis("MouseScroll-") * sensitivity_scroll * Time.deltaTime;
-            scroll_delta += ControlManager.get_axis("MouseScroll+") * sensitivity_scroll * Time.deltaTime;            
-            scroll_delta += ControlManager.get_axis("MouseScroll") * sensitivity_scroll * Time.deltaTime;
+            scroll_delta -= Control_Manager.get_axis("MouseScroll-") * sensitivity_scroll * Time.deltaTime;
+            scroll_delta += Control_Manager.get_axis("MouseScroll+") * sensitivity_scroll * Time.deltaTime;            
+            scroll_delta += Control_Manager.get_axis("MouseScroll") * sensitivity_scroll * Time.deltaTime;
            
             if (scroll_delta < -1) {
                 scroll_delta += 1;
@@ -41,18 +41,18 @@ namespace TommoJProductions.MoControlsV2.MouseInput {
             send(p, (uint)MOUSE_EVENT_BUTTON.NULL, (uint)MOUSE_EVENT.MOVE);
         }
         public void simulate_mouse_button(MOUSE_EVENT e) {
-            User32Imports.GetCursorPos(out Point p);
+            User32_Imports.GetCursorPos(out Point p);
             send(p, (uint)MOUSE_EVENT_BUTTON.XBUTTON1, (uint)e);
         }
         public void simulate_mouse_scroll(int direction) {
-            User32Imports.GetCursorPos(out Point p);
+            User32_Imports.GetCursorPos(out Point p);
             send(p, (uint)direction, (uint)MOUSE_EVENT.WHEEL);
         }
 
         private void send(Point p, uint data, uint flags) {
             Input input = new Input() {
                 type = 0,
-                mi = new MouseInput() {
+                mi = new Mouse_Input() {
                     x = p.x,
                     y = p.y,
                     data = data,
@@ -60,7 +60,7 @@ namespace TommoJProductions.MoControlsV2.MouseInput {
                 }
             };
 
-            User32Imports.SendInput(1, input, Input.size);
+            User32_Imports.SendInput(1, input, Input.size);
         }
     }
 }

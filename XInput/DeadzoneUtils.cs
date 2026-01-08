@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 namespace TommoJProductions.MoControlsV2.XInput {
-    internal static class DeadzoneUtils {
+    internal static class Deadzone_Utils {
         public static float apply_trigger_deadzone(byte x, float deadzone) {
             float fx = x / 255.0f;
             float dz01 = deadzone / 100.0f;

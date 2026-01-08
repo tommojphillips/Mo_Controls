@@ -7,14 +7,14 @@ using MSCLoader;
 using TommoJProductions.MoControlsV2.XInput;
 using TommoJProductions.MoControlsV2.MouseInput;
 
-using static TommoJProductions.MoControlsV2.ControlManager;
+using static TommoJProductions.MoControlsV2.Control_Manager;
 
 namespace TommoJProductions.MoControlsV2 {
     public enum PLAYER_MODE {
         FOOT_MODE,
         DRIVING_MODE,
     }
-    public struct control_input {
+    public struct Control_Input {
         public XINPUT_GAMEPAD_INPUT modifier;
         public XINPUT_GAMEPAD_INPUT input;
 
@@ -25,10 +25,10 @@ namespace TommoJProductions.MoControlsV2 {
             input = c;
         }
     }
-    public class ControlManager : MonoBehaviour {        
-        public static Dictionary<string, control_input> foot_controls;
-        public static Dictionary<string, control_input> driving_controls;
-        public static Dictionary<string, control_input> current_controls {
+    public class Control_Manager : MonoBehaviour {        
+        public static Dictionary<string, Control_Input> foot_controls;
+        public static Dictionary<string, Control_Input> driving_controls;
+        public static Dictionary<string, Control_Input> current_controls {
             get {
                 switch (player_mode) {
                     case PLAYER_MODE.FOOT_MODE:
@@ -60,10 +60,10 @@ namespace TommoJProductions.MoControlsV2 {
         private static PlayMakerFSM m_select_item;
         private static FsmBool m_hand_empty;
         private static XInput_Gamepad m_controller;
-        private static MouseEmulator m_mouse_emulator;
+        private static Mouse_Emulator m_mouse_emulator;
         private static List<string> m_control_names;
         private static PLAYER_MODE m_player_mode;
-        private static CameraManager m_camera_manager;
+        private static Camera_Manager m_camera_manager;
 
         public static XInput_Gamepad controller => m_controller;
         public static PLAYER_MODE player_mode => m_player_mode;
@@ -71,8 +71,8 @@ namespace TommoJProductions.MoControlsV2 {
         public static bool hand_empty => m_hand_empty.Value;
         public static bool hand_mode => m_pick_up.Active;
         public static List<string> control_names => m_control_names;
-        public static MouseEmulator mouse_emulator => m_mouse_emulator;
-        public static CameraManager camera_manager => m_camera_manager;
+        public static Mouse_Emulator mouse_emulator => m_mouse_emulator;
+        public static Camera_Manager camera_manager => m_camera_manager;
 
         public static bool player_in_menu { 
             get => m_player_in_menu.Value; 
@@ -121,12 +121,12 @@ namespace TommoJProductions.MoControlsV2 {
             get_cinput_control_list();
             hook_cinput();
 
-            foot_controls = new Dictionary<string, control_input>();
-            driving_controls = new Dictionary<string, control_input>();
+            foot_controls = new Dictionary<string, Control_Input>();
+            driving_controls = new Dictionary<string, Control_Input>();
 
             m_controller = new XInput_Gamepad(XINPUT_GAMEPAD_INDEX.ONE);
-            m_mouse_emulator = new MouseEmulator();
-            m_camera_manager = new CameraManager();
+            m_mouse_emulator = new Mouse_Emulator();
+            m_camera_manager = new Camera_Manager();
             m_camera_manager.load();
             m_player_vehicle = PlayMakerGlobals.Instance.Variables.FindFsmString("PlayerCurrentVehicle");
             m_pick_up = GameObject.Find("PLAYER/Pivot/AnimPivot/Camera/FPSCamera/1Hand_Assemble/Hand").gameObject.GetPlayMaker("PickUp");
@@ -140,61 +140,61 @@ namespace TommoJProductions.MoControlsV2 {
         }
 
         public static void set_control(PLAYER_MODE mode, string key, XINPUT_GAMEPAD_INPUT? c = null, XINPUT_GAMEPAD_INPUT? m = null) {
-            control_input t;
+            Control_Input t;
             switch(mode) {
                 case PLAYER_MODE.FOOT_MODE:
-                    if (ControlManager.foot_controls.ContainsKey(key)) {
-                        t = ControlManager.foot_controls[key];
+                    if (Control_Manager.foot_controls.ContainsKey(key)) {
+                        t = Control_Manager.foot_controls[key];
                         if (c != null) {
                             t.set_input(c.Value);
                         }
                         if (m != null) {
                             t.set_modifier(m.Value);
                         }
-                        ControlManager.foot_controls[key] = t;
+                        Control_Manager.foot_controls[key] = t;
                     }
                     else {
-                        t = new control_input();
+                        t = new Control_Input();
                         if (c != null) {
                             t.set_input(c.Value);
                         }
                         if (m != null) {
                             t.set_modifier(m.Value);
                         }
-                        ControlManager.foot_controls.Add(key, t);
+                        Control_Manager.foot_controls.Add(key, t);
                     }
                     break;
                 case PLAYER_MODE.DRIVING_MODE:
-                    if (ControlManager.driving_controls.ContainsKey(key)) {
-                        t = ControlManager.driving_controls[key];
+                    if (Control_Manager.driving_controls.ContainsKey(key)) {
+                        t = Control_Manager.driving_controls[key];
                         if (c != null) {
                             t.set_input(c.Value);
                         }
                         if (m != null) {
                             t.set_modifier(m.Value);
                         }
-                        ControlManager.driving_controls[key] = t;
+                        Control_Manager.driving_controls[key] = t;
                     }
                     else {
-                        t = new control_input();
+                        t = new Control_Input();
                         if (c != null) {
                             t.set_input(c.Value);
                         }
                         if (m != null) {
                             t.set_modifier(m.Value);
                         }
-                        ControlManager.driving_controls.Add(key, t);
+                        Control_Manager.driving_controls.Add(key, t);
                     }
                     break;
             }
         }
-        public static void get_control(PLAYER_MODE mode, string key, out control_input c) {
+        public static void get_control(PLAYER_MODE mode, string key, out Control_Input c) {
             switch (mode) {
                 case PLAYER_MODE.FOOT_MODE:
-                    ControlManager.foot_controls.TryGetValue(key, out c);
+                    Control_Manager.foot_controls.TryGetValue(key, out c);
                     break;
                 case PLAYER_MODE.DRIVING_MODE:
-                    ControlManager.driving_controls.TryGetValue(key, out c);
+                    Control_Manager.driving_controls.TryGetValue(key, out c);
                     break;
                 default:
                     c = default;
@@ -216,7 +216,7 @@ namespace TommoJProductions.MoControlsV2 {
         }
         public void update_tool_mode_button() {
             if (m_controller.state.is_connected) {
-                if (ControlManager.get_input_down("ToolMode")) {
+                if (Control_Manager.get_input_down("ToolMode")) {
                     if (hand_mode) {
                         m_select_item.SendEvent("ITEM2");
                     }
@@ -248,14 +248,14 @@ namespace TommoJProductions.MoControlsV2 {
         private void hook_cinput() {
             MoControlsV2Mod.log("Patching cInput");
             HarmonyInstance harmony = HarmonyInstance.Create("mo_controls.input");
-            harmony.Patch(AccessTools.Method(typeof(cInput), "GetKey", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(ControlManagerHooks), "cinput_GetKey"));
-            harmony.Patch(AccessTools.Method(typeof(cInput), "GetKeyDown", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(ControlManagerHooks), "cinput_GetKeyDown"));
-            harmony.Patch(AccessTools.Method(typeof(cInput), "GetKeyUp", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(ControlManagerHooks), "cinput_GetKeyUp"));
-            harmony.Patch(AccessTools.Method(typeof(cInput), "GetButton", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(ControlManagerHooks), "cinput_GetKey"));
-            harmony.Patch(AccessTools.Method(typeof(cInput), "GetButtonDown", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(ControlManagerHooks), "cinput_GetKeyDown"));
-            harmony.Patch(AccessTools.Method(typeof(cInput), "GetButtonUp", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(ControlManagerHooks), "cinput_GetKeyUp"));
-            harmony.Patch(AccessTools.Method(typeof(cInput), "GetAxis", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(ControlManagerHooks), "cinput_GetAxis"));
-            harmony.Patch(AccessTools.Method(typeof(cInput), "GetAxisRaw", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(ControlManagerHooks), "cinput_GetAxis"));
+            harmony.Patch(AccessTools.Method(typeof(cInput), "GetKey", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetKey"));
+            harmony.Patch(AccessTools.Method(typeof(cInput), "GetKeyDown", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetKeyDown"));
+            harmony.Patch(AccessTools.Method(typeof(cInput), "GetKeyUp", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetKeyUp"));
+            harmony.Patch(AccessTools.Method(typeof(cInput), "GetButton", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetKey"));
+            harmony.Patch(AccessTools.Method(typeof(cInput), "GetButtonDown", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetKeyDown"));
+            harmony.Patch(AccessTools.Method(typeof(cInput), "GetButtonUp", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetKeyUp"));
+            harmony.Patch(AccessTools.Method(typeof(cInput), "GetAxis", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetAxis"));
+            harmony.Patch(AccessTools.Method(typeof(cInput), "GetAxisRaw", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetAxis"));
         }
 
         private void add_cinput_inputs() {
@@ -324,7 +324,7 @@ namespace TommoJProductions.MoControlsV2 {
             m_camera_manager.controller_look_y.sensitivity = 65;
         }
 
-        public static bool is_modifier_down(control_input v) {
+        public static bool is_modifier_down(Control_Input v) {
             if (v.modifier != XINPUT_GAMEPAD_INPUT.NONE) {
                 /* Control has modifier */
                 return m_controller.get_input(v.modifier) != 0;
@@ -348,7 +348,7 @@ namespace TommoJProductions.MoControlsV2 {
         }
         public static bool get_input(string description) {
             if (description != null) {
-                if (current_controls.TryGetValue(description, out control_input v)) {
+                if (current_controls.TryGetValue(description, out Control_Input v)) {
                     if (!is_modifier_down(v)) {
                         return false; 
                     }
@@ -359,7 +359,7 @@ namespace TommoJProductions.MoControlsV2 {
         }
         public static float get_axis(string description) {
             if (description != null) {
-                if (current_controls.TryGetValue(description, out control_input v)) {
+                if (current_controls.TryGetValue(description, out Control_Input v)) {
                     if (!is_modifier_down(v)) {
                         return 0;
                     }
@@ -370,7 +370,7 @@ namespace TommoJProductions.MoControlsV2 {
         }
         public static bool get_input_down(string description) {
             if (description != null) {
-                if (current_controls.TryGetValue(description, out control_input v)) {
+                if (current_controls.TryGetValue(description, out Control_Input v)) {
                     if (!is_modifier_down(v)) {
                         return false;
                     }
@@ -381,7 +381,7 @@ namespace TommoJProductions.MoControlsV2 {
         }
         public static bool get_input_up(string description) {
             if (description != null) {
-                if (current_controls.TryGetValue(description, out control_input v)) {
+                if (current_controls.TryGetValue(description, out Control_Input v)) {
                     return m_controller.get_input_up(v.input);                    
                 }
             }
@@ -389,10 +389,10 @@ namespace TommoJProductions.MoControlsV2 {
         }
     }
 
-    public static class ControlManagerHooks {
+    public static class Control_Manager_Hooks {
 
         private static bool get_key(string description, out bool result) {
-            if (ControlManager.get_input(description)) {
+            if (Control_Manager.get_input(description)) {
                 result = true;
                 return false; /* skip orignal method */
             }
@@ -402,7 +402,7 @@ namespace TommoJProductions.MoControlsV2 {
             }
         }
         private static bool get_key_down(string description, out bool result) {
-            if (ControlManager.get_input_down(description)) {
+            if (Control_Manager.get_input_down(description)) {
                 result = true;
                 return false; /* skip orignal method */
             }
@@ -412,7 +412,7 @@ namespace TommoJProductions.MoControlsV2 {
             }
         }
         private static bool get_key_up(string description, out bool result) {
-            if (ControlManager.get_input_up(description)) {
+            if (Control_Manager.get_input_up(description)) {
                 result = true;
                 return false; /* skip orignal method */
             }
@@ -422,7 +422,7 @@ namespace TommoJProductions.MoControlsV2 {
             }
         }
         private static bool get_axis(string description, out float result) {
-            result = ControlManager.get_axis(description);
+            result = Control_Manager.get_axis(description);
             if (result != 0.0f) {
                 return false; /* skip orignal method */
             }

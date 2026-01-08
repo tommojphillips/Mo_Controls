@@ -5,17 +5,17 @@ using TommoJProductions.MoControlsV2.XInput;
 using System;
 
 namespace TommoJProductions.MoControlsV2 {
-    public struct MoControlsV2Assets {
+    public struct Mo_Controls_V2_Assets {
         public GameObject UI_prefab;
         public Sprite[] sprites;
 
-        public MoControlsV2Assets(int sprite_count) {
+        public Mo_Controls_V2_Assets(int sprite_count) {
             UI_prefab = null;
             sprites = new Sprite[sprite_count];
         }
     }
 
-    public static class MoControlsV2Util {
+    public static class Mo_Controls_V2_Util {
         public static void load<T>(Mod mod, string key, ref T output, Func<T, bool> func) {
             if (SaveLoad.ValueExists(mod, key)) {
                 T v = SaveLoad.ReadValue<T>(mod, key);
@@ -36,7 +36,7 @@ namespace TommoJProductions.MoControlsV2 {
         public override string Description => "Mo'Controls";
 
         private GameObject manager_go;
-        private ControlManager control_manager;
+        private Control_Manager control_manager;
         private UI_Manager ui_manager;
 
         public static Mod mod;
@@ -71,12 +71,12 @@ namespace TommoJProductions.MoControlsV2 {
         }
 
         private void load_control_manager() {
-            control_manager = manager_go.AddComponent<ControlManager>();
+            control_manager = manager_go.AddComponent<Control_Manager>();
             control_manager.load();
         }
 
         private void load_commands() {
-            ConsoleCommand.Add(new WriteCinputExternInputsCommand());
+            ConsoleCommand.Add(new Cinput_Extern_Command());
         }
 
         private static void validate_controller_input(int index, out XINPUT_GAMEPAD_INPUT c) {
@@ -94,47 +94,47 @@ namespace TommoJProductions.MoControlsV2 {
                ES2 complains if we try to load a value as a different type. So we must load it back as an INT.
             */
             string key;
-            for (int i = 0; i < ControlManager.control_names.Count; ++i) {
+            for (int i = 0; i < Control_Manager.control_names.Count; ++i) {
 
                 /* Load foot controls */
-                key = $"foot_input_{ControlManager.control_names[i]}";
+                key = $"foot_input_{Control_Manager.control_names[i]}";
                 if (SaveLoad.ValueExists(mod, key)) {
                     int index = SaveLoad.ReadValue<int>(mod, key);
                     validate_controller_input(index, out XINPUT_GAMEPAD_INPUT c);
-                    ControlManager.set_control(PLAYER_MODE.FOOT_MODE, ControlManager.control_names[i], c, XINPUT_GAMEPAD_INPUT.NONE);
+                    Control_Manager.set_control(PLAYER_MODE.FOOT_MODE, Control_Manager.control_names[i], c, XINPUT_GAMEPAD_INPUT.NONE);
                 }
-                key = $"foot_modifier_{ControlManager.control_names[i]}";
+                key = $"foot_modifier_{Control_Manager.control_names[i]}";
                 if (SaveLoad.ValueExists(mod, key)) {
                     int index = SaveLoad.ReadValue<int>(mod, key);
                     validate_controller_input(index, out XINPUT_GAMEPAD_INPUT c);
-                    ControlManager.set_control(PLAYER_MODE.FOOT_MODE, ControlManager.control_names[i], null, c);
+                    Control_Manager.set_control(PLAYER_MODE.FOOT_MODE, Control_Manager.control_names[i], null, c);
                 }
 
                 /* Load driving controls */
-                key = $"driving_input_{ControlManager.control_names[i]}";
+                key = $"driving_input_{Control_Manager.control_names[i]}";
                 if (SaveLoad.ValueExists(mod, key)) {
                     int index = SaveLoad.ReadValue<int>(mod, key);
                     validate_controller_input(index, out XINPUT_GAMEPAD_INPUT c);
-                    ControlManager.set_control(PLAYER_MODE.DRIVING_MODE, ControlManager.control_names[i], c, XINPUT_GAMEPAD_INPUT.NONE);
+                    Control_Manager.set_control(PLAYER_MODE.DRIVING_MODE, Control_Manager.control_names[i], c, XINPUT_GAMEPAD_INPUT.NONE);
                 }
-                key = $"driving_modifier_{ControlManager.control_names[i]}";
+                key = $"driving_modifier_{Control_Manager.control_names[i]}";
                 if (SaveLoad.ValueExists(mod, key)) {
                     int index = SaveLoad.ReadValue<int>(mod, key);
                     validate_controller_input(index, out XINPUT_GAMEPAD_INPUT c);
-                    ControlManager.set_control(PLAYER_MODE.DRIVING_MODE, ControlManager.control_names[i], null, c);
+                    Control_Manager.set_control(PLAYER_MODE.DRIVING_MODE, Control_Manager.control_names[i], null, c);
                 }
             }
 
             /* Load Deadzones */
-            MoControlsV2Util.load<float>(mod, "ls_deadzone", ref ControlManager.controller.deadzone.ls, delegate (float v) { return v >= 0; });
-            MoControlsV2Util.load<float>(mod, "rs_deadzone", ref ControlManager.controller.deadzone.rs, delegate (float v) { return v >= 0; });
-            MoControlsV2Util.load<float>(mod, "lt_deadzone", ref ControlManager.controller.deadzone.lt, delegate (float v) { return v >= 0; });
-            MoControlsV2Util.load<float>(mod, "rt_deadzone", ref ControlManager.controller.deadzone.rt, delegate (float v) { return v >= 0; });
+            Mo_Controls_V2_Util.load<float>(mod, "ls_deadzone", ref Control_Manager.controller.deadzone.ls, delegate (float v) { return v >= 0; });
+            Mo_Controls_V2_Util.load<float>(mod, "rs_deadzone", ref Control_Manager.controller.deadzone.rs, delegate (float v) { return v >= 0; });
+            Mo_Controls_V2_Util.load<float>(mod, "lt_deadzone", ref Control_Manager.controller.deadzone.lt, delegate (float v) { return v >= 0; });
+            Mo_Controls_V2_Util.load<float>(mod, "rt_deadzone", ref Control_Manager.controller.deadzone.rt, delegate (float v) { return v >= 0; });
 
             /* Load Sensitivity */
-            MoControlsV2Util.load<float>(mod, "mouse_look_x_sensitivity", ref ControlManager.camera_manager.controller_look_x.sensitivity, delegate (float v) { return v >= 0; });
-            MoControlsV2Util.load<float>(mod, "mouse_look_y_sensitivity", ref ControlManager.camera_manager.controller_look_y.sensitivity, delegate (float v) { return v >= 0; });
-            MoControlsV2Util.load<float>(mod, "mouse_scroll_sensitivity", ref ControlManager.mouse_emulator.sensitivity_scroll, delegate (float v) { return v >= 0; });
+            Mo_Controls_V2_Util.load<float>(mod, "mouse_look_x_sensitivity", ref Control_Manager.camera_manager.controller_look_x.sensitivity, delegate (float v) { return v >= 0; });
+            Mo_Controls_V2_Util.load<float>(mod, "mouse_look_y_sensitivity", ref Control_Manager.camera_manager.controller_look_y.sensitivity, delegate (float v) { return v >= 0; });
+            Mo_Controls_V2_Util.load<float>(mod, "mouse_scroll_sensitivity", ref Control_Manager.mouse_emulator.sensitivity_scroll, delegate (float v) { return v >= 0; });
         }
 
         public static void save_setting<T>(string key, T v) {

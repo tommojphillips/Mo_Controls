@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 namespace TommoJProductions.MoControlsV2.MouseInput {
-    internal class User32Imports {
+    internal class User32_Imports {
         [DllImport("user32.dll")]
         internal static extern bool GetCursorPos(out Point pos);
         

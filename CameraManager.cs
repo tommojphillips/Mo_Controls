@@ -2,26 +2,26 @@
 using Harmony;
 
 namespace TommoJProductions.MoControlsV2 {
-    public class CameraManager {
+    public class Camera_Manager {
 
-        public ControllerLook controller_look_x;
-        public ControllerLook controller_look_y;
-        public MoMouseLook mouse_look_x;
-        public MoMouseLook mouse_look_y;
+        public Controller_Look controller_look_x;
+        public Controller_Look controller_look_y;
+        public Mo_Mouse_Look mouse_look_x;
+        public Mo_Mouse_Look mouse_look_y;
 
         public void load() {
             hook_mouse_look();
 
             GameObject player = GameObject.Find("PLAYER");
-            controller_look_x = player.AddComponent<ControllerLook>();
+            controller_look_x = player.AddComponent<Controller_Look>();
             controller_look_x.use_raw_input = true;
-            mouse_look_x = player.AddComponent<MoMouseLook>();
+            mouse_look_x = player.AddComponent<Mo_Mouse_Look>();
             mouse_look_x.use_raw_input = false;
 
             GameObject pov = GameObject.Find("PLAYER/Pivot/AnimPivot/Camera/FPSCamera");
-            controller_look_y = pov.AddComponent<ControllerLook>();
+            controller_look_y = pov.AddComponent<Controller_Look>();
             controller_look_y.use_raw_input = true;
-            mouse_look_y = pov.AddComponent<MoMouseLook>();
+            mouse_look_y = pov.AddComponent<Mo_Mouse_Look>();
             mouse_look_y.use_raw_input = false;
         }
 
@@ -29,7 +29,7 @@ namespace TommoJProductions.MoControlsV2 {
             /* Patch out MouseLook::Update() */
             MoControlsV2Mod.log("Patching MouseLook");
             HarmonyInstance harmony = HarmonyInstance.Create("mo_controls.camera");
-            harmony.Patch(AccessTools.Method(typeof(MouseLook), "Update"), new HarmonyMethod(typeof(CameraManager), "MouseLook_Update"));
+            harmony.Patch(AccessTools.Method(typeof(MouseLook), "Update"), new HarmonyMethod(typeof(Camera_Manager), "MouseLook_Update"));
         }
 
         /* Hooks */

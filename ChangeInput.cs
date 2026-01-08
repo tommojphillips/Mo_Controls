@@ -47,7 +47,7 @@ namespace TommoJProductions.MoControlsV2 {
                 }
 
                 for (XINPUT_GAMEPAD_INPUT i = 0; i < XINPUT_GAMEPAD_INPUT.COUNT; ++i) {
-                    float input = ControlManager.controller.get_input(i);                                        
+                    float input = Control_Manager.controller.get_input(i);                                        
                     if (input > 0.25f || input < -0.25f) {
                         reassign_key = false;
                         on_reassign_key?.Invoke(i, false); /* Set Input */

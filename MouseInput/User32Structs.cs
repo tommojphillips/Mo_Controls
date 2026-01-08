@@ -35,7 +35,7 @@ namespace TommoJProductions.MoControlsV2.MouseInput {
         public float sqr_mag => x * x + y * y;
     }
 
-    public struct MouseInput {
+    public struct Mouse_Input {
         public int x;
         public int y;
         public uint data;
@@ -47,7 +47,7 @@ namespace TommoJProductions.MoControlsV2.MouseInput {
     [StructLayout(LayoutKind.Sequential)]
     public struct Input {
         public uint type;
-        public MouseInput mi;
+        public Mouse_Input mi;
         public static int size => Marshal.SizeOf(typeof(Input));
     }
 }
