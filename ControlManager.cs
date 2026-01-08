@@ -45,7 +45,11 @@ namespace TommoJProductions.MoControlsV2 {
             "Left", "Right", "ThrottleOn", "ThrottleOff", "BrakeOn", "BrakeOff", "ClutchOn", "ClutchOff", "StartEngine", "ShiftUp",
             "ShiftDown", "reverse", "neutral", "first", "second", "third", "fourth", "fifth", "sixth", "Handbrake1", "Handbrake",
             "IndicatorLeft", "IndicatorRight", "Range", "HighBeam", "Wipers", "Boost", "PlayerLeft", "PlayerRight", "PlayerUp",
-            "PlayerDown", "ReachRight", "Horizontal", "Throttle", "Brake", "Clutch", "Vertical", "Up", "Down"
+            "PlayerDown", "ReachRight", "Horizontal", "Throttle", "Brake", "Clutch", "Vertical", "Up", "Down",
+
+            /* MWC only */
+            "ACC", "Ignition", "Lift1Up", "Lift1Down", "Lift2Up", "Lift2Down", "LightsOff", "LightsPark", "LightsDrive", "HiBeamToggle",
+            "HiBeamFlash", "Washer", "IndicatorReturn", 
         };
 
         public static readonly string[] driving_controls_blacklist = new string[] {
