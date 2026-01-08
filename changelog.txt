@@ -8,7 +8,6 @@ Mo'Controls v2.0.0.195 - 08.01.2026
 # Added frame-independent player look logic
 # Removed mouse move code
 # Added Urinate keybind to the driving mode blacklist
-#
 
 Mo'Controls v2.0.0.2 - 15.07.2025
 # Changed dll name from Mo_Controls_V2.dll to Mo_Controls.dll.
