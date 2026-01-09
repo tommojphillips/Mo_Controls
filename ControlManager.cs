@@ -55,7 +55,8 @@ namespace TommoJProductions.MoControlsV2 {
         public static readonly string[] driving_controls_blacklist = new string[] {
             "ThrottleOn", "ThrottleOff", "BrakeOn", "BrakeOff", "ClutchOn", "ClutchOff", "StartEngine", "Handbrake1",
             "PlayerLeft", "PlayerRight", "PlayerUp", "PlayerDown", "Jump", "Run", "Crouch", "Push", "PlayerVertical",
-            "PlayerHorizontal", "Vertical", "Up", "Down", "Left", "Right", "Urinate"
+            "PlayerHorizontal", "Vertical", "Up", "Down", "Left", "Right", "Urinate", "reverse", "neutral", "first",
+            "second", "third", "fourth", "fifth", "sixth"
         };
 
         private static FsmBool m_player_in_menu;
