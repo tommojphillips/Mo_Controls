@@ -1,3 +1,8 @@
+Mo'Controls v2.0.1.0 - 09.01.2026
+# Marked mod as compatible with My Winter Car
+# Updated blacklist with some controls from MWC
+# Added H-Shifter controls to driving blacklist
+
 Mo'Controls v2.0.0.195 - 08.01.2026
 # Updated UI
 # Added a modifier key to controls
