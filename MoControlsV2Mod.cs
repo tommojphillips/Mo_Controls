@@ -34,6 +34,7 @@ namespace TommoJProductions.MoControlsV2 {
         public override string Author => "tommojphillips";
         public override string Version => VersionInfo.full_version;
         public override string Description => "Mo'Controls";
+        public override Game SupportedGames => Game.MySummerCar_And_MyWinterCar;
 
         private GameObject manager_go;
         private Control_Manager control_manager;
