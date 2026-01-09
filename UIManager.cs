@@ -595,12 +595,12 @@ namespace TommoJProductions.MoControlsV2 {
                 Transform t;
                 switch (selected_tab) {
                     case MENU_ITEMS.FOOT_CONTROLS:
-                        k = Control_Manager.foot_controls[Control_Manager.control_names[i]].input;
+                        k = Control_Manager.foot_controls[i].input;
                         t = foot_controls_tab.transform.Find($"Content/Item {i}");
                         player_mode = PLAYER_MODE.FOOT_MODE;
                         break;
                     case MENU_ITEMS.DRIVING_CONTROLS:
-                        k = Control_Manager.driving_controls[Control_Manager.control_names[i]].input;
+                        k = Control_Manager.driving_controls[i].input;
                         t = driving_controls_tab.transform.Find($"Content/Item {i}");
                         player_mode = PLAYER_MODE.DRIVING_MODE;
                         break;
