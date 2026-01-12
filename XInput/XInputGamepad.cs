@@ -29,7 +29,7 @@ namespace TommoJProductions.MoControlsV2.XInput {
             return state;
         }
 
-        public void set_state(XInput_Gamepad_Vibration vibration) => XInput_Imports.xinput_set_state(player_index, vibration);
+        public void set_state(XInput_Gamepad_Vibration vibration) => XInput_Imports.xinput_set_state(player_index, ref vibration);
 
         public void update_state(XInput_Gamepad_Raw_State raw_state, XInput_Gamepad_Deadzone deadzone) {
             state.is_connected = true;
