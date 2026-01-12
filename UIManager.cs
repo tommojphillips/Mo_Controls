@@ -91,6 +91,46 @@ namespace TommoJProductions.MoControlsV2 {
             image.sprite = sprite;
         }
     }
+    public struct Toggle_Struct {
+        public Transform item;
+        public Text text;
+        public Toggle toggle;
+
+        public Toggle_Struct(Transform transform, string name = "Toggle") {
+            item = null;
+            text = null;
+            toggle = null;
+            load(transform, name);
+        }
+
+        public void load(Transform transform, string name = "Toggle") {
+            if (transform == null) {
+                item = null;
+                text = null;
+                toggle = null;
+                MoControlsV2Mod.error("button_struct: transform was null.");
+                return;
+            }
+
+            item = transform;
+            text = item.Find($"{name}/Label").GetComponent<Text>();
+            toggle = item.Find(name).GetComponent<Toggle>();
+
+            text.color = Color.black;
+        }
+
+        public void add_listener(UnityAction<bool> hook) {
+            toggle.onValueChanged.AddListener(hook);
+        }
+
+        public void enable(bool enable) {
+            item.gameObject.SetActive(enable);
+        }
+
+        public void set_text(string str) {
+            text.text = str;
+        }
+    }
     public struct Control_Struct {
         public Transform item;
         public Text text;
@@ -307,6 +347,14 @@ namespace TommoJProductions.MoControlsV2 {
             button.enable(true);
             button.set_text(text);
             button.add_listener(on_click);
+        }
+        private void create_toggle(out Toggle_Struct toggle, UnityAction<bool> on_changed, Transform tab_transform, int i, string text, bool initial_value) {
+            toggle = new Toggle_Struct(tab_transform.Find($"Content/Toggle {i}"));
+            toggle.enable(true);
+            toggle.set_text(text);
+            toggle.add_listener(on_changed);
+            on_changed(initial_value);
+            toggle.toggle.isOn = initial_value;
         }
         private void create_ui() {
             ui_go = Instantiate(assets.UI_prefab);
