@@ -1,5 +1,4 @@
-﻿using System.IO;
-using UnityEngine;
+﻿using UnityEngine;
 using MSCLoader;
 using TommoJProductions.MoControlsV2.XInput;
 using System;
@@ -149,7 +148,7 @@ namespace TommoJProductions.MoControlsV2 {
         public static void save_setting<T>(string key, T v) {
             SaveLoad.WriteValue(mod, key, v);
         }
-        
+
         internal static void log(string message) {
             ModConsole.Log("<b>Mo'Controls</b>: " + message);
         }
