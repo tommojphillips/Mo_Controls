@@ -118,12 +118,28 @@ namespace TommoJProductions.MoControlsV2 {
             { XINPUT_GAMEPAD_INPUT.LT, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.Trigger_Axis } },
             { XINPUT_GAMEPAD_INPUT.RT, new XINPUT_GAMEPAD_INPUT[] { XINPUT_GAMEPAD_INPUT.Trigger_Axis } },
         };
+#if FFB
+        public static bool ffb;
+        public static string ffb_vehicle;
+        public static Drivetrain ffb_drivetrain;
+        public static CarDynamics ffb_dynamics;
+        public static Axles ffb_axles;
 
+        public static bool ffb_opt_default;
+        public static bool ffb_opt_gear_change;
+        public static bool ffb_opt_wheel_slip;
+        public static bool ffb_opt_wheel_spin;
+        public static bool ffb_opt_rpm_limiter;
+        public static bool ffb_opt_shiver;
+#endif
         private void Update() {
             m_controller.get_state();
             update_tool_mode_button();
             update_player_mode();
             update_in_game();
+#if FFB
+            update_force_feedback();
+#endif
         }
 
         public void load() {
@@ -195,6 +211,9 @@ namespace TommoJProductions.MoControlsV2 {
             set_default_controls();
             set_default_deadzones();
             set_default_sensitivity();
+#if FFB
+            set_default_force_feedback();
+#endif
         }
 
         public static void set_control(PLAYER_MODE mode, string key, XINPUT_GAMEPAD_INPUT? c = null, XINPUT_GAMEPAD_INPUT? m = null) {
@@ -278,7 +297,131 @@ namespace TommoJProductions.MoControlsV2 {
                 }
             }
         }
+#if FFB
+        private XInput_Gamepad_Vibration ffb_state;
 
+        private void update_force_feedback() {
+            if (ffb && m_controller.state.is_connected) {
+
+                switch (m_player_mode) {
+                    case PLAYER_MODE.FOOT_MODE:
+                        if (ffb_vehicle != null) {
+                            ffb_vehicle = null;
+                            MoControlsV2Mod.log($"FFB Vehicle: {ffb_vehicle} unset");
+
+                            ffb_state.left = 0;
+                            ffb_state.right = 0;
+                            m_controller.set_state(ffb_state);
+                        }
+                        break;
+                    case PLAYER_MODE.DRIVING_MODE:
+                        if (ffb_vehicle != m_player_vehicle.Value) {
+
+                            /* Find car dynamics */
+                            ffb_dynamics = m_player.transform.GetComponentInParent<CarDynamics>();
+                            if (ffb_dynamics == null) {
+                                MoControlsV2Mod.error($"{ffb_vehicle}: CarDynamics not found!");
+                                break;
+                            }
+
+                            /* Find drivetrain */
+                            ffb_drivetrain = m_player.transform.GetComponentInParent<Drivetrain>();
+                            if (ffb_drivetrain == null) {
+                                MoControlsV2Mod.error($"{ffb_vehicle}: Drivetrain not found!");
+                                break;
+                            }
+
+                            /* Find axles */
+                            ffb_axles = m_player.transform.GetComponentInParent<Axles>();
+                            if (ffb_axles == null) {
+                                MoControlsV2Mod.error($"{ffb_vehicle}: Axles not found!");
+                                break;
+                            }
+
+                            ffb_vehicle = m_player_vehicle.Value;
+                            MoControlsV2Mod.log($"FFB Vehicle: {ffb_vehicle} set");
+                        }
+
+                        if (ffb_vehicle != null) {
+                            ffb_state.left = 0;
+                            ffb_state.right = 0;
+
+                            if (ffb_opt_gear_change) {
+                                float_to_rumble(ffb_gear_change(), ref ffb_state.left);
+                            }
+                            if (ffb_opt_rpm_limiter) {
+                                float_to_rumble(ffb_rpm_limiter(), ref ffb_state.right);
+                            }
+                            if (ffb_opt_wheel_slip) {
+                                vector2_to_rumble(ffb_wheel_slip(), ref ffb_state);
+                            }
+                            if (ffb_opt_wheel_spin) {
+                                vector2_to_rumble(ffb_wheel_spin(), ref ffb_state);
+                            }
+
+                            m_controller.set_state(ffb_state);
+                        }
+
+                        break;
+                }
+            }
+        }
+
+        private void float_to_rumble(float value, ref ushort rumble) {
+            rumble += (ushort)((float)ushort.MaxValue * value);
+        }
+        private void vector2_to_rumble(Vector2 value, ref XInput_Gamepad_Vibration rumble) {
+            float_to_rumble(value.x, ref rumble.left);
+            float_to_rumble(value.y, ref rumble.right);
+        }
+
+        private Vector2 ffb_wheel_slip() {
+            Vector2 v2 = default;
+            for (int i = 0; i < ffb_axles.allWheels.Length; ++i) {
+                WheelPos pos = ffb_axles.allWheels[i].wheelPos;
+                switch (pos) {
+                    case WheelPos.FRONT_LEFT:
+                        v2.x += ffb_axles.allWheels[i].longitudinalSlip;
+                        break;
+                    case WheelPos.FRONT_RIGHT:
+                        v2.y += ffb_axles.allWheels[i].longitudinalSlip;
+                        break;
+                }
+            }
+            return v2;
+        }
+        private Vector2 ffb_wheel_spin() {
+            Vector2 v2 = default;
+            for (int i = 0; i < ffb_drivetrain.poweredWheels.Length; ++i) {
+                switch (ffb_drivetrain.poweredWheels[i].wheelPos) {
+                    case WheelPos.FRONT_LEFT:
+                    case WheelPos.REAR_LEFT:
+                        v2.x += ffb_axles.allWheels[i].longitudinalSlip;
+                        break;
+                    case WheelPos.FRONT_RIGHT:
+                    case WheelPos.REAR_RIGHT:
+                        v2.y += ffb_axles.allWheels[i].longitudinalSlip;
+                        break;
+                }
+            }
+            return v2;
+        }
+        private float ffb_gear_change() {
+            if (ffb_drivetrain.changingGear) {
+                return ffb_drivetrain.rpm / ffb_drivetrain.maxRPM;
+            }
+            return 0;
+        }
+        private float ffb_rpm_limiter() {
+            if (ffb_drivetrain.revLimiterTriggered) {
+                return ffb_drivetrain.rpm / ffb_drivetrain.maxRPM;
+            }
+            return 0;
+        }
+        private float ffb_shiver() {
+            return 0;
+        }
+#endif
         private void get_cinput_control_list() {
             FieldInfo _inputName_fi = typeof(cInput).GetField("_inputName", (BindingFlags.Static | BindingFlags.NonPublic));
             FieldInfo _axisName_fi = typeof(cInput).GetField("_axisName", (BindingFlags.Static | BindingFlags.NonPublic));
@@ -380,6 +523,16 @@ namespace TommoJProductions.MoControlsV2 {
             m_camera_manager.controller_look_x.sensitivity = 65;
             m_camera_manager.controller_look_y.sensitivity = 65;
         }
+#if FFB
+        public static void set_default_force_feedback() {
+            ffb = false;
+            ffb_opt_default = false;
+            ffb_opt_gear_change = true;
+            ffb_opt_wheel_slip = true;
+            ffb_opt_wheel_spin = true;
+            ffb_opt_rpm_limiter = true;
+        }
+#endif
 
         public static bool is_modifier_down(Control_Input v) {
             if (v.modifier != XINPUT_GAMEPAD_INPUT.NONE) {

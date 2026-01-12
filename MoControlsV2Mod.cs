@@ -136,6 +136,14 @@ namespace TommoJProductions.MoControlsV2 {
             Mo_Controls_V2_Util.load<float>(mod, "mouse_look_x_sensitivity", ref Control_Manager.camera_manager.controller_look_x.sensitivity, delegate (float v) { return v >= 0; });
             Mo_Controls_V2_Util.load<float>(mod, "mouse_look_y_sensitivity", ref Control_Manager.camera_manager.controller_look_y.sensitivity, delegate (float v) { return v >= 0; });
             Mo_Controls_V2_Util.load<float>(mod, "mouse_scroll_sensitivity", ref Control_Manager.mouse_emulator.sensitivity_scroll, delegate (float v) { return v >= 0; });
+#if FFB
+            /* Load force feedback */
+            Mo_Controls_V2_Util.load<bool>(mod, "ffb", ref Control_Manager.ffb, null);
+            Mo_Controls_V2_Util.load<bool>(mod, "ffb_opt_gear_change", ref Control_Manager.ffb_opt_gear_change, null);
+            Mo_Controls_V2_Util.load<bool>(mod, "ffb_opt_wheel_slip", ref Control_Manager.ffb_opt_wheel_slip, null);
+            Mo_Controls_V2_Util.load<bool>(mod, "ffb_opt_wheel_spin", ref Control_Manager.ffb_opt_wheel_spin, null);
+            Mo_Controls_V2_Util.load<bool>(mod, "ffb_opt_rpm_limiter", ref Control_Manager.ffb_opt_rpm_limiter, null);
+#endif
         }
 
         public static void save_setting<T>(string key, T v) {

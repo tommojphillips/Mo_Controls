@@ -405,6 +405,15 @@ namespace TommoJProductions.MoControlsV2 {
             create_button(out reset_deadzones, on_reset_deadzones, settings_tab.transform, 1, "Reset Deadzones");
             create_button(out reset_sensitivity, on_reset_sensitivity, settings_tab.transform, 2, "Reset Sensitivity");
 
+#if FFB
+            create_toggle(out Toggle_Struct toggle, on_ffb_changed, settings_tab.transform, 0, "FFB", Control_Manager.ffb);
+            create_toggle(out toggle, on_ffb_opt_gear_change_changed, settings_tab.transform, 1, "FFB - gear change", Control_Manager.ffb_opt_gear_change);
+            create_toggle(out toggle, on_ffb_opt_wheel_slip_changed, settings_tab.transform, 2, "FFB - wheel slip", Control_Manager.ffb_opt_wheel_slip);
+            create_toggle(out toggle, on_ffb_opt_wheel_spin_changed, settings_tab.transform, 3, "FFB - wheel spin", Control_Manager.ffb_opt_wheel_spin);
+            create_toggle(out toggle, on_ffb_opt_rpm_limiter_changed, settings_tab.transform, 4, "FFB - rpm limiter", Control_Manager.ffb_opt_rpm_limiter);
+            create_toggle(out toggle, on_ffb_opt_shiver_changed, settings_tab.transform, 5, "FFB - player shiver", Control_Manager.ffb_opt_shiver);
+#endif
+
             /* Context menu */
             for (int i = 0; i < 4; i++) {
                 int c_index = i;
@@ -766,5 +775,31 @@ namespace TommoJProductions.MoControlsV2 {
             Control_Manager.set_default_sensitivity();
             set_settings();
         }
+#if FFB
+        private void on_ffb_changed(bool value) {
+            Control_Manager.ffb = value;
+            MoControlsV2Mod.save_setting("ffb", value);
+        }
+        private void on_ffb_opt_gear_change_changed(bool value) {
+            Control_Manager.ffb_opt_gear_change = value;
+            MoControlsV2Mod.save_setting("ffb_opt_gear_change", value);
+        }
+        private void on_ffb_opt_wheel_slip_changed(bool value) {
+            Control_Manager.ffb_opt_wheel_slip = value;
+            MoControlsV2Mod.save_setting("ffb_opt_wheel_slip", value);
+        }
+        private void on_ffb_opt_wheel_spin_changed(bool value) {
+            Control_Manager.ffb_opt_wheel_spin = value;
+            MoControlsV2Mod.save_setting("ffb_opt_wheel_spin", value);
+        }
+        private void on_ffb_opt_rpm_limiter_changed(bool value) {
+            Control_Manager.ffb_opt_rpm_limiter = value;
+            MoControlsV2Mod.save_setting("ffb_opt_rpm_limiter", value);
+        }
+        private void on_ffb_opt_shiver_changed(bool value) {
+            Control_Manager.ffb_opt_shiver = value;
+            MoControlsV2Mod.save_setting("ffb_opt_shiver", value);
+        }
+#endif
     }
 }
