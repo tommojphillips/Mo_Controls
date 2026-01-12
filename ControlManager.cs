@@ -7,8 +7,6 @@ using MSCLoader;
 using TommoJProductions.MoControlsV2.XInput;
 using TommoJProductions.MoControlsV2.MouseInput;
 
-using static TommoJProductions.MoControlsV2.Control_Manager;
-
 namespace TommoJProductions.MoControlsV2 {
     public enum PLAYER_MODE {
         FOOT_MODE,
@@ -550,11 +548,11 @@ namespace TommoJProductions.MoControlsV2 {
                         if (context_dic.TryGetValue(v.input, out XINPUT_GAMEPAD_INPUT[] related_inputs)) {
                             for (int j = 0; j < related_inputs.Length; ++j) {
                                 if (current_controls[i].input == related_inputs[j] && m_controller.get_input_pressed(current_controls[i].modifier)) {
-                                return false;
+                                    return false;
+                                }
                             }
                         }
                     }
-                }
                 }
                 return true;
             }
