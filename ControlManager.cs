@@ -340,21 +340,24 @@ namespace TommoJProductions.MoControlsV2 {
         public static bool is_modifier_down(Control_Input v) {
             if (v.modifier != XINPUT_GAMEPAD_INPUT.NONE) {
                 /* Control has modifier */
-                return m_controller.get_input(v.modifier) != 0;
+                return m_controller.get_input_pressed(v.modifier);
             }
             else {
                 /* Control has no modifier */
                 for (int i = 0; i < current_controls.Length; ++i) {
                     /* Check all other controls with the same input for a modifier */
-                    if (current_controls[i].input == v.input) {
-                        /* Check found modifier */
-                        if (current_controls[i].modifier != XINPUT_GAMEPAD_INPUT.NONE) {
-                            /* Ignore this control input if the found modifier is pressed. */
-                            if (m_controller.get_input(current_controls[i].modifier) != 0) {
+                    if (current_controls[i].input == v.input && m_controller.get_input_pressed(current_controls[i].modifier)) {
+                        return false;
+                    }
+                    else {
+                        if (context_dic.TryGetValue(v.input, out XINPUT_GAMEPAD_INPUT[] related_inputs)) {
+                            for (int j = 0; j < related_inputs.Length; ++j) {
+                                if (current_controls[i].input == related_inputs[j] && m_controller.get_input_pressed(current_controls[i].modifier)) {
                                 return false;
                             }
                         }
                     }
+                }
                 }
                 return true;
             }
@@ -366,7 +369,7 @@ namespace TommoJProductions.MoControlsV2 {
                         if (!is_modifier_down(current_controls[i])) {
                             return false;
                         }
-                        return m_controller.get_input(current_controls[i].input) != 0;
+                        return m_controller.get_input_pressed(current_controls[i].input);
                     }
                 }
             }
@@ -379,7 +382,7 @@ namespace TommoJProductions.MoControlsV2 {
                         if (!is_modifier_down(current_controls[i])) {
                             return 0;
                         }
-                        return m_controller.get_input(current_controls[i].input);
+                        return m_controller.get_input_axis(current_controls[i].input);
                     }
                 }
             }

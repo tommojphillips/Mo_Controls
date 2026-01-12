@@ -77,46 +77,28 @@ namespace TommoJProductions.MoControlsV2.XInput {
             state.triggers.right = 0;
         }
 
-        /* Get any input in the current frame */
-        public float get_input(XINPUT_GAMEPAD_INPUT input) {
-            return get_input_state(state, input);
+        private float abs(float x) {
+            return x > 0 ? x : -x;
         }
 
-        /* Get any input in the previous frame */
-        public float get_prev_input(XINPUT_GAMEPAD_INPUT input) {
-            return get_input_state(prev_state, input);
+        /* Get input pressed */
+        public bool get_input_pressed(XINPUT_GAMEPAD_INPUT input) {
+            return abs(get_input_state(state, input)) >= 0.25f;
         }
 
-        /* Get any input that has been pressed in the current frame */
+        /* Get input down (pressed this frame) */
         public bool get_input_down(XINPUT_GAMEPAD_INPUT input) {
-            if (get_prev_input(input) == 0 && get_input(input) != 0) {
-                return true;
-            }
-            return false;
+            return abs(get_input_state(prev_state, input)) <= 0.25f && abs(get_input_state(state, input)) >= 0.25f;
         }
 
-        /* Get any input that has been released in the current frame */
+        /* Get input up (released this frame) */
         public bool get_input_up(XINPUT_GAMEPAD_INPUT input) {
-            if (get_prev_input(input) != 0 && get_input(input) == 0) {
-                return true;
-            }
-            return false;
+            return abs(get_input_state(prev_state, input)) >= 0.25f && abs(get_input_state(state, input)) <= 0.25f;
         }
 
-        /* Get any input that has been tapped in the current frame */
-        public bool get_input_tap(XINPUT_GAMEPAD_INPUT input) {
-            if (get_prev_input(input) != 0 && get_input(input) >= 0.1f) {
-                return true;
-            }
-            return false;
-        }
-
-        /* Get any input that has been doubled tapped in the current frame */
-        public bool get_input_double_tap(XINPUT_GAMEPAD_INPUT input) {
-            if (get_prev_input(input) != 0 && get_input(input) >= 0.1f) {
-                return true;
-            }
-            return false;
+        /* Get input axis */
+        public float get_input_axis(XINPUT_GAMEPAD_INPUT input) {
+            return get_input_state(state, input);
         }
 
         private float get_input_state(XInput_Gamepad_State state, XINPUT_GAMEPAD_INPUT input) {
