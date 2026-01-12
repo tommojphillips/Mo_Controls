@@ -72,6 +72,8 @@ namespace TommoJProductions.MoControlsV2 {
         private static List<string> m_control_names;
         private static PLAYER_MODE m_player_mode;
         private static Camera_Manager m_camera_manager;
+        private static PlayMakerFSM m_running;
+        private static FsmBool m_run;
 
         public static XInput_Gamepad controller => m_controller;
         public static PLAYER_MODE player_mode => m_player_mode;
@@ -139,7 +141,7 @@ namespace TommoJProductions.MoControlsV2 {
             update_force_feedback();
 #endif
         }
-
+        
         public void load() {
             add_cinput_inputs();
             get_cinput_control_list();
@@ -205,6 +207,8 @@ namespace TommoJProductions.MoControlsV2 {
                 MoControlsV2Mod.error("Selection FSM not found!");
                 return;
             }
+
+            hook_toggle_run();
 
             set_default_controls();
             set_default_deadzones();
@@ -450,8 +454,8 @@ namespace TommoJProductions.MoControlsV2 {
             harmony.Patch(AccessTools.Method(typeof(cInput), "GetAxis", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetAxis"));
             harmony.Patch(AccessTools.Method(typeof(cInput), "GetAxisRaw", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetAxis"));
         }
-
         private void add_cinput_inputs() {
+            cInput.SetKey("ToggleRun", "None");
             cInput.SetKey("ToolMode", "None");
             cInput.SetKey("MouseButton0", "None");
             cInput.SetKey("MouseButton1", "None");
@@ -459,6 +463,21 @@ namespace TommoJProductions.MoControlsV2 {
             cInput.SetKey("MouseScroll+", "None");
             cInput.SetKey("MouseLookX", "None");
             cInput.SetKey("MouseLookY", "None");
+        }
+        
+        private void hook_toggle_run() {
+            m_running = m_player.GetPlayMaker("Running");
+            if (m_running != null) {
+                m_run = m_running.GetVariable<FsmBool>("Run");
+                FsmState state = m_running.GetState("No run");
+                if (state != null) {
+                    m_running.FsmInject("No run", check_no_running, true, state.Actions.Length - 1, true);
+                }
+                state = m_running.GetState("Run");
+                if (state != null) {
+                    m_running.FsmInject("Run", check_running, true, state.Actions.Length - 1, true);
+                }
+            }
         }
 
         public static void set_default_controls() {
@@ -472,7 +491,7 @@ namespace TommoJProductions.MoControlsV2 {
             set_control(PLAYER_MODE.FOOT_MODE, "PlayerVertical", XINPUT_GAMEPAD_INPUT.LS_Y);
             set_control(PLAYER_MODE.FOOT_MODE, "Jump", XINPUT_GAMEPAD_INPUT.Y);
             set_control(PLAYER_MODE.FOOT_MODE, "Crouch", XINPUT_GAMEPAD_INPUT.RS);
-            set_control(PLAYER_MODE.FOOT_MODE, "Run", XINPUT_GAMEPAD_INPUT.LS);
+            set_control(PLAYER_MODE.FOOT_MODE, "ToggleRun", XINPUT_GAMEPAD_INPUT.LS);
             set_control(PLAYER_MODE.FOOT_MODE, "Use", XINPUT_GAMEPAD_INPUT.X);
             set_control(PLAYER_MODE.FOOT_MODE, "Finger", XINPUT_GAMEPAD_INPUT.DPAD_LEFT);
             set_control(PLAYER_MODE.FOOT_MODE, "Smoking", XINPUT_GAMEPAD_INPUT.DPAD_RIGHT);
@@ -605,6 +624,19 @@ namespace TommoJProductions.MoControlsV2 {
                 }
             }
             return false;
+        }
+
+        void check_no_running() {
+            if (get_input_down("ToggleRun") || get_input("Run")) {
+                m_running.SendEvent("RUN");
+                m_run.Value = true;
+            }
+        }
+        void check_running() {
+            if (get_input_down("ToggleRun") || get_input_up("Run")) {
+                m_running.SendEvent("WALK");
+                m_run.Value = false;
+            }
         }
     }
 
