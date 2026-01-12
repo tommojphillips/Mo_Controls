@@ -1,7 +1,5 @@
 ﻿using MSCLoader;
 using System;
-using System.Collections.Generic;
-using TommoJProductions.MoControlsV2.MouseInput;
 using TommoJProductions.MoControlsV2.XInput;
 using UnityEngine;
 using UnityEngine.Events;
