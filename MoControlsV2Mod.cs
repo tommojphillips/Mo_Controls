@@ -142,20 +142,6 @@ namespace TommoJProductions.MoControlsV2 {
             SaveLoad.WriteValue(mod, key, v);
         }
         
-        private int compare_byte_array(byte[] a1, byte[] a2) {
-            if (a1.Length == a2.Length) {
-                for (int i = 0; i < a1.Length; ++i) {
-                    if (a1[i] != a2[i]) {
-                        return 1;
-                    }
-                }
-            }
-            else {
-                return 1;
-            }
-            return 0;
-        }
-
         internal static void log(string message) {
             ModConsole.Log("<b>Mo'Controls</b>: " + message);
         }
