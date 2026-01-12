@@ -401,7 +401,7 @@ namespace TommoJProductions.MoControlsV2 {
             create_slider(out sensitivity_mouse_look_y, on_sensitivity_changed_mouse_look_y, settings_tab.transform, 5, Control_Manager.camera_manager.controller_look_y.sensitivity);
             create_slider(out sensitivity_mouse_scroll, on_sensitivity_changed_mouse_scroll, settings_tab.transform, 6, Control_Manager.mouse_emulator.sensitivity_scroll);
 
-            create_button(out reset_controls, on_reset_settings, settings_tab.transform, 0, "Reset Controls");
+            create_button(out reset_controls, on_reset_controls, settings_tab.transform, 0, "Reset Controls");
             create_button(out reset_deadzones, on_reset_deadzones, settings_tab.transform, 1, "Reset Deadzones");
             create_button(out reset_sensitivity, on_reset_sensitivity, settings_tab.transform, 2, "Reset Sensitivity");
 
@@ -749,7 +749,7 @@ namespace TommoJProductions.MoControlsV2 {
             Control_Manager.mouse_emulator.sensitivity_scroll = v;
             MoControlsV2Mod.save_setting($"mouse_scroll_sensitivity", v);
         }
-        private void on_reset_settings() {
+        private void on_reset_controls() {
             for (int i = 0; i < Control_Manager.control_names.Count; i++) {
                 SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"foot_input_{Control_Manager.control_names[i]}");
                 SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"foot_modifier_{Control_Manager.control_names[i]}");
