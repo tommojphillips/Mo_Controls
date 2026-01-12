@@ -694,8 +694,10 @@ namespace TommoJProductions.MoControlsV2 {
         }
         private void on_reset_settings() {
             for (int i = 0; i < Control_Manager.control_names.Count; i++) {
-                SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"foot_{Control_Manager.control_names[i]}");
-                SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"driving_{Control_Manager.control_names[i]}");
+                SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"foot_input_{Control_Manager.control_names[i]}");
+                SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"foot_modifier_{Control_Manager.control_names[i]}");
+                SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"driving_input_{Control_Manager.control_names[i]}");
+                SaveLoad.DeleteValue(MoControlsV2Mod.mod, $"driving_modifier_{Control_Manager.control_names[i]}");
             }
 
             Control_Manager.set_default_controls();
