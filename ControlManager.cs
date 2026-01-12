@@ -63,6 +63,7 @@ namespace TommoJProductions.MoControlsV2 {
             "second", "third", "fourth", "fifth", "sixth"
         };
 
+        private static GameObject m_player;
         private static FsmBool m_player_in_menu;
         private static FsmString m_player_vehicle;
         private static PlayMakerFSM m_pick_up;
@@ -142,11 +143,54 @@ namespace TommoJProductions.MoControlsV2 {
             m_mouse_emulator = new Mouse_Emulator();
             m_camera_manager = new Camera_Manager();
             m_camera_manager.load();
+
             m_player_vehicle = PlayMakerGlobals.Instance.Variables.FindFsmString("PlayerCurrentVehicle");
-            m_pick_up = GameObject.Find("PLAYER/Pivot/AnimPivot/Camera/FPSCamera/1Hand_Assemble/Hand").gameObject.GetPlayMaker("PickUp");
+            if (m_player_vehicle == null) {
+                MoControlsV2Mod.error("PlayerCurrentVehicle not found!");
+                return;
+            }
+
+            m_player_in_menu = PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerInMenu");
+            if (m_player_in_menu == null) {
+                MoControlsV2Mod.error("PlayerInMenu not found!");
+                return;
+            }
+
+            m_player = GameObject.Find("PLAYER");
+            if (m_player == null) {
+                MoControlsV2Mod.error("PLAYER not found!");
+                return;
+            }
+
+            Transform t = m_player.transform.Find("Pivot/AnimPivot/Camera/FPSCamera/1Hand_Assemble/Hand");
+            if (t == null) {
+                MoControlsV2Mod.error("1Hand_Assemble/Hand not found!");
+                return;
+            }
+
+            m_pick_up = t.GetPlayMaker("PickUp");
+            if (m_pick_up == null) {
+                MoControlsV2Mod.error("Pickup FSM not found!");
+                return;
+            }
+
             m_hand_empty = m_pick_up.FsmVariables.FindFsmBool("HandEmpty");
-            m_select_item = GameObject.Find("PLAYER/Pivot/AnimPivot/Camera/FPSCamera/SelectItem").gameObject.GetPlayMaker("Selection");
-            m_player_in_menu = FsmVariables.GlobalVariables.GetFsmBool("PlayerInMenu");
+            if (m_hand_empty == null) {
+                MoControlsV2Mod.error("HandEmpty not found!");
+                return;
+            }
+
+            t = m_player.transform.Find("Pivot/AnimPivot/Camera/FPSCamera/SelectItem");
+            if (t == null) {
+                MoControlsV2Mod.error("SelectItem not found!");
+                return;
+            }
+
+            m_select_item = t.GetPlayMaker("Selection");
+            if (m_select_item == null) {
+                MoControlsV2Mod.error("Selection FSM not found!");
+                return;
+            }
 
             set_default_controls();
             set_default_deadzones();
@@ -222,7 +266,7 @@ namespace TommoJProductions.MoControlsV2 {
                 m_mouse_emulator.update_mouse_scroll();
             }
         }
-        public void update_tool_mode_button() {
+        private void update_tool_mode_button() {
             if (m_controller.state.is_connected) {
                 if (Control_Manager.get_input_down("ToolMode")) {
                     if (hand_mode) {
