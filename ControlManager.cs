@@ -627,13 +627,13 @@ namespace TommoJProductions.MoControlsV2 {
         }
 
         void check_no_running() {
-            if (get_input_down("ToggleRun") || get_input("Run")) {
+            if (get_input_down("ToggleRun") || cInput.GetButtonDown("Run")) {
                 m_running.SendEvent("RUN");
                 m_run.Value = true;
             }
         }
         void check_running() {
-            if (get_input_down("ToggleRun") || get_input_up("Run")) {
+            if (get_input_down("ToggleRun") || cInput.GetButtonUp("Run")) {
                 m_running.SendEvent("WALK");
                 m_run.Value = false;
             }
