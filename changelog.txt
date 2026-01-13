@@ -1,3 +1,6 @@
+Mo'Controls v2.0.1.2 - 13.01.2026
+# Fixed kbd run not working
+
 Mo'Controls v2.0.1.1 - 12.01.2026
 # Fixed reset controls button not working
 # Changed how an axis is determined as pressed/released when used as a button.
