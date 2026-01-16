@@ -210,7 +210,16 @@ namespace TommoJProductions.MoControlsV2 {
             hover = false;
         }
     }
-
+    public class Tab_Handler: MonoBehaviour {
+        public Action on_tab_enable;
+        public Action on_tab_disable;
+        public void OnEnable() {
+            on_tab_enable?.Invoke();
+        }
+        public void OnDisable() {
+            on_tab_disable?.Invoke();
+        }
+    }
     public class UI_Manager : MonoBehaviour {
 
         enum MENU_ITEMS {
@@ -256,19 +265,58 @@ namespace TommoJProductions.MoControlsV2 {
                 change_input.update();
                 context_input.update();
                 update_connection_status();
+                if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.F1)) {
+                    toggle_UI();
+                }
             }
 
             if (MoControlsV2Mod.ui_toggle_keybind.GetKeybindDown()) {
                 toggle_UI();
             }
         }
-
+        GameObject options_menu;
+        GameObject options_tab_graphics;
+        GameObject options_tab_debug;
+        GameObject options_tab_driving;
+        GameObject options_tab_vehicle;
+        GameObject options_tab_player;
         public void load() {
             change_input = new Change_Input(on_control_button_reassigned);
             context_input = new Context_Input(on_context_menu_click);
             load_asset_bundle();
             create_ui();
             set_settings();
+
+            GameObject systems = GameObject.Find("Systems");
+            if (systems != null) {
+                options_menu = systems.transform.Find("OptionsMenu")?.gameObject;
+            }
+            if (options_menu != null) {
+                Tab_Handler t = options_menu.AddComponent<Tab_Handler>();
+                t.on_tab_disable = on_tab_enabled;
+
+                options_tab_graphics = options_menu.transform.Find("Graphics")?.gameObject;
+                if (options_tab_graphics != null) {
+                    t = options_tab_graphics.AddComponent<Tab_Handler>();
+                    t.on_tab_enable = on_tab_enabled;
+                }
+                options_tab_debug = options_menu.transform.Find("DEBUG")?.gameObject;
+                options_tab_driving = options_menu.transform.Find("DrivingControls")?.gameObject;
+                if (options_tab_driving != null) {
+                    t = options_tab_driving.AddComponent<Tab_Handler>();
+                    t.on_tab_enable = on_tab_enabled;
+                }
+                options_tab_vehicle = options_menu.transform.Find("VehicleControls")?.gameObject;
+                if (options_tab_vehicle != null) {
+                    t = options_tab_vehicle.AddComponent<Tab_Handler>();
+                    t.on_tab_enable = on_tab_enabled;
+                }
+                options_tab_player = options_menu.transform.Find("PlayerControls")?.gameObject;
+                if (options_tab_player != null) {
+                    t = options_tab_player.AddComponent<Tab_Handler>();
+                    t.on_tab_enable = on_tab_enabled;
+                }
+            }
         }
         private void load_asset_bundle() {
             assets = new Mo_Controls_V2_Assets((int)XINPUT_GAMEPAD_INPUT.COUNT);
@@ -509,7 +557,15 @@ namespace TommoJProductions.MoControlsV2 {
         }
         private void toggle_UI() {
             ui_go.SetActive(!ui_go.activeInHierarchy);
-            Control_Manager.player_in_menu = ui_go.activeInHierarchy;
+            Control_Manager.player_in_menu = ui_go.activeInHierarchy || (options_menu?.activeInHierarchy ?? ui_go.activeInHierarchy);
+
+            if (ui_go.activeInHierarchy) {
+                options_tab_graphics?.SetActive(false);
+                options_tab_debug?.SetActive(false);
+                options_tab_driving?.SetActive(false);
+                options_tab_vehicle?.SetActive(false);
+                options_tab_player?.SetActive(false);
+            }
         }
         private void set_control_input(PLAYER_MODE mode, string key, XINPUT_GAMEPAD_INPUT input) {
             Control_Manager.set_control(mode, key, input, null);
@@ -773,6 +829,11 @@ namespace TommoJProductions.MoControlsV2 {
             Control_Manager.set_default_sensitivity();
             set_settings();
         }
+
+        private void on_tab_enabled() {
+            ui_go.SetActive(false);
+        }
+
 #if FFB
         private void on_ffb_changed(bool value) {
             Control_Manager.ffb = value;
