@@ -1,3 +1,8 @@
+Mo'Controls v2.0.1.3 - 16.01.2026
+# UI can now be closed with ESC or F1 key
+# Fixed UI scaling issues at higher resolutions
+# Updated mod description in MSCLoader
+
 Mo'Controls v2.0.1.2 - 13.01.2026
 # Fixed kbd run not working
 
