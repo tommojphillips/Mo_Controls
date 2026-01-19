@@ -130,6 +130,9 @@ namespace TommoJProductions.MoControlsV2 {
         public static bool ffb_opt_rpm_limiter;
         public static bool ffb_opt_shiver;
 #endif
+
+        private static HarmonyInstance harmony;
+
         private void Update() {
             m_controller.get_state();
             update_tool_mode_button();
@@ -220,16 +223,16 @@ namespace TommoJProductions.MoControlsV2 {
                 case PLAYER_MODE.FOOT_MODE:
                     has_value = foot_controls.TryGetValue(key, out v);
 
-                            if (c != null) {
+                    if (c != null) {
                         v.set_input(c.Value);
-                            }
-                            if (m != null) {
+                    }
+                    if (m != null) {
                         v.set_modifier(m.Value);
-                            }
+                    }
 
                     if (has_value) {
                         foot_controls[key] = v;
-                        }
+                    }
                     else {
                         foot_controls.Add(key, v);
                     }
@@ -237,16 +240,16 @@ namespace TommoJProductions.MoControlsV2 {
                 case PLAYER_MODE.DRIVING_MODE:
                     has_value = driving_controls.TryGetValue(key, out v);
 
-                            if (c != null) {
+                    if (c != null) {
                         v.set_input(c.Value);
-                            }
-                            if (m != null) {
+                    }
+                    if (m != null) {
                         v.set_modifier(m.Value);
-                            }
+                    }
 
                     if (has_value) {
                         driving_controls[key] = v;
-                        }
+                    }
                     else {
                         driving_controls.Add(key, v);
                     }
@@ -456,18 +459,28 @@ namespace TommoJProductions.MoControlsV2 {
                 }
             }
         }
+
         private void hook_cinput() {
-            MoControlsV2Mod.log("Patching cInput");
-            HarmonyInstance harmony = HarmonyInstance.Create("mo_controls.input");
-            harmony.Patch(AccessTools.Method(typeof(cInput), "GetKey", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetKey"));
-            harmony.Patch(AccessTools.Method(typeof(cInput), "GetKeyDown", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetKeyDown"));
-            harmony.Patch(AccessTools.Method(typeof(cInput), "GetKeyUp", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetKeyUp"));
-            harmony.Patch(AccessTools.Method(typeof(cInput), "GetButton", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetKey"));
-            harmony.Patch(AccessTools.Method(typeof(cInput), "GetButtonDown", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetKeyDown"));
-            harmony.Patch(AccessTools.Method(typeof(cInput), "GetButtonUp", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetKeyUp"));
-            harmony.Patch(AccessTools.Method(typeof(cInput), "GetAxis", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetAxis"));
-            harmony.Patch(AccessTools.Method(typeof(cInput), "GetAxisRaw", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetAxis"));
+            if (harmony == null) {
+                MoControlsV2Mod.log("Patching cInput");
+                harmony = HarmonyInstance.Create("mo_controls.input");
+                harmony.Patch(AccessTools.Method(typeof(cInput), "GetKey", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetKey"));
+                harmony.Patch(AccessTools.Method(typeof(cInput), "GetKeyDown", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetKeyDown"));
+                harmony.Patch(AccessTools.Method(typeof(cInput), "GetKeyUp", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetKeyUp"));
+                harmony.Patch(AccessTools.Method(typeof(cInput), "GetButton", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetKey"));
+                harmony.Patch(AccessTools.Method(typeof(cInput), "GetButtonDown", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetKeyDown"));
+                harmony.Patch(AccessTools.Method(typeof(cInput), "GetButtonUp", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetKeyUp"));
+                harmony.Patch(AccessTools.Method(typeof(cInput), "GetAxis", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetAxis"));
+                harmony.Patch(AccessTools.Method(typeof(cInput), "GetAxisRaw", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Control_Manager_Hooks), "cinput_GetAxis"));
+            }
         }
+        private void unpatch_cinput() {
+            if (harmony != null) {
+                MoControlsV2Mod.log("Unpatching cInput");
+                harmony.UnpatchAll();
+            }
+        }
+
         private void add_cinput_inputs() {
             cInput.SetKey("ToggleRun", "None");
             cInput.SetKey("ToolMode", "None");
@@ -573,8 +586,8 @@ namespace TommoJProductions.MoControlsV2 {
             if (description != null) {
                 if (current_controls.TryGetValue(description, out Control_Input control)) {
                     if (!is_modifier_down(control)) {
-                            return false;
-                        }
+                        return false;
+                    }
                     return m_controller.get_input_pressed(control.input);
                 }
             }
@@ -584,8 +597,8 @@ namespace TommoJProductions.MoControlsV2 {
             if (description != null) {
                 if (current_controls.TryGetValue(description, out Control_Input control)) {
                     if (!is_modifier_down(control)) {
-                            return 0;
-                        }
+                        return 0;
+                    }
                     return m_controller.get_input_axis(control.input);
                 }
             }
@@ -595,8 +608,8 @@ namespace TommoJProductions.MoControlsV2 {
             if (description != null) {
                 if (current_controls.TryGetValue(description, out Control_Input control)) {
                     if (!is_modifier_down(control)) {
-                            return false;
-                        }
+                        return false;
+                    }
                     return m_controller.get_input_down(control.input);
                 }
             }
