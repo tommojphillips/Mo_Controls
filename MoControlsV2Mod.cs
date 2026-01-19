@@ -5,11 +5,11 @@ using System;
 
 namespace TommoJProductions.MoControlsV2 {
     public struct Mo_Controls_V2_Assets {
-        public GameObject UI_prefab;
+        public GameObject ui_prefab;
         public Sprite[] sprites;
 
         public Mo_Controls_V2_Assets(int sprite_count) {
-            UI_prefab = null;
+            ui_prefab = null;
             sprites = new Sprite[sprite_count];
         }
     }
@@ -26,8 +26,6 @@ namespace TommoJProductions.MoControlsV2 {
     }
 
     public class MoControlsV2Mod : Mod {
-        // Project start, 11.03.2023; Comeback, 09.07.2025
-
         public override string ID => "Mo_Controls";
         public override string Name => "Mo'Controls";
         public override string Author => "tommojphillips";
@@ -43,13 +41,12 @@ namespace TommoJProductions.MoControlsV2 {
         public static SettingsKeybind ui_toggle_keybind;
 
         public override void ModSetup() {
-            mod = this;
             SetupFunction(Setup.OnLoad, on_load);
             SetupFunction(Setup.ModSettings, on_settings);
         }
 
         private void on_load() {
-            log("Loading");
+            mod = this;
             load_commands();
             create_manager_gameobject();
             load_control_manager();
@@ -89,13 +86,8 @@ namespace TommoJProductions.MoControlsV2 {
         }
 
         public static void load_settings() {
-            /* 
-               We save Gamepad.Input as an INT so that it is modifable in the MSCEditor. 
-               ES2 complains if we try to load a value as a different type. So we must load it back as an INT.
-            */
             string key;
             for (int i = 0; i < Control_Manager.control_names.Count; ++i) {
-
                 /* Load foot controls */
                 key = $"foot_input_{Control_Manager.control_names[i]}";
                 if (SaveLoad.ValueExists(mod, key)) {

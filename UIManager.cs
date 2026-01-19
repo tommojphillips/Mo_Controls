@@ -260,6 +260,13 @@ namespace TommoJProductions.MoControlsV2 {
         Text header_text;
         Text header_shadow;
 
+        GameObject options_menu;
+        GameObject options_tab_graphics;
+        GameObject options_tab_debug;
+        GameObject options_tab_driving;
+        GameObject options_tab_vehicle;
+        GameObject options_tab_player;
+
         public void Update() {
             if (ui_go.activeInHierarchy) {
                 change_input.update();
@@ -274,12 +281,7 @@ namespace TommoJProductions.MoControlsV2 {
                 toggle_UI();
             }
         }
-        GameObject options_menu;
-        GameObject options_tab_graphics;
-        GameObject options_tab_debug;
-        GameObject options_tab_driving;
-        GameObject options_tab_vehicle;
-        GameObject options_tab_player;
+        
         public void load() {
             change_input = new Change_Input(on_control_button_reassigned);
             context_input = new Context_Input(on_context_menu_click);
@@ -318,19 +320,19 @@ namespace TommoJProductions.MoControlsV2 {
                 }
             }
         }
+        public void unload() {
+            unload_asset_bundle();
+            DestroyImmediate(gameObject);
+        }
         private void load_asset_bundle() {
             assets = new Mo_Controls_V2_Assets((int)XINPUT_GAMEPAD_INPUT.COUNT);
-
-            MoControlsV2Mod.log($"Loading asset bundle");
             AssetBundle ab = AssetBundle.CreateFromMemoryImmediate(Properties.Resources.assetbundle);
-
-            MoControlsV2Mod.log($"Loading ui prefabs");
-            if (!assets.UI_prefab) {
-                /* load ui prefab */
-                assets.UI_prefab = ab.LoadAsset<GameObject>("Mo_Controls_UI.prefab");
-                assets.UI_prefab.SetActive(false);
+            if (ab == null) {
+                MoControlsV2Mod.log($"Failed to create asset bundle");
+                return;
             }
 
+            assets.ui_prefab = ab.LoadAsset<GameObject>("Mo_Controls_UI.prefab");
             assets.sprites[0] = create_sprite(ab, "xc_blank.png");
             assets.sprites[1] = create_sprite(ab, "xc_a.png");
             assets.sprites[2] = create_sprite(ab, "xc_b.png");
@@ -366,6 +368,20 @@ namespace TommoJProductions.MoControlsV2 {
 
             ab.Unload(false);
         }
+        private void unload_asset_bundle() {
+            if (assets.ui_prefab != null) {
+                GameObject.DestroyImmediate(assets.ui_prefab);
+                assets.ui_prefab = null;
+            }
+
+            for (int i = 0; i < (int)XINPUT_GAMEPAD_INPUT.COUNT; ++i) {
+                if (assets.sprites[i] != null) {
+                    Sprite.DestroyImmediate(assets.sprites[i]);
+                    assets.sprites[i] = null;
+                }
+            }
+        }
+
         private void create_control(string[] blacklist, Transform tab_transform, int i, ref int count) {
             for (int j = 0; j < blacklist.Length; j++) {
                 if (blacklist[j] == Control_Manager.control_names[i]) {
@@ -402,8 +418,9 @@ namespace TommoJProductions.MoControlsV2 {
             on_changed(initial_value);
             toggle.toggle.isOn = initial_value;
         }
+        
         private void create_ui() {
-            ui_go = Instantiate(assets.UI_prefab);
+            ui_go = Instantiate(assets.ui_prefab);
 
             foot_controls_tab = ui_go.transform.Find($"UI/Foot_Controls_Tab").gameObject;
             driving_controls_tab = ui_go.transform.Find($"UI/Driving_Controls_Tab").gameObject;
@@ -470,6 +487,13 @@ namespace TommoJProductions.MoControlsV2 {
 
             context_pointer_handler = context_settings.AddComponent<Pointer_Handler>();
         }
+        private void destroy_ui() {
+            if (ui_go != null) {
+                GameObject.DestroyImmediate(ui_go);
+                ui_go = null;
+            }
+        }
+
         private Sprite create_sprite(AssetBundle ab, string asset_name) {
             try {
                 return Sprite.Create(ab.LoadAsset<Texture2D>(asset_name), Rect.MinMaxRect(0, 0, 100, 100), Vector2.zero);
@@ -479,7 +503,7 @@ namespace TommoJProductions.MoControlsV2 {
                 return null;
             }
         }
-                
+
         private void update_connection_status() {
             string connection;
             if (Control_Manager.controller.state.is_connected) {
