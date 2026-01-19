@@ -13,13 +13,9 @@ namespace TommoJProductions.MoControlsV2 {
         DRIVING_MODE,
     }
     public struct Control_Input {
-        public string name;
         public XINPUT_GAMEPAD_INPUT modifier;
         public XINPUT_GAMEPAD_INPUT input;
 
-        public void set_name(string n) {
-            name = n;
-        }
         public void set_modifier(XINPUT_GAMEPAD_INPUT c) {
             modifier = c;
         }
@@ -28,9 +24,9 @@ namespace TommoJProductions.MoControlsV2 {
         }
     }
     public class Control_Manager : MonoBehaviour {        
-        public static Control_Input[] foot_controls;
-        public static Control_Input[] driving_controls;
-        public static Control_Input[] current_controls {
+        public static Dictionary<string, Control_Input> foot_controls;
+        public static Dictionary<string, Control_Input> driving_controls;
+        public static Dictionary<string, Control_Input> current_controls {
             get {
                 switch (player_mode) {
                     case PLAYER_MODE.FOOT_MODE:
@@ -60,6 +56,8 @@ namespace TommoJProductions.MoControlsV2 {
             "PlayerHorizontal", "Vertical", "Up", "Down", "Left", "Right", "Urinate", "reverse", "neutral", "first",
             "second", "third", "fourth", "fifth", "sixth"
         };
+
+        public static Dictionary<XINPUT_GAMEPAD_INPUT, bool> modifier_block_map;
 
         private static GameObject m_player;
         private static FsmBool m_player_in_menu;
@@ -137,6 +135,7 @@ namespace TommoJProductions.MoControlsV2 {
             update_tool_mode_button();
             update_player_mode();
             update_in_game();
+            update_modifier_block_map();
 #if FFB
             update_force_feedback();
 #endif
@@ -147,13 +146,9 @@ namespace TommoJProductions.MoControlsV2 {
             get_cinput_control_list();
             hook_cinput();
 
-            foot_controls = new Control_Input[m_control_names.Count];
-            driving_controls = new Control_Input[m_control_names.Count];
-
-            for (int i = 0; i < m_control_names.Count; ++i) {
-                foot_controls[i].name = m_control_names[i];
-                driving_controls[i].name = m_control_names[i];
-            }
+            modifier_block_map = new Dictionary<XINPUT_GAMEPAD_INPUT, bool>();
+            foot_controls = new Dictionary<string, Control_Input>();
+            driving_controls = new Dictionary<string, Control_Input>();
 
             m_controller = new XInput_Gamepad(XINPUT_GAMEPAD_INDEX.ONE);
             m_mouse_emulator = new Mouse_Emulator();
@@ -219,60 +214,57 @@ namespace TommoJProductions.MoControlsV2 {
         }
 
         public static void set_control(PLAYER_MODE mode, string key, XINPUT_GAMEPAD_INPUT? c = null, XINPUT_GAMEPAD_INPUT? m = null) {
+            Control_Input v;
+            bool has_value;
             switch (mode) {
                 case PLAYER_MODE.FOOT_MODE:
-                    for (int i = 0; i < foot_controls.Length; ++i) {
-                        if (foot_controls[i].name == key) {
+                    has_value = foot_controls.TryGetValue(key, out v);
+
                             if (c != null) {
-                                foot_controls[i].set_input(c.Value);
+                        v.set_input(c.Value);
                             }
                             if (m != null) {
-                                foot_controls[i].set_modifier(m.Value);
+                        v.set_modifier(m.Value);
                             }
-                            return;
-                        }
-                    }
 
-                    MoControlsV2Mod.error($"Error could not find control: {key}");
+                    if (has_value) {
+                        foot_controls[key] = v;
+                        }
+                    else {
+                        foot_controls.Add(key, v);
+                    }
                     break;
                 case PLAYER_MODE.DRIVING_MODE:
-                    for (int i = 0; i < driving_controls.Length; ++i) {
-                        if (driving_controls[i].name == key) {
+                    has_value = driving_controls.TryGetValue(key, out v);
+
                             if (c != null) {
-                                driving_controls[i].set_input(c.Value);
+                        v.set_input(c.Value);
                             }
                             if (m != null) {
-                                driving_controls[i].set_modifier(m.Value);
+                        v.set_modifier(m.Value);
                             }
-                            return;
-                        }
-                    }
 
-                    MoControlsV2Mod.error($"Error could not find control: {key}");
+                    if (has_value) {
+                        driving_controls[key] = v;
+                        }
+                    else {
+                        driving_controls.Add(key, v);
+                    }
                     break;
             }
         }
         public static void get_control(PLAYER_MODE mode, string key, out Control_Input c) {
             switch (mode) {
                 case PLAYER_MODE.FOOT_MODE:
-                    for (int i = 0; i < foot_controls.Length; ++i) {
-                        if (foot_controls[i].name == key) {
-                            c = foot_controls[i];
-                            return;
-                        }
-                    }
-                    c = default;
+                    foot_controls.TryGetValue(key, out c);
                     break;
                 case PLAYER_MODE.DRIVING_MODE:
-                    for (int i = 0; i < driving_controls.Length; ++i) {
-                        if (driving_controls[i].name == key) {
-                            c = driving_controls[i];
-                            return;
-                        }
-                    }
+                    driving_controls.TryGetValue(key, out c);
+                    break;
+                default:
+                    c = default;
                     break;
             }
-            c = default;
         }
 
         private void update_player_mode() {
@@ -295,6 +287,28 @@ namespace TommoJProductions.MoControlsV2 {
                     }
                     else {
                         m_select_item.SendEvent("ITEM1");
+                    }
+                }
+            }
+        }
+        private void update_modifier_block_map() {
+            modifier_block_map.Clear();
+            foreach (KeyValuePair<string, Control_Input> kv in current_controls) {
+                Control_Input c = kv.Value;
+
+                if (c.modifier == XINPUT_GAMEPAD_INPUT.NONE) {
+                    continue;
+                }
+
+                if (!m_controller.get_input_pressed(c.modifier)) {
+                    continue;
+                }
+
+                modifier_block_map[c.input] = true;
+
+                if (context_dic.TryGetValue(c.input, out XINPUT_GAMEPAD_INPUT[] related)) {
+                    for (int i = 0; i < related.Length; i++) {
+                        modifier_block_map[related[i]] = true;
                     }
                 }
             }
@@ -481,10 +495,7 @@ namespace TommoJProductions.MoControlsV2 {
         }
 
         public static void set_default_controls() {
-            for (int i = 0; i < foot_controls.Length; ++i) {
-                foot_controls[i].input = XINPUT_GAMEPAD_INPUT.NONE;
-                foot_controls[i].modifier = XINPUT_GAMEPAD_INPUT.NONE;
-            }
+            foot_controls.Clear();
             set_control(PLAYER_MODE.FOOT_MODE, "DrivingMode", XINPUT_GAMEPAD_INPUT.BACK);
             set_control(PLAYER_MODE.FOOT_MODE, "ToolMode", XINPUT_GAMEPAD_INPUT.START);
             set_control(PLAYER_MODE.FOOT_MODE, "PlayerHorizontal", XINPUT_GAMEPAD_INPUT.LS_X);
@@ -509,10 +520,7 @@ namespace TommoJProductions.MoControlsV2 {
             set_control(PLAYER_MODE.FOOT_MODE, "MouseScroll-", XINPUT_GAMEPAD_INPUT.LT);
             set_control(PLAYER_MODE.FOOT_MODE, "MouseScroll+", XINPUT_GAMEPAD_INPUT.RT);
 
-            for (int i = 0; i < driving_controls.Length; ++i) {
-                driving_controls[i].input = XINPUT_GAMEPAD_INPUT.NONE;
-                driving_controls[i].modifier = XINPUT_GAMEPAD_INPUT.NONE;
-            }
+            driving_controls.Clear();
             set_control(PLAYER_MODE.DRIVING_MODE, "DrivingMode", XINPUT_GAMEPAD_INPUT.BACK);
             set_control(PLAYER_MODE.DRIVING_MODE, "ToolMode", XINPUT_GAMEPAD_INPUT.START);
             set_control(PLAYER_MODE.DRIVING_MODE, "Throttle", XINPUT_GAMEPAD_INPUT.RT);
@@ -558,69 +566,46 @@ namespace TommoJProductions.MoControlsV2 {
             }
             else {
                 /* Control has no modifier */
-                for (int i = 0; i < current_controls.Length; ++i) {
-                    /* Check all other controls with the same input for a modifier */
-                    if (current_controls[i].input == v.input && m_controller.get_input_pressed(current_controls[i].modifier)) {
-                        return false;
-                    }
-                    else {
-                        if (context_dic.TryGetValue(v.input, out XINPUT_GAMEPAD_INPUT[] related_inputs)) {
-                            for (int j = 0; j < related_inputs.Length; ++j) {
-                                if (current_controls[i].input == related_inputs[j] && m_controller.get_input_pressed(current_controls[i].modifier)) {
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-                }
-                return true;
+                return !modifier_block_map.ContainsKey(v.input);
             }
         }
         public static bool get_input(string description) {
             if (description != null) {
-                for (int i = 0; i < current_controls.Length; ++i) {
-                    if (current_controls[i].name == description) {
-                        if (!is_modifier_down(current_controls[i])) {
+                if (current_controls.TryGetValue(description, out Control_Input control)) {
+                    if (!is_modifier_down(control)) {
                             return false;
                         }
-                        return m_controller.get_input_pressed(current_controls[i].input);
-                    }
+                    return m_controller.get_input_pressed(control.input);
                 }
             }
             return false;
         }
         public static float get_axis(string description) {
             if (description != null) {
-                for (int i = 0; i < current_controls.Length; ++i) {
-                    if (current_controls[i].name == description) {
-                        if (!is_modifier_down(current_controls[i])) {
+                if (current_controls.TryGetValue(description, out Control_Input control)) {
+                    if (!is_modifier_down(control)) {
                             return 0;
                         }
-                        return m_controller.get_input_axis(current_controls[i].input);
-                    }
+                    return m_controller.get_input_axis(control.input);
                 }
             }
             return 0;
         }
         public static bool get_input_down(string description) {
             if (description != null) {
-                for (int i = 0; i < current_controls.Length; ++i) {
-                    if (current_controls[i].name == description) {
-                        if (!is_modifier_down(current_controls[i])) {
+                if (current_controls.TryGetValue(description, out Control_Input control)) {
+                    if (!is_modifier_down(control)) {
                             return false;
                         }
-                        return m_controller.get_input_down(current_controls[i].input);
-                    }
+                    return m_controller.get_input_down(control.input);
                 }
             }
             return false;
         }
         public static bool get_input_up(string description) {
             if (description != null) {
-                for (int i = 0; i < current_controls.Length; ++i) {
-                    if (current_controls[i].name == description) {
-                        return m_controller.get_input_up(current_controls[i].input);
-                    }
+                if (current_controls.TryGetValue(description, out Control_Input control)) {
+                    return m_controller.get_input_up(control.input);
                 }
             }
             return false;
