@@ -421,6 +421,7 @@ namespace TommoJProductions.MoControlsV2 {
         
         private void create_ui() {
             ui_go = Instantiate(assets.ui_prefab);
+            ui_go.SetActive(false);
 
             foot_controls_tab = ui_go.transform.Find($"UI/Foot_Controls_Tab").gameObject;
             driving_controls_tab = ui_go.transform.Find($"UI/Driving_Controls_Tab").gameObject;
