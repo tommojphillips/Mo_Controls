@@ -168,77 +168,80 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>REM define msc mods dir if not defined in environment.
-IF "%25MSC_DIR%25" == "" (
-  SET "MSC_DIR=F:\SteamLibrary\steamapps\common\My Summer Car\Mods"
+    <MSC_DIR>F:\SteamLibrary\steamapps\common\My Summer Car\Mods</MSC_DIR>
+    <MWC_DIR>F:\SteamLibrary\steamapps\common\My Winter Car\Mods</MWC_DIR>
+    <UNITY3D_LOC>Q:\Unity\msc bundles\AssetBundles\mo_controls_v2.unity3d</UNITY3D_LOC>
+    <PostBuildEvent>
+IF "$(MSC_DIR)" == "" (
+  GOTO mwc
 )
-IF NOT EXIST "%25MSC_DIR%25" (
-  ECHO Error. mods dir not found. update MSC_DIR env var.
-  ECHO dir. %25MSC_DIR%25
+IF "$(MSC_DIR)" == "NONE" (
+  GOTO mwc
 )
-
-IF "%25MWC_DIR%25" == "" (
-  SET "MWC_DIR=F:\SteamLibrary\steamapps\common\My Winter Car\Mods"
-)
-IF NOT EXIST "%25MWC_DIR%25" (
-  ECHO Error. mods dir not found. update MWC_DIR env var.
-  ECHO dir. %25MWC_DIR%25
+IF NOT EXIST "$(MSC_DIR)" (
+  ECHO Error. mods dir not found. update MSC_DIR Property in .cspro.
+  GOTO mwc
 )
 
-ECHO Config $(ConfigurationName)
+ECHO $(ProjectName) -^&gt; $(MSC_DIR)\$(TargetName).dll
+COPY "$(TargetPath)" "$(MSC_DIR)" /y &gt;nul
 
-IF EXIST "%25MSC_DIR%25" (
- ECHO MSC Mods directory: %25MSC_DIR%25
- ECHO Copying $(TargetPath) -^&gt; %25MSC_DIR%25\$(TargetName).dll
- COPY "$(TargetPath)" "%25MSC_DIR%25" /y &gt;nul
-
-  IF /i "$(ConfigurationName)" == "debug" (
-      GOTO msc_dbg
-  )
-  IF /i "$(ConfigurationName)" == "upd_ver_debug" (
-      GOTO msc_dbg
-  )
+IF /i "$(ConfigurationName)" == "debug" (
+  GOTO msc_dbg
+)
+IF /i "$(ConfigurationName)" == "upd_ver_debug" (
+  GOTO msc_dbg
 )
 
 GOTO mwc
 
 :msc_dbg
-IF EXIST "%25MSC_DIR%25\debug.bat" (
-  ECHO Copying $(TargetDir)$(TargetName).pdb -^&gt; %25MSC_DIR%25\$(TargetName).pdb
-  COPY "$(TargetDir)$(TargetName).pdb" "%25MSC_DIR%25" &gt;nul
-  CD "%25MSC_DIR%25"
-  CALL "%25MSC_DIR%25\debug.bat"
-  DEL "%25MSC_DIR%25\$(TargetName).pdb" /q &gt;nul
+IF EXIST "$(MSC_DIR)\debug.bat" (
+  ECHO $(ProjectName) -^&gt; $(MSC_DIR)\$(TargetName).pdb
+  COPY "$(TargetDir)$(TargetName).pdb" "$(MSC_DIR)" &gt;nul
+  CD "$(MSC_DIR)"
+  CALL "$(MSC_DIR)\debug.bat"
+  DEL "$(MSC_DIR)\$(TargetName).pdb" /q &gt;nul
 ) ELSE (
-   ECHO Error. %25MSC_DIR%25\debug.bat not found. Are you in Debug mode?
+  ECHO Error. $(MSC_DIR)\debug.bat not found. Are you in Debug mode?
 )
 
 :mwc
-IF EXIST "%25MWC_DIR%25" (
- ECHO MWC Mods directory: %25MWC_DIR%25
- ECHO Copying $(TargetPath) -^&gt; %25MWC_DIR%25\$(TargetName).dll
- COPY "$(TargetPath)" "%25MWC_DIR%25" /y &gt;nul
-
-  IF /i "$(ConfigurationName)" == "debug" (
-      GOTO mwc_dbg
-  )
-  IF /i "$(ConfigurationName)" == "upd_ver_debug" (
-      GOTO mwc_dbg
-  )
+IF "$(MWC_DIR)" == "" (
+  GOTO done
+)
+IF "$(MWC_DIR)" == "NONE" (
+  GOTO done
+)
+IF NOT EXIST "$(MWC_DIR)" (
+  ECHO Error. mwc mods dir not found. update MWC_DIR Property in .cspro.
+  GOTO done
 )
 
-EXIT /b 0
+ECHO $(ProjectName) -^&gt; $(MWC_DIR)\$(TargetName).dll
+COPY "$(TargetPath)" "$(MWC_DIR)" /y &gt;nul
+
+IF /i "$(ConfigurationName)" == "debug" (
+  GOTO mwc_dbg
+)
+IF /i "$(ConfigurationName)" == "upd_ver_debug" (
+  GOTO mwc_dbg
+)
+
+GOTO done
 
 :mwc_dbg
-IF EXIST "%25MWC_DIR%25\debug.bat" (
-  ECHO Copying $(TargetDir)$(TargetName).pdb -^&gt; %25MWC_DIR%25\$(TargetName).pdb
-  COPY "$(TargetDir)$(TargetName).pdb" "%25MWC_DIR%25" &gt;nul
-  CD "%25MWC_DIR%25"
-  CALL "%25MWC_DIR%25\debug.bat"
-  DEL "%25MWC_DIR%25\$(TargetName).pdb" /q &gt;nul
+IF EXIST "$(MWC_DIR)\debug.bat" (
+  ECHO $(ProjectName) -^&gt; $(MWC_DIR)\$(TargetName).pdb
+  COPY "$(TargetName).pdb" "$(MWC_DIR)" &gt;nul
+  CD "$(MWC_DIR)"
+  CALL "$(MWC_DIR)\debug.bat"
+  DEL "$(MWC_DIR)\$(TargetName).pdb" /q &gt;nul
 ) ELSE (
-   ECHO Error. %25MWC_DIR%25\debug.bat not found. Are you in Debug mode?
+  ECHO Error. $(MWC_DIR)\debug.bat not found. Are you in Debug mode?
 )
+
+:done
 EXIT /b 0</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
@@ -257,18 +260,14 @@ REM update version
 : copy_asset_bundle
 
 REM define mo_controls_v2.unity3d file if not defined in environment.
-IF "%25MO_CONTROLS_V2_UNITY3D%25" == "" (
-  SET "MO_CONTROLS_V2_UNITY3D=Q:\Unity\msc bundles\AssetBundles\mo_controls_v2.unity3d"
-)
-
-SET "MO_CONTROLS_V2_UNITY3D_LOC=$(ProjectDir)Resources\mo_controls_v2.unity3d"
-
-REM copy mo_controls_v2.unity3d into Resouces folder
-IF EXIST "%25MO_CONTROLS_V2_UNITY3D%25" (
-    ECHO Copying %25MO_CONTROLS_V2_UNITY3D%25 -^&gt; %25MO_CONTROLS_V2_UNITY3D_LOC%25
-    COPY "%25MO_CONTROLS_V2_UNITY3D%25" "%25MO_CONTROLS_V2_UNITY3D_LOC%25" /y &gt;nul
-) else (
-    ECHO ERR: %25MO_CONTROLS_V2_UNITY3D%25 not found. Update MO_CONTROLS_V2_UNITY3D env var.
+IF NOT "$(UNITY3D_LOC)" == "" (
+  REM copy mo_controls_v2.unity3d into Resouces folder
+  IF EXIST "$(UNITY3D_LOC)" (
+    ECHO $(ProjectName) -^&gt; $(ProjectDir)Resources\mo_controls_v2.unity3d
+    COPY "$(UNITY3D_LOC)" "$(ProjectDir)Resources\mo_controls_v2.unity3d" /y &gt;nul
+  ) else (
+    ECHO ERR: $(UNITY3D_LOC) not found. Update UNITY3D_LOC Property in .cspro.
+  )
 )</PreBuildEvent>
   </PropertyGroup>
 </Project>
