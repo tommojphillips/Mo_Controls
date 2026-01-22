@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TommoJProductions.MoControlsV2.Properties {
+namespace TommoJProductions.MoControlsV2.Mo_Controls.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace TommoJProductions.MoControlsV2.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TommoJProductions.MoControlsV2.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TommoJProductions.MoControlsV2.Mo_Controls.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

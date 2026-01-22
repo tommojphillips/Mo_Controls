@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.1.11312.151 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mo_Controls_V2", "Mo_Controls_V2.csproj", "{E5E06FF9-9241-4CDC-83B5-CB1A2E346E5F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mo_Controls", "Mo_Controls_V2.csproj", "{E5E06FF9-9241-4CDC-83B5-CB1A2E346E5F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

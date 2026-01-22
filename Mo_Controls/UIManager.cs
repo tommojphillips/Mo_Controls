@@ -326,7 +326,7 @@ namespace TommoJProductions.MoControlsV2 {
         }
         private void load_asset_bundle() {
             assets = new Mo_Controls_V2_Assets((int)XINPUT_GAMEPAD_INPUT.COUNT);
-            AssetBundle ab = AssetBundle.CreateFromMemoryImmediate(Properties.Resources.assetbundle);
+            AssetBundle ab = AssetBundle.CreateFromMemoryImmediate(Mo_Controls.Properties.Resources.assetbundle);
             if (ab == null) {
                 MoControlsV2Mod.log($"Failed to create asset bundle");
                 return;

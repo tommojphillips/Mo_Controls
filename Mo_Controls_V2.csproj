@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{E5E06FF9-9241-4CDC-83B5-CB1A2E346E5F}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <AppDesignerFolder>Mo_Controls\Properties</AppDesignerFolder>
     <RootNamespace>TommoJProductions.MoControlsV2</RootNamespace>
     <AssemblyName>Mo_Controls</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
@@ -86,32 +86,32 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="UIManager.cs" />
-    <Compile Include="CameraManager.cs" />
-    <Compile Include="ChangeInput.cs" />
-    <Compile Include="Commands.cs" />
-    <Compile Include="ControllerLook.cs" />
-    <Compile Include="ControlManager.cs" />
-    <Compile Include="FPSLook.cs" />
-    <Compile Include="MouseInput\MouseEmulator.cs" />
-    <Compile Include="MouseInput\User32Structs.cs" />
-    <Compile Include="MouseInput\User32Imports.cs" />
-    <Compile Include="MoControlsV2Mod.cs" />
-    <Compile Include="MoMouseLook.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs">
+    <Compile Include="Mo_Controls\UIManager.cs" />
+    <Compile Include="Mo_Controls\CameraManager.cs" />
+    <Compile Include="Mo_Controls\ChangeInput.cs" />
+    <Compile Include="Mo_Controls\Commands.cs" />
+    <Compile Include="Mo_Controls\ControllerLook.cs" />
+    <Compile Include="Mo_Controls\ControlManager.cs" />
+    <Compile Include="Mo_Controls\FPSLook.cs" />
+    <Compile Include="Mo_Controls\MouseInput\MouseEmulator.cs" />
+    <Compile Include="Mo_Controls\MouseInput\User32Structs.cs" />
+    <Compile Include="Mo_Controls\MouseInput\User32Imports.cs" />
+    <Compile Include="Mo_Controls\MoControlsV2Mod.cs" />
+    <Compile Include="Mo_Controls\MoMouseLook.cs" />
+    <Compile Include="Mo_Controls\Properties\AssemblyInfo.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyInfo.tt</DependentUpon>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
+    <Compile Include="Mo_Controls\Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="XInput\XInputStructs.cs" />
-    <Compile Include="XInput\XInputGamepad.cs" />
-    <Compile Include="XInput\XInputImports.cs" />
-    <Compile Include="XInput\DeadzoneUtils.cs" />
+    <Compile Include="Mo_Controls\XInput\XInputStructs.cs" />
+    <Compile Include="Mo_Controls\XInput\XInputGamepad.cs" />
+    <Compile Include="Mo_Controls\XInput\XInputImports.cs" />
+    <Compile Include="Mo_Controls\XInput\DeadzoneUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
@@ -152,7 +152,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Properties\AssemblyInfo.tt">
+    <Content Include="Mo_Controls\Properties\AssemblyInfo.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
     </Content>
@@ -161,9 +161,10 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
+    <EmbeddedResource Include="Mo_Controls\Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
