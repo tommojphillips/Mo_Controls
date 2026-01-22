@@ -30,7 +30,7 @@ namespace TommoJProductions.MoControlsV2 {
         public override string Name => "Mo'Controls";
         public override string Author => "tommojphillips";
         public override string Version => VersionInfo.full_version;
-        public override string Description => "Adds full controller support for XInput compatible devices";
+        public override string Description => "XInput controller support";
         public override Game SupportedGames => Game.MySummerCar_And_MyWinterCar;
 
         private GameObject manager_go;
