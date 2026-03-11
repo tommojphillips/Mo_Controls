@@ -3,7 +3,13 @@ using System.Runtime.InteropServices;
 
 namespace TommoJProductions.MoControlsV2.MouseInput {
 
-    public enum MOUSE_EVENT : uint {
+    public enum INPUTTYPE : uint {
+        MOUSE    = 0,
+        KEYBOARD = 1,
+        HARDWARE = 2,
+    }
+
+    public enum MOUSEEVENTF : uint {
         MOVE       = 0x00000001,
         LEFTDOWN   = 0x00000002,
         LEFTUP     = 0x00000004,
@@ -18,36 +24,62 @@ namespace TommoJProductions.MoControlsV2.MouseInput {
         ABSOLUTE   = 0x00008000,
     }
 
-    public enum MOUSE_EVENT_BUTTON : uint {
-        NULL     = 0x00000000,
-        XBUTTON1 = 0x00000001,
-        XBUTTON2 = 0x00000002
+    public enum KEYEVENTF : uint {
+        KEYEVENTF_EXTENDEDKEY = 0x00000001,
+        KEYEVENTF_KEYUP       = 0x00000002,
+        KEYEVENTF_SCANCODE    = 0x00000004,
+        KEYEVENTF_UNICODE     = 0x00000008,
     }
 
+    [StructLayout(LayoutKind.Sequential)]
     public struct Point {
         public int x;
         public int y;
     }
 
-    public struct PointF {
-        public float x;
-        public float y;
-        public float sqr_mag => x * x + y * y;
-    }
-
-    public struct Mouse_Input {
-        public int x;
-        public int y;
-        public uint data;
-        public uint flags;
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MOUSEINPUT {
+        public int dx;
+        public int dy;
+        public uint mouseData;
+        public MOUSEEVENTF dwFlags;
         public uint time;
-        public IntPtr extra_info;
+        public IntPtr dwExtraInfo;
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct Input {
-        public uint type;
-        public Mouse_Input mi;
-        public static int size => Marshal.SizeOf(typeof(Input));
+    public struct KEYBDINPUT {
+        public ushort wVk;
+        public ushort wScan;
+        public KEYEVENTF dwFlags;
+        public uint time;
+        public IntPtr dwExtraInfo;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct HARDWAREINPUT {
+        public uint uMsg;
+        public ushort wParamL;
+        public ushort wParamH;
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    public struct InputUnion {
+        [FieldOffset(0)]
+        public MOUSEINPUT mi;
+
+        [FieldOffset(0)]
+        public KEYBDINPUT ki;
+
+        [FieldOffset(0)]
+        public HARDWAREINPUT hi;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct INPUT {
+        public INPUTTYPE type;
+        public InputUnion u;
+
+        public static readonly int Size = Marshal.SizeOf(typeof(INPUT));
     }
 }
