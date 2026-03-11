@@ -28,6 +28,13 @@ namespace TommoJProductions.MoControlsV2 {
                 deltaY *= Time.deltaTime;
             }
 
+            if (float.IsNaN(deltaX)) {
+                deltaX = 0;
+            }
+            if (float.IsNaN(deltaY)) {
+                deltaY = 0;
+            }
+
             if (mouse_look.axes == MouseLook.RotationAxes.MouseX) {
                 mouse_look.transform.Rotate(0f, deltaX, 0f);
             }
