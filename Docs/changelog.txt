@@ -1,3 +1,7 @@
+Mo'Controls v2.0.1.5 - 11.03.2026
+# Fixed grey screen issue
+# Potential linux proton mouse fix
+
 Mo'Controls v2.0.1.4 - 25.01.2026
 # Added lookup table for blocked modifier keys. Should improve performance of the mod.
 

@@ -1,6 +1,6 @@
-25.01.2026 [DD.MM.YYYY]
+11.03.2026 [DD.MM.YYYY]
 Mod: Mo'Controls
-Version: 2.0.1.4
+Version: 2.0.1.5
 Arthur: tommojphillips
 
 About:
@@ -16,14 +16,6 @@ Installation:
 
 1.) Copy "Mo_Controls.dll" into your mods folder
 
-If you like the mod give it a rating on:
-nexusmods: https://www.nexusmods.com/mysummercar/mods/14
-racedepartment: https://www.racedepartment.com/downloads/mocontrols.22028/
-
-Thanks to all the people who support and appreciate the project.
-
-Cheers -Tom J. Armytage. (tommojphillips)
-
-# Please let me know if you are having issues or you have found a potential bug! Thanks.
-# If you like my mod, please review it!
-# If you have any suggestions for this mod, or have a mod request please comment/message me!
+If you like the mod give it an endorsement on my nexusmods page:
+MSC: https://www.nexusmods.com/mysummercar/mods/14
+MWC: https://www.nexusmods.com/mywintercar/mods/992
