@@ -256,7 +256,7 @@ GOTO copy_asset_bundle
 
 :upd_ver
 REM update version
-"$(DevEnvDir)TextTransform.exe" -a !!BuildConfiguration!$(Configuration) "$(ProjectDir)Properties\AssemblyInfo.tt"
+"$(DevEnvDir)TextTransform.exe" -a !!BuildConfiguration!$(Configuration) "$(ProjectDir)Mo_Controls\Properties\AssemblyInfo.tt"
 
 : copy_asset_bundle
 
